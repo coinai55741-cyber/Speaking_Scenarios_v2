@@ -78,7 +78,7 @@ body {
 .brand {
   display: inline-flex;
   align-items: center;
-  gap: 10px;
+  gap: 20px;
   color: var(--ink);
   text-decoration: none;
   font-size: 20px;
@@ -88,13 +88,13 @@ body {
 .brand-mark {
   display: grid;
   place-items: center;
-  width: 42px;
-  height: 42px;
+  width: 50px;
+  height: 50px;
   border: 3px solid #1e315b;
   border-radius: 14px;
   color: #fff;
   background: #f36d56;
-  box-shadow: 0 5px 0 #1e315b;
+  /*box-shadow: 0 5px 0 #1e315b;*/
   font-size: 15px;
 }
 
