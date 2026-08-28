@@ -3,7 +3,7 @@ const scenarios = [
     id: "holiday",
     title: "休假日",
     artClass: "art-holiday",
-    image: "./assets/scenario-holiday-park.png",
+    image: "./assets/holiday-task-1-invite.png",
     description: "到公園走走，和朋友一起活動，練習用客語說出休假日看到的事情。",
     flow: [
       "先說：下午要不要一起去打籃球？",
@@ -46,7 +46,7 @@ function createScenarioCard(scenario) {
   const card = document.createElement("article");
   card.className = "scenario-card";
 
-  const demoUrl = `../demo_v1/?step=${scenario.demoStep}`;
+  const demoUrl = scenario.id === "holiday" ? "./holiday.html" : `../demo_v1/?step=${scenario.demoStep}`;
 
   card.innerHTML = `
     <img class="scenario-art ${scenario.artClass}" src="${scenario.image}" alt="" aria-hidden="true">
