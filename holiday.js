@@ -239,17 +239,22 @@ function updateHitStatus(transcript) {
   const cleanTranscript = (transcript || "").replace(/[。，！？、？\s]/g, "");
   
   if (currentStep === 0) {
-    const hakkaTarget = (dialectSentences[currentDialect][0] || "").replace(/[。，！？、？\s]/g, "");
-    const mandarinTarget = (tasks[0].mandarin || "").replace(/[。，！？、？\s]/g, "");
+    const hakkaWords = ["下晝", "愛", "共下去", "打", "籃球", "無"];
+    const mandarinWords = ["下午", "要不要", "一起", "去", "打", "籃球"];
     
-    // Check if transcript contains the target or target contains transcript (if long enough), or key phrases
-    const isHakkaHit = cleanTranscript && (cleanTranscript.includes("下晝") || cleanTranscript.includes("共下") || (hakkaTarget && cleanTranscript.includes(hakkaTarget)));
-    const isMandarinHit = cleanTranscript && (cleanTranscript.includes("下午") || cleanTranscript.includes("一起") || (mandarinTarget && cleanTranscript.includes(mandarinTarget)));
+    let html = '<div style="width: 100%; font-size: 12px; color: #666; margin-bottom: 2px;">客語：</div>';
+    hakkaWords.forEach(word => {
+      const isHit = cleanTranscript.includes(word);
+      html += `<span class="${isHit ? 'is-hit' : ''}">${word}</span>`;
+    });
     
-    els.hitTags.innerHTML = `
-      <span class="${isHakkaHit ? 'is-hit' : ''}">客語: ${isHakkaHit ? '命中' : '未命中'}</span>
-      <span class="${isMandarinHit ? 'is-hit' : ''}">華語: ${isMandarinHit ? '命中' : '未命中'}</span>
-    `;
+    html += '<div style="width: 100%; font-size: 12px; color: #666; margin-top: 6px; margin-bottom: 2px;">華語：</div>';
+    mandarinWords.forEach(word => {
+      const isHit = cleanTranscript.includes(word);
+      html += `<span class="${isHit ? 'is-hit' : ''}">${word}</span>`;
+    });
+    
+    els.hitTags.innerHTML = html;
   } else {
     els.hitTags.innerHTML = `
       <span>地點: 未命中</span>
