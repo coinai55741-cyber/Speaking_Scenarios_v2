@@ -182,7 +182,8 @@ const els = {
   audioPreview: document.querySelector("#audioPreview"),
   asrProviderSelect: document.querySelector("#asrProviderSelect"),
   asrProviderNote: document.querySelector("#asrProviderNote"),
-  debugProvider: document.querySelector("#debugProvider")
+  debugProvider: document.querySelector("#debugProvider"),
+  hitTags: document.querySelector("#hitTags")
 };
 
 function renderTask() {
@@ -222,6 +223,31 @@ function renderTask() {
   updateDeveloperMode();
   updateFinishPanel();
   updateProviderUi();
+  updateHitStatus(saved.transcript);
+}
+
+function updateHitStatus(transcript) {
+  if (!els.hitTags) return;
+  const cleanTranscript = (transcript || "").replace(/[。，！？、？\s]/g, "");
+  
+  if (currentStep === 0) {
+    const hakkaTarget = (dialectSentences[currentDialect][0] || "").replace(/[。，！？、？\s]/g, "");
+    const mandarinTarget = (tasks[0].mandarin || "").replace(/[。，！？、？\s]/g, "");
+    
+    // Check if transcript contains the target or target contains transcript (if long enough), or key phrases
+    const isHakkaHit = cleanTranscript && (cleanTranscript.includes("下晝") || cleanTranscript.includes("共下") || (hakkaTarget && cleanTranscript.includes(hakkaTarget)));
+    const isMandarinHit = cleanTranscript && (cleanTranscript.includes("下午") || cleanTranscript.includes("一起") || (mandarinTarget && cleanTranscript.includes(mandarinTarget)));
+    
+    els.hitTags.innerHTML = `
+      <span class="${isHakkaHit ? 'is-hit' : ''}">客語: ${isHakkaHit ? '命中' : '未命中'}</span>
+      <span class="${isMandarinHit ? 'is-hit' : ''}">華語: ${isMandarinHit ? '命中' : '未命中'}</span>
+    `;
+  } else {
+    els.hitTags.innerHTML = `
+      <span>地點: 未命中</span>
+      <span>活動: 未命中</span>
+    `;
+  }
 }
 
 function updateDeveloperMode() {
@@ -463,6 +489,7 @@ async function transcribeAudioBlob(blob) {
     isTranscribing = false;
     setCheckEnabled(Boolean(els.answerInput.value.trim()), "等待辨識");
     saveCurrentAnswer();
+    updateHitStatus(els.answerInput.value.trim());
   }
 }
 
@@ -498,6 +525,7 @@ if (els.answerInput) {
     els.asrStatus.textContent = text || "手動編輯中";
     setCheckEnabled(Boolean(text), "等待辨識");
     saveCurrentAnswer();
+    updateHitStatus(text);
   });
 }
 

@@ -534,6 +534,12 @@ textarea {
   font-weight: 700;
 }
 
+.hit-tags span.is-hit {
+  background: #ecfdf5;
+  border-color: #10b981;
+  color: #059669;
+}
+
 .developer-select {
   width: 100%;
   margin-top: 4px;
