@@ -189,6 +189,7 @@ const els = {
   finishPanel: document.querySelector("#finishPanel"),
   finishBtn: document.querySelector("#finishBtn"),
   reviewResult: document.querySelector("#reviewResult"),
+  missionLayout: document.querySelector(".mission-layout"),
   recordingPanel: document.querySelector("#recordingPanel"),
   recordingStatus: document.querySelector("#recordingStatus"),
   audioPreview: document.querySelector("#audioPreview"),
@@ -356,13 +357,19 @@ function updateFinishPanel() {
 }
 
 function showReview() {
-  const practiceItems = answers
-    .map((answer, index) => answer.needsPractice ? `第 ${index + 1} 題可以再多練習喔！` : "")
-    .filter(Boolean);
-  els.reviewResult.innerHTML = practiceItems.length
-    ? practiceItems.map(text => `<p>${text}</p>`).join("")
-    : "<p>三題都完成了，表現很穩喔！</p>";
-  els.reviewResult.hidden = false;
+  els.missionLayout.classList.add("is-complete");
+  els.missionLayout.innerHTML = `
+    <section class="completion-card" aria-labelledby="completionTitle">
+      <img class="completion-medal" src="./assets/holiday-medal.svg" alt="休假日任務完成獎牌">
+      <p class="completion-kicker">休假日任務完成</p>
+      <h2 id="completionTitle">通過測驗～</h2>
+      <p class="completion-copy">恭喜你完成「休假日」任務！</p>
+      <button id="playAgainBtn" class="completion-button" type="button">再玩一次</button>
+    </section>
+  `;
+  document.querySelector("#playAgainBtn")?.addEventListener("click", () => {
+    window.location.reload();
+  });
 }
 
 function isAnswerReady(answer) {
@@ -623,3 +630,5 @@ els.checkBtn.addEventListener("click", () => {
 });
 
 renderTask();
+
+

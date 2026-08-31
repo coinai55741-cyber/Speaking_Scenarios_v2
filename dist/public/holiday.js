@@ -1,4 +1,4 @@
-const DEFAULT_ASR_ENDPOINT = "http://127.0.0.1:8000/transcribe";
+const DEFAULT_ASR_ENDPOINT = "https://reversal-batboy-bust.ngrok-free.dev/transcribe";
 const ASR_ENDPOINT = getAsrEndpoint();
 const ASR_PROVIDERS = {
   taiwan_tongues_zh: {
@@ -32,23 +32,34 @@ function updateProviderUi() {
   if (els.debugProvider) {
     els.debugProvider.textContent = `${config.label} / ${config.enabled ? "可用" : "預留"}`;
   }
+  
+  if (typeof updateHitStatus === 'function' && els.answerInput) {
+    updateHitStatus(els.answerInput.value.trim());
+  }
 }
 
 function getAsrEndpoint() {
-  const params = new URLSearchParams(window.location.search);
-  const fromUrl = params.get("asr");
-  if (fromUrl && isAllowedAsrEndpoint(fromUrl)) {
-    localStorage.setItem("speakingDemoAsrEndpoint", fromUrl);
-    return fromUrl;
+  const urlParams = new URLSearchParams(window.location.search);
+  const paramUrl = urlParams.get('asr');
+  
+  if (paramUrl && isAllowedAsrEndpoint(paramUrl)) {
+    localStorage.setItem('asrEndpoint', paramUrl);
+    return paramUrl;
   }
-  return localStorage.getItem("speakingDemoAsrEndpoint") || DEFAULT_ASR_ENDPOINT;
+  
+  const savedUrl = localStorage.getItem('asrEndpoint');
+  if (savedUrl && isAllowedAsrEndpoint(savedUrl)) {
+    return savedUrl;
+  }
+  
+  return DEFAULT_ASR_ENDPOINT;
 }
 
 function isAllowedAsrEndpoint(value) {
   try {
     const url = new URL(value);
     const allowedLocal = url.hostname === "127.0.0.1" || url.hostname === "localhost";
-    const allowedTunnel = url.hostname.endsWith(".trycloudflare.com") || url.hostname.endsWith(".ngrok-free.app");
+    const allowedTunnel = url.hostname.endsWith(".trycloudflare.com") || url.hostname.endsWith(".ngrok-free.app") || url.hostname.endsWith(".ngrok-free.dev") || url.hostname.endsWith(".onrender.com");
     return url.pathname === "/transcribe" && (allowedLocal || allowedTunnel);
   } catch (error) {
     return false;
@@ -73,32 +84,32 @@ const dialectSentences = {
   sixian: [
     "下晝愛共下去打籃球無？",
     "𠊎逐擺打籃球都擲毋準。",
-    ""
+    "阿明當愛在公園肚打籃球"
   ],
   hailu: [
     "下晝愛共下去打籃球無？",
     "𠊎逐擺打籃球都擲毋準。",
-    ""
+    "阿明當愛在公園肚打籃球"
   ],
   dabu: [
     "下晝愛共下去打籃球無？",
     "𠊎逐擺打籃球都擲毋準。",
-    ""
+    "阿明當愛在公園肚打籃球"
   ],
   raoping: [
     "下晝愛共下去打籃球無？",
     "𠊎逐擺打籃球都擲毋準。",
-    ""
+    "阿明當愛在公園肚打籃球"
   ],
   zhaoan: [
     "下晝愛共下去打籃球無？",
     "𠊎逐擺打籃球都擲毋準。",
-    ""
+    "阿明當愛在公園肚打籃球"
   ],
   southSixian: [
     "下晝愛共下去打籃球無？",
     "𠊎逐擺打籃球都擲毋準。",
-    ""
+    "阿明當愛在公園肚打籃球"
   ]
 };
 
@@ -128,7 +139,7 @@ const tasks = [
     title: "看圖說一說",
     prompt: "觀察圖片，用客語完整回答。",
     question: "阿明喜歡在哪裡做什麼？",
-    mandarin: "",
+    mandarin: "阿明喜歡在公園裡打籃球",
     audio: "",
     image: "./assets/scenario-holiday-basketball-hoodie.png",
     alt: "阿明穿著帽T在公園打籃球"
@@ -178,12 +189,14 @@ const els = {
   finishPanel: document.querySelector("#finishPanel"),
   finishBtn: document.querySelector("#finishBtn"),
   reviewResult: document.querySelector("#reviewResult"),
+  missionLayout: document.querySelector(".mission-layout"),
   recordingPanel: document.querySelector("#recordingPanel"),
   recordingStatus: document.querySelector("#recordingStatus"),
   audioPreview: document.querySelector("#audioPreview"),
   asrProviderSelect: document.querySelector("#asrProviderSelect"),
   asrProviderNote: document.querySelector("#asrProviderNote"),
-  debugProvider: document.querySelector("#debugProvider")
+  debugProvider: document.querySelector("#debugProvider"),
+  hitTags: document.querySelector("#hitTags")
 };
 
 function renderTask() {
@@ -223,6 +236,56 @@ function renderTask() {
   updateDeveloperMode();
   updateFinishPanel();
   updateProviderUi();
+  updateHitStatus(saved.transcript);
+}
+
+function updateHitStatus(transcript) {
+  if (!els.hitTags) return;
+  const cleanTranscript = (transcript || "").replace(/[。，！？、？\s]/g, "").replace(/准/g, "準");
+  
+  const renderBilingualTags = (hakkaWords, mandarinWords) => {
+    const providerId = getSelectedAsrProvider();
+    const isHakkaApi = ASR_PROVIDERS[providerId]?.language === "hak";
+    
+    let html = '';
+    if (isHakkaApi) {
+      html += '<div style="width: 100%; font-size: 12px; color: #666; margin-bottom: 2px;">客語：</div>';
+      hakkaWords.forEach(word => {
+        const isHit = cleanTranscript.includes(word);
+        html += `<span class="${isHit ? 'is-hit' : ''}">${word}</span>`;
+      });
+    } else {
+      html += '<div style="width: 100%; font-size: 12px; color: #666; margin-bottom: 2px;">華語：</div>';
+      mandarinWords.forEach(word => {
+        const isHit = cleanTranscript.includes(word);
+        html += `<span class="${isHit ? 'is-hit' : ''}">${word}</span>`;
+      });
+    }
+    els.hitTags.innerHTML = html;
+  };
+
+  if (currentStep === 0) {
+    const hakkaWords = ["下晝", "愛", "共下去", "打", "籃球", "無"];
+    const mandarinWords = ["下午", "要不要", "一起", "去", "打", "籃球"];
+    renderBilingualTags(hakkaWords, mandarinWords);
+  } else if (currentStep === 1) {
+    const hakkaWords = ["𠊎", "逐擺", "打", "籃球", "都", "擲", "毋準"];
+    const mandarinWords = ["我", "每次", "打", "籃球", "都", "投", "不準"];
+    renderBilingualTags(hakkaWords, mandarinWords);
+  } else if (currentStep === 2) {
+    const placeWord = "公園";
+    const activityWords = ["打", "籃球"];
+    
+    let html = '<div style="width: 100%; font-size: 12px; color: #666; margin-bottom: 2px;">地點：</div>';
+    html += `<span class="${cleanTranscript.includes(placeWord) ? 'is-hit' : ''}">${placeWord}</span>`;
+    
+    html += '<div style="width: 100%; font-size: 12px; color: #666; margin-top: 6px; margin-bottom: 2px;">活動：</div>';
+    activityWords.forEach(word => {
+      const isHit = cleanTranscript.includes(word);
+      html += `<span class="${isHit ? 'is-hit' : ''}">${word}</span>`;
+    });
+    els.hitTags.innerHTML = html;
+  }
 }
 
 function updateDeveloperMode() {
@@ -294,13 +357,19 @@ function updateFinishPanel() {
 }
 
 function showReview() {
-  const practiceItems = answers
-    .map((answer, index) => answer.needsPractice ? `第 ${index + 1} 題可以再多練習喔！` : "")
-    .filter(Boolean);
-  els.reviewResult.innerHTML = practiceItems.length
-    ? practiceItems.map(text => `<p>${text}</p>`).join("")
-    : "<p>三題都完成了，表現很穩喔！</p>";
-  els.reviewResult.hidden = false;
+  els.missionLayout.classList.add("is-complete");
+  els.missionLayout.innerHTML = `
+    <section class="completion-card" aria-labelledby="completionTitle">
+      <img class="completion-medal" src="./assets/holiday-medal.svg" alt="休假日任務完成獎牌">
+      <p class="completion-kicker">休假日任務完成</p>
+      <h2 id="completionTitle">通過測驗～</h2>
+      <p class="completion-copy">恭喜你完成「休假日」任務！</p>
+      <button id="playAgainBtn" class="completion-button" type="button">再玩一次</button>
+    </section>
+  `;
+  document.querySelector("#playAgainBtn")?.addEventListener("click", () => {
+    window.location.reload();
+  });
 }
 
 function isAnswerReady(answer) {
@@ -464,6 +533,7 @@ async function transcribeAudioBlob(blob) {
     isTranscribing = false;
     setCheckEnabled(Boolean(els.answerInput.value.trim()), "等待辨識");
     saveCurrentAnswer();
+    updateHitStatus(els.answerInput.value.trim());
   }
 }
 
@@ -499,6 +569,7 @@ if (els.answerInput) {
     els.asrStatus.textContent = text || "手動編輯中";
     setCheckEnabled(Boolean(text), "等待辨識");
     saveCurrentAnswer();
+    updateHitStatus(text);
   });
 }
 
@@ -559,3 +630,5 @@ els.checkBtn.addEventListener("click", () => {
 });
 
 renderTask();
+
+

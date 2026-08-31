@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 260" role="img" aria-labelledby="title desc">
+  <title id="title">休假日任務獎牌</title>
+  <desc id="desc">金色圓形獎牌，上面寫著休假日任務完成。</desc>
+  <defs>
+    <linearGradient id="ribbonA" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#2f946f"/>
+      <stop offset="1" stop-color="#1d6e54"/>
+    </linearGradient>
+    <linearGradient id="gold" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#ffe28a"/>
+      <stop offset="0.52" stop-color="#f3bd45"/>
+      <stop offset="1" stop-color="#dc9d2d"/>
+    </linearGradient>
+  </defs>
+  <path d="M75 14h35l-10 92H45z" fill="url(#ribbonA)"/>
+  <path d="M130 14h35l30 92h-55z" fill="#f4cf64"/>
+  <circle cx="120" cy="142" r="86" fill="#ffe8a8"/>
+  <circle cx="120" cy="142" r="72" fill="url(#gold)"/>
+  <circle cx="120" cy="142" r="55" fill="none" stroke="#b8791f" stroke-width="4" opacity="0.45"/>
+  <path d="M120 88l14 31 34 4-25 23 7 34-30-17-30 17 7-34-25-23 34-4z" fill="#fff4bd" stroke="#b8791f" stroke-width="3"/>
+  <text x="120" y="205" text-anchor="middle" font-family="Noto Sans TC, Microsoft JhengHei, Arial, sans-serif" font-size="19" font-weight="900" fill="#704914">休假日完成</text>
+</svg>
