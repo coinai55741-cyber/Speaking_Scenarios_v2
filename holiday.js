@@ -238,18 +238,21 @@ function updateHitStatus(transcript) {
   if (!els.hitTags) return;
   const cleanTranscript = (transcript || "").replace(/[。，！？、？\s]/g, "");
   
-  if (currentStep === 0) {
-    const hakkaWords = ["下晝", "愛", "共下去", "打", "籃球", "無"];
-    const mandarinWords = ["下午", "要不要", "一起", "去", "打", "籃球"];
-    
+  const renderBilingualTags = (hakkaWords, mandarinWords) => {
     const hakkaHits = hakkaWords.filter(w => cleanTranscript.includes(w)).length;
     const mandarinHits = mandarinWords.filter(w => cleanTranscript.includes(w)).length;
     
     let activeLang = "both";
     if (hakkaHits > mandarinHits) activeLang = "hakka";
     else if (mandarinHits > hakkaHits) activeLang = "mandarin";
-    else if (cleanTranscript.includes("下晝") || cleanTranscript.includes("共下")) activeLang = "hakka";
-    else if (cleanTranscript.includes("下午") || cleanTranscript.includes("一起")) activeLang = "mandarin";
+    else {
+       const exclusiveHakka = hakkaWords.filter(w => !mandarinWords.includes(w));
+       const exclusiveMandarin = mandarinWords.filter(w => !hakkaWords.includes(w));
+       const hasExclusiveHakka = exclusiveHakka.some(w => cleanTranscript.includes(w));
+       const hasExclusiveMandarin = exclusiveMandarin.some(w => cleanTranscript.includes(w));
+       if (hasExclusiveHakka && !hasExclusiveMandarin) activeLang = "hakka";
+       else if (hasExclusiveMandarin && !hasExclusiveHakka) activeLang = "mandarin";
+    }
     
     let html = '<div style="width: 100%; font-size: 12px; color: #666; margin-bottom: 2px;">客語：</div>';
     hakkaWords.forEach(word => {
@@ -262,13 +265,30 @@ function updateHitStatus(transcript) {
       const isHit = (activeLang === "mandarin" || activeLang === "both") && cleanTranscript.includes(word);
       html += `<span class="${isHit ? 'is-hit' : ''}">${word}</span>`;
     });
-    
     els.hitTags.innerHTML = html;
-  } else {
-    els.hitTags.innerHTML = `
-      <span>地點: 未命中</span>
-      <span>活動: 未命中</span>
-    `;
+  };
+
+  if (currentStep === 0) {
+    const hakkaWords = ["下晝", "愛", "共下去", "打", "籃球", "無"];
+    const mandarinWords = ["下午", "要不要", "一起", "去", "打", "籃球"];
+    renderBilingualTags(hakkaWords, mandarinWords);
+  } else if (currentStep === 1) {
+    const hakkaWords = ["𠊎", "逐擺", "打", "籃球", "都", "擲", "毋準"];
+    const mandarinWords = ["我", "每次", "打", "籃球", "都", "投", "不準"];
+    renderBilingualTags(hakkaWords, mandarinWords);
+  } else if (currentStep === 2) {
+    const placeWord = "公園";
+    const activityWords = ["打", "籃球"];
+    
+    let html = '<div style="width: 100%; font-size: 12px; color: #666; margin-bottom: 2px;">地點：</div>';
+    html += `<span class="${cleanTranscript.includes(placeWord) ? 'is-hit' : ''}">${placeWord}</span>`;
+    
+    html += '<div style="width: 100%; font-size: 12px; color: #666; margin-top: 6px; margin-bottom: 2px;">活動：</div>';
+    activityWords.forEach(word => {
+      const isHit = cleanTranscript.includes(word);
+      html += `<span class="${isHit ? 'is-hit' : ''}">${word}</span>`;
+    });
+    els.hitTags.innerHTML = html;
   }
 }
 
