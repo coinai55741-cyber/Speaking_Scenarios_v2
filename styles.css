@@ -651,12 +651,51 @@ h1 {
   font-size: 14px;
   font-weight: 900;
   cursor: pointer;
+  text-decoration: none;
   transition: opacity 0.2s, background 0.2s;
 }
 
 .start-learning-btn:hover {
   opacity: 0.8;
 }
+
+.start-learning-btn.is-disabled,
+.start-learning-btn:disabled {
+  background: #e2e8f0;
+  color: #8392a0;
+  border: 1px solid #cbd5e1;
+  cursor: not-allowed;
+}
+
+.start-learning-btn.is-disabled:hover,
+.start-learning-btn:disabled:hover {
+  opacity: 1;
+}
+
+.learning-card.is-disabled,
+.wide-card.is-disabled {
+  position: relative;
+  background: rgba(255, 253, 250, 0.95);
+  border-color: rgba(228, 210, 171, 0.7);
+}
+
+.card-coming-soon-badge {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  border: 1.5px solid #d0dbe5;
+  border-radius: 999px;
+  background: #f1f5f9;
+  color: #55697d;
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 0.04em;
+  box-shadow: 0 2px 6px rgba(30, 49, 91, 0.06);
+}
+
 
 .mini-art,
 .wide-art {

@@ -107,11 +107,16 @@
       </div>
       <div class="developer-item">
         <span class="developer-label">辨識 API</span>
-        <p>Taiwan-Tongues-ASR-CE（華語 v2） / 可用</p>
+        <select id="asrProviderSelect" class="developer-select">
+          <option value="taiwan_tongues_zh">Taiwan-Tongues-ASR-CE（華語 v2）</option>
+          <option value="hakka_api_hak">客委會 API（客語預留）</option>
+        </select>
+        <p id="asrProviderNote" class="developer-note"></p>
+        <p id="debugProvider" class="developer-subnote"></p>
       </div>
     </aside>
   </main>
 
-  <script src="./holiday.js?v=20260828-18"></script>
+  <script src="./holiday.js?v=20260831-01"></script>
 </body>
 </html>

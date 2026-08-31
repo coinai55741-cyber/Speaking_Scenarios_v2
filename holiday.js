@@ -1,3 +1,65 @@
+const DEFAULT_ASR_ENDPOINT = "http://127.0.0.1:8000/transcribe";
+const ASR_ENDPOINT = getAsrEndpoint();
+const ASR_PROVIDERS = {
+  taiwan_tongues_zh: {
+    label: "Taiwan-Tongues-ASR-CE（華語 v2）",
+    provider: "taiwan_tongues",
+    language: "zh",
+    enabled: true,
+    note: "目前可用：用 Taiwan-Tongues-ASR-CE v2.0 走華語辨識流程。"
+  },
+  hakka_api_hak: {
+    label: "客委會 API（客語預留）",
+    provider: "hakka_api",
+    language: "hak",
+    enabled: false,
+    note: "接口已預留；需申請 API key 後由後端串接，key 不會放在前端。"
+  }
+};
+
+function getSelectedAsrProvider() {
+  const providerId = els.asrProviderSelect?.value || localStorage.getItem("speakingDemoAsrProvider") || "taiwan_tongues_zh";
+  const hasVisibleOption = !els.asrProviderSelect || [...els.asrProviderSelect.options].some(option => option.value === providerId);
+  return ASR_PROVIDERS[providerId] && hasVisibleOption ? providerId : "taiwan_tongues_zh";
+}
+
+function updateProviderUi() {
+  if (!els.asrProviderSelect) return;
+  const providerId = getSelectedAsrProvider();
+  const config = ASR_PROVIDERS[providerId];
+  els.asrProviderSelect.value = providerId;
+  if (els.asrProviderNote) els.asrProviderNote.textContent = config.note;
+  if (els.debugProvider) {
+    els.debugProvider.textContent = `${config.label} / ${config.enabled ? "可用" : "預留"}`;
+  }
+}
+
+function getAsrEndpoint() {
+  const params = new URLSearchParams(window.location.search);
+  const fromUrl = params.get("asr");
+  if (fromUrl && isAllowedAsrEndpoint(fromUrl)) {
+    localStorage.setItem("speakingDemoAsrEndpoint", fromUrl);
+    return fromUrl;
+  }
+  return localStorage.getItem("speakingDemoAsrEndpoint") || DEFAULT_ASR_ENDPOINT;
+}
+
+function isAllowedAsrEndpoint(value) {
+  try {
+    const url = new URL(value);
+    const allowedLocal = url.hostname === "127.0.0.1" || url.hostname === "localhost";
+    const allowedTunnel = url.hostname.endsWith(".trycloudflare.com") || url.hostname.endsWith(".ngrok-free.app");
+    return url.pathname === "/transcribe" && (allowedLocal || allowedTunnel);
+  } catch (error) {
+    return false;
+  }
+}
+
+function formatBytes(bytes) {
+  if (!bytes) return "0 KB";
+  return `${Math.max(1, Math.round(bytes / 1024))} KB`;
+}
+
 const dialectLabels = {
   sixian: "四縣腔",
   hailu: "海陸腔",
@@ -82,6 +144,7 @@ let stream = null;
 let chunks = [];
 let audioUrl = "";
 let isRecording = false;
+let isTranscribing = false;
 const answers = tasks.map(() => ({
   transcript: "",
   audioUrl: "",
@@ -117,7 +180,10 @@ const els = {
   reviewResult: document.querySelector("#reviewResult"),
   recordingPanel: document.querySelector("#recordingPanel"),
   recordingStatus: document.querySelector("#recordingStatus"),
-  audioPreview: document.querySelector("#audioPreview")
+  audioPreview: document.querySelector("#audioPreview"),
+  asrProviderSelect: document.querySelector("#asrProviderSelect"),
+  asrProviderNote: document.querySelector("#asrProviderNote"),
+  debugProvider: document.querySelector("#debugProvider")
 };
 
 function renderTask() {
@@ -133,7 +199,7 @@ function renderTask() {
   els.sceneImage.src = task.image;
   els.sceneImage.alt = task.alt;
   if (els.answerInput) els.answerInput.value = saved.transcript;
-  els.asrStatus.textContent = "尚未送出";
+  els.asrStatus.textContent = saved.transcript || "尚未送出";
   els.missCount.textContent = "0";
   resetRecording({ keepSaved: true });
   restoreRecordingPreview(saved);
@@ -156,6 +222,7 @@ function renderTask() {
   }
   updateDeveloperMode();
   updateFinishPanel();
+  updateProviderUi();
 }
 
 function updateDeveloperMode() {
@@ -263,6 +330,7 @@ function resetRecording(options = {}) {
   recorder = null;
   chunks = [];
   isRecording = false;
+  isTranscribing = false;
   answerChecked = false;
   if (audioUrl && !options.keepSaved) {
     URL.revokeObjectURL(audioUrl);
@@ -310,9 +378,9 @@ async function startRecording() {
       els.audioPreview.src = audioUrl;
       els.audioPreview.hidden = false;
       els.recordingPanel.hidden = false;
-      els.recordingStatus.textContent = "錄音完成，正在辨識...";
+      els.recordingStatus.textContent = `錄音完成：${formatBytes(blob.size)}。正在辨識...`;
       cleanupStream();
-      simulateTranscription(blob);
+      transcribeAudioBlob(blob);
     });
 
     recorder.start();
@@ -348,19 +416,55 @@ function stopRecording() {
   }
 }
 
-function simulateTranscription() {
-  window.setTimeout(() => {
-    const sentence = dialectSentences[currentDialect][currentStep] || "";
-    if (sentence && !els.answerInput.value.trim()) {
-      els.answerInput.value = sentence;
-    } else if (currentStep === 2 && !els.answerInput.value.trim()) {
-      els.answerInput.value = "阿明在公園打籃球";
+async function transcribeAudioBlob(blob) {
+  if (!blob) {
+    setCheckEnabled(false, "等待辨識");
+    return;
+  }
+
+  isTranscribing = true;
+  setCheckEnabled(false, "辨識中...");
+  els.recordingStatus.textContent = "錄音完成，正在發送辨識請求...";
+
+  const formData = new FormData();
+  formData.append("audio", blob, "recording.webm");
+  const providerId = getSelectedAsrProvider();
+  const providerConfig = ASR_PROVIDERS[providerId];
+  formData.append("provider_id", providerId);
+  formData.append("provider", providerConfig.provider);
+  formData.append("language", providerConfig.language);
+
+  try {
+    const response = await fetch(ASR_ENDPOINT, {
+      method: "POST",
+      body: formData
+    });
+    if (!response.ok) {
+      const message = await response.text();
+      throw new Error(message || `HTTP ${response.status}`);
     }
-    els.asrStatus.textContent = els.answerInput.value.trim() || "辨識完成";
-    els.recordingStatus.textContent = "辨識完成，可以送出辨識。";
-    setCheckEnabled(true);
+    const result = await response.json();
+    if (result.status === "not_enabled") {
+      throw new Error(result.message || "此辨識 API 尚未啟用");
+    }
+    const text = (result.text || "").trim();
+    if (text) {
+      els.answerInput.value = text;
+      els.asrStatus.textContent = text;
+      els.recordingStatus.textContent = "辨識完成，可以送出辨識。";
+    } else {
+      els.asrStatus.textContent = "未辨識出文字";
+      els.recordingStatus.textContent = "沒有辨識到文字。開發者模式可手動修正，或重新錄音。";
+    }
+  } catch (error) {
+    console.warn("Local ASR failed / not reachable:", error);
+    els.asrStatus.textContent = "本機 ASR 離線";
+    els.recordingStatus.textContent = "本機 ASR 尚未連線或辨識失敗。開發者模式可手動修正，或重新錄音。";
+  } finally {
+    isTranscribing = false;
+    setCheckEnabled(Boolean(els.answerInput.value.trim()), "等待辨識");
     saveCurrentAnswer();
-  }, 650);
+  }
 }
 
 els.dialects.forEach(button => {
@@ -381,6 +485,22 @@ els.debugToggle.addEventListener("change", event => {
   debugMode = event.target.checked;
   updateDeveloperMode();
 });
+
+if (els.asrProviderSelect) {
+  els.asrProviderSelect.addEventListener("change", (event) => {
+    localStorage.setItem("speakingDemoAsrProvider", event.target.value);
+    updateProviderUi();
+  });
+}
+
+if (els.answerInput) {
+  els.answerInput.addEventListener("input", () => {
+    const text = els.answerInput.value.trim();
+    els.asrStatus.textContent = text || "手動編輯中";
+    setCheckEnabled(Boolean(text), "等待辨識");
+    saveCurrentAnswer();
+  });
+}
 
 els.scenePlayBtn.addEventListener("click", () => {
   toggleTaskAudio();
@@ -414,6 +534,7 @@ els.retryBtn.addEventListener("click", () => {
     needsPractice: false
   };
   resetRecording();
+  if (els.answerInput) els.answerInput.value = "";
   els.asrStatus.textContent = "尚未送出";
   els.missCount.textContent = "0";
   updateFinishPanel();
