@@ -35,11 +35,19 @@ function updateProviderUi() {
 }
 
 function getAsrEndpoint() {
-  const params = new URLSearchParams(window.location.search);
-  const fromUrl = params.get("asr");
-  if (fromUrl && isAllowedAsrEndpoint(fromUrl)) {
-    return fromUrl;
+  const urlParams = new URLSearchParams(window.location.search);
+  const paramUrl = urlParams.get('asr');
+  
+  if (paramUrl && isAllowedAsrEndpoint(paramUrl)) {
+    localStorage.setItem('asrEndpoint', paramUrl);
+    return paramUrl;
   }
+  
+  const savedUrl = localStorage.getItem('asrEndpoint');
+  if (savedUrl && isAllowedAsrEndpoint(savedUrl)) {
+    return savedUrl;
+  }
+  
   return DEFAULT_ASR_ENDPOINT;
 }
 
