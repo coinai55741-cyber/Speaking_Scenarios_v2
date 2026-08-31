@@ -34,7 +34,7 @@ function updateProviderUi() {
   }
   
   if (typeof updateHitStatus === 'function' && els.answerInput) {
-    updateHitStatus(els.answerInput.value.trim() || saved.transcript);
+    updateHitStatus(els.answerInput.value.trim());
   }
 }
 
