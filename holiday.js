@@ -38,17 +38,16 @@ function getAsrEndpoint() {
   const params = new URLSearchParams(window.location.search);
   const fromUrl = params.get("asr");
   if (fromUrl && isAllowedAsrEndpoint(fromUrl)) {
-    localStorage.setItem("speakingDemoAsrEndpoint", fromUrl);
     return fromUrl;
   }
-  return localStorage.getItem("speakingDemoAsrEndpoint") || DEFAULT_ASR_ENDPOINT;
+  return DEFAULT_ASR_ENDPOINT;
 }
 
 function isAllowedAsrEndpoint(value) {
   try {
     const url = new URL(value);
     const allowedLocal = url.hostname === "127.0.0.1" || url.hostname === "localhost";
-    const allowedTunnel = url.hostname.endsWith(".trycloudflare.com") || url.hostname.endsWith(".ngrok-free.app");
+    const allowedTunnel = url.hostname.endsWith(".trycloudflare.com") || url.hostname.endsWith(".ngrok-free.app") || url.hostname.endsWith(".onrender.com");
     return url.pathname === "/transcribe" && (allowedLocal || allowedTunnel);
   } catch (error) {
     return false;
