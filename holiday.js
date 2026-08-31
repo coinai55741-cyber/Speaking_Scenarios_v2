@@ -240,7 +240,7 @@ function renderTask() {
 
 function updateHitStatus(transcript) {
   if (!els.hitTags) return;
-  const cleanTranscript = (transcript || "").replace(/[。，！？、？\s]/g, "");
+  const cleanTranscript = (transcript || "").replace(/[。，！？、？\s]/g, "").replace(/准/g, "準");
   
   const renderBilingualTags = (hakkaWords, mandarinWords) => {
     const providerId = getSelectedAsrProvider();
