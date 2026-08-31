@@ -1,0 +1,1704 @@
+{
+  "生病看醫 (Sickness)": [
+    {
+      "id": "q_listening_d1_l1_c1_1",
+      "level": "I",
+      "category": "身體認識",
+      "hakka": "𠊎个牙齒當痛哦！",
+      "chinese": "我的牙齒好痛！",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/65837_4dc6e076630b4dbfbeeb3dd26b8008fe.wav"
+    },
+    {
+      "id": "q_listening_d1_l1_c1_13",
+      "level": "I",
+      "category": "身體認識",
+      "hakka": "你寒著了，係無？",
+      "chinese": "你感冒了嗎？",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/65838_48b97249c6a7522327c046c6394f8189.wav"
+    },
+    {
+      "id": "q_listening_d1_l1_c1_14",
+      "level": "I",
+      "category": "身體認識",
+      "hakka": "著，鼻公緊流鼻水。",
+      "chinese": "對，鼻子一直流鼻水。",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/65340_40a5871ce9c143bd852dc7db90db9652.wav"
+    },
+    {
+      "id": "q_listening_d1_l2_c16_938",
+      "level": "II",
+      "category": "同儕互動",
+      "hakka": "𠊎寒著了，毋過這下好當多了。",
+      "chinese": "我感冒，不過現在好多了。",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/72605_af54cdb12277ac3be3669555953715bc.wav"
+    },
+    {
+      "id": "q_listening_d1_l4_c35_2101",
+      "level": "IV",
+      "category": "職場稱謂",
+      "hakka": "厥面頰卵著傷，愛去尋護理師膏藥仔。",
+      "chinese": "他臉頰受傷，要找護理師擦藥。",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/66074_1856351227e95ff6ec2c7fac2a441e1f.mp3"
+    },
+    {
+      "id": "q_listening_d1_l5_c42_2713",
+      "level": "V",
+      "category": "社會參與",
+      "hakka": "頭先看著路脣有著傷个貓仔，愛仰結煞呢？",
+      "chinese": "剛剛看到路邊有受傷的貓，該怎麼辦呢？",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/72047_cee35c4b079de8786e3b1a8c15bbf44a.mp3"
+    }
+  ],
+  "吃東西 (Eating)": [
+    {
+      "id": "q_listening_d1_l1_c1_2",
+      "level": "I",
+      "category": "身體認識",
+      "hakka": "你係毋係食忒多糖仔了？",
+      "chinese": "你是不是吃太多糖果了？",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/79180_de4a92be62b1590b44f929fab0f51d4c.mp3"
+    },
+    {
+      "id": "q_listening_d1_l1_c2_85",
+      "level": "I",
+      "category": "簡易表達",
+      "hakka": "你愛食牛乳無？",
+      "chinese": "你要不要喝牛奶？",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/71247_a2d70d231e27c1b349f9faa160ae3998.wav"
+    },
+    {
+      "id": "q_listening_d1_l1_c2_86",
+      "level": "I",
+      "category": "簡易表達",
+      "hakka": "這下𠊎無想愛食。",
+      "chinese": "我現在不想喝。",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/72542_8aa668f289aa5a1b2834171e5b8d9678.wav"
+    },
+    {
+      "id": "q_listening_d1_l1_c3_169",
+      "level": "I",
+      "category": "生活起居",
+      "hakka": "𠊎會用筷仔食飯。",
+      "chinese": "我會用筷子吃飯。",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/71846_c96b2e151889c1fa8443406667fbf197.wav"
+    },
+    {
+      "id": "q_listening_d1_l1_c5_266",
+      "level": "I",
+      "category": "親屬稱謂",
+      "hakka": "𠊎好同阿姆共下做點心。",
+      "chinese": "我喜歡跟媽媽一起做點心。",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/65364_7f990dce6d1d85f6093f2b1d6b020cbc.wav"
+    },
+    {
+      "id": "q_listening_d1_l1_c6_325",
+      "level": "I",
+      "category": "招呼用語",
+      "hakka": "你食飽吂？",
+      "chinese": "你吃飽了嗎？",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/71255_a6626c4be043bb962bcbed20da68e79d.wav"
+    },
+    {
+      "id": "q_listening_d1_l1_c6_326",
+      "level": "I",
+      "category": "招呼用語",
+      "hakka": "食飽了，恁仔細。",
+      "chinese": "吃飽了，謝謝。",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/72553_7fb441f9db65ee8e750860a1aae9cd83.wav"
+    },
+    {
+      "id": "q_listening_d1_l1_c6_337",
+      "level": "I",
+      "category": "招呼用語",
+      "hakka": "愛食餅仔無？",
+      "chinese": "要不要吃餅乾？",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/71258_0e443987c9b834601f520f58b785d80e.wav"
+    },
+    {
+      "id": "q_listening_d1_l2_c10_565",
+      "level": "II",
+      "category": "意見表達",
+      "hakka": "你中意食紅蘿蔔無？",
+      "chinese": "你喜歡吃紅蘿蔔嗎？",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/71861_f44ce2001df711f6c084697de13cb6b8.wav"
+    },
+    {
+      "id": "q_listening_d1_l2_c10_566",
+      "level": "II",
+      "category": "意見表達",
+      "hakka": "無中意，毋過𠊎還係會食兜仔。",
+      "chinese": "不喜歡，但是我還是會吃一些。",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/72573_ec23301e141043400ddd73c6c0a166e1.wav"
+    },
+    {
+      "id": "q_listening_d1_l2_c11_613",
+      "level": "II",
+      "category": "家務分工",
+      "hakka": "若屋下都係麼人煮飯？",
+      "chinese": "你們家都是誰煮飯？",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/71885_df15e7d7b32c61af82526e0ae0d86b5d.wav"
+    },
+    {
+      "id": "q_listening_d1_l2_c12_673",
+      "level": "II",
+      "category": "客家社區關懷",
+      "hakka": "聽講客家擂茶當好食。",
+      "chinese": "聽說客家擂茶很好喝。",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/71993_0c694eab6148ab99b946a8768b6622a3.mp3"
+    },
+    {
+      "id": "q_listening_d1_l2_c12_685",
+      "level": "II",
+      "category": "客家社區關懷",
+      "hakka": "姐婆在該滷鹹菜。",
+      "chinese": "外婆在醃製酸菜。",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/71994_858ef2a26135a4b73ef23f634d4f4048.mp3"
+    },
+    {
+      "id": "q_listening_d1_l2_c12_686",
+      "level": "II",
+      "category": "客家社區關懷",
+      "hakka": "鹹菜煮豬肉湯當好食。",
+      "chinese": "酸菜煮豬肉湯很好吃。",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/72717_e3457b11bebc86d9927ef03fecbee842.wav"
+    },
+    {
+      "id": "q_listening_d1_l2_c13_710",
+      "level": "II",
+      "category": "時間與氣候",
+      "hakka": "愛多食水，正毋會熱著哦！",
+      "chinese": "要多喝水，才不會中暑喔！",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/72719_50c0883133063189eabaee72684c93ef.wav"
+    },
+    {
+      "id": "q_listening_d1_l2_c14_793",
+      "level": "II",
+      "category": "社交稱謂",
+      "hakka": "營養師講今晡日當晝个飯菜盡好食。",
+      "chinese": "營養師說今天午餐很好吃。",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/66035_afc2bb621df443550570e095b12aaa04.mp3"
+    },
+    {
+      "id": "q_listening_d1_l2_c14_805",
+      "level": "II",
+      "category": "社交稱謂",
+      "hakka": "頭先在菜市場堵著王先生。",
+      "chinese": "剛剛在菜市場遇到王醫師。",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/66036_2af583e46e7de1a470cc657556ae8442.mp3"
+    },
+    {
+      "id": "q_listening_d1_l2_c14_806",
+      "level": "II",
+      "category": "社交稱謂",
+      "hakka": "佢都會自家去買菜。",
+      "chinese": "他都會自己去買菜。",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/65385_7615f56279886c68587887a130d65168.wav"
+    },
+    {
+      "id": "q_listening_d1_l2_c16_890",
+      "level": "II",
+      "category": "同儕互動",
+      "hakka": "好啊，校長都會請𠊎兜食東西。",
+      "chinese": "好啊，校長都會請我們吃東西。",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/72599_a474c89e0f0a339efa38828da1f19979.wav"
+    },
+    {
+      "id": "q_listening_d1_l2_c18_1046",
+      "level": "II",
+      "category": "鄰里社區",
+      "hakka": "昨晡日𠊎既經去買當多好食个麵包了。",
+      "chinese": "我昨天已經去買很多好吃的麵包了。",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/65466_7414c6699ba206f7f81933480ab3cce8.wav"
+    },
+    {
+      "id": "q_listening_d1_l2_c18_1057",
+      "level": "II",
+      "category": "鄰里社區",
+      "hakka": "該間早餐店个卵餅當好食。",
+      "chinese": "那家早餐店的蛋餅很好吃。",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/66041_059c5c96fabf4f15fb36acc2b5168f12.mp3"
+    },
+    {
+      "id": "q_listening_d1_l2_c18_1058",
+      "level": "II",
+      "category": "鄰里社區",
+      "hakka": "𠊎乜當好食佢个卵餅。",
+      "chinese": "我也很喜歡吃他們的蛋餅。",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/65467_515b76e70d83c7189f058cb65527f050.wav"
+    },
+    {
+      "id": "q_listening_d1_l3_c19_1105",
+      "level": "III",
+      "category": "性別認識與尊重",
+      "hakka": "𠊎本旦話著細妹仔較會煮飯。",
+      "chinese": "我原先以為女生比較會煮飯。",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/66045_cd6207f056230c203028bd858fdeb303.mp3"
+    },
+    {
+      "id": "q_listening_d1_l3_c19_1106",
+      "level": "III",
+      "category": "性別認識與尊重",
+      "hakka": "煮飯係看技術，毋係看細倈仔抑係細妹仔。",
+      "chinese": "煮飯看技術，不是男生女生。",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/65395_2a8e7f050ef29c49779b9f6baf9ec87c.wav"
+    },
+    {
+      "id": "q_listening_d1_l3_c20_1141",
+      "level": "III",
+      "category": "意見與情感表達",
+      "hakka": "苦瓜當苦，𠊎毋好食。",
+      "chinese": "苦瓜很苦，我不喜歡吃。",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/71914_ec70146708529c03b86a7f62c33aa08a.wav"
+    },
+    {
+      "id": "q_listening_d1_l3_c21_1189",
+      "level": "III",
+      "category": "衣食健康",
+      "hakka": "朝晨你食麼个？",
+      "chinese": "你早餐吃什麼？",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/64101_3cbc0173705d1268b1bbf3760d4c4598.wav"
+    },
+    {
+      "id": "q_listening_d1_l3_c21_1190",
+      "level": "III",
+      "category": "衣食健康",
+      "hakka": "𠊎食卵餅同豆乳。",
+      "chinese": "我吃了蛋餅和豆漿。",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/65469_bf8fa55f493f7e6ab865d3f911e5815e.wav"
+    },
+    {
+      "id": "q_listening_d1_l3_c22_1261",
+      "level": "III",
+      "category": "客家社會關懷",
+      "hakka": "吾爸盡好食薑絲炒大腸。",
+      "chinese": "我爸爸最愛吃薑絲大腸。",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/72007_7a7055783bb10b027636c54c48bb5959.mp3"
+    },
+    {
+      "id": "q_listening_d1_l3_c22_1262",
+      "level": "III",
+      "category": "客家社會關懷",
+      "hakka": "該係客家个名菜哦！",
+      "chinese": "那是客家的名菜喔！",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/72735_b9ea20d4aac86256121b16218eda7b83.wav"
+    },
+    {
+      "id": "q_listening_d1_l3_c23_1310",
+      "level": "III",
+      "category": "時間與節氣",
+      "hakka": "𠊎盡好食甜粄圓。",
+      "chinese": "我最喜歡吃甜湯圓。",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/86868_a25f927204c1aecca438f7ec609c0cfe586b63a5170ec878536adfd94608b233.mp3"
+    },
+    {
+      "id": "q_listening_d1_l3_c29_1729",
+      "level": "III",
+      "category": "城鄉社會",
+      "hakka": "路口有一個老阿婆在該賣菜。",
+      "chinese": "路口有個老奶奶在賣菜。",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/66066_69c9c35c99b820bf6a8db94bbf76289c.mp3"
+    },
+    {
+      "id": "q_listening_d1_l3_c29_1730",
+      "level": "III",
+      "category": "城鄉社會",
+      "hakka": "佢賣个高麗菜係自家種个。",
+      "chinese": "她賣的高麗菜是自己種的。",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/65489_7cc2b56d0147ec6f4854822e20e9f08f.wav"
+    },
+    {
+      "id": "q_listening_d1_l4_c33_2005",
+      "level": "IV",
+      "category": "客家族群關懷",
+      "hakka": "阿婆煮个客家粄條當好食！",
+      "chinese": "奶奶煮的客家粄條很好吃！",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/72029_6b681ca81270ddaeb467cb2703305838.mp3"
+    },
+    {
+      "id": "q_listening_d1_l4_c33_2006",
+      "level": "IV",
+      "category": "客家族群關懷",
+      "hakka": "𠊎乜好食客家鹹粄圓。",
+      "chinese": "我也喜歡吃客家鹹湯圓。",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/72764_6aa6a5687113ce055496799dca502ee2.wav"
+    },
+    {
+      "id": "q_listening_d1_l4_c38_2486",
+      "level": "IV",
+      "category": "社群互動",
+      "hakka": "著啊，大家都講𠊎兜个烰雞肉當好食。",
+      "chinese": "對呀，大家都說我們的炸雞超好吃。",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/65536_8c19920d9c776622a64b42be44cb983c.wav"
+    },
+    {
+      "id": "q_listening_d1_l5_c41_2617",
+      "level": "V",
+      "category": "家庭生活",
+      "hakka": "吾爸吾姆這駁仔輒常加班，無時間煮飯。",
+      "chinese": "我爸媽最近常加班，都沒時間煮飯。",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/71966_920ae94e334ff6f7f0ab04f1ba42dbc3.wav"
+    },
+    {
+      "id": "q_listening_d1_l5_c41_2618",
+      "level": "V",
+      "category": "家庭生活",
+      "hakka": "𠊎乜開始學煮菜，分擔家務。",
+      "chinese": "我也開始學煮菜，分擔家事。",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/65538_1cef3bcf3170cb597e881e466de535cc.wav"
+    },
+    {
+      "id": "q_listening_d1_l5_c50_3181",
+      "level": "V",
+      "category": "臺灣多元族群的發展",
+      "hakka": "姐婆教𠊎做客家擂茶，當好食。",
+      "chinese": "外婆教我做客家擂茶，很好喝。",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/72056_e2c4510069c2eb525551fe505b49a026.mp3"
+    }
+  ],
+  "社交與打招呼 (Social & Greeting)": [
+    {
+      "id": "q_listening_d1_l1_c1_26",
+      "level": "I",
+      "category": "身體認識",
+      "hakka": "無要緊，膏藥仔就會好了。",
+      "chinese": "沒關係，擦藥膏就會好。",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/79182_2e54a38e10bc4f57d12bca9c8227df70.mp3"
+    },
+    {
+      "id": "q_listening_d1_l1_c6_301",
+      "level": "I",
+      "category": "招呼用語",
+      "hakka": "你好，恁久無看著！",
+      "chinese": "你好，好久不見！",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/71251_81881aaabf3d052f5b1ebfbcc60f8592.wav"
+    },
+    {
+      "id": "q_listening_d1_l1_c6_313",
+      "level": "I",
+      "category": "招呼用語",
+      "hakka": "正來尞，下二擺再過來若屋下搞！",
+      "chinese": "再見，下次再來你家玩！",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/86743_8795de033d4496753b1632cea9ea0b070dc1b49e905917983c06188938b0be63.mp3"
+    },
+    {
+      "id": "q_listening_d1_l1_c6_314",
+      "level": "I",
+      "category": "招呼用語",
+      "hakka": "正來尞，感謝你同𠊎共下搞。",
+      "chinese": "再見，謝謝你陪我一起玩。",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/72552_7df83643a28a2941239f5f017b32aa38.wav"
+    },
+    {
+      "id": "q_listening_d1_l1_c6_338",
+      "level": "I",
+      "category": "招呼用語",
+      "hakka": "恁仔細，𠊎搓牙齒了。",
+      "chinese": "謝謝，我刷牙了。",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/72554_e332111f22431e8cbde18fabaa21b0ee.wav"
+    },
+    {
+      "id": "q_listening_d1_l2_c9_505",
+      "level": "II",
+      "category": "情緒用語",
+      "hakka": "有你做伴，𠊎个心情好當多了，恁仔細！",
+      "chinese": "謝謝你陪我，心情好多了。",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/66026_39e363f710ac8494bd664592e7f68e12.mp3"
+    },
+    {
+      "id": "q_listening_d1_l2_c9_506",
+      "level": "II",
+      "category": "情緒用語",
+      "hakka": "毋使客氣，𫣆俚係好朋友啊！",
+      "chinese": "不必客氣，我們是好朋友呀！",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/65374_ee9ccb4f13041c8f3e388c926fe484fd.wav"
+    },
+    {
+      "id": "q_listening_d1_l2_c15_829",
+      "level": "II",
+      "category": "簡易生活應對",
+      "hakka": "感謝你借𠊎捽仔。",
+      "chinese": "謝謝你借我橡皮擦。",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/71880_9db86febd3d7b11332e7625f6dd83097.wav"
+    },
+    {
+      "id": "q_listening_d1_l2_c15_841",
+      "level": "II",
+      "category": "簡易生活應對",
+      "hakka": "失禮，頭先無細義撞著你。",
+      "chinese": "對不起，剛剛不小心撞到你。",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/71867_4e9d01d36977bbfd19031f957d83ad2a.wav"
+    },
+    {
+      "id": "q_listening_d1_l2_c15_842",
+      "level": "II",
+      "category": "簡易生活應對",
+      "hakka": "無要緊，你毋係挑挑个。",
+      "chinese": "沒關係，你不是故意的。",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/72580_4579c6d2ed951176d4b8107e091a8a9e.wav"
+    },
+    {
+      "id": "q_listening_d1_l3_c51_1394",
+      "level": "III",
+      "category": "社交稱謂",
+      "hakka": "𠊎都會同警察阿叔講恁仔細。",
+      "chinese": "我都會跟警察叔叔說謝謝。",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/65401_0a7ec0802e748eb55a238071a8f3f11f.wav"
+    },
+    {
+      "id": "q_listening_d1_l3_c24_1429",
+      "level": "III",
+      "category": "常用生活應對",
+      "hakka": "恁早，今晡日係𠊎做值日無？",
+      "chinese": "早安，今天是我當值日嗎？",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/86744_d3bcd002fd33dd9b9a195625787ede34c3e08a11b9fc4b9590bc6a4c492b1de1.mp3"
+    },
+    {
+      "id": "q_listening_d1_l3_c24_1442",
+      "level": "III",
+      "category": "常用生活應對",
+      "hakka": "感謝你个提醒，你自家乜愛細義。",
+      "chinese": "謝謝你提醒，你自己也要小心。",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/72618_3f5bd5065fc06b1167b1a8c9b8fa2b05.wav"
+    },
+    {
+      "id": "q_listening_d1_l3_c24_1466",
+      "level": "III",
+      "category": "常用生活應對",
+      "hakka": "感謝你記得𠊎个生日。",
+      "chinese": "謝謝你記得我的生日。",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/72624_57bcbe8bdf8c82a6d2541de059a4fd29.wav"
+    },
+    {
+      "id": "q_listening_d1_l3_c28_1669",
+      "level": "III",
+      "category": "情緒管理",
+      "hakka": "𠊎同好朋友冤家，有兜仔艱苦。",
+      "chinese": "我跟好朋友吵架，有點難過。",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/66053_f5655166e9aacec7e4464508e6b25fed.mp3"
+    },
+    {
+      "id": "q_listening_d1_l3_c28_1670",
+      "level": "III",
+      "category": "情緒管理",
+      "hakka": "𠊎想，若朋友乜盡艱苦。",
+      "chinese": "我想，你的朋友也很難過。",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/65408_cecc464580bedbe6f743f44ed263d7d5.wav"
+    },
+    {
+      "id": "q_listening_d1_l4_c30_1813",
+      "level": "IV",
+      "category": "性格特質與性向探索",
+      "hakka": "你親像盡會交到朋友呢！",
+      "chinese": "你好像很容易交到朋友耶！",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/66071_96a2688bb660ba9bf1a0d0a7719d2132.mp3"
+    },
+    {
+      "id": "q_listening_d1_l4_c30_1825",
+      "level": "IV",
+      "category": "性格特質與性向探索",
+      "hakka": "𠊎看你親像盡好寫故事。",
+      "chinese": "我發現你好像很喜歡寫故事。",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/65877_ef6f69613fa4e0b051a74416d5b1a24a.wav"
+    },
+    {
+      "id": "q_listening_d1_l4_c31_1861",
+      "level": "IV",
+      "category": "情緒表達與經驗分享",
+      "hakka": "昨晡日𠊎有同朋友講，做麼个𠊎會恁譴。",
+      "chinese": "昨天我有跟朋友說，我為什麼生氣了。",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/86881_974ff4b151a125a9cfa3cbbe35cf2398b0b8c1bdce253deb12d2b0c93de71c3f.mp3"
+    },
+    {
+      "id": "q_listening_d1_l4_c35_2090",
+      "level": "IV",
+      "category": "職場稱謂",
+      "hakka": "係呀，佢輒常愛去拜訪人客。",
+      "chinese": "是呀，她常常要拜訪客戶。",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/65427_b00b17808fd03ddf021838b7f8a66982.wav"
+    },
+    {
+      "id": "q_listening_d1_l5_c39_2546",
+      "level": "V",
+      "category": "認識自我",
+      "hakka": "無要緊，定定仔就會尋著自家个路。",
+      "chinese": "沒關係，慢慢會找到自己的路。",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/86914_803f60929eb3b533e6a01c7e9f0c616083c52d9d956d069693029c0f68de4047.mp3"
+    },
+    {
+      "id": "q_listening_d1_l5_c40_2605",
+      "level": "V",
+      "category": "人際關係處理",
+      "hakka": "感謝你肯聽𠊎講這兜。",
+      "chinese": "謝謝你願意聽我說這些。",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/71946_545d178e6a235f98c3cb14cda97cd65d.wav"
+    },
+    {
+      "id": "q_listening_d1_l5_c40_2606",
+      "level": "V",
+      "category": "人際關係處理",
+      "hakka": "朋友之間本來就愛互相𢯭手！",
+      "chinese": "朋友之間本來就是要互相幫忙！",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/86920_13b5ed8759c1eddd58cfeb827fab845aae07d3917d6670d31f5826e231ae6c3d.mp3"
+    },
+    {
+      "id": "q_listening_d1_l5_c42_2702",
+      "level": "V",
+      "category": "社會參與",
+      "hakka": "逐禮拜六𠊎都會去教小朋友寫功課。",
+      "chinese": "我每週六都去教小朋友功課。",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/72791_f0f5abe3ebf17e32e1bdfdd9937cf42f.wav"
+    },
+    {
+      "id": "q_listening_d1_l5_c44_2846",
+      "level": "V",
+      "category": "社會角色",
+      "hakka": "做得教小朋友數學，𠊎當歡喜。",
+      "chinese": "能夠教小朋友數學，我很開心。",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/72668_db432222dadbdb21b68e644a0c7ac68d.wav"
+    },
+    {
+      "id": "q_listening_d1_l5_c45_2906",
+      "level": "V",
+      "category": "社交禮儀",
+      "hakka": "失禮，𠊎無應該恁樣講。",
+      "chinese": "對不起，我不應該那樣說。",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/72680_74c51ade972a2da5652e80cafa173189.wav"
+    },
+    {
+      "id": "q_listening_d1_l5_c49_3133",
+      "level": "V",
+      "category": "社區參與",
+      "hakka": "社區在該尋人講古分小朋友聽。",
+      "chinese": "社區在找人說故事給小朋友聽。",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/66100_d1edf2e5f1ea506791fbc4ceb30136aa.mp3"
+    }
+  ],
+  "家庭與做家事 (Family & Chores)": [
+    {
+      "id": "q_listening_d1_l1_c1_38",
+      "level": "I",
+      "category": "身體認識",
+      "hakka": "天光日阿姆愛帶𠊎去剪頭那毛。",
+      "chinese": "明天媽媽要帶我去剪頭髮。",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/65356_9053508acce2a3e0eba4d20b22df8dee.wav"
+    },
+    {
+      "id": "q_listening_d1_l1_c2_61",
+      "level": "I",
+      "category": "簡易表達",
+      "hakka": "今晡日𠊎試著當想愛睡目哦！",
+      "chinese": "我今天覺得好想睡覺喔！",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/71238_a8953ca1164b5e3571c4088d8a2b1c82.wav"
+    },
+    {
+      "id": "q_listening_d1_l1_c2_62",
+      "level": "I",
+      "category": "簡易表達",
+      "hakka": "係毋係昨晡日忒暗睡了？",
+      "chinese": "是不是昨天太晚睡覺？",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/86864_376265f9a8c49cfb3240e6d0c9431b60399c0030af76595a148b676f2225a1a0.mp3"
+    },
+    {
+      "id": "q_listening_d1_l1_c2_110",
+      "level": "I",
+      "category": "簡易表達",
+      "hakka": "無，吾姆會教𠊎寫字。",
+      "chinese": "沒有，媽媽會教我功課。",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/72546_0c5ed091c4df24aac446ba3d616aa38d.wav"
+    },
+    {
+      "id": "q_listening_d1_l1_c3_121",
+      "level": "I",
+      "category": "生活起居",
+      "hakka": "昨暗晡𠊎 七點就睡目了！",
+      "chinese": "昨天晚上我七點就睡覺了！",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/71842_497718f245aa068f3b02294bad8ff4bf.wav"
+    },
+    {
+      "id": "q_listening_d1_l1_c3_133",
+      "level": "I",
+      "category": "生活起居",
+      "hakka": "逐日朝晨你幾多點䟘床？",
+      "chinese": "你每天早上幾點起床？",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/71848_72d7e82bd29d5846a48df95e97128829.wav"
+    },
+    {
+      "id": "q_listening_d1_l1_c3_134",
+      "level": "I",
+      "category": "生活起居",
+      "hakka": "六點半䟘床，先搓牙洗面。",
+      "chinese": "六點半起床，先刷牙洗臉。",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/72557_168d875b07744bf9a54f3bb9b82ddf37.wav"
+    },
+    {
+      "id": "q_listening_d1_l2_c11_589",
+      "level": "II",
+      "category": "家務分工",
+      "hakka": "𠊎做得𢯭手做麼个？",
+      "chinese": "我可以幫忙做什麼？",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/71894_cdc006fc30f85e4d2bb74abc9cacd0fe.wav"
+    },
+    {
+      "id": "q_listening_d1_l2_c11_601",
+      "level": "II",
+      "category": "家務分工",
+      "hakka": "拚掃个工作愛仰般分呢？",
+      "chinese": "打掃的工作要怎麼分？",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/71895_7b5a0caa62460b7afaa597de1db4978d.wav"
+    },
+    {
+      "id": "q_listening_d1_l2_c11_614",
+      "level": "II",
+      "category": "家務分工",
+      "hakka": "吾爸同吾姆輪流煮。",
+      "chinese": "爸爸跟媽媽輪流煮。",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/72595_838fcc9317918a735722a961be476d4f.wav"
+    },
+    {
+      "id": "q_listening_d1_l2_c11_625",
+      "level": "II",
+      "category": "家務分工",
+      "hakka": "這兜垃圾愛仰般分類？",
+      "chinese": "這些垃圾要怎麼分類？",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/71903_74c4f52c61f89f06badecf9f0a2da1b5.mp3"
+    },
+    {
+      "id": "q_listening_d1_l2_c12_661",
+      "level": "II",
+      "category": "客家社區關懷",
+      "hakka": "叔公在伯公下𢯭手掃地泥。",
+      "chinese": "叔公在土地公廟前幫忙掃地。",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/71992_ca753254a7a018d12fea0cfe1c36e449.mp3"
+    },
+    {
+      "id": "q_listening_d1_l2_c12_662",
+      "level": "II",
+      "category": "客家社區關懷",
+      "hakka": "𫣆俚乜去𢯭手拈垃圾。",
+      "chinese": "我們也去幫忙撿垃圾。",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/72715_bcd4e6db75fade77b97f42f25491dbf9.wav"
+    },
+    {
+      "id": "q_listening_d1_l3_c21_1214",
+      "level": "III",
+      "category": "衣食健康",
+      "hakka": "著啊，吾姆有買頸圍仔分𠊎。",
+      "chinese": "對啊，我媽媽還有買圍巾給我。",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/65475_e478f45416f4ac463be8c02ba8a02717.wav"
+    },
+    {
+      "id": "q_listening_d1_l3_c26_1550",
+      "level": "III",
+      "category": "客家公共事務",
+      "hakka": "知啊，後日阿爸愛帶𠊎去參加。",
+      "chinese": "知道啊，後天爸爸要帶我去參加。",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/72741_c498ac132eb68006f39ae1dcdcecb00e.wav"
+    },
+    {
+      "id": "q_listening_d1_l3_c26_1561",
+      "level": "III",
+      "category": "客家公共事務",
+      "hakka": "社區个伯公下拚掃到當淨俐。",
+      "chinese": "社區的土地公廟打掃得好乾淨。",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/72012_a8694d07e50b35ad08f6f2e040ab38df.mp3"
+    },
+    {
+      "id": "q_listening_d1_l3_c26_1562",
+      "level": "III",
+      "category": "客家公共事務",
+      "hakka": "因為有大家共下拚掃啊。",
+      "chinese": "因為有大家一起打掃呀。",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/72742_37a8221afc677faaf593d2c9ab45247f.wav"
+    },
+    {
+      "id": "q_listening_d1_l3_c29_1766",
+      "level": "III",
+      "category": "城鄉社會",
+      "hakka": "𠊎輒常同阿姆來遶這隻市場。",
+      "chinese": "我常常跟媽媽來逛這個市場。",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/65498_c8597856f2a165b4488c7a284a96685e.wav"
+    },
+    {
+      "id": "q_listening_d1_l4_c35_2077",
+      "level": "IV",
+      "category": "職場稱謂",
+      "hakka": "若爸公司个新主管，人仰般？",
+      "chinese": "你爸爸公司的新主管，人怎樣？",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/66072_e6cdacff3238005d281d34ff8009c29f.mp3"
+    },
+    {
+      "id": "q_listening_d1_l5_c41_2629",
+      "level": "V",
+      "category": "家庭生活",
+      "hakka": "吾老弟總係毋收自家个間房。",
+      "chinese": "我弟弟總是不收自己的房間。",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/71967_bc75f5861bc24395e2f8426c35e1443f.wav"
+    },
+    {
+      "id": "q_listening_d1_l5_c41_2630",
+      "level": "V",
+      "category": "家庭生活",
+      "hakka": "你做得教佢整理，共下拚掃較遽。",
+      "chinese": "你可以教他整理，一起打掃比較快。",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/65540_36ca05014fb5edd8ab3d42b4cb57e72b.wav"
+    },
+    {
+      "id": "q_listening_d1_l5_c41_2653",
+      "level": "V",
+      "category": "家庭生活",
+      "hakka": "阿爸講拜六愛帶歸家人去蹶山。",
+      "chinese": "爸爸說週末要帶全家去爬山。",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/71969_d1650bbec15defcb44e497a77aca4076.wav"
+    },
+    {
+      "id": "q_listening_d1_l5_c42_2689",
+      "level": "V",
+      "category": "社會參與",
+      "hakka": "上擺个淨灘活動，正經拈著當多垃圾。",
+      "chinese": "上次淨灘活動，真的撿到很多垃圾。",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/72045_5cc17524013e2d8cc59dd9d413c95186.mp3"
+    },
+    {
+      "id": "q_listening_d1_l5_c42_2714",
+      "level": "V",
+      "category": "社會參與",
+      "hakka": "𠊎知有一個動保團體做得𢯭手。",
+      "chinese": "我知道有個動保團體可以幫忙。",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/72792_8c8db75e25b2f4696965158ebbc8300a.wav"
+    },
+    {
+      "id": "q_listening_d1_l5_c47_2989",
+      "level": "V",
+      "category": "公共政策的認識與參與",
+      "hakka": "𫣆俚社區附近愛設新个垃圾分類站。",
+      "chinese": "我們社區附近要設置新的垃圾分類站。",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/72050_795717e009cf95f1fa662f0e325319a7.mp3"
+    },
+    {
+      "id": "q_listening_d1_l5_c47_2990",
+      "level": "V",
+      "category": "公共政策的認識與參與",
+      "hakka": "恁樣垃圾回收會還較利便。",
+      "chinese": "這樣垃圾回收會更方便。",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/72796_0fcdfc35f5740d4fd5a3ea631d3e3e03.wav"
+    },
+    {
+      "id": "q_listening_d1_l5_c49_3110",
+      "level": "V",
+      "category": "社區參與",
+      "hakka": "做得打電話分里長，佢會𢯭手處理。",
+      "chinese": "可以打電話給里長，他會幫忙處理。",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/65559_7458ec2d564e3ccd47a870c28c5353df.wav"
+    }
+  ],
+  "運動 (Exercising)": [
+    {
+      "id": "q_listening_d1_l1_c2_74",
+      "level": "I",
+      "category": "簡易表達",
+      "hakka": "先生講愛去運動坪排列仔。",
+      "chinese": "老師說要去操場排隊。",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/72541_2e04645e892f0cc09982758c8541cf4d.wav"
+    },
+    {
+      "id": "q_listening_d1_l2_c12_649",
+      "level": "II",
+      "category": "客家社區關懷",
+      "hakka": "𠊎兜个學校有客家山歌比賽。",
+      "chinese": "我們學校有客家山歌比賽。",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/71991_774e203e586e4e47332de17fb47372f9.mp3"
+    },
+    {
+      "id": "q_listening_d1_l2_c13_709",
+      "level": "II",
+      "category": "時間與氣候",
+      "hakka": "今晡日當熱，𠊎緊出汗。",
+      "chinese": "今天好熱，我一直流汗。",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/71996_2a1e8f7d7ee39b85fdef619268cd7906.mp3"
+    },
+    {
+      "id": "q_listening_d1_l2_c17_962",
+      "level": "II",
+      "category": "社區環境與景觀",
+      "hakka": "𫣆俚共下來去看鴨仔泅水。",
+      "chinese": "我們一起去看鴨子游泳。",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/72728_3b14d705d9380ddc524bf3533bca04f1.wav"
+    },
+    {
+      "id": "q_listening_d1_l2_c18_1021",
+      "level": "II",
+      "category": "鄰里社區",
+      "hakka": "公園肚有當多人在該打拳頭。",
+      "chinese": "公園裡有很多人在打拳。",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/66038_a738e5f08d8a77adaf927ba9fb2801d0.mp3"
+    },
+    {
+      "id": "q_listening_d1_l3_c19_1069",
+      "level": "III",
+      "category": "性別認識與尊重",
+      "hakka": "隔壁班个細妹仔走盡遽。",
+      "chinese": "隔壁班的女生跑步很快。",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/66042_b0b0e5e7f38d4428fd35d3eb0c3b9b3e.mp3"
+    },
+    {
+      "id": "q_listening_d1_l3_c21_1225",
+      "level": "III",
+      "category": "衣食健康",
+      "hakka": "𠊎个運動衫係阿哥著過个。",
+      "chinese": "我的運動服是哥哥穿過的。",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/66058_f35129a4b5c5579446da59daa1e07e6d.mp3"
+    },
+    {
+      "id": "q_listening_d1_l4_c30_1777",
+      "level": "IV",
+      "category": "性格特質與性向探索",
+      "hakka": "𠊎逐擺打籃球都擲毋準。",
+      "chinese": "我每次打籃球都投不準。",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/66070_a4747f47f0c1b7c691fe36e1e5dc03f6.mp3"
+    },
+    {
+      "id": "q_listening_d1_l4_c30_1778",
+      "level": "IV",
+      "category": "性格特質與性向探索",
+      "hakka": "雖然打籃球無恁會，毋過你盡會畫圖！",
+      "chinese": "雖然籃球不行，但你很會畫畫！",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/65417_7392b354f9f272118d00fe9797514274.wav"
+    },
+    {
+      "id": "q_listening_d1_l4_c31_1837",
+      "level": "IV",
+      "category": "情緒表達與經驗分享",
+      "hakka": "看忒比賽，𠊎暢到跳起來！",
+      "chinese": "看完比賽，我開心得跳起來！",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/86879_a22a8bb51405c72e77243f5e4aa1b22a84a5d43e7a6729010bcfbd07c02e6612.mp3"
+    },
+    {
+      "id": "q_listening_d1_l4_c32_1897",
+      "level": "IV",
+      "category": "休閒育樂",
+      "hakka": "下晝愛共下去打籃球無？",
+      "chinese": "下午要不要一起去打籃球？",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/66079_4d91b320010330a8105c5893e5fc96a1.mp3"
+    },
+    {
+      "id": "q_listening_d1_l4_c32_1933",
+      "level": "IV",
+      "category": "休閒育樂",
+      "hakka": "拜六愛去公園騎自行車無？",
+      "chinese": "週末要不要去公園騎腳踏車？",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/66082_2857e11b53a24cca797f36ea83967635.mp3"
+    },
+    {
+      "id": "q_listening_d1_l4_c32_1934",
+      "level": "IV",
+      "category": "休閒育樂",
+      "hakka": "好啊，該條自行車道騎起來當鬆爽。",
+      "chinese": "好啊，那條腳踏車道很舒服。",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/65512_378b700915dbc1cba8491ee6bb4a491c.wav"
+    },
+    {
+      "id": "q_listening_d1_l4_c33_1993",
+      "level": "IV",
+      "category": "客家族群關懷",
+      "hakka": "你有去報名客家歌謠比賽無？",
+      "chinese": "你有報名客家歌謠比賽嗎？",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/72028_f1b08be056cd858c2138a7fc688eb7e5.mp3"
+    },
+    {
+      "id": "q_listening_d1_l4_c52_2209",
+      "level": "IV",
+      "category": "學習活動",
+      "hakka": "你愛共下去參加讀者劇場比賽無？",
+      "chinese": "你要不要一起參加讀者劇場比賽？",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/66085_664688ef1038c602645245fdb5c5feb1.mp3"
+    },
+    {
+      "id": "q_listening_d1_l4_c54_2377",
+      "level": "IV",
+      "category": "情緒管理",
+      "hakka": "這擺比賽輸忒，當毋甘願。",
+      "chinese": "這次比賽輸了，好不甘心。",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/66076_2b53ab62dd3dfb0a3c3c9a4d691a4de6.mp3"
+    },
+    {
+      "id": "q_listening_d1_l4_c54_2390",
+      "level": "IV",
+      "category": "情緒管理",
+      "hakka": "愛共下來去運動坪行行啊無？",
+      "chinese": "要不要一起去操場走走？",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/65445_321f964222e0d4a84cadadadf9005b95.wav"
+    },
+    {
+      "id": "q_listening_d1_l4_c54_2414",
+      "level": "IV",
+      "category": "情緒管理",
+      "hakka": "𠊎會去打球仔來轉換心情。",
+      "chinese": "我會去打球來轉換心情。",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/65452_974d6328d693d85b87b23bb00857574a.wav"
+    },
+    {
+      "id": "q_listening_d1_l4_c38_2438",
+      "level": "IV",
+      "category": "社群互動",
+      "hakka": "𠊎參加籃球社，盡好搞呢。",
+      "chinese": "我參加籃球社，超好玩的。",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/65531_8b7e3e83aa1f261a1d87499550eecaab.wav"
+    },
+    {
+      "id": "q_listening_d1_l5_c46_2917",
+      "level": "V",
+      "category": "學校教育",
+      "hakka": "下禮拜學校有科展比賽，你有參加無？",
+      "chinese": "下週學校有科展比賽，你有要參加嗎？",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/64466_8a04ecf5f23d2a0a0677e40e1fd87d72.wav"
+    },
+    {
+      "id": "q_listening_d1_l5_c49_3109",
+      "level": "V",
+      "category": "社區參與",
+      "hakka": "公園个路燈壞忒了，愛同麼人講呢？",
+      "chinese": "公園的路燈壞了，要跟誰反映呢？",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/66102_a1eb0fd0b6e7da64e5b63b2492879e1c.mp3"
+    },
+    {
+      "id": "q_listening_d1_l5_c49_3121",
+      "level": "V",
+      "category": "社區參與",
+      "hakka": "社區同學校共下辦運動會，你會參加無？",
+      "chinese": "社區跟學校一起辦運動會，你會參加嗎？",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/66101_aa252d584654814da81f91ae58712532.mp3"
+    }
+  ],
+  "學校生活 (School Life)": [
+    {
+      "id": "q_listening_d1_l1_c2_97",
+      "level": "I",
+      "category": "簡易表達",
+      "hakka": "等𠊎一下哦，𠊎去拿鉛筆。",
+      "chinese": "等我一下，我去拿鉛筆。",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/71248_3235aa15b0095dad45172aa312e35ded.wav"
+    },
+    {
+      "id": "q_listening_d1_l1_c5_229",
+      "level": "I",
+      "category": "親屬稱謂",
+      "hakka": "今晡日放學阿公愛來接𠊎！",
+      "chinese": "今天爺爺要來接我放學！",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/66031_9a7da81888a68385ac3d8b68f399d24a.mp3"
+    },
+    {
+      "id": "q_listening_d1_l1_c7_374",
+      "level": "I",
+      "category": "校園生活",
+      "hakka": "希望先生功課做得出較少兜仔。",
+      "chinese": "希望老師功課可以出少一點。",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/72564_97c2326195002ed5e899a59a2b7ae893.wav"
+    },
+    {
+      "id": "q_listening_d1_l1_c7_385",
+      "level": "I",
+      "category": "校園生活",
+      "hakka": "𠊎班項愛去圖書館借書。",
+      "chinese": "我們班要去圖書館借書。",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/71857_5d9656153ce6b671356efd34ab2b0d9a.wav"
+    },
+    {
+      "id": "q_listening_d1_l1_c7_386",
+      "level": "I",
+      "category": "校園生活",
+      "hakka": "還好哦，𠊎最好看故事書。",
+      "chinese": "真好，我最喜歡看故事書。",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/72565_2ae76fa90d5e00f7666109977895007c.wav"
+    },
+    {
+      "id": "q_listening_d1_l1_c7_397",
+      "level": "I",
+      "category": "校園生活",
+      "hakka": "下課時節愛共下搞鬼捉人無？",
+      "chinese": "下課時要一起玩鬼抓人嗎？",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/71854_51b54c26beab154b32b854f1c83b7ba7.wav"
+    },
+    {
+      "id": "q_listening_d1_l2_c9_469",
+      "level": "II",
+      "category": "情緒用語",
+      "hakka": "還暢哦，這擺考試𠊎考一百分。",
+      "chinese": "好開心，這次考試我考一百分。",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/68966_d9cd2c2aac973f3c25b878d682d2251f.wav"
+    },
+    {
+      "id": "q_listening_d1_l2_c9_481",
+      "level": "II",
+      "category": "情緒用語",
+      "hakka": "𠊎个鉛筆盒仔毋見忒了，當艱苦哦！",
+      "chinese": "我的鉛筆盒不見了，好難過喔。",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/65849_7521e1e98608b181f55e9be9a666c567.wav"
+    },
+    {
+      "id": "q_listening_d1_l2_c9_518",
+      "level": "II",
+      "category": "情緒用語",
+      "hakka": "無要緊，𫣆俚在教室畫圖。",
+      "chinese": "沒關係，我們在教室畫圖。",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/65378_d33ea24f6cbb1d7c2171552e101d5610.wav"
+    },
+    {
+      "id": "q_listening_d1_l2_c10_541",
+      "level": "II",
+      "category": "意見表達",
+      "hakka": "𫣆俚下課來去跳索仔好無？",
+      "chinese": "我們下課來玩跳繩好不好？",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/71864_ef935bbb935adbe5e764c4b65067d0e8.wav"
+    },
+    {
+      "id": "q_listening_d1_l2_c10_577",
+      "level": "II",
+      "category": "意見表達",
+      "hakka": "拜六愛去圖書館無？",
+      "chinese": "週末要去圖書館嗎？",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/71862_e66a614fc254e884b58345840f7d1c87.wav"
+    },
+    {
+      "id": "q_listening_d1_l2_c13_734",
+      "level": "II",
+      "category": "時間與氣候",
+      "hakka": "𠊎顛倒中意上課，毋好放尞。",
+      "chinese": "但是我比較喜歡上課，不喜歡放假。",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/72722_add4c8fa226e96cb26b4d7f05d5d2000.wav"
+    },
+    {
+      "id": "q_listening_d1_l2_c13_757",
+      "level": "II",
+      "category": "時間與氣候",
+      "hakka": "先生講外背个空氣品質毋好。",
+      "chinese": "老師說外面空氣品質不好。",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/72000_7f3b2640b56c816095bb95827704a5ac.mp3"
+    },
+    {
+      "id": "q_listening_d1_l2_c13_758",
+      "level": "II",
+      "category": "時間與氣候",
+      "hakka": "𠊎兜就留在教室搞好了。",
+      "chinese": "我們就留在教室玩好了。",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/72725_f6d679b0100762edc077b3afc87d8e6e.wav"
+    },
+    {
+      "id": "q_listening_d1_l2_c14_818",
+      "level": "II",
+      "category": "社交稱謂",
+      "hakka": "毋過體育先生盡生趣。",
+      "chinese": "但是體育老師就很有趣。",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/65386_7d917d1a15589aa13e7d589cf44b0221.wav"
+    },
+    {
+      "id": "q_listening_d1_l2_c15_877",
+      "level": "II",
+      "category": "簡易生活應對",
+      "hakka": "𠊎毋記得帶作業了，仰結煞？",
+      "chinese": "我忘記帶作業了，怎麼辦？",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/71882_a772e1c1239dbc059506235c30b954a9.wav"
+    },
+    {
+      "id": "q_listening_d1_l2_c15_878",
+      "level": "II",
+      "category": "簡易生活應對",
+      "hakka": "先同先生講，天光日正過帶來。",
+      "chinese": "先跟老師說，明天再帶來。",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/72588_bea84a558e5481c6e3f14f86dd4a0428.wav"
+    },
+    {
+      "id": "q_listening_d1_l2_c16_889",
+      "level": "II",
+      "category": "同儕互動",
+      "hakka": "下課時節，愛共下去尋校長無？",
+      "chinese": "下課時，要不要一起去找校長？",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/71912_bc6845752e67629ea3801bf89c2731e2.mp3"
+    },
+    {
+      "id": "q_listening_d1_l2_c16_902",
+      "level": "II",
+      "category": "同儕互動",
+      "hakka": "好啊，𫣆俚下課共下搞跳索仔。",
+      "chinese": "好啊，我們下課一起玩跳繩。",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/72601_b81c8236ad386710b3c5cb27d7e44d17.wav"
+    },
+    {
+      "id": "q_listening_d1_l2_c16_926",
+      "level": "II",
+      "category": "同儕互動",
+      "hakka": "好，𫣆俚下課共下畫。",
+      "chinese": "好，我們下課一起畫。",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/72604_c248966293413d5d4c910b533a9700d5.wav"
+    },
+    {
+      "id": "q_listening_d1_l2_c18_1033",
+      "level": "II",
+      "category": "鄰里社區",
+      "hakka": "社區圖書館買當多新書。",
+      "chinese": "社區圖書館買了很多新書。",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/66039_e843095499ef2ebe3273eda91c8a0ac5.mp3"
+    },
+    {
+      "id": "q_listening_d1_l2_c18_1034",
+      "level": "II",
+      "category": "鄰里社區",
+      "hakka": "𫣆俚共下來去借書。",
+      "chinese": "我們一起去借書。",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/65464_a3d87074199ccfb50aa06d8012ad8ef6.wav"
+    },
+    {
+      "id": "q_listening_d1_l2_c18_1045",
+      "level": "II",
+      "category": "鄰里社區",
+      "hakka": "學校脣新開了一間麵包店。",
+      "chinese": "學校旁邊開了一間新的麵包店。",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/66040_9a14bc79f6193d835cb175c3afbf4cc1.mp3"
+    },
+    {
+      "id": "q_listening_d1_l3_c20_1165",
+      "level": "III",
+      "category": "意見與情感表達",
+      "hakka": "先生愛𠊎兜寫日記，還麻煩哦！",
+      "chinese": "老師要我們寫日記，好麻煩喔！",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/71916_ec2aea5f4d588c4f63230893f12da35a.wav"
+    },
+    {
+      "id": "q_listening_d1_l3_c22_1273",
+      "level": "III",
+      "category": "客家社會關懷",
+      "hakka": "學校愛表演客家山歌！",
+      "chinese": "學校要表演客家山歌！",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/72008_d8824980ae0c8713752311403a974c80.mp3"
+    },
+    {
+      "id": "q_listening_d1_l3_c23_1334",
+      "level": "III",
+      "category": "時間與節氣",
+      "hakka": "𠊎同幾隻同學愛去參加營隊。",
+      "chinese": "我和幾個同學要參加營隊。",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/86869_59266ffc3fed10b1afcf7e6a39caca42962708d1bb0f8ef8fe77182332702932.mp3"
+    },
+    {
+      "id": "q_listening_d1_l3_c51_1381",
+      "level": "III",
+      "category": "社交稱謂",
+      "hakka": "有看著圖書館个志工無？",
+      "chinese": "有看到圖書館的志工嗎？",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/66048_ed40b8075618ed74a8f0bb2dc00f33e3.mp3"
+    },
+    {
+      "id": "q_listening_d1_l3_c51_1382",
+      "level": "III",
+      "category": "社交稱謂",
+      "hakka": "佢在書櫥仔後背整理書。",
+      "chinese": "他在書櫃後面整理書。",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/65400_c0dd46c32afc865beea18debb990ec01.wav"
+    },
+    {
+      "id": "q_listening_d1_l3_c24_1430",
+      "level": "III",
+      "category": "常用生活應對",
+      "hakka": "著啊，愛記得撳忒電火同捽粉牌哦。",
+      "chinese": "對啊，要記得關燈和擦黑板喔。",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/72617_d8f46657efb4162eb3863ea7313fb74a.wav"
+    },
+    {
+      "id": "q_listening_d1_l3_c25_1489",
+      "level": "III",
+      "category": "學習活動",
+      "hakka": "𫣆俚係毋係行毋著教室了？",
+      "chinese": "我們是不是走錯教室了？",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/66060_127e7cf82fa4c09102101b1bf924a17d.mp3"
+    },
+    {
+      "id": "q_listening_d1_l3_c25_1490",
+      "level": "III",
+      "category": "學習活動",
+      "hakka": "𠊎看一下課表係麼个課。",
+      "chinese": "我看一下課表是什麼課。",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/65478_a97ac57fdc3ab02eb0b5cdfcd146733d.wav"
+    },
+    {
+      "id": "q_listening_d1_l3_c25_1513",
+      "level": "III",
+      "category": "學習活動",
+      "hakka": "昨晡日个作業還多哦。",
+      "chinese": "昨天的作業有好多喔。",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/66062_1241df16879d5c3509973722fbdbb15c.mp3"
+    },
+    {
+      "id": "q_listening_d1_l3_c29_1717",
+      "level": "III",
+      "category": "城鄉社會",
+      "hakka": "學校附近新開一間便利商店。",
+      "chinese": "學校附近新開了一家便利商店。",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/66065_179ebc70249d8476ea5f9a4b52c622fd.mp3"
+    },
+    {
+      "id": "q_listening_d1_l4_c30_1801",
+      "level": "IV",
+      "category": "性格特質與性向探索",
+      "hakka": "𠊎較好自家恬恬仔看書。",
+      "chinese": "我比較喜歡自己安靜看書。",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/65893_23461965a9f20792a837c4ded7e74513.wav"
+    },
+    {
+      "id": "q_listening_d1_l4_c31_1885",
+      "level": "IV",
+      "category": "情緒表達與經驗分享",
+      "hakka": "分先生阿腦，𠊎試著當有自信。",
+      "chinese": "被老師稱讚，我感覺超有自信。",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/86883_aa116079f4edca2167ced85ba8cdbd3fc11f53a8d839da83e2146149f4070d2d.mp3"
+    },
+    {
+      "id": "q_listening_d1_l4_c31_1886",
+      "level": "IV",
+      "category": "情緒表達與經驗分享",
+      "hakka": "這駁仔你正經進步當多，先生乜有發現。",
+      "chinese": "你最近真的進步很多，老師也有發現。",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/72637_8464eb0fa68ef76b0cc94ebd9ade8daa.wav"
+    },
+    {
+      "id": "q_listening_d1_l4_c35_2113",
+      "level": "IV",
+      "category": "職場稱謂",
+      "hakka": "天光日警察阿叔會來學校教安全教育。",
+      "chinese": "警察叔叔明天會來學校教安全教育。",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/66075_9f50e0d3c230fd0dce73ccf365222141.mp3"
+    },
+    {
+      "id": "q_listening_d1_l4_c36_2149",
+      "level": "IV",
+      "category": "生活與社交",
+      "hakka": "拜六愛約同學來𠊎屋下搞無？",
+      "chinese": "星期六要不要約同學來我家？",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/86885_4de73c560b2f8e8de159d304c48c7d95f6145a3ea1695efdb2b7484f150d3e87.mp3"
+    },
+    {
+      "id": "q_listening_d1_l4_c36_2161",
+      "level": "IV",
+      "category": "生活與社交",
+      "hakka": "班項轉來一個新同學，看起來當孤栖。",
+      "chinese": "班上轉來一個新同學，看起來很孤單。",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/71922_eb48eddc03d5577b6239331f2e6979a7.wav"
+    },
+    {
+      "id": "q_listening_d1_l4_c36_2174",
+      "level": "IV",
+      "category": "生活與社交",
+      "hakka": "天光日𠊎愛同同學去逛街。",
+      "chinese": "明天我要跟同學去逛街。",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/72647_f9e90aabfb01bc88cf0a01a4d19b9960.wav"
+    },
+    {
+      "id": "q_listening_d1_l4_c36_2185",
+      "level": "IV",
+      "category": "生活與社交",
+      "hakka": "同圖書館借个書既經過期了。",
+      "chinese": "跟圖書館借的書已經逾期了。",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/71925_3e7d4ae5e6f8a53931cced72e89705d0.mp3"
+    },
+    {
+      "id": "q_listening_d1_l4_c52_2197",
+      "level": "IV",
+      "category": "學習活動",
+      "hakka": "這擺考試，𠊎考到比上擺好！",
+      "chinese": "這次考試，我考得比上次好！",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/66084_94b49cae16a60286e113e7a741f62f88.mp3"
+    },
+    {
+      "id": "q_listening_d1_l4_c52_2210",
+      "level": "IV",
+      "category": "學習活動",
+      "hakka": "好啊，𫣆俚下課个時節共下來練習。",
+      "chinese": "好啊，我們下課一起練習。",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/65522_6d394a6d146af6e4cbb5a55322f9d854.wav"
+    },
+    {
+      "id": "q_listening_d1_l4_c52_2245",
+      "level": "IV",
+      "category": "學習活動",
+      "hakka": "你个筆記畫到當靚。",
+      "chinese": "你的筆記畫得很漂亮。",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/66088_a6dd28979fea705146e0cb3309fd2e2e.mp3"
+    },
+    {
+      "id": "q_listening_d1_l4_c38_2449",
+      "level": "IV",
+      "category": "社群互動",
+      "hakka": "下課愛共下來去圖書館無？",
+      "chinese": "下課要不要一起去圖書館？",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/66091_552e8e80598beb195d30b2c0b6862239.mp3"
+    },
+    {
+      "id": "q_listening_d1_l5_c39_2521",
+      "level": "V",
+      "category": "認識自我",
+      "hakka": "𠊎想愛做先生，做得教小朋友。",
+      "chinese": "我想當老師，可以教小朋友。",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/71928_40d47bc1e4f39532961a4063cf1280e9.wav"
+    },
+    {
+      "id": "q_listening_d1_l5_c42_2677",
+      "level": "V",
+      "category": "社會參與",
+      "hakka": "學校這下當在該辦義賣，你愛去參加無？",
+      "chinese": "學校正在舉辦義賣，你要參加嗎？",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/72044_1016ebe26266d841fc79d7ff93886d0f.mp3"
+    },
+    {
+      "id": "q_listening_d1_l5_c42_2690",
+      "level": "V",
+      "category": "社會參與",
+      "hakka": "係啊，下二擺𫣆俚做得邀請還較多同學共下去。",
+      "chinese": "對啊，下次我們可以邀更多同學一起去。",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/72790_8c556896f6e7c66715b40c68ff151caa.wav"
+    },
+    {
+      "id": "q_listening_d1_l5_c44_2798",
+      "level": "V",
+      "category": "社會角色",
+      "hakka": "著啊，先生交代个都有做好。",
+      "chinese": "對啊，老師交代的都有做好。",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/72662_57315502ae24f4c8ecd1f7d29a246d29.wav"
+    },
+    {
+      "id": "q_listening_d1_l5_c44_2809",
+      "level": "V",
+      "category": "社會角色",
+      "hakka": "做學校个圖書館志工會當無閒無？",
+      "chinese": "當學校的圖書館志工會很忙嗎？",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/71940_6895e9101cea9b97236dd111bcb1e596.mp3"
+    },
+    {
+      "id": "q_listening_d1_l5_c44_2810",
+      "level": "V",
+      "category": "社會角色",
+      "hakka": "毋會，單淨愛𢯭手整理書架同借書。",
+      "chinese": "不會，只要幫忙整理書架和借書。",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/72663_d0990eb0f8ed3941444082bac675fb17.wav"
+    },
+    {
+      "id": "q_listening_d1_l5_c45_2857",
+      "level": "V",
+      "category": "社交禮儀",
+      "hakka": "先生頭先在該喊你，你仰無應呢。",
+      "chinese": "老師剛剛在叫你，你沒回應耶。",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/71952_c5e8035e7a0b5608609260a3d08127a7.wav"
+    },
+    {
+      "id": "q_listening_d1_l5_c46_2942",
+      "level": "V",
+      "category": "學校教育",
+      "hakka": "化學先生講下禮拜愛做新个實驗！",
+      "chinese": "化學老師說下週要做新的實驗！",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/65555_e69a4283bfd53e363579a6c0886fbc54.wav"
+    },
+    {
+      "id": "q_listening_d1_l5_c47_2977",
+      "level": "V",
+      "category": "公共政策的認識與參與",
+      "hakka": "學校講愛推行減塑政策，你試著仰般？",
+      "chinese": "學校說要推行減塑政策，你覺得呢？",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/72049_01a09eecf180ee50b546c57884eb1dfb.mp3"
+    },
+    {
+      "id": "q_listening_d1_l5_c47_3001",
+      "level": "V",
+      "category": "公共政策的認識與參與",
+      "hakka": "學校附近个青紅燈重新調整時間了。",
+      "chinese": "學校附近的紅綠燈重新調整時間了。",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/72051_2d3e3aede4f37075b38dfab8745f2446.mp3"
+    },
+    {
+      "id": "q_listening_d1_l5_c50_3157",
+      "level": "V",
+      "category": "臺灣多元族群的發展",
+      "hakka": "上擺學校辦个原住民文化展當好搞！",
+      "chinese": "上次學校辦的原住民文化展很好玩！",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/72054_79c524244f0b6c3a6a53ae7556d5f778.mp3"
+    },
+    {
+      "id": "q_listening_d1_l5_c50_3193",
+      "level": "V",
+      "category": "臺灣多元族群的發展",
+      "hakka": "吾班項有一個同學會講馬祖話。",
+      "chinese": "我班上有個同學會說馬祖話。",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/72057_1ad31bb5d678d3eab76f34b5a00d28dc.mp3"
+    }
+  ],
+  "天氣與出門 (Weather & Outing)": [
+    {
+      "id": "q_listening_d1_l1_c4_181",
+      "level": "I",
+      "category": "時間與天氣",
+      "hakka": "落雨了，𠊎毋記得帶遮仔。",
+      "chinese": "下雨了，我忘了帶雨傘。",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/71978_5e510407d2f27944aa12cf8eaad82d64.mp3"
+    },
+    {
+      "id": "q_listening_d1_l1_c4_182",
+      "level": "I",
+      "category": "時間與天氣",
+      "hakka": "好得朝晨𠊎有帶遮仔出門。",
+      "chinese": "幸好早上我有帶傘出門。",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/72698_4c14fd8bb33a2ab12e735ab2116f80b3.wav"
+    },
+    {
+      "id": "q_listening_d1_l1_c4_205",
+      "level": "I",
+      "category": "時間與天氣",
+      "hakka": "天時還熱哦，當想愛吹冷氣。",
+      "chinese": "天氣這麼熱，好想吹冷氣。",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/71979_0f0aef067b50c0e129873cca8ac7aa57.mp3"
+    },
+    {
+      "id": "q_listening_d1_l1_c4_206",
+      "level": "I",
+      "category": "時間與天氣",
+      "hakka": "𠊎乜熱到會佇毋著了。",
+      "chinese": "我也熱到快受不了了。",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/72700_00d83528af3047c819e37dc0d03e2dcb.wav"
+    },
+    {
+      "id": "q_listening_d1_l1_c4_217",
+      "level": "I",
+      "category": "時間與天氣",
+      "hakka": "朝晨出門還寒哦！",
+      "chinese": "今天早上出門好冷哦！",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/71980_b627932fe1ce7675369023c7ded7f3f0.mp3"
+    },
+    {
+      "id": "q_listening_d1_l1_c4_218",
+      "level": "I",
+      "category": "時間與天氣",
+      "hakka": "𠊎著了幾下領衫褲還係會冷。",
+      "chinese": "我穿了好幾件衣服還是會冷。",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/72704_86731efe77e6c574cdec38f7f930f1c0.wav"
+    },
+    {
+      "id": "q_listening_d1_l1_c6_289",
+      "level": "I",
+      "category": "招呼用語",
+      "hakka": "恁會早！今晡日天時還好哦。",
+      "chinese": "早安！今天天氣真好。",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/71841_1dd59e217748c83a2e74b9c8b559ec64.wav"
+    },
+    {
+      "id": "q_listening_d1_l1_c6_290",
+      "level": "I",
+      "category": "招呼用語",
+      "hakka": "恁早！今晡日應該毋會落雨。",
+      "chinese": "早！今天應該不會下雨。",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/72547_7a7ece4b9b6381ab89bb2d15d9a05c68.wav"
+    },
+    {
+      "id": "q_listening_d1_l2_c9_517",
+      "level": "II",
+      "category": "情緒用語",
+      "hakka": "落雨天做毋得出去尞，當無聊。",
+      "chinese": "下雨不能出去玩，好無聊。",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/65852_5f946629b60f3c6ea57604dc2059c637.wav"
+    },
+    {
+      "id": "q_listening_d1_l2_c11_590",
+      "level": "II",
+      "category": "家務分工",
+      "hakka": "你來𢯭手摺衫褲。",
+      "chinese": "你來幫忙摺衣服。",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/72591_4b686a212d2a0bea38fb204a813a86de.wav"
+    },
+    {
+      "id": "q_listening_d1_l2_c13_721",
+      "level": "II",
+      "category": "時間與氣候",
+      "hakka": "會落雨了，天烏疏疏仔。",
+      "chinese": "快下雨了，天空好黑。",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/71997_fc0af5fb3db8b46251cacbb4226926e1.mp3"
+    },
+    {
+      "id": "q_listening_d1_l2_c13_745",
+      "level": "II",
+      "category": "時間與氣候",
+      "hakka": "寒天到吔，變還冷哦。",
+      "chinese": "冬天到了，變得好冷。",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/71999_ba28e3c36d1de68196e5c37b1cc57a33.mp3"
+    },
+    {
+      "id": "q_listening_d1_l2_c13_746",
+      "level": "II",
+      "category": "時間與氣候",
+      "hakka": "記得著加一領襖仔。",
+      "chinese": "記得多穿一件外套。",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/72723_8ea85cc5b88c5f771900c957448bacc9.wav"
+    },
+    {
+      "id": "q_listening_d1_l2_c14_769",
+      "level": "II",
+      "category": "社交稱謂",
+      "hakka": "今晡日主任著到當靚哦！",
+      "chinese": "主任今天穿得好漂亮喔！",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/65853_1158f52a199cf08246d19081344aa342.wav"
+    },
+    {
+      "id": "q_listening_d1_l2_c14_770",
+      "level": "II",
+      "category": "社交稱謂",
+      "hakka": "校長乜著到盡好看。",
+      "chinese": "校長也穿得很好看。",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/65379_c48adf26abb779987ec4814f2dff00ef.wav"
+    },
+    {
+      "id": "q_listening_d1_l3_c20_1153",
+      "level": "III",
+      "category": "意見與情感表達",
+      "hakka": "𠊎試著這身衫褲个色目當靚。",
+      "chinese": "我覺得這件衣服的顏色很漂亮。",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/71915_ebfe7b82c46960be8c64ca2f2ff4e260.wav"
+    },
+    {
+      "id": "q_listening_d1_l3_c20_1154",
+      "level": "III",
+      "category": "意見與情感表達",
+      "hakka": "你著水紅色正經當好看！",
+      "chinese": "你穿粉紅色的真的很好看！",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/72608_fade5a0ade8038a0675db48e8427febd.wav"
+    },
+    {
+      "id": "q_listening_d1_l3_c21_1201",
+      "level": "III",
+      "category": "衣食健康",
+      "hakka": "你个襖仔當得人惜，在哪位買个？",
+      "chinese": "你的外套好可愛，在哪裡買的？",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/66057_b60bb5f85b48e7522405988e1bbc0792.mp3"
+    },
+    {
+      "id": "q_listening_d1_l3_c21_1213",
+      "level": "III",
+      "category": "衣食健康",
+      "hakka": "天時變冷了，衫褲愛加著兜仔。",
+      "chinese": "天氣變冷了，衣服要多穿一些。",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/65910_74ccac9a0f4057cb06af54b5705d29ca.wav"
+    },
+    {
+      "id": "q_listening_d1_l3_c21_1237",
+      "level": "III",
+      "category": "衣食健康",
+      "hakka": "日頭當烈，還晟眼哦。",
+      "chinese": "太陽好大，好刺眼喔。",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/66059_a695970fed26086b9490d46bed68fa0e.mp3"
+    },
+    {
+      "id": "q_listening_d1_l3_c21_1238",
+      "level": "III",
+      "category": "衣食健康",
+      "hakka": "𠊎有戴帽仔，做得遮日頭。",
+      "chinese": "我有戴帽子，可以遮太陽。",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/65477_259a2b58b8b97799ea06fe1da71bf1c5.wav"
+    },
+    {
+      "id": "q_listening_d1_l3_c23_1321",
+      "level": "III",
+      "category": "時間與節氣",
+      "hakka": "天光日當像會落雨，天時變涼了。",
+      "chinese": "明天好像要下雨，天氣變涼了。",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/72016_9b5f55c5919a23b46eb86a3c98ead289.mp3"
+    },
+    {
+      "id": "q_listening_d1_l3_c51_1369",
+      "level": "III",
+      "category": "社交稱謂",
+      "hakka": "今晡日你著个新衫異靚。",
+      "chinese": "你今天穿的新衣服真漂亮。",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/66047_3a4396fa3b78c69857c8e43686527ada.mp3"
+    },
+    {
+      "id": "q_listening_d1_l3_c51_1370",
+      "level": "III",
+      "category": "社交稱謂",
+      "hakka": "這領衫係阿婆買分𠊎个生日禮物。",
+      "chinese": "這件衣服是奶奶買給我的生日禮物。",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/65398_310b9b8c8d37e58f702edc57091ad9ff.wav"
+    },
+    {
+      "id": "q_listening_d1_l3_c28_1682",
+      "level": "III",
+      "category": "情緒管理",
+      "hakka": "等心情較穩定兜仔再過同佢好好啊講。",
+      "chinese": "等冷靜一點再跟他好好說。",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/65412_2607ad39ab6f6d572b5df485bf8aea8b.wav"
+    },
+    {
+      "id": "q_listening_d1_l3_c29_1765",
+      "level": "III",
+      "category": "城鄉社會",
+      "hakka": "這隻市場當多人，還鬧熱哦。",
+      "chinese": "這個市場人很多，好熱鬧喔。",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/66069_77c498f7bd5c144508b0546d747c50f5.mp3"
+    },
+    {
+      "id": "q_listening_d1_l4_c30_1802",
+      "level": "IV",
+      "category": "性格特質與性向探索",
+      "hakka": "𠊎好同人打嘴鼓，恁樣較鬧熱。",
+      "chinese": "我喜歡跟人聊天，這樣比較熱鬧。",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/65420_fa4b516f71daff7de6c58ed580ff7de4.wav"
+    },
+    {
+      "id": "q_listening_d1_l4_c32_1898",
+      "level": "IV",
+      "category": "休閒育樂",
+      "hakka": "好啊，順續仔試看啊這雙新球鞋好著無。",
+      "chinese": "好啊，順便試試新球鞋好不好穿。",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/65504_3b2dddf78ca99bd8eb41cb69212fcd0b.wav"
+    },
+    {
+      "id": "q_listening_d1_l4_c33_1981",
+      "level": "IV",
+      "category": "客家族群關懷",
+      "hakka": "你有著過藍衫無？",
+      "chinese": "你有穿過藍衫嗎？",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/72027_29ad647ddd6f431646debb3723d9355a.mp3"
+    },
+    {
+      "id": "q_listening_d1_l4_c33_1982",
+      "level": "IV",
+      "category": "客家族群關懷",
+      "hakka": "舊年客家文化節个時節有著過。",
+      "chinese": "去年客家文化節時有穿過。",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/72759_13de96d0d529eecf20758c88536c4e97.wav"
+    },
+    {
+      "id": "q_listening_d1_l4_c34_2017",
+      "level": "IV",
+      "category": "臺灣的氣候變遷",
+      "hakka": "今年个天時當奇怪，寒天都毋會冷。",
+      "chinese": "今年天氣好奇怪，冬天都不冷。",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/72035_df872b2dc2f2156e68a2296423dcaf9d.mp3"
+    },
+    {
+      "id": "q_listening_d1_l4_c34_2053",
+      "level": "IV",
+      "category": "臺灣的氣候變遷",
+      "hakka": "今年係有紀錄以來最熱个一年。",
+      "chinese": "今年是有紀錄以來最熱的一年。",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/72037_9470055183ee6a4011be792d292771cb.mp3"
+    },
+    {
+      "id": "q_listening_d1_l4_c34_2066",
+      "level": "IV",
+      "category": "臺灣的氣候變遷",
+      "hakka": "成時單淨落雨乜會造成災害。",
+      "chinese": "有時候只是下雨也會造成災害。",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/72781_64efddfec67775f49e7dd77382d39c26.wav"
+    },
+    {
+      "id": "q_listening_d1_l4_c37_2341",
+      "level": "IV",
+      "category": "臺灣自然地景",
+      "hakka": "你有坐過臺東个熱氣球無？",
+      "chinese": "你有坐過臺東的熱氣球嗎？",
+      "audio": "https://dn9mvjhbyvvpc.cloudfront.net/files/72041_c4c2001fe6f1f791e0dae225eda7410c.mp3"
+    }
+  ]
+}

@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>第1課 𠊎好食个東西｜客語生活任務</title>
+  <link rel="stylesheet" href="./breakfast.css?v=20260831-27">
+</head>
+<body>
+  <main class="game-shell">
+    <header class="game-topbar">
+      <a class="back-link" href="./index.html#classroom">返回</a>
+      <div>
+        <h1>單元快問快答</h1>
+      </div>
+    </header>
+
+    <section id="introScreen" class="screen intro-screen" aria-labelledby="introTitle">
+      <div class="intro-copy">
+<section class="dialect-area" aria-labelledby="dialectTitle">
+          <h3 id="dialectTitle">選擇腔別</h3>
+          <div class="dialect-switcher">
+            <button class="dialect" type="button" data-dialect="sixian">四縣腔</button>
+            <button class="dialect" type="button" disabled aria-disabled="true">海陸腔</button>
+            <button class="dialect" type="button" disabled aria-disabled="true">大埔腔</button>
+            <button class="dialect" type="button" disabled aria-disabled="true">饒平腔</button>
+            <button class="dialect" type="button" disabled aria-disabled="true">詔安腔</button>
+            <button class="dialect" type="button" disabled aria-disabled="true">南四縣腔</button>
+          </div>
+        </section>
+
+        <section class="lesson-area" aria-labelledby="lessonTitle">
+          <div class="lesson-heading">
+            <h3 id="lessonTitle">選擇課別</h3>
+            <p id="lessonHint">請先選擇腔別，再選課別開始。</p>
+          </div>
+          <div class="lesson-carousel-wrap"><div class="lesson-carousel" id="lessonCarousel" aria-label="課別卡片">
+              <button class="lesson-card" type="button" data-lesson="1" disabled>
+                <span class="complete-badge" data-complete-badge hidden>已完成</span>
+                <img src="./assets/lesson-card-1-breakfast.png" alt="學生進行早餐圖卡測驗">
+                <span>第1課</span>
+                <strong>早餐圖卡小廚師</strong>
+                <small>看早餐圖卡，選出正確詞語。</small>
+              </button>
+              <button class="lesson-card is-locked" type="button" data-lesson="2" disabled>
+                <img src="./assets/lesson-card-2-clothes.png" alt="學生進行衣服圖卡配對">
+                <span>第2課</span>
+                <strong>衣服配配樂</strong>
+                <small>認識衣服詞語，練習搭配。</small>
+              </button>
+              <button class="lesson-card is-locked" type="button" data-lesson="3" disabled>
+                <img src="./assets/lesson-card-3-rest.png" alt="學生在休息角落進行活動">
+                <span>第3課</span>
+                <strong>休憩之間</strong>
+                <small>看休息活動，讀懂生活句。</small>
+              </button>
+            </div></div>
+        </section>
+      </div>
+    </section>
+
+    <section id="playScreen" class="screen play-screen" hidden aria-live="polite">
+      <aside class="status-panel">
+        <p class="eyebrow">第 <span id="questionNumber">1</span> 題 / 5</p>
+        <div class="star-row" id="starRow" aria-label="目前星星數"></div>
+        <div class="word-bank" id="wordBank"></div>
+      </aside>
+
+      <article class="question-panel">
+        <div class="question-head">
+          <p id="questionType" class="question-type">看華語選客語</p>
+          <h2 id="questionTitle">白飯</h2>
+          <p id="questionPrompt">請選出正確的四縣腔詞。</p>
+        </div>
+        <div id="imageStage" class="image-stage">
+          <img src="./assets/lesson-1-foods-cards.jpg" alt="早餐圖卡">
+        </div>
+        <div id="choiceGrid" class="choice-grid"></div>
+        <p id="feedback" class="feedback" hidden></p>
+        <div class="action-row">
+          <button id="retryBtn" class="plain-button" type="button">重選</button>
+          <button id="nextBtn" class="primary-button" type="button" disabled>下一題</button>
+        </div>
+      </article>
+    </section>
+
+    <section id="completeScreen" class="screen complete-screen" hidden>
+      <div class="badge">早餐小達人</div>
+      <h2>通過測驗～</h2>
+      <p>恭喜你完成第1課「𠊎好食个東西」！</p>
+      <div class="result-list">
+        <span>看懂食物圖片</span>
+        <span>選出生詞</span>
+        <span>認得拼音</span>
+        <span>完成第1課測驗</span>
+      </div>
+      <div class="action-row center">
+        <button id="againBtn" class="plain-button" type="button">再玩一次</button>
+        <a class="primary-link" href="./breakfast.html">回到課堂測驗</a>
+      </div>
+    </section>
+  </main>
+
+  <script src="./breakfast.js?v=20260831-27"></script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

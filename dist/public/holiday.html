@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>休假日任務｜客語生活任務</title>
+  <link rel="stylesheet" href="./holiday.css?v=20260828-19">
+</head>
+<body>
+  <main class="task-shell">
+    <header class="task-topbar">
+      <a class="back-link" href="./index.html#situations">返回</a>
+      <div>
+        <h1>休假日</h1>
+      </div>
+      <label class="mode-toggle" title="顯示題目句、辨識文字與手動修正欄位">
+        <input id="debugToggle" type="checkbox">
+        <span>開發者模式</span>
+      </label>
+      <section class="dialect-switcher" aria-label="選擇腔別">
+        <button class="dialect is-active" type="button" data-dialect="sixian">四縣腔</button>
+        <button class="dialect" type="button" data-dialect="hailu">海陸腔</button>
+        <button class="dialect" type="button" data-dialect="dabu">大埔腔</button>
+        <button class="dialect" type="button" data-dialect="raoping">饒平腔</button>
+        <button class="dialect" type="button" data-dialect="zhaoan">詔安腔</button>
+        <button class="dialect" type="button" data-dialect="southSixian">南四縣腔</button>
+      </section>
+    </header>
+
+    <section class="mission-layout">
+      <article class="scene-panel">
+        <img id="sceneImage" src="./assets/holiday-task-1-invite.png" alt="小達抱著籃球，阿明邀請他一起打籃球">
+        <button id="scenePlayBtn" class="scene-play-button" type="button" aria-label="播放音檔">
+          <svg viewBox="0 0 10 14" aria-hidden="true">
+            <path d="M0 0v14l11-7z"/>
+          </svg>
+        </button>
+        <audio id="taskAudio" preload="auto"></audio>
+      </article>
+
+      <article class="task-panel">
+        <div class="progress-strip" aria-label="任務題目">
+          <button class="step is-active" type="button" data-step="0">1 邀請</button>
+          <button class="step" type="button" data-step="1">2 分享</button>
+          <button class="step" type="button" data-step="2">3 看圖回答</button>
+        </div>
+
+        <div class="task-heading">
+          <p id="taskType" class="task-type">題型一：聽音複誦</p>
+          <h2 id="taskTitle">邀請小達一起打球</h2>
+        </div>
+
+        <p id="taskPrompt" class="prompt">先聽一句，再按錄音跟著說。</p>
+        <div id="questionBox" class="question-box" hidden></div>
+
+        <div class="answer-actions">
+          <button id="recordBtn" class="record-button" type="button">開始錄音</button>
+          <button id="checkBtn" class="primary-button" type="button" disabled>等待辨識</button>
+          <button id="retryBtn" class="plain-button" type="button">重來</button>
+        </div>
+        <div id="recordingPanel" class="recording-panel" hidden>
+          <p id="recordingStatus">尚未錄音</p>
+          <audio id="audioPreview" controls hidden></audio>
+        </div>
+        <div id="finishPanel" class="finish-panel" hidden>
+          <button id="finishBtn" class="finish-button" type="button">完成任務</button>
+          <div id="reviewResult" class="review-result" hidden></div>
+        </div>
+      </article>
+    </section>
+
+    <aside id="developerPanel" class="developer-panel" hidden>
+      <h2>內部檢視</h2>
+      <div id="targetSentence" class="developer-item target-sentence">
+        <span id="sentenceLabel" class="sentence-label">四縣腔</span>
+        <strong id="sentenceText">下晝愛共下去打籃球無？</strong>
+        <small id="sentenceMandarin">下午要不要一起去打籃球？</small>
+        <button id="developerPlayBtn" class="developer-play-button" type="button" hidden aria-label="播放音檔">
+          <svg viewBox="0 0 11 14" aria-hidden="true">
+            <path d="M0 0v14l11-7z"/>
+          </svg>
+          <span>播放音檔</span>
+        </button>
+      </div>
+      <div class="developer-item">
+        <span class="developer-label">模擬 ASR</span>
+        <strong id="asrStatus">尚未送出</strong>
+      </div>
+      <div class="developer-item">
+        <span class="developer-label">失敗次數</span>
+        <strong id="missCount">0</strong>
+      </div>
+      <div class="developer-item">
+        <span class="developer-label">命中狀態</span>
+        <div class="hit-tags">
+          <span>地點: 未命中</span>
+          <span>活動: 未命中</span>
+        </div>
+      </div>
+      <div class="developer-item">
+        <span class="developer-label">完整度</span>
+        <p>此題無額外完整度項目</p>
+      </div>
+      <div class="answer-box">
+        <label for="answerInput">辨識文字 / 開放式音檔</label>
+        <textarea id="answerInput" rows="3" placeholder="錄音辨識完成後會顯示在這裡，也可以手動修正測試"></textarea>
+      </div>
+      <div class="developer-item">
+        <span class="developer-label">辨識 API</span>
+        <p>Taiwan-Tongues-ASR-CE（華語 v2） / 可用</p>
+      </div>
+    </aside>
+  </main>
+
+  <script src="./holiday.js?v=20260828-18"></script>
+</body>
+</html>

@@ -1,0 +1,852 @@
+:root {
+  --ink: #18344a;
+  --muted: #60717b;
+  --line: #e4d2ab;
+  --paper: #fffdfa;
+  --green: #2f946f;
+  --gold: #f1b84f;
+  --rose: #f17362;
+  --sky: #dff2ff;
+  --shadow: 0 18px 42px rgba(91, 67, 35, 0.14);
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: "Noto Sans TC", "Microsoft JhengHei", Arial, sans-serif;
+  color: var(--ink);
+  background:
+    linear-gradient(180deg, rgba(255, 250, 235, 0.96), rgba(241, 249, 236, 0.98)),
+    radial-gradient(circle, rgba(24, 52, 74, 0.08) 1px, transparent 1.4px) 0 0 / 18px 18px;
+}
+
+[hidden] { display: none !important; }
+
+.game-shell {
+  width: min(1160px, calc(100% - 32px));
+  margin: 0 auto;
+  padding: 24px 0 42px;
+}
+
+.game-topbar {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 18px 24px;
+  align-items: center;
+  padding-bottom: 22px;
+}
+
+.back-link,
+.plain-button,
+.primary-button,
+.primary-link,
+.dialect,
+.choice-button {
+  font: inherit;
+  font-weight: 900;
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 42px;
+  padding: 0 16px;
+  border: 2px solid var(--green);
+  border-radius: 999px;
+  color: var(--green);
+  background: #fff;
+  text-decoration: none;
+}
+
+.eyebrow {
+  margin: 0 0 6px;
+  color: #08724e;
+  font-size: 14px;
+  font-weight: 900;
+}
+
+h1,
+h2,
+h3,
+p { margin-top: 0; }
+
+h1 {
+  margin-bottom: 0;
+  font-size: 40px;
+  line-height: 1.12;
+}
+
+.screen {
+  border: 2px solid var(--line);
+  border-radius: 18px;
+  background: var(--paper);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+
+.intro-screen {
+  min-height: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  overflow: visible;
+}
+
+.image-stage img {
+  display: block;
+  width: 100%;
+  max-height: 230px;
+  object-fit: contain;
+  mix-blend-mode: multiply;
+}
+
+.intro-copy {
+  padding: 34px 28px 40px;
+}
+
+.intro-copy h2,
+.complete-screen h2 {
+  margin-bottom: 16px;
+  font-size: 42px;
+  line-height: 1.15;
+}
+
+.lead {
+  color: var(--muted);
+  font-size: 20px;
+  font-weight: 800;
+  line-height: 1.65;
+}
+
+.dialect-area {
+  margin: 18px 0 20px;
+}
+
+.dialect-area h3 {
+  margin-bottom: 10px;
+  font-size: 20px;
+}
+
+.dialect-switcher {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  padding: 12px;
+  border: 2px solid rgba(228, 210, 171, 0.9);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.76);
+}
+
+.dialect {
+  min-height: 42px;
+  padding: 0 16px;
+  border: 2px solid rgba(30, 49, 91, 0.16);
+  border-radius: 999px;
+  color: var(--ink);
+  background: #fff;
+  cursor: pointer;
+}
+
+.dialect.is-active {
+  border-color: var(--green);
+  color: #fff;
+  background: var(--green);
+}
+
+.dialect:disabled {
+  color: #8d9aa3;
+  background: #eef1ee;
+  cursor: not-allowed;
+  opacity: 0.72;
+}
+
+.lesson-area {
+  margin-top: 18px;
+}
+
+.lesson-heading {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: end;
+  margin-bottom: 10px;
+}
+
+.lesson-heading h3 {
+  margin-bottom: 0;
+  font-size: 20px;
+}
+
+.lesson-heading p {
+  margin-bottom: 0;
+  color: var(--muted);
+  font-size: 15px;
+  font-weight: 800;
+}
+
+.lesson-carousel {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: clamp(280px, 44%, 390px);
+  gap: 12px;
+  overflow-x: auto;
+  padding: 4px 2px 12px;
+  scroll-snap-type: x mandatory;
+}
+
+.lesson-card {
+  display: grid;
+  gap: 8px;
+  min-height: 320px;
+  padding: 18px;
+  border: 2px solid rgba(47, 148, 111, 0.28);
+  border-radius: 16px;
+  color: var(--ink);
+  background: #fff;
+  text-align: left;
+  cursor: pointer;
+  scroll-snap-align: start;
+  box-shadow: 0 10px 24px rgba(91, 67, 35, 0.08);
+}
+
+.lesson-card img {
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  object-fit: cover;
+  border-radius: 12px;
+  background: #fff;
+  mix-blend-mode: multiply;
+}
+.lesson-card span,
+.lesson-card small {
+  font-weight: 900;
+}
+
+.lesson-card span {
+  color: var(--green);
+  font-size: 15px;
+}
+
+.lesson-card strong {
+  font-size: 24px;
+  line-height: 1.25;
+}
+
+.lesson-card small {
+  align-self: end;
+  color: #805100;
+}
+
+.lesson-card:not(:disabled):hover {
+  border-color: var(--green);
+  background: #f2fbf5;
+  transform: translateY(-1px);
+}
+
+.lesson-card:disabled {
+  color: #8d9aa3;
+  background: #eef1ee;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.lesson-card:disabled span,
+.lesson-card:disabled small {
+  color: #8d9aa3;
+}
+
+.lesson-card.is-locked {
+  opacity: 0.76;
+}
+
+.play-screen {
+  display: grid;
+  grid-template-columns: 280px minmax(0, 1fr);
+  min-height: 620px;
+}
+
+.status-panel {
+  padding: 26px;
+  border-right: 2px solid var(--line);
+  background: #fff9ec;
+}
+
+.star-row {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 24px;
+}
+
+.star {
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: #e8eee9;
+  color: #82918b;
+  font-size: 22px;
+  font-weight: 900;
+}
+
+.star.is-earned {
+  color: #8b5b00;
+  background: var(--gold);
+}
+
+.word-bank {
+  display: grid;
+  gap: 10px;
+}
+
+.word-chip {
+  padding: 12px 14px;
+  border: 2px solid rgba(47, 148, 111, 0.22);
+  border-radius: 12px;
+  background: #fff;
+}
+
+.word-chip strong {
+  display: block;
+  font-size: 18px;
+}
+
+.word-chip small {
+  color: var(--muted);
+  font-weight: 800;
+}
+
+.question-panel {
+  padding: 32px;
+}
+
+.question-type {
+  margin-bottom: 8px;
+  color: #08724e;
+  font-size: 15px;
+  font-weight: 900;
+}
+
+.question-head h2 {
+  margin-bottom: 10px;
+  font-size: 38px;
+}
+
+.question-head p:last-child {
+  color: var(--muted);
+  font-size: 18px;
+  font-weight: 800;
+}
+
+.image-stage {
+  display: grid;
+  place-items: center;
+  min-height: 210px;
+  margin: 18px 0;
+  padding: 18px;
+  border: 2px solid rgba(228, 210, 171, 0.82);
+  border-radius: 16px;
+  background: #fff;
+}
+
+.choice-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.choice-button {
+  min-height: 74px;
+  padding: 12px 16px;
+  border: 2px solid rgba(30, 49, 91, 0.16);
+  border-radius: 16px;
+  color: var(--ink);
+  background: #fff;
+  cursor: pointer;
+  text-align: left;
+}
+
+.choice-button strong {
+  display: block;
+  font-size: 22px;
+}
+
+.choice-button small {
+  color: var(--muted);
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.choice-button.is-correct {
+  border-color: var(--green);
+  background: #e8f8ee;
+}
+
+.choice-button.is-wrong {
+  border-color: var(--rose);
+  background: #fff1ee;
+}
+
+.feedback {
+  margin: 16px 0 0;
+  padding: 14px 16px;
+  border-radius: 14px;
+  background: var(--sky);
+  color: var(--ink);
+  font-size: 18px;
+  font-weight: 900;
+  line-height: 1.55;
+}
+
+.action-row {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 18px;
+}
+
+.action-row.center {
+  justify-content: center;
+}
+
+.plain-button,
+.primary-button,
+.primary-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px;
+  padding: 0 18px;
+  border-radius: 999px;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.plain-button {
+  border: 2px solid var(--line);
+  color: var(--ink);
+  background: #fff;
+}
+
+.primary-button,
+.primary-link {
+  border: 2px solid var(--green);
+  color: #fff;
+  background: var(--green);
+}
+
+.primary-button:disabled {
+  border-color: #bfc9c3;
+  color: #334155;
+  background: #cfd8d3;
+  cursor: not-allowed;
+}
+
+.complete-screen {
+  display: grid;
+  justify-items: center;
+  min-height: 560px;
+  padding: 64px 24px;
+  text-align: center;
+}
+
+.badge {
+  display: grid;
+  place-items: center;
+  width: 148px;
+  height: 148px;
+  margin-bottom: 20px;
+  border: 8px solid #ffe2a3;
+  border-radius: 50%;
+  color: #805100;
+  background: var(--gold);
+  font-size: 22px;
+  font-weight: 900;
+}
+
+.complete-screen p {
+  max-width: 640px;
+  color: var(--muted);
+  font-size: 20px;
+  font-weight: 800;
+  line-height: 1.65;
+}
+
+.result-list {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin: 8px 0 10px;
+}
+
+.result-list span {
+  padding: 10px 14px;
+  border: 2px solid rgb(238, 215, 88);
+  border-radius: 999px;
+  background: #ffe2a3;
+  font-weight: 900;
+}
+
+@media (max-width: 900px) {
+  .game-topbar,
+  .intro-screen,
+  .play-screen,
+  .choice-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .status-panel {
+    border-right: 0;
+    border-bottom: 2px solid var(--line);
+  }
+
+  h1 { font-size: 34px; }
+  .intro-copy { padding: 32px 24px; }
+  .intro-copy h2,
+  .complete-screen h2 { font-size: 32px; }
+}
+
+
+
+
+.complete-badge {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  min-height: 30px;
+  padding: 0 12px;
+  border-radius: 999px;
+  color: #fff;
+  background: var(--green);
+  font-size: 13px;
+  font-weight: 900;
+  box-shadow: 0 8px 18px rgba(47, 148, 111, 0.2);
+}
+
+.lesson-card:disabled .complete-badge {
+  opacity: 1;
+  color: #fff;
+  background: var(--green);
+}
+
+
+
+
+
+.word-chip img {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  max-height: none;
+  object-fit: contain;
+  border-radius: 10px;
+  background: #fff;
+}
+
+
+
+/* Drag carousel overrides */
+.lesson-carousel {
+  scroll-behavior: smooth;
+  scrollbar-width: none;
+  cursor: grab;
+  user-select: none;
+}
+
+.lesson-carousel::-webkit-scrollbar {
+  display: none;
+}
+
+.lesson-carousel.is-dragging {
+  cursor: grabbing;
+  scroll-snap-type: none;
+}
+
+.lesson-card img,
+.choice-button img,
+.word-chip img {
+  pointer-events: none;
+}
+
+/* Pinyin-only answer choices */
+.choice-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 78px;
+  text-align: center;
+}
+
+.choice-button strong {
+  font-size: 24px;
+  line-height: 1.35;
+}
+
+.choice-button img,
+.choice-button small {
+  display: none;
+}
+
+/* Complete badge visibility fix */
+.complete-badge[hidden] {
+  display: none !important;
+}
+
+.complete-badge {
+  min-width: 64px;
+  justify-content: center;
+  color: #fff !important;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+/* Complete badge local progress */
+.complete-badge[hidden] {
+  display: none !important;
+}
+
+.complete-badge {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 64px;
+  min-height: 30px;
+  padding: 0 12px;
+  border-radius: 999px;
+  color: #fff !important;
+  background: var(--green);
+  font-size: 13px;
+  font-weight: 900;
+  line-height: 1;
+  white-space: nowrap;
+  box-shadow: 0 8px 18px rgba(47, 148, 111, 0.2);
+}
+
+/* Complete badge on lesson image card */
+.lesson-card {
+  position: relative;
+}
+
+.complete-badge[hidden] {
+  display: none !important;
+}
+
+.complete-badge {
+  position: absolute;
+  top: 28px;
+  right: 28px;
+  z-index: 4;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 68px;
+  min-height: 30px;
+  padding: 0 12px;
+  border-radius: 999px;
+  color: #fff !important;
+  background: var(--green);
+  font-size: 13px;
+  font-weight: 900;
+  line-height: 1;
+  white-space: nowrap;
+  box-shadow: 0 8px 18px rgba(47, 148, 111, 0.22);
+}
+
+/* Image answer choices */
+.image-choice {
+  display: grid;
+  grid-template-rows: 92px auto;
+  grid-template-columns: 1fr;
+  gap: 8px;
+  min-height: 136px;
+  padding: 10px;
+  text-align: center;
+}
+
+.image-choice img {
+  display: block;
+  width: 100%;
+  height: 92px;
+  object-fit: contain;
+  border-radius: 10px;
+  background: #fff;
+}
+
+.image-choice strong {
+  font-size: 16px;
+  line-height: 1.25;
+}
+
+.choice-button.image-choice img {
+  display: block;
+}
+
+/* Square image choices */
+.image-choice {
+  aspect-ratio: 1 / 1;
+  min-height: 0;
+  padding: 12px;
+}
+
+.image-choice img,
+.choice-button.image-choice img {
+  width: 100%;
+  height: 100%;
+  max-height: none;
+  object-fit: contain;
+}
+
+/* Small centered food images inside square choices */
+.image-choice {
+  place-items: center;
+}
+
+.image-choice img,
+.choice-button.image-choice img {
+  width: clamp(74px, 38%, 112px);
+  height: clamp(74px, 38%, 112px);
+  object-fit: contain;
+}
+
+/* Compact square image-choice grid for combined challenge */
+.choice-grid.is-image-grid {
+  grid-template-columns: repeat(4, minmax(0, 104px));
+  justify-content: start;
+  align-items: start;
+  gap: 14px;
+}
+
+.choice-grid.is-image-grid .choice-button.image-choice {
+  width: 104px;
+  height: 104px;
+  min-height: 0;
+  aspect-ratio: 1 / 1;
+  padding: 8px;
+  display: grid;
+  place-items: center;
+}
+
+.choice-grid.is-image-grid .choice-button.image-choice img {
+  display: block;
+  width: 86px;
+  height: 86px;
+  object-fit: contain;
+  border-radius: 0;
+  background: transparent;
+}
+
+@media (max-width: 560px) {
+  .choice-grid.is-image-grid {
+    grid-template-columns: repeat(4, minmax(0, 72px));
+    gap: 10px;
+  }
+
+  .choice-grid.is-image-grid .choice-button.image-choice {
+    width: 72px;
+    height: 72px;
+    padding: 6px;
+  }
+
+  .choice-grid.is-image-grid .choice-button.image-choice img {
+    width: 60px;
+    height: 60px;
+  }
+}
+
+/* Fill the full row with four square image choices */
+.choice-grid.is-image-grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  width: 100%;
+  justify-content: stretch;
+}
+
+.choice-grid.is-image-grid .choice-button.image-choice {
+  width: 100%;
+  height: auto;
+  min-width: 0;
+  aspect-ratio: 1 / 1;
+}
+
+.choice-grid.is-image-grid .choice-button.image-choice img {
+  width: min(72%, 96px);
+  height: min(72%, 96px);
+}
+
+@media (max-width: 560px) {
+  .choice-grid.is-image-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  .choice-grid.is-image-grid .choice-button.image-choice img {
+    width: min(72%, 64px);
+    height: min(72%, 64px);
+  }
+}
+
+/* Fill square image cards with the food artwork */
+.choice-grid.is-image-grid .choice-button.image-choice {
+  padding: 0;
+  overflow: hidden;
+}
+
+.choice-grid.is-image-grid .choice-button.image-choice img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Remove bottom whitespace from square food choice cards */
+.choice-grid.is-image-grid .choice-button.image-choice {
+  background: #fff;
+  border-radius: 12px;
+}
+
+.choice-grid.is-image-grid .choice-button.image-choice img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center center;
+  transform: scale(1.45);
+  transform-origin: center center;
+}
+
+/* Image-only choices are one full square, not a two-row text card */
+.choice-grid.is-image-grid .choice-button.image-choice {
+  grid-template-rows: 1fr;
+  grid-template-columns: 1fr;
+  gap: 0;
+  align-items: stretch;
+  justify-items: stretch;
+}
+
+.choice-grid.is-image-grid .choice-button.image-choice img {
+  grid-row: 1;
+  grid-column: 1;
+}
+
+/* Show complete artwork inside each square image choice */
+.choice-grid.is-image-grid .choice-button.image-choice {
+  padding: 8px;
+  overflow: visible;
+  background: #fff;
+}
+
+.choice-grid.is-image-grid .choice-button.image-choice img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center center;
+  transform: none;
+}
