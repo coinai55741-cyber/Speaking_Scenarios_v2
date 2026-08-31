@@ -360,7 +360,7 @@ function showReview() {
   els.missionLayout.classList.add("is-complete");
   els.missionLayout.innerHTML = `
     <section class="completion-card" aria-labelledby="completionTitle">
-      <img class="completion-medal" src="./assets/holiday-medal.svg" alt="休假日任務完成獎牌">
+      <img class="completion-medal" src="./assets/holiday-completion-medal.png" alt="休假日任務完成獎牌">
       <p class="completion-kicker">休假日任務完成</p>
       <h2 id="completionTitle">通過測驗～</h2>
       <p class="completion-copy">恭喜你完成「休假日」任務！</p>
@@ -630,5 +630,6 @@ els.checkBtn.addEventListener("click", () => {
 });
 
 renderTask();
+
 
 
