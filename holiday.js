@@ -1,4 +1,4 @@
-const DEFAULT_ASR_ENDPOINT = "https://speaking-scenarios-kou-shuo-api.onrender.com/transcribe";
+const DEFAULT_ASR_ENDPOINT = "https://reversal-batboy-bust.ngrok-free.dev/transcribe";
 const ASR_ENDPOINT = getAsrEndpoint();
 const ASR_PROVIDERS = {
   taiwan_tongues_zh: {
@@ -47,7 +47,7 @@ function isAllowedAsrEndpoint(value) {
   try {
     const url = new URL(value);
     const allowedLocal = url.hostname === "127.0.0.1" || url.hostname === "localhost";
-    const allowedTunnel = url.hostname.endsWith(".trycloudflare.com") || url.hostname.endsWith(".ngrok-free.app") || url.hostname.endsWith(".onrender.com");
+    const allowedTunnel = url.hostname.endsWith(".trycloudflare.com") || url.hostname.endsWith(".ngrok-free.app") || url.hostname.endsWith(".ngrok-free.dev") || url.hostname.endsWith(".onrender.com");
     return url.pathname === "/transcribe" && (allowedLocal || allowedTunnel);
   } catch (error) {
     return false;
