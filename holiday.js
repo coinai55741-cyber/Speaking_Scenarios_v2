@@ -32,6 +32,10 @@ function updateProviderUi() {
   if (els.debugProvider) {
     els.debugProvider.textContent = `${config.label} / ${config.enabled ? "可用" : "預留"}`;
   }
+  
+  if (typeof updateHitStatus === 'function' && els.answerInput) {
+    updateHitStatus(els.answerInput.value.trim() || saved.transcript);
+  }
 }
 
 function getAsrEndpoint() {
@@ -239,32 +243,23 @@ function updateHitStatus(transcript) {
   const cleanTranscript = (transcript || "").replace(/[。，！？、？\s]/g, "");
   
   const renderBilingualTags = (hakkaWords, mandarinWords) => {
-    const hakkaHits = hakkaWords.filter(w => cleanTranscript.includes(w)).length;
-    const mandarinHits = mandarinWords.filter(w => cleanTranscript.includes(w)).length;
+    const providerId = getSelectedAsrProvider();
+    const isHakkaApi = ASR_PROVIDERS[providerId]?.language === "hak";
     
-    let activeLang = "both";
-    if (hakkaHits > mandarinHits) activeLang = "hakka";
-    else if (mandarinHits > hakkaHits) activeLang = "mandarin";
-    else {
-       const exclusiveHakka = hakkaWords.filter(w => !mandarinWords.includes(w));
-       const exclusiveMandarin = mandarinWords.filter(w => !hakkaWords.includes(w));
-       const hasExclusiveHakka = exclusiveHakka.some(w => cleanTranscript.includes(w));
-       const hasExclusiveMandarin = exclusiveMandarin.some(w => cleanTranscript.includes(w));
-       if (hasExclusiveHakka && !hasExclusiveMandarin) activeLang = "hakka";
-       else if (hasExclusiveMandarin && !hasExclusiveHakka) activeLang = "mandarin";
+    let html = '';
+    if (isHakkaApi) {
+      html += '<div style="width: 100%; font-size: 12px; color: #666; margin-bottom: 2px;">客語：</div>';
+      hakkaWords.forEach(word => {
+        const isHit = cleanTranscript.includes(word);
+        html += `<span class="${isHit ? 'is-hit' : ''}">${word}</span>`;
+      });
+    } else {
+      html += '<div style="width: 100%; font-size: 12px; color: #666; margin-bottom: 2px;">華語：</div>';
+      mandarinWords.forEach(word => {
+        const isHit = cleanTranscript.includes(word);
+        html += `<span class="${isHit ? 'is-hit' : ''}">${word}</span>`;
+      });
     }
-    
-    let html = '<div style="width: 100%; font-size: 12px; color: #666; margin-bottom: 2px;">客語：</div>';
-    hakkaWords.forEach(word => {
-      const isHit = (activeLang === "hakka" || activeLang === "both") && cleanTranscript.includes(word);
-      html += `<span class="${isHit ? 'is-hit' : ''}">${word}</span>`;
-    });
-    
-    html += '<div style="width: 100%; font-size: 12px; color: #666; margin-top: 6px; margin-bottom: 2px;">華語：</div>';
-    mandarinWords.forEach(word => {
-      const isHit = (activeLang === "mandarin" || activeLang === "both") && cleanTranscript.includes(word);
-      html += `<span class="${isHit ? 'is-hit' : ''}">${word}</span>`;
-    });
     els.hitTags.innerHTML = html;
   };
 
