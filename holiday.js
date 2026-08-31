@@ -1,4 +1,4 @@
-const DEFAULT_ASR_ENDPOINT = "http://127.0.0.1:8000/transcribe";
+const DEFAULT_ASR_ENDPOINT = "https://speaking-scenarios-kou-shuo-api.onrender.com/transcribe";
 const ASR_ENDPOINT = getAsrEndpoint();
 const ASR_PROVIDERS = {
   taiwan_tongues_zh: {
