@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>屋下在哪 - 情境遊戲復刻</title>
+  <link rel="stylesheet" href="scene-game-1-2.css?v=20260901-2">
+</head>
+<body>
+  <main class="page-shell">
+    <header class="lesson-header">
+      <a class="back-link" href="./index.html#situations">返回</a>
+      <div>
+        <h1>屋下在哪</h1>
+      </div>
+      <div class="header-actions">
+        <label class="select-label" for="dialectSelect">腔調</label>
+        <select id="dialectSelect"></select>
+        <button id="resetStage" class="ghost-button" type="button">重新整理</button>
+      </div>
+    </header>
+
+    <nav id="stageTabs" class="stage-tabs" aria-label="遊戲階段"></nav>
+
+    <section class="game-frame" aria-live="polite">
+      <div id="sceneLayer" class="scene-layer scene-intro"></div>
+      <div id="charactersLayer" class="characters-layer"></div>
+      <div id="stageView" class="stage-view"></div>
+    </section>
+
+    <aside class="control-strip" aria-label="音量設定">
+      <label>背景音量 <input id="bgmVolume" type="range" min="0" max="100" value="20"></label>
+      <label>效果音量 <input id="seVolume" type="range" min="0" max="100" value="40"></label>
+      <label>語音音量 <input id="voiceVolume" type="range" min="0" max="100" value="80"></label>
+    </aside>
+  </main>
+
+  <script src="scene-game-1-2.js?v=20260901-2"></script>
+</body>
+</html>

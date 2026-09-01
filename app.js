@@ -24,6 +24,19 @@ const scenarios = [
     demoStep: 1
   },
   {
+    id: "scene-game-1-2",
+    title: "屋下在哪",
+    artClass: "art-home",
+    image: "./assets/scene-game-1-2/intro-school-friends.png",
+    description: "放學後大家討論要去誰家玩，聽一聽、問一問，完成客語交通與住家情境任務。",
+    flow: [
+      "先聽同學討論要去哪裡。",
+      "再用客語問朋友怎麼來。",
+      "最後依照回答完成前往任務。"
+    ],
+    demoStep: 0
+  },
+  {
     id: "shopping-food",
     title: "逛街吃飯記",
     artClass: "art-food",
@@ -59,7 +72,11 @@ function createScenarioCard(scenario) {
   const card = document.createElement("article");
   card.className = "scenario-card";
 
-  const demoUrl = scenario.id === "holiday" ? "./holiday.html" : `../demo_v1/?step=${scenario.demoStep}`;
+  const demoUrl = scenario.id === "holiday"
+    ? "./holiday.html"
+    : scenario.id === "scene-game-1-2"
+      ? "./scene-game-1-2.html"
+      : `../demo_v1/?step=${scenario.demoStep}`;
   const actionButton = scenario.disabled
     ? `<button class="card-link is-disabled" type="button" disabled aria-disabled="true">開始任務</button>` 
     : `<a class="card-link" href="${demoUrl}">開始任務</a>`;
