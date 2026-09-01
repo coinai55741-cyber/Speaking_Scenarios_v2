@@ -677,7 +677,7 @@ textarea {
   place-items: center;
   min-height: 520px;
   padding: 54px 28px;
-  border-right: 2px solid rgba(228, 210, 171, 0.9);
+  border-right: 0px solid rgba(228, 210, 171, 0.9);
 }
 
 .story-visual img {
@@ -758,7 +758,7 @@ textarea {
   .story-visual {
     min-height: 320px;
     border-right: 0;
-    border-bottom: 2px solid rgba(228, 210, 171, 0.9);
+    border-bottom: 0px solid rgba(228, 210, 171, 0.9);
   }
 
   .story-copy {
@@ -785,4 +785,50 @@ textarea {
 .step.is-locked.is-active {
   color: #8d9aa3;
   background: #eef1ee;
+}
+
+/* Completion transition */
+.mission-layout.is-completing {
+  animation: missionCompleteOut 0.46s ease both;
+}
+
+.mission-layout.is-complete {
+  animation: completionStageIn 0.46s ease both;
+}
+
+.completion-card > * {
+  opacity: 0;
+  animation: completionItemIn 0.48s ease both;
+}
+
+.completion-medal {
+  animation-name: completionMedalIn;
+  animation-duration: 0.64s;
+  animation-delay: 0.1s;
+}
+
+.completion-kicker { animation-delay: 0.26s; }
+.completion-card h2 { animation-delay: 0.38s; }
+.completion-copy { animation-delay: 0.5s; }
+.completion-button { animation-delay: 0.62s; }
+
+@keyframes missionCompleteOut {
+  from { opacity: 1; transform: translateY(0) scale(1); }
+  to { opacity: 0; transform: translateY(-16px) scale(0.985); }
+}
+
+@keyframes completionStageIn {
+  from { opacity: 0; transform: translateY(18px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes completionItemIn {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes completionMedalIn {
+  0% { opacity: 0; transform: translateY(18px) scale(0.72) rotate(-8deg); }
+  68% { opacity: 1; transform: translateY(-4px) scale(1.08) rotate(3deg); }
+  100% { opacity: 1; transform: translateY(0) scale(1) rotate(0); }
 }
