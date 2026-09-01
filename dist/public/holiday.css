@@ -728,7 +728,7 @@ textarea {
   font: inherit;
   font-weight: 900;
   cursor: pointer;
-  box-shadow: 0 12px 24px rgba(47, 148, 111, 0.22);
+  /*box-shadow: 0 12px 24px rgba(47, 148, 111, 0.22);*/
 }
 
 .mission-layout.is-entering {
@@ -831,4 +831,22 @@ textarea {
   0% { opacity: 0; transform: translateY(18px) scale(0.72) rotate(-8deg); }
   68% { opacity: 1; transform: translateY(-4px) scale(1.08) rotate(3deg); }
   100% { opacity: 1; transform: translateY(0) scale(1) rotate(0); }
+}
+
+
+.dialect:disabled,
+.dialect.is-disabled {
+  border-color: #d8e0dc;
+  color: #91a09a;
+  background: #f3f6f4;
+  cursor: not-allowed;
+  box-shadow: none;
+  opacity: 0.72;
+}
+
+.dialect:disabled:hover,
+.dialect.is-disabled:hover {
+  border-color: #d8e0dc;
+  color: #91a09a;
+  background: #f3f6f4;
 }

@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>第1課 𠊎好食个東西｜客語生活任務</title>
+  <link rel="stylesheet" href="./Vocabulary.css?v=20260901-01">
+</head>
+<body>
+  <main class="game-shell">
+    <header class="game-topbar">
+      <a class="back-link" href="./index.html#basic">返回</a>
+      <div>
+        <h1>詞彙卡</h1>
+      </div>
+    </header>
+
+    <section id="introScreen" class="screen intro-screen" aria-labelledby="introTitle">
+      <div class="intro-copy">
+<section class="dialect-area" aria-labelledby="dialectTitle">
+          <h3 id="dialectTitle">選擇腔別</h3>
+          <div class="dialect-switcher">
+            <button class="dialect" type="button" data-dialect="sixian">四縣腔</button>
+            <button class="dialect" type="button" disabled aria-disabled="true">海陸腔</button>
+            <button class="dialect" type="button" disabled aria-disabled="true">大埔腔</button>
+            <button class="dialect" type="button" disabled aria-disabled="true">饒平腔</button>
+            <button class="dialect" type="button" disabled aria-disabled="true">詔安腔</button>
+            <button class="dialect" type="button" disabled aria-disabled="true">南四縣腔</button>
+          </div>
+        </section>
+
+        <section class="lesson-area" aria-labelledby="lessonTitle">
+          <div class="lesson-heading">
+            <h3 id="lessonTitle">選擇主題</h3>
+            <p id="lessonHint">請先選擇腔別，再選課別開始。</p>
+          </div>
+          <div class="lesson-carousel-wrap"><div class="lesson-carousel" id="lessonCarousel" aria-label="課別卡片">
+              <button class="lesson-card" type="button" data-lesson="primary" data-url="./Vocabulary-Primary.html" disabled>
+                <span class="complete-badge" data-complete-badge hidden>已完成</span>
+                <img src="./assets/vocabulary-card-primary-scene.png" alt="客語互動場景學習圖">
+                <span>國小</span>
+                <strong>客語互動場景</strong>
+                <small>觀察場景圖片，點選物件學習常見客語詞彙。</small>
+              </button>
+              <button class="lesson-card is-locked" type="button" data-lesson="middle" data-url="./Vocabulary-Middle.html" disabled>
+                <img src="./assets/vocabulary-card-middle-tiles.png" alt="字磚拼拼樂學習圖">
+                <span>國中</span>
+                <strong>字磚拼拼樂</strong>
+                <small>從字磚中找出正確字詞，依序排出客語詞彙。</small>
+              </button>
+              <button class="lesson-card is-locked" type="button" data-lesson="high1" data-url="./Vocabulary-High-1.html" disabled>
+                <img src="./assets/vocabulary-card-high-radio.png" alt="庄頭廣播電台學習圖">
+                <span>高中</span>
+                <strong>庄頭廣播電台</strong>
+                <small>聽廣播情境與線索，辨認進階生活詞彙</small>
+              </button>
+              <button class="lesson-card is-locked" type="button" data-lesson="high2" data-url="./Vocabulary-High-2.html" disabled>
+                <img src="./assets/vocabulary-card-high-boardgame.png" alt="字句大富翁學習圖">
+                <span>高中</span>
+                <strong>字句大富翁</strong>
+                <small>辨認進階生活詞彙與讀懂課文內容</small>
+              </button>
+            </div></div>
+        </section>
+      </div>
+    </section>
+
+    <section id="playScreen" class="screen play-screen" hidden aria-live="polite">
+      <button id="wordMenuBtn" class="word-menu-button" type="button" aria-controls="statusPanel" aria-expanded="false">單字</button>
+      <div id="wordMenuBackdrop" class="word-menu-backdrop" hidden></div>
+      <aside id="statusPanel" class="status-panel" aria-label="單字選單">
+        <button id="wordMenuCloseBtn" class="word-menu-close" type="button">關閉</button>
+        <div class="word-bank" id="wordBank"></div>
+      </aside>
+
+      <article class="question-panel">
+        <div class="player-progress" aria-label="答題星星">
+          <span>第 <span id="visibleQuestionNumber">1</span> 題 / 5</span>
+          <div class="star-row visible-star-row" id="visibleStarRow"></div>
+        </div>
+        <div class="question-head">
+          <p id="questionType" class="question-type">看華語選客語</p>
+          <h2 id="questionTitle">白飯</h2>
+          <p id="questionPrompt">請選出正確的四縣腔詞。</p>
+        </div>
+        <div id="imageStage" class="image-stage">
+          <img src="./assets/lesson-1-foods-cards.jpg" alt="早餐圖卡">
+        </div>
+        <div id="choiceGrid" class="choice-grid"></div>
+        <p id="feedback" class="feedback" hidden></p>
+        <div class="action-row">
+          <button id="retryBtn" class="plain-button" type="button">重選</button>
+          <button id="nextBtn" class="primary-button" type="button" disabled>下一題</button>
+        </div>
+      </article>
+    </section>
+
+    <section id="completeScreen" class="screen complete-screen" hidden>
+      <img class="badge medal-badge" src="./assets/holiday-completion-medal.png" alt="完成測驗獎牌">
+      <h2 id="completeTitle">恭喜你完成第1課「𠊎好食个東西」！</h2>
+      <div id="completeStars" class="complete-stars" aria-label="結算星星"></div>
+      <div id="resultList" class="result-list">
+        <span>看懂食物圖片</span>
+        <span>選出生詞</span>
+        <span>認得拼音</span>
+        <span>完成第1課測驗</span>
+      </div>
+      <div class="action-row center">
+        <button id="againBtn" class="plain-button" type="button">再玩一次</button>
+        <a class="primary-link" href="./breakfast.html">回到課堂測驗</a>
+      </div>
+    </section>
+  </main>
+
+  <script src="./Vocabulary.js?v=20260901-01"></script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,900 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>字磚｜伙房屋</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@500;900&family=Noto+Sans+TC:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root{--indigo:#1F3A5F;--brick:#B85C3C;--grain:#E8C87A;--paper:#FDFBF5;
+    --bamboo:#4A7A5E;--lantern:#C0392B;--ink:#20242B;--wood:#8B6039}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--indigo);font-family:"Noto Sans TC",system-ui,sans-serif;
+    color:var(--paper);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:14px}
+  .frame{width:100%;max-width:920px}
+
+  nav{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-bottom:12px}
+  .tab{background:rgba(253,251,245,.08);border:1.5px solid rgba(253,251,245,.2);border-radius:12px;
+    padding:8px 15px;cursor:pointer;color:var(--paper);font-family:"Noto Sans TC";
+    transition:.2s;line-height:1.3;text-align:center}
+  .tab:hover{background:rgba(253,251,245,.17);border-color:rgba(232,200,122,.6)}
+  .tab.on{background:var(--grain);border-color:var(--grain);color:var(--ink)}
+  .tab small{display:block;font-size:10.5px;opacity:.7}
+  .tab b{font-family:"Noto Serif TC",serif;font-weight:900;font-size:15px;letter-spacing:.05em}
+
+  .stage{position:relative;border-radius:18px;overflow:hidden;
+    box-shadow:0 24px 60px rgba(0,0,0,.45);background:#E9D9BB}
+  svg.scene{display:block;width:100%;height:auto}
+  .obj{opacity:0;transition:opacity .5s}
+  .obj.on{opacity:1}
+  .obj.pop{animation:rise .7s cubic-bezier(.34,1.4,.64,1)}
+  @keyframes rise{0%{transform:translateY(26px) scale(.6);opacity:0}100%{transform:translateY(0) scale(1);opacity:1}}
+
+  .heat{position:absolute;left:16px;top:14px;display:flex;align-items:center;gap:9px}
+  .heat span{font-family:"Noto Serif TC",serif;font-weight:900;font-size:14px;
+    letter-spacing:.14em;color:var(--ink);opacity:.72}
+  .heatbar{width:140px;height:9px;border-radius:99px;background:rgba(32,36,43,.16);overflow:hidden}
+  .heatbar i{display:block;height:100%;width:100%;background:var(--lantern);
+    transform-origin:left;transform:scaleX(0);transition:transform .6s}
+
+  .say{position:absolute;left:50%;top:14px;transform:translateX(-50%);background:var(--ink);
+    color:var(--paper);padding:9px 20px;border-radius:999px;font-weight:700;font-size:14.5px;
+    white-space:nowrap;box-shadow:0 6px 18px rgba(0,0,0,.3);opacity:0;transition:opacity .3s;pointer-events:none}
+  .say.on{opacity:1}
+
+  .quiz{margin-top:12px;background:rgba(253,251,245,.07);border-radius:16px;padding:14px 16px}
+  .qtop{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:12px}
+  .clue{font-size:14px;opacity:.75}
+  .clue b{font-family:"Noto Serif TC",serif;font-size:19px;font-weight:900;
+    color:var(--grain);letter-spacing:.06em;margin-left:4px}
+  .tools{margin-left:auto;display:flex;gap:8px;flex-wrap:wrap}
+  .tool{background:rgba(253,251,245,.12);border:1.5px solid rgba(253,251,245,.24);color:var(--paper);
+    border-radius:10px;padding:7px 13px;font-size:13px;cursor:pointer;font-family:"Noto Sans TC";
+    transition:.18s;white-space:nowrap}
+  .tool:hover{background:rgba(253,251,245,.22)}
+  .tool:disabled{opacity:.35;cursor:default}
+
+  .slots{display:flex;gap:10px;justify-content:center;margin-bottom:16px;flex-wrap:wrap}
+  .slot{width:60px;height:60px;border-radius:12px;border:2.5px dashed rgba(253,251,245,.3);
+    display:flex;align-items:center;justify-content:center;font-family:"Noto Serif TC",serif;
+    font-size:30px;font-weight:900;cursor:pointer;transition:.18s;background:rgba(31,58,95,.3)}
+  .slot.filled{border-style:solid;border-color:var(--grain);background:var(--grain);color:var(--ink)}
+  .slot.good{border-color:var(--bamboo);background:var(--bamboo);color:var(--paper)}
+  .slot.given{border-color:#9AA7AE;background:#9AA7AE;color:var(--paper)}
+  .slot.bad{animation:nope .42s}
+  @keyframes nope{0%,100%{transform:translateX(0)}25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
+
+  .tray{display:flex;gap:7px;flex-wrap:wrap;justify-content:center}
+  .tile{width:48px;height:48px;border-radius:10px;border:0;cursor:pointer;background:var(--paper);
+    color:var(--ink);font-family:"Noto Serif TC",serif;font-size:24px;font-weight:900;
+    transition:.15s;box-shadow:0 3px 8px rgba(0,0,0,.28)}
+  .tile:hover{transform:translateY(-4px)}
+  .tile.used{opacity:.2;pointer-events:none;box-shadow:none}
+  .tile.demo{background:var(--lantern);color:var(--paper);transform:translateY(-7px) scale(1.1)}
+
+
+  /* 課文面板：拼著詞了後，聽該詞在課文肚个原句 */
+  .text{margin-top:12px;background:rgba(253,251,245,.06);border-radius:16px;
+    padding:0 16px;max-height:0;overflow:hidden;opacity:0;
+    transition:max-height .5s ease,opacity .4s,padding .4s}
+  .text.on{max-height:260px;opacity:1;padding:14px 16px}
+  .thead{display:flex;align-items:center;gap:10px;margin-bottom:9px}
+  .tlab{font-family:"Noto Sans TC";font-size:15px;font-weight:700;letter-spacing:.04em;
+    color:var(--grain);background:rgba(232,200,122,.12);border:1px solid rgba(232,200,122,.34);
+    border-radius:999px;padding:5px 15px}
+  .who{background:rgba(232,200,122,.16);border:1px solid rgba(232,200,122,.4);
+    border-radius:999px;padding:3px 12px;font-size:12px;color:var(--grain)}
+  .spk{margin-left:auto;background:var(--grain);color:var(--ink);border:0;border-radius:999px;
+    padding:7px 16px;font-family:"Noto Sans TC";font-weight:700;font-size:13px;cursor:pointer}
+  .spk:hover{background:var(--paper)}
+  .spk.mute{background:rgba(253,251,245,.12);color:rgba(253,251,245,.5);cursor:default}
+  .tha{font-family:"Noto Serif TC",serif;font-size:19px;font-weight:500;line-height:1.85;letter-spacing:.02em}
+  .tha em{font-style:normal;font-weight:900;color:var(--grain);
+    border-bottom:2.5px solid var(--lantern);padding-bottom:1px}
+  .tpy{margin-top:7px;font-size:12.5px;line-height:1.7;color:rgba(253,251,245,.5);letter-spacing:.01em}
+  .bottom{margin-top:12px;display:flex;align-items:center;justify-content:space-between;gap:14px}
+  .hint{font-size:13px;opacity:.66;line-height:1.6}
+  .count{font-family:"Noto Serif TC",serif;font-weight:900;font-size:14px;letter-spacing:.08em;white-space:nowrap;opacity:.9}
+  .restart{background:var(--grain);color:var(--ink);border:0;border-radius:999px;padding:10px 24px;
+    font-family:"Noto Sans TC";font-weight:700;font-size:14px;cursor:pointer;white-space:nowrap;transition:.18s}
+  .restart:hover{background:var(--paper)}
+  @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+  .back-link{position:fixed;left:18px;top:18px;z-index:50;display:inline-flex;align-items:center;justify-content:center;min-height:38px;padding:0 16px;border:2px solid #2f946f;border-radius:999px;color:#2f946f;background:rgba(255,255,255,.92);font-weight:900;text-decoration:none;box-shadow:0 8px 18px rgba(0,0,0,.12)}
+  .back-link:hover{background:#2f946f;color:#fff}
+  @media(max-width:560px){.back-link{left:12px;top:12px;min-height:34px;padding:0 13px;font-size:13px}}
+</style>
+</head>
+<body>
+  <a class="back-link" href="./Vocabulary.html">返回</a>
+<div class="frame">
+  <nav id="tabs"></nav>
+
+  <div class="stage" id="stage">
+    <svg class="scene" viewBox="0 0 900 400" xmlns="http://www.w3.org/2000/svg">
+      <g id="bg"></g>
+      <g id="furn"></g>
+      <g id="objs"></g>
+      <rect id="tint" width="900" height="400" opacity="0" style="mix-blend-mode:multiply"/>
+    </svg>
+    <div class="heat"><span>鬧熱</span><div class="heatbar"><i id="heat"></i></div></div>
+    <div class="say" id="say"></div>
+  </div>
+
+  <div class="quiz">
+    <div class="qtop">
+      <p class="clue">愛揣个係：<b id="clue">－</b></p>
+      <div class="tools">
+        <button class="tool" id="btnPlay">🔊 聽一擺</button>
+        <button class="tool" id="btnDemo">看順序</button>
+        <button class="tool" id="btnAns">解答</button>
+        <button class="tool" id="btnSkip">跳過</button>
+      </div>
+    </div>
+    <div class="slots" id="slots"></div>
+    <div class="tray" id="tray"></div>
+  </div>
+
+  <div class="text" id="textBox">
+    <div class="thead">
+      <span class="tlab" id="tLab">華 語</span>
+      <span class="who" id="tWho">—</span>
+      <button class="spk" id="tSpk">🔊 聽這句</button>
+    </div>
+    <p class="tha" id="tHa"></p>
+    <p class="tpy" id="tPy"></p>
+  </div>
+
+  <div class="bottom">
+    <p class="hint" id="hint">從字磚揣出正確个字，照順序排入格仔。</p>
+    <p class="count" id="count">0 / 10</p>
+    <button class="restart" id="btnReset">重新開始</button>
+  </div>
+</div>
+
+<script>
+/* ===================== 共用繪圖 ===================== */
+const BRICK = `
+<rect width="900" height="400" fill="#E9D9BB"/>
+<rect width="900" height="250" fill="#D9C29A"/>
+<g opacity=".55"><rect y="40" width="900" height="210" fill="#B85C3C"/>
+<g stroke="#9E4A2E" stroke-width="2">
+<path d="M0 82H900M0 124H900M0 166H900M0 208H900"/>
+<path d="M60 40v42M180 40v42M300 40v42M420 40v42M540 40v42M660 40v42M780 40v42"/>
+<path d="M120 82v42M240 82v42M360 82v42M480 82v42M600 82v42M720 82v42M840 82v42"/>
+<path d="M60 124v42M180 124v42M300 124v42M420 124v42M540 124v42M660 124v42M780 124v42"/>
+<path d="M120 166v42M240 166v42M360 166v42M480 166v42M600 166v42M720 166v42M840 166v42"/></g></g>
+<rect width="900" height="42" fill="#6F4B2C"/><rect y="34" width="900" height="8" fill="#5A3C22"/>
+<rect y="250" width="900" height="150" fill="#C4A87E"/>
+<path d="M0 250H900" stroke="#A98B62" stroke-width="4"/>
+<g stroke="#B3966D" stroke-width="2"><path d="M150 250V400M330 250V400M560 250V400M750 250V400"/>
+<path d="M0 310H900M0 358H900"/></g>`;
+
+const YARD = `
+<rect width="900" height="400" fill="#BFD8E8"/>
+<path d="M0 150 L140 96 L280 150Z" fill="#4A7A5E" opacity=".5"/>
+<path d="M230 150 L420 84 L600 150Z" fill="#4A7A5E" opacity=".7"/>
+<rect y="150" width="900" height="40" fill="#8FAF88"/>
+<rect x="60" y="120" width="780" height="70" fill="#B85C3C"/>
+<path d="M40 122 L450 70 L860 122Z" fill="#20242B" opacity=".82"/>
+<rect x="400" y="138" width="100" height="52" fill="#20242B" opacity=".72"/>
+<rect x="170" y="144" width="50" height="38" fill="#F0DCA8"/>
+<rect x="680" y="144" width="50" height="38" fill="#F0DCA8"/>
+<rect y="190" width="900" height="210" fill="#E8C87A"/>
+<path d="M0 214H900" stroke="#D4AF5F" stroke-width="3"/>`;
+
+const YARD_BARE = `
+<rect width="900" height="400" fill="#BFD8E8"/>
+<path d="M0 150 L140 96 L280 150Z" fill="#4A7A5E" opacity=".5"/>
+<path d="M230 150 L420 84 L600 150Z" fill="#4A7A5E" opacity=".7"/>
+<path d="M540 150 L700 104 L860 150Z" fill="#4A7A5E" opacity=".5"/>
+<rect y="150" width="900" height="46" fill="#8FAF88"/>
+<rect y="196" width="900" height="204" fill="#E8C87A"/>
+<path d="M0 218H900" stroke="#D4AF5F" stroke-width="3"/>
+<path d="M0 300H900" stroke="#DDBB6E" stroke-width="2" opacity=".7"/>`;
+
+/* 粽仔：四角粽側面，粽葉煮過係橄欖青，麻索仔綁等 */
+function Z(x,y,rot,sc){
+  return `<g transform="translate(${x},${y}) rotate(${rot}) scale(${sc})">
+    <path d="M2 -30 l16 10 l6 8 l-4 26 l-10 12 l-22 2 l-12 -10 l-2 -22 l8 -16Z" fill="#7A7D42"/>
+    <path d="M2 -30 l16 10 l6 8 l-4 26 l-10 12 l-6 -56Z" fill="#636633"/>
+    <path d="M2 -30 l-16 12 l-8 16 l2 22 l10 8 l12 -58Z" fill="#8E9152"/>
+    <path d="M2 -30 l-4 58" stroke="#5A5D2E" stroke-width="1.8" opacity=".8"/>
+    <path d="M-14 -18 l30 6 M-20 -2 l40 4 M-18 14 l36 2" stroke="#5A5D2E" stroke-width="1.4" opacity=".45"/>
+    <path d="M2 -30 l10 -14 l4 4 l-8 12Z" fill="#8E9152"/>
+    <path d="M-20 20 l-10 8 l6 2 l8 -6Z" fill="#636633"/>
+    <path d="M-22 -6 q24 -12 44 4" stroke="#D9CBA3" stroke-width="3.4" fill="none"/>
+    <path d="M-16 14 q22 -8 36 2" stroke="#D9CBA3" stroke-width="3.4" fill="none"/>
+    <path d="M0 -28 q-4 24 -2 46" stroke="#D9CBA3" stroke-width="3" fill="none"/>
+  </g>`;
+}
+
+/* 人物產生器 */
+function P(x, y, shirt, o={}){
+  const hair = o.hair || "#20242B";
+  const s = o.s || 1;
+  return `<g transform="translate(${x},${y}) scale(${s})">
+    <rect x="-15" y="0" width="30" height="${o.tall?54:48}" rx="8" fill="${shirt}"/>
+    <circle cx="0" cy="-17" r="17" fill="#F2C9A0"/>
+    <path d="M-17 -22 q17 -20 34 0 q-8 -12 -17 -12 q-9 0 -17 12Z" fill="${hair}"/>
+    <circle cx="-6" cy="-15" r="2.4" fill="#20242B"/><circle cx="7" cy="-15" r="2.4" fill="#20242B"/>
+    ${o.face||`<path d="M-6 -6 q7 5 13 0" stroke="#20242B" stroke-width="2.2" fill="none" stroke-linecap="round"/>`}
+    ${o.extra||""}</g>`;
+}
+const POUT  = `<path d="M-2 -6 q5 -5 9 0 q-5 5 -9 0Z" fill="#20242B"/>`;
+const FLAT  = `<path d="M-6 -6 h13" stroke="#20242B" stroke-width="2.3" stroke-linecap="round"/>`;
+const SWEAT = `<path d="M15 -24 q4 7 0 10 q-4 -3 0 -10Z" fill="#7FA8C4"/>`;
+
+/* ===================== 五課資料 ===================== */
+const LESSONS = [
+{
+ id:"3-1-1", tab:"3年上 第1課", name:"正月半 · 庄頭", room:"bare",
+ furn:``,
+ words:[
+  {w:'伙房屋',c:'三合院',u:'224_d1bbdda8a888cc89e16afa8426872281',
+   svg:`<g><rect x="90" y="120" width="720" height="76" fill="#B85C3C"/>
+     <g opacity=".4" stroke="#9E4A2E" stroke-width="2">
+     <path d="M90 146H810M90 172H810M170 120v26M250 146v26M330 120v26M410 146v26
+       M490 120v26M570 146v26M650 120v26M730 146v26"/></g>
+     <path d="M66 122 L450 66 L834 122Z" fill="#20242B" opacity=".85"/>
+     <path d="M66 122 H834" stroke="#3E4A55" stroke-width="5"/>
+     <rect x="196" y="142" width="52" height="40" fill="#F0DCA8"/>
+     <rect x="652" y="142" width="52" height="40" fill="#F0DCA8"/>
+     <rect x="90" y="188" width="720" height="10" fill="#8B6039"/></g>`},
+  {w:'公廳',c:'祠堂',u:'261_39e55166e98bb0d0a3663a54302fa725',
+   svg:`<g><rect x="404" y="136" width="92" height="60" fill="#5A3C22"/>
+     <path d="M450 136v60" stroke="#3E2A16" stroke-width="3"/>
+     <rect x="392" y="106" width="116" height="30" rx="4" fill="#E8C87A" stroke="#8B6039" stroke-width="3"/>
+     <text x="450" y="128" text-anchor="middle" font-size="19" font-weight="900" fill="#8B2E1E"
+       font-family="Noto Serif TC,serif">公 廳</text>
+     <rect x="336" y="66" width="4" height="18" fill="#20242B"/><ellipse cx="338" cy="98" rx="15" ry="19" fill="#C0392B"/>
+     <rect x="560" y="66" width="4" height="18" fill="#20242B"/><ellipse cx="562" cy="98" rx="15" ry="19" fill="#C0392B"/></g>`},
+  {w:'古蹟',c:'古蹟',u:'195_cc0447f799ca6077d752f1c1627aa855',
+   svg:`<g transform="translate(838,246)">
+     <rect x="-46" y="76" width="92" height="12" rx="3" fill="#9AA7AE"/>
+     <rect x="-40" y="66" width="80" height="12" rx="2" fill="#B0BCC2"/>
+     <rect x="-36" y="6" width="72" height="62" fill="#C9A05C"/>
+     <rect x="-30" y="18" width="24" height="50" fill="#8B2E1E"/>
+     <rect x="6" y="18" width="24" height="50" fill="#8B2E1E"/>
+     <rect x="-9" y="14" width="18" height="54" fill="#5A3C22"/>
+     <rect x="-32" y="6" width="9" height="62" fill="#C0392B"/>
+     <rect x="23" y="6" width="9" height="62" fill="#C0392B"/>
+     <path d="M-52 6 h104 l-10 -14 h-84Z" fill="#3E4A55"/>
+     <path d="M-46 -8 q46 -30 92 0 l6 6 h-104Z" fill="#8B2E1E"/>
+     <path d="M-46 -8 q-16 -6 -26 -20 q18 2 30 12Z" fill="#8B2E1E"/>
+     <path d="M46 -8 q16 -6 26 -20 q-18 2 -30 12Z" fill="#8B2E1E"/>
+     <path d="M-40 -12 q40 -24 80 0" stroke="#E8C87A" stroke-width="3" fill="none"/>
+     <rect x="-22" y="-4" width="44" height="14" rx="2" fill="#E8C87A" stroke="#8B6039" stroke-width="2"/>
+     <ellipse cx="0" cy="88" rx="15" ry="5" fill="#8B6039"/>
+     <path d="M-11 88 q11 -14 22 0Z" fill="#B08355"/>
+     <g stroke="#7A5238" stroke-width="2" stroke-linecap="round"><path d="M-4 80v-14"/><path d="M0 78v-18"/><path d="M4 80v-14"/></g>
+   </g>`},
+  {w:'正月半',c:'元宵節',u:'297_72849b1d05467e71176c5fb07a5d82c2',
+   svg:P(268,318,"#C0392B",{s:.9,extra:`<path d="M16 6 l18 -8" stroke="#8B6039" stroke-width="3"/>
+     <rect x="30" y="-6" width="16" height="4" fill="#20242B"/>
+     <ellipse cx="38" cy="10" rx="15" ry="18" fill="#E8542E"/>
+     <rect x="30" y="26" width="16" height="4" fill="#20242B"/>
+     <path d="M38 30 v8" stroke="#C0392B" stroke-width="3"/>`})},
+  {w:'五月節',c:'端午節',u:'334_d7d52dfdbcdc31e870cad0386629d953',
+   svg:`<g transform="translate(600,196) scale(.74)">
+     <path d="M-74 0 h148" stroke="#8B6039" stroke-width="7" stroke-linecap="round"/>
+     <path d="M0 2 v14" stroke="#8B6039" stroke-width="4"/>
+     <path d="M-6 16 q6 -6 12 0 q-6 8 -12 0Z" fill="#7A5238"/>
+     <!-- 索仔對一點放射落來 -->
+     <g stroke="#D9CBA3" stroke-width="2.6" fill="none">
+       <path d="M0 16 q-24 14 -38 34"/><path d="M0 16 q-10 18 -14 40"/>
+       <path d="M0 16 q6 20 4 38"/><path d="M0 16 q18 16 30 34"/>
+       <path d="M0 16 q-18 30 -22 62"/><path d="M0 16 q14 32 18 64"/>
+     </g>
+     ${Z(4,64,-3,.86)}
+     ${Z(-40,58,-14,.94)}
+     ${Z(32,58,13,.9)}
+     ${Z(-24,96,-7,.88)}
+     ${Z(20,100,9,.84)}
+     ${Z(-2,88,3,.8)}
+   </g>`},
+  {w:'拜喏',c:'祭拜',u:'371_96ddc5df63993c28b3b303c3187a8d20',
+   svg:`<g transform="translate(752,316)"><rect x="-15" y="0" width="30" height="46" rx="8" fill="#2C5580"/>
+     <g transform="rotate(-14)"><circle cx="0" cy="-17" r="17" fill="#F2C9A0"/>
+     <path d="M-17 -22 q17 -20 34 0 q-8 -12 -17 -12 q-9 0 -17 12Z" fill="#20242B"/>
+     <path d="M-6 -14 h13" stroke="#20242B" stroke-width="2.2" stroke-linecap="round"/></g>
+     <path d="M-4 2 q4 -16 8 0" stroke="#F2C9A0" stroke-width="8" stroke-linecap="round" fill="none"/>
+     <g stroke="#7A5238" stroke-width="2.4" stroke-linecap="round"><path d="M0 -8 v-22"/><path d="M-5 -8 v-18"/><path d="M5 -8 v-18"/></g>
+     <circle cx="0" cy="-31" r="2.6" fill="#C0392B"/></g>`},
+  {w:'打拚',c:'打拚',u:'883_f87ba9d7921924e4f936fff43fb2d38b',
+   svg:P(452,314,"#4A7A5E",{face:FLAT,extra:`<path d="M-34 -6 h68" stroke="#8B6039" stroke-width="5" stroke-linecap="round"/>
+     <path d="M-30 -6 v14" stroke="#8B6039" stroke-width="2"/><path d="M30 -6 v14" stroke="#8B6039" stroke-width="2"/>
+     <path d="M-42 8 q12 16 24 0Z" fill="#B08355"/><path d="M18 8 q12 16 24 0Z" fill="#B08355"/>${SWEAT}`})},
+  {w:'儘採',c:'隨便',u:'844_3724d520793df3022e8ee1e11bf03cc3',
+   svg:`<g transform="translate(70,258) scale(.72)">
+     <!-- 桌仔 -->
+     <rect x="52" y="-6" width="150" height="12" rx="4" fill="#A0703F"/>
+     <rect x="52" y="6" width="150" height="6" fill="#7A5238"/>
+     <rect x="62" y="12" width="12" height="60" fill="#7A5238"/>
+     <rect x="182" y="12" width="12" height="60" fill="#7A5238"/>
+     <ellipse cx="128" cy="76" rx="80" ry="7" fill="#20242B" opacity=".12"/>
+     <ellipse cx="10" cy="74" rx="46" ry="7" fill="#20242B" opacity=".14"/>
+     <g transform="translate(0,70) rotate(-21)">
+       <!-- 椅仔：翹起來，只賰後背兩腳著地 -->
+       <rect x="-5" y="-52" width="9" height="54" rx="3" fill="#C0392B"/>
+       <rect x="44" y="-48" width="8" height="52" rx="3" fill="#9E2B1E"/>
+       <rect x="-8" y="-60" width="64" height="9" rx="3" fill="#C0392B"/>
+       <rect x="-10" y="-108" width="9" height="52" rx="3" fill="#C0392B"/>
+       <rect x="-16" y="-116" width="22" height="9" rx="3" fill="#C0392B"/>
+       <rect x="-6" y="-30" width="56" height="6" rx="2" fill="#9E2B1E"/>
+       <!-- 人 -->
+       <rect x="2" y="-104" width="34" height="48" rx="10" fill="#B08355"/>
+       <circle cx="14" cy="-120" r="17" fill="#F2C9A0"/>
+       <path d="M-3 -125 q17 -20 34 0 q-8 -12 -17 -12 q-9 0 -17 12Z" fill="#20242B"/>
+       <path d="M6 -119 q4 3 8 0 M17 -119 q4 3 8 0" stroke="#20242B" stroke-width="2" fill="none" stroke-linecap="round"/>
+       <path d="M8 -109 h13" stroke="#20242B" stroke-width="2.2" stroke-linecap="round"/>
+       <path d="M4 -92 q-12 6 -10 22" stroke="#F2C9A0" stroke-width="8" fill="none" stroke-linecap="round"/>
+     </g>
+     <!-- 兩支腳跨在桌頂 -->
+     <path d="M34 -8 l52 -22" stroke="#5F6C74" stroke-width="15" stroke-linecap="round"/>
+     <path d="M86 -30 l44 6" stroke="#5F6C74" stroke-width="14" stroke-linecap="round"/>
+     <path d="M130 -24 l22 -2" stroke="#20242B" stroke-width="13" stroke-linecap="round"/>
+     <path d="M30 6 l50 -14" stroke="#6B7880" stroke-width="15" stroke-linecap="round"/>
+     <path d="M80 -8 l46 -12" stroke="#6B7880" stroke-width="14" stroke-linecap="round"/>
+     <path d="M126 -20 l22 -4" stroke="#20242B" stroke-width="13" stroke-linecap="round"/>
+   </g>`},
+  {w:'知人我',c:'懂事',u:'406_6ff0fcf438abc078ae9be606096516e4',
+   svg:`<g transform="translate(340,326) scale(.78)">
+     <rect x="-14" y="0" width="28" height="42" rx="8" fill="#6B4A8C"/>
+     <circle cx="0" cy="-15" r="15" fill="#F2C9A0"/>
+     <path d="M-15 -20 q15 -18 30 0 q-7 -11 -15 -11 q-8 0 -15 11Z" fill="#20242B"/>
+     <path d="M-6 -13 q4 -6 8 0 M3 -13 q4 -6 8 0" stroke="#20242B" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+     <path d="M-5 -5 q6 5 11 0" stroke="#20242B" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+     <path d="M13 4 h13" stroke="#F2C9A0" stroke-width="8" stroke-linecap="round"/>
+     <ellipse cx="34" cy="2" rx="13" ry="10" fill="#FDFBF5"/>
+     <path d="M24 0 q10 -10 20 0" stroke="#E4DBC6" stroke-width="2.2" fill="none"/>
+     <path d="M34 -8 q-3 -4 1 -7 M34 -8 q3 -4 -1 -7" stroke="#E4DBC6" stroke-width="1.8" fill="none"/>
+     <path d="M27 -3 l3 -5 M34 -5 l0 -5 M41 -3 l-3 -5" stroke="#E4DBC6" stroke-width="1.6"/>
+   </g>`},
+  {w:'鬧熱',c:'熱鬧',u:'922_49382be536c2d305e7ef8cd940c8e70d',
+   svg:P(486,352,"#7A5238",{s:.86,hair:"#3E3226"})+P(690,318,"#C0392B",{s:.92,hair:"#3E3226"})
+      +P(524,322,"#4A7A5E",{s:.84})+P(392,348,"#B08355",{s:.8,hair:"#3E3226"})},
+ ]},
+
+{
+ id:"3-2-1", tab:"3年下 第1課", name:"食飯 · 灶下", room:"hall",
+ furn:`<rect x="60" y="150" width="150" height="16" rx="4" fill="#8B6039"/>
+   <rect x="70" y="166" width="130" height="86" fill="#6F4B2C"/>
+   <ellipse cx="135" cy="150" rx="40" ry="12" fill="#3E4A55"/>
+   <rect x="260" y="286" width="380" height="16" rx="5" fill="#A0703F"/>
+   <rect x="274" y="302" width="14" height="60" fill="#7A5238"/>
+   <rect x="612" y="302" width="14" height="60" fill="#7A5238"/>`,
+ words:[
+  {w:'飯甑',c:'木製飯鍋',u:'14239_3faff9015eedead7a0c0d0feeb757408',
+   svg:`<g transform="translate(340,258)"><path d="M-32 0 L32 0 L26 30 H-26Z" fill="#B08355"/>
+     <ellipse cx="0" cy="0" rx="32" ry="9" fill="#C9A074"/><path d="M-32 10 h64" stroke="#8B6039" stroke-width="4"/>
+     <rect x="-6" y="-14" width="12" height="14" rx="3" fill="#8B6039"/></g>`},
+  {w:'豆腐',c:'豆腐',u:'14821_cedbf494289d2f0f748ce603c862f17e',
+   svg:`<g transform="translate(452,278)"><ellipse cx="0" cy="8" rx="34" ry="11" fill="#FDFBF5"/>
+     <rect x="-20" y="-10" width="18" height="16" fill="#F5EFD8" stroke="#DDD2AE" stroke-width="1.5"/>
+     <rect x="2" y="-10" width="18" height="16" fill="#F5EFD8" stroke="#DDD2AE" stroke-width="1.5"/>
+     <rect x="-9" y="-20" width="18" height="16" fill="#FAF6E6" stroke="#DDD2AE" stroke-width="1.5"/></g>`},
+  {w:'炒豬腸',c:'炒豬腸',u:'14858_ff23e3b7d90ce4c86e3880ef948d344b',
+   svg:`<g transform="translate(556,280)"><ellipse cx="0" cy="6" rx="36" ry="12" fill="#FDFBF5"/>
+     <path d="M-22 0 q10 -12 20 0 q10 12 20 0" stroke="#C98A6C" stroke-width="9" fill="none" stroke-linecap="round"/>
+     <path d="M-16 -8 l10 -4 M8 -8 l10 -4" stroke="#4A7A5E" stroke-width="4" stroke-linecap="round"/></g>`},
+  {w:'世大人',c:'家裡長輩',u:'14358_02bf619807d55c95d9b17e9a6cc4f6a4',
+   svg:P(700,300,"#2C5580",{hair:"#C9C4BC",face:FLAT,extra:`<path d="M-8 6 q8 12 16 0" stroke="#C9C4BC" stroke-width="3" fill="none"/>`})},
+  {w:'添飯',c:'添飯',u:'14320_7d338dc7d75196a0801add6e449b9e51',
+   svg:`<g transform="translate(400,236)"><path d="M-16 0 q16 20 32 0Z" fill="#FDFBF5" stroke="#D8CDB4" stroke-width="2"/>
+     <path d="M-10 -2 q10 -10 20 0" fill="#FAF6E6"/><path d="M18 -6 l22 -20" stroke="#B08355" stroke-width="5" stroke-linecap="round"/>
+     <ellipse cx="44" cy="-30" rx="11" ry="7" fill="#C9A074"/></g>`},
+  {w:'挾菜',c:'挾菜',u:'14396_add1df6c6b360af37240946d69580032',
+   svg:`<g transform="translate(500,232)"><path d="M0 0 l30 -34 M8 4 l30 -34" stroke="#B08355" stroke-width="3.5" stroke-linecap="round"/>
+     <path d="M-2 2 q8 6 12 -2" fill="#4A7A5E"/></g>`},
+  {w:'嘴恁翹',c:'嘴這麼翹',u:'14279_15f3a944d3044c14810876de5017397a',
+   svg:P(316,344,"#C0392B",{s:.84,face:POUT})},
+  {w:'挑事',c:'故意',u:'14897_4a4f5eda0cae9682d3569d530e64116e',
+   svg:`<g transform="translate(236,214) scale(.66)">
+     <!-- 一支跤蹬灶脣、一支吊等 -->
+     <path d="M-6 34 l-32 14" stroke="#20242B" stroke-width="11" stroke-linecap="round"/>
+     <path d="M-38 48 l-14 -6" stroke="#20242B" stroke-width="10" stroke-linecap="round"/>
+     <path d="M8 34 l14 26" stroke="#20242B" stroke-width="11" stroke-linecap="round"/>
+     <path d="M22 60 l16 4" stroke="#20242B" stroke-width="10" stroke-linecap="round"/>
+     <g transform="rotate(-20)">
+       <rect x="-15" y="-16" width="30" height="52" rx="10" fill="#E8C87A"/>
+       <circle cx="-2" cy="-32" r="16" fill="#F2C9A0"/>
+       <path d="M-18 -37 q16 -19 32 0 q-8 -11 -16 -11 q-8 0 -16 11Z" fill="#20242B"/>
+       <path d="M-10 -31 q4 -5 8 -1 M2 -32 q4 -5 8 -1" stroke="#20242B" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+       <path d="M-8 -22 q7 6 13 -2" stroke="#20242B" stroke-width="2.4" fill="none" stroke-linecap="round"/>
+     </g>
+     <!-- 手擐灶脣（短短） -->
+     <path d="M-12 -16 q-16 -14 -22 -30" stroke="#F2C9A0" stroke-width="9" fill="none" stroke-linecap="round"/>
+     <path d="M0 -14 q-8 -18 -10 -34" stroke="#F2C9A0" stroke-width="9" fill="none" stroke-linecap="round"/>
+   </g>`},
+  {w:'定定仔',c:'慢慢',u:'14425_babff5755bc238959224ef9a58a668b5',
+   svg:`<g transform="translate(800,306)">
+     <ellipse cx="0" cy="62" rx="38" ry="7" fill="#20242B" opacity=".12"/>
+     <!-- 駝背：粗筆畫出厚身體 -->
+     <path d="M-6 52 q-18 -34 2 -52 q14 -13 28 -11" stroke="#4A6B7A" stroke-width="34"
+           fill="none" stroke-linecap="round"/>
+     <path d="M-6 52 q-14 -28 0 -44" stroke="#3E5A67" stroke-width="14" fill="none" stroke-linecap="round" opacity=".5"/>
+     <circle cx="34" cy="-12" r="16" fill="#F2C9A0"/>
+     <path d="M18 -17 q16 -18 32 0 q-8 -11 -16 -11 q-8 0 -16 11Z" fill="#D8D2C6"/>
+     <path d="M27 -12 q3 3 7 0" stroke="#20242B" stroke-width="2.1" fill="none" stroke-linecap="round"/>
+     <path d="M40 -12 q3 3 7 0" stroke="#20242B" stroke-width="2.1" fill="none" stroke-linecap="round"/>
+     <path d="M32 -3 h9" stroke="#20242B" stroke-width="2.1" stroke-linecap="round"/>
+     <path d="M26 2 q7 10 14 2" stroke="#D8D2C6" stroke-width="3.4" fill="none"/>
+     <!-- 細細步（徙倒轉手片） -->
+     <path d="M-12 50 l-8 26" stroke="#20242B" stroke-width="10" stroke-linecap="round"/>
+     <path d="M-20 76 l-13 4" stroke="#20242B" stroke-width="9" stroke-linecap="round"/>
+     <path d="M2 50 l7 26" stroke="#20242B" stroke-width="10" stroke-linecap="round"/>
+     <path d="M9 76 l13 4" stroke="#20242B" stroke-width="9" stroke-linecap="round"/>
+     <!-- 拐棍仔：手貼等身體，短棍 -->
+     <path d="M22 20 q9 0 12 6" stroke="#F2C9A0" stroke-width="8.5" fill="none" stroke-linecap="round"/>
+     <path d="M35 28 v48" stroke="#8B6039" stroke-width="5.5" stroke-linecap="round"/>
+     <path d="M35 28 q0 -8 -8 -8" stroke="#8B6039" stroke-width="5.5" fill="none" stroke-linecap="round"/>
+     <ellipse cx="35" cy="78" rx="6" ry="3" fill="#5A3C22"/>
+   </g>`},
+  {w:'鬥緊',c:'著急',u:'14459_bec0e98fe299763b6111e45c1a773b6a',
+   svg:`<g transform="translate(126,352)">
+     <!-- 速度線 -->
+     <g stroke="#7A5238" stroke-width="5" stroke-linecap="round" opacity=".5">
+       <path d="M-44 -46 h-42"/><path d="M-52 -30 h-56"/><path d="M-44 -14 h-40"/>
+       <path d="M-56 2 h-34"/><path d="M-40 16 h-30"/>
+     </g>
+     <g transform="rotate(-16)">
+       <rect x="-14" y="-46" width="28" height="44" rx="9" fill="#B08355"/>
+       <circle cx="4" cy="-62" r="15" fill="#F2C9A0"/>
+       <path d="M-11 -67 q15 -18 30 0 q-7 -11 -15 -11 q-8 0 -15 11Z" fill="#20242B"/>
+       <path d="M-2 -62 q4 -5 8 0 M8 -62 q4 -5 8 0" stroke="#20242B" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+       <path d="M0 -53 q6 5 11 -1" stroke="#20242B" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+       <path d="M20 -70 q5 8 0 12 q-5 -4 0 -12Z" fill="#7FA8C4"/>
+     </g>
+     <!-- 手擛等 -->
+     <path d="M-12 -46 q-22 4 -28 -14" stroke="#F2C9A0" stroke-width="8" fill="none" stroke-linecap="round"/>
+     <path d="M14 -40 q22 6 26 -12" stroke="#F2C9A0" stroke-width="8" fill="none" stroke-linecap="round"/>
+     <!-- 跨大步 -->
+     <path d="M-6 0 l-26 20" stroke="#20242B" stroke-width="10" stroke-linecap="round"/>
+     <path d="M-32 20 l-16 6" stroke="#20242B" stroke-width="9" stroke-linecap="round"/>
+     <path d="M8 0 l24 14" stroke="#20242B" stroke-width="10" stroke-linecap="round"/>
+     <path d="M32 14 l6 16" stroke="#20242B" stroke-width="9" stroke-linecap="round"/>
+   </g>`},
+ ]},
+
+{
+ id:"4-1-1", tab:"4年上 第1課", name:"焙肉 · 禾埕", room:"yard",
+ furn:`<rect x="300" y="286" width="300" height="14" rx="4" fill="#7E8B92"/>
+   <g stroke="#5F6C74" stroke-width="3"><path d="M312 286v-8M336 286v-8M360 286v-8M384 286v-8M408 286v-8
+     M432 286v-8M456 286v-8M480 286v-8M504 286v-8M528 286v-8M552 286v-8M576 286v-8"/></g>
+   <rect x="310" y="300" width="14" height="46" fill="#5F6C74"/>
+   <rect x="576" y="300" width="14" height="46" fill="#5F6C74"/>
+   <path d="M330 274 q10 -22 22 0 M420 272 q10 -24 22 0 M520 274 q10 -22 22 0"
+     stroke="#E8542E" stroke-width="5" fill="none" opacity=".75"/>
+   <rect x="640" y="290" width="180" height="14" rx="4" fill="#A0703F"/>
+   <rect x="652" y="304" width="12" height="50" fill="#7A5238"/>
+   <rect x="796" y="304" width="12" height="50" fill="#7A5238"/>`,
+ words:[
+  {w:'焙肉',c:'烤肉',u:'85_8c5b278bf41fdafad5e780458b6090e6',
+   svg:`<g><rect x="326" y="272" width="34" height="14" rx="5" fill="#A0522D"/>
+     <rect x="332" y="276" width="22" height="6" rx="3" fill="#7A3A1E"/>
+     <rect x="472" y="272" width="34" height="14" rx="5" fill="#A0522D"/>
+     <rect x="478" y="276" width="22" height="6" rx="3" fill="#7A3A1E"/></g>`},
+  {w:'煙腸',c:'香腸',u:'126_aa074376fb4b5a456b56c9985715a27f',
+   svg:`<g><path d="M382 278 q16 -10 32 0" stroke="#C0392B" stroke-width="13" fill="none" stroke-linecap="round"/>
+     <path d="M414 280 q16 -10 32 0" stroke="#C0392B" stroke-width="13" fill="none" stroke-linecap="round"/></g>`},
+  {w:'包粟',c:'玉米',u:'100_4306fc08774d2fd3e642d637e96743be',
+   svg:`<g transform="translate(534,272)"><ellipse cx="0" cy="0" rx="13" ry="26" fill="#E8C24C"/>
+     <path d="M-8 -18v36M0 -22v44M8 -18v36" stroke="#C9A02E" stroke-width="2"/>
+     <path d="M-12 -22 q-12 -12 -4 -24" stroke="#4A7A5E" stroke-width="4" fill="none"/></g>`},
+  {w:'茭筍',c:'筊白筍',u:'612_4cfef25258e0906575198af5598958d6',
+   svg:`<g transform="translate(674,272)"><path d="M0 -30 q14 20 6 42 h-12 q-8 -22 6 -42Z" fill="#F0EAD2"/>
+     <path d="M-4 -30 q-10 -14 -2 -22 M4 -30 q10 -14 2 -22" stroke="#4A7A5E" stroke-width="4" fill="none"/></g>`},
+  {w:'蝦公',c:'蝦子',u:'109_6d84b718222508f221c40ebed7858f60',
+   svg:`<g transform="translate(722,278)"><path d="M-16 0 q6 -18 20 -14 q16 4 12 20 q-4 12 -16 8" fill="#E8845C"/>
+     <path d="M14 -12 l12 -10 M14 -8 l14 -4" stroke="#E8845C" stroke-width="3" stroke-linecap="round"/>
+     <circle cx="10" cy="-10" r="2.4" fill="#20242B"/></g>`},
+  {w:'蒜頭',c:'蒜頭',u:'697_698bec6dc349063bd30917d4043f843d',
+   svg:`<g transform="translate(768,276)"><path d="M0 -18 q16 10 12 22 q-4 12 -12 12 q-8 0 -12 -12 q-4 -12 12 -22Z" fill="#F5EFE2"/>
+     <path d="M0 -18 v34 M-8 -8 q4 14 0 22 M8 -8 q-4 14 0 22" stroke="#D8CDB4" stroke-width="1.8"/>
+     <path d="M0 -18 v-10" stroke="#B8A98A" stroke-width="3"/></g>`},
+  {w:'鹽',c:'鹽',u:'645_c976a3603e1c9f2bfeca5ca9b2a78233',
+   svg:`<g transform="translate(806,272)"><path d="M-11 -12 h22 l3 26 h-28Z" fill="#FDFBF5" stroke="#C9C4BC" stroke-width="2"/>
+     <rect x="-9" y="-18" width="18" height="7" rx="2" fill="#9AA7AE"/>
+     <circle cx="-3" cy="-15" r="1.4" fill="#5F6C74"/><circle cx="3" cy="-15" r="1.4" fill="#5F6C74"/></g>`},
+  {w:'涼水',c:'汽水',u:'141_8f0902a2c3c920b9d6737658bb31c351',
+   svg:`<g transform="translate(224,266)"><rect x="-13" y="-26" width="26" height="54" rx="6" fill="#7FA8C4" opacity=".85"/>
+     <rect x="-13" y="0" width="26" height="28" rx="4" fill="#C0392B" opacity=".7"/>
+     <rect x="-9" y="-34" width="18" height="10" rx="3" fill="#9AA7AE"/>
+     <circle cx="-4" cy="8" r="3" fill="#FDFBF5" opacity=".8"/><circle cx="5" cy="-2" r="2.4" fill="#FDFBF5" opacity=".8"/></g>`},
+  {w:'月餅',c:'月餅',u:'161_308426f2c388fd0a417003dc85cd420f',
+   svg:`<g transform="translate(700,286)"><ellipse cx="0" cy="0" rx="26" ry="12" fill="#C9A05C"/>
+     <ellipse cx="0" cy="-4" rx="26" ry="12" fill="#DDB673"/>
+     <circle cx="0" cy="-4" r="9" fill="none" stroke="#B8873F" stroke-width="2.2"/>
+     <path d="M-16 -8 l6 -4 M16 -8 l-6 -4" stroke="#B8873F" stroke-width="2"/></g>`},
+  {w:'柚仔',c:'柚子',u:'184_cfcec611b11e889707fda35cd1862c2c',
+   svg:`<g transform="translate(768,282)"><path d="M0 -22 q22 6 22 22 q0 14 -22 14 q-22 0 -22 -14 q0 -16 22 -22Z" fill="#C9C24C"/>
+     <path d="M0 -22 v-8" stroke="#4A7A5E" stroke-width="4"/>
+     <path d="M-4 -30 q-14 -4 -16 6 q12 4 16 -6Z" fill="#4A7A5E"/></g>`},
+ ]},
+
+{
+ id:"4-1-2", tab:"4年上 第2課", name:"著衫 · 間房", room:"hall",
+ furn:`<rect x="60" y="120" width="150" height="120" rx="4" fill="#7FA8C4"/>
+   <rect x="60" y="120" width="150" height="120" rx="4" fill="none" stroke="#FDFBF5" stroke-width="7"/>
+   <path d="M135 120v120M60 180h150" stroke="#FDFBF5" stroke-width="6"/>
+   <rect x="560" y="120" width="290" height="14" rx="4" fill="#8B6039"/>
+   <rect x="568" y="134" width="10" height="128" fill="#7A5238"/>
+   <rect x="832" y="134" width="10" height="128" fill="#7A5238"/>
+   <rect x="560" y="252" width="290" height="12" rx="4" fill="#8B6039"/>
+   <rect x="250" y="290" width="240" height="14" rx="5" fill="#A0703F"/>
+   <rect x="262" y="304" width="12" height="50" fill="#7A5238"/>
+   <rect x="466" y="304" width="12" height="50" fill="#7A5238"/>`,
+ words:[
+  {w:'底衫仔',c:'內衣',u:'5056_13598e7805fedc15aba94941a053396a',
+   svg:`<g transform="translate(600,180)"><path d="M-22 -22 l10 -6 h24 l10 6 l-8 12 l-4 -4 v34 h-20 v-34 l-4 4Z" fill="#FDFBF5" stroke="#D8CDB4" stroke-width="2"/></g>`},
+  {w:'長袖',c:'長袖',u:'5005_e181ebb33b98456cf3d9deaf9d5bb0dd',
+   svg:`<g transform="translate(670,182)"><path d="M-24 -22 h48 l14 14 l-10 12 l-8 -6 v38 h-40 v-38 l-8 6 l-10 -12Z" fill="#4A7A5E"/>
+     <path d="M-38 -8 l-8 22 l12 6 l8 -20Z" fill="#4A7A5E"/><path d="M38 -8 l8 22 l-12 6 l-8 -20Z" fill="#4A7A5E"/></g>`},
+  {w:'外衫',c:'外套',u:'4559_84a9142598263144cdc514a85909bc8e',
+   svg:`<g transform="translate(748,182)"><path d="M-24 -22 h48 l12 12 l-8 12 v34 h-52 v-34 l-8 -12Z" fill="#2C5580"/>
+     <path d="M0 -22 v58" stroke="#1F3A5F" stroke-width="3"/>
+     <circle cx="-6" cy="0" r="2.4" fill="#E8C87A"/><circle cx="-6" cy="16" r="2.4" fill="#E8C87A"/></g>`},
+  {w:'羽絨衫',c:'羽絨衣',u:'4630_87dc9d770d76ac67b6ee6a43b158c39d',
+   svg:`<g transform="translate(818,182)"><path d="M-22 -20 h44 l10 12 v40 h-64 v-40Z" fill="#C0392B"/>
+     <path d="M-32 -4 h64 M-32 8 h64 M-32 20 h64" stroke="#9E2B1E" stroke-width="3"/>
+     <path d="M0 -20 v52" stroke="#9E2B1E" stroke-width="3"/></g>`},
+  {w:'短褲',c:'短褲',u:'4489_6d833f832ceccad48d2968524c544240',
+   svg:`<g transform="translate(300,270)"><path d="M-20 -18 h40 v14 l-6 22 h-12 l-2 -18 l-2 18 h-12 l-6 -22Z" fill="#B08355"/></g>`},
+  {w:'頸圍仔',c:'圍巾',u:'5095_f095f38a5c2c19f48d144cf4e0c2df4b',
+   svg:`<g transform="translate(370,268)"><path d="M-24 -14 q24 12 48 0 l0 10 q-24 12 -48 0Z" fill="#E8C87A"/>
+     <path d="M14 -4 l6 26 h12 l-6 -28Z" fill="#E8C87A"/>
+     <path d="M-24 -12 h48 M-22 -2 h44" stroke="#C9A64C" stroke-width="2"/></g>`},
+  {w:'手落仔',c:'手套',u:'5142_6071324c335c121d54e7875e201afdd9',
+   svg:`<g transform="translate(440,270)"><path d="M-16 -12 h20 v-8 h6 v8 h6 v20 q0 8 -14 8 q-14 0 -14 -8Z" fill="#4A7A5E"/>
+     <path d="M-18 4 q-8 -6 -2 -12 l4 4Z" fill="#4A7A5E"/>
+     <path d="M-16 -4 h32" stroke="#3A6349" stroke-width="3"/></g>`},
+  {w:'熱𤐰𤐰仔',c:'炎熱',u:'4452_aeed33320b3d7dc660a48f2587b0df2b',
+   excl:"天氣", tint:"#E8942E", tintAmt:.22,
+   svg:`<g transform="translate(135,180)"><circle cx="0" cy="0" r="26" fill="#F0B429"/>
+     <g stroke="#F0B429" stroke-width="5" stroke-linecap="round">
+     <path d="M0 -38v-12M0 38v12M-38 0h-12M38 0h12M-27 -27l-9 -9M27 27l9 9M-27 27l-9 9M27 -27l9 -9"/></g></g>`},
+  {w:'涼爽',c:'涼爽',u:'4526_666e7686c031521d882f7e8ee78688ef',
+   excl:"天氣", tint:"#7FA8C4", tintAmt:.09,
+   svg:`<g transform="translate(135,180)" opacity=".9">
+     <path d="M-46 -6 q26 -14 52 0 q14 8 26 0" stroke="#FDFBF5" stroke-width="5" fill="none" stroke-linecap="round"/>
+     <path d="M-40 12 q26 -12 52 0" stroke="#FDFBF5" stroke-width="4" fill="none" stroke-linecap="round"/>
+     <path d="M20 -22 q14 -10 22 2 q-12 8 -22 -2Z" fill="#4A7A5E"/></g>`},
+  {w:'冷颼颼仔',c:'冷颼颼的',u:'4597_d019ec799b0f8a83ba973d098171b195',
+   excl:"天氣", tint:"#5B8CC4", tintAmt:.26,
+   svg:`<g transform="translate(135,180)" stroke="#FDFBF5" stroke-width="3.5" stroke-linecap="round">
+     <path d="M0 -26v52M-23 -13l46 26M-23 13l46 -26"/>
+     <path d="M-6 -20l6 6l6 -6M-6 20l6 -6l6 6"/>
+     <g transform="translate(56,26) scale(.6)"><path d="M0 -26v52M-23 -13l46 26M-23 13l46 -26"/></g></g>`},
+ ]},
+
+{
+ id:"4-1-3", tab:"4年上 第3課", name:"年三十 · 公廳", room:"hall",
+ furn:`<rect x="330" y="196" width="240" height="16" rx="4" fill="#8B6039"/>
+   <rect x="344" y="212" width="212" height="54" fill="#6F4B2C"/>
+   <rect x="288" y="286" width="324" height="16" rx="5" fill="#A0703F"/>
+   <rect x="300" y="302" width="14" height="56" fill="#7A5238"/>
+   <rect x="586" y="302" width="14" height="56" fill="#7A5238"/>
+   <rect x="176" y="42" width="4" height="18" fill="#20242B"/><ellipse cx="178" cy="78" rx="17" ry="21" fill="#C0392B"/>
+   <rect x="722" y="42" width="4" height="18" fill="#20242B"/><ellipse cx="724" cy="78" rx="17" ry="21" fill="#C0392B"/>`,
+ words:[
+  {w:'年三十',c:'除夕',u:'9014_d4a61504abe6d7d6962c59415ee3e424',
+   svg:`<g><rect x="86" y="96" width="34" height="140" rx="4" fill="#C0392B"/>
+     <rect x="780" y="96" width="34" height="140" rx="4" fill="#C0392B"/>
+     <text x="103" y="128" text-anchor="middle" font-size="21" font-weight="900" fill="#E8C87A" font-family="Noto Serif TC,serif">年</text>
+     <text x="103" y="158" text-anchor="middle" font-size="21" font-weight="900" fill="#E8C87A" font-family="Noto Serif TC,serif">三</text>
+     <text x="103" y="188" text-anchor="middle" font-size="21" font-weight="900" fill="#E8C87A" font-family="Noto Serif TC,serif">十</text>
+     <text x="797" y="128" text-anchor="middle" font-size="21" font-weight="900" fill="#E8C87A" font-family="Noto Serif TC,serif">團</text>
+     <text x="797" y="158" text-anchor="middle" font-size="21" font-weight="900" fill="#E8C87A" font-family="Noto Serif TC,serif">圓</text>
+     <text x="797" y="188" text-anchor="middle" font-size="21" font-weight="900" fill="#E8C87A" font-family="Noto Serif TC,serif">年</text></g>`},
+  {w:'阿公婆',c:'祖先',u:'9052_e1118c8a8b4d6424ca811305660fb758',
+   svg:`<g><rect x="418" y="120" width="64" height="76" rx="4" fill="#5A3C22"/>
+     <rect x="426" y="128" width="48" height="60" rx="2" fill="#E8C87A"/>
+     <text x="450" y="152" text-anchor="middle" font-size="15" font-weight="900" fill="#5A3C22" font-family="Noto Serif TC,serif">阿公</text>
+     <text x="450" y="172" text-anchor="middle" font-size="15" font-weight="900" fill="#5A3C22" font-family="Noto Serif TC,serif">婆</text></g>`},
+  {w:'金香',c:'金紙和香',u:'9111_a3c22548cf732ee610c59a59e4298f7d',
+   svg:`<g><ellipse cx="450" cy="204" rx="30" ry="9" fill="#B8842E"/>
+     <path d="M424 204 q26 -22 52 0Z" fill="#D9A94E"/>
+     <g stroke="#7A5238" stroke-width="2.6" stroke-linecap="round"><path d="M438 194v-30"/><path d="M450 192v-36"/><path d="M462 194v-30"/></g>
+     <circle cx="438" cy="162" r="3" fill="#C0392B"/><circle cx="450" cy="154" r="3" fill="#C0392B"/><circle cx="462" cy="162" r="3" fill="#C0392B"/>
+     <rect x="352" y="180" width="34" height="24" rx="3" fill="#E8C87A"/><rect x="358" y="174" width="34" height="24" rx="3" fill="#F0D98A"/>
+     <path d="M450 150 q-12 -22 4 -36 q14 -14 2 -32" stroke="#FDFBF5" stroke-width="4" fill="none" stroke-linecap="round" opacity=".55"/></g>`},
+  {w:'牲儀',c:'牲禮',u:'9076_35e0daf4ab16d3eb1c7ee8b51d108213',
+   svg:`<g><ellipse cx="360" cy="282" rx="34" ry="11" fill="#FDFBF5"/><path d="M340 280 q20 -22 40 0Z" fill="#D9A24E"/>
+     <ellipse cx="450" cy="282" rx="34" ry="11" fill="#FDFBF5"/><path d="M430 280 q20 -20 40 0Z" fill="#E8B08A"/>
+     <ellipse cx="540" cy="282" rx="34" ry="11" fill="#FDFBF5"/><path d="M518 280 q22 -14 44 0Z" fill="#9FBBD0"/></g>`},
+  {w:'粄圓',c:'湯圓',u:'9185_6a9c3340a25d1f35cf1e9373c4a52350',
+   svg:`<g><ellipse cx="330" cy="300" rx="30" ry="12" fill="#FDFBF5"/><path d="M302 298 q28 20 56 0Z" fill="#EFE6D2"/>
+     <circle cx="318" cy="294" r="7" fill="#FDFBF5" stroke="#D8C8AC" stroke-width="1.6"/>
+     <circle cx="334" cy="290" r="7" fill="#F2B8C6" stroke="#DDA0AE" stroke-width="1.6"/>
+     <circle cx="348" cy="295" r="7" fill="#FDFBF5" stroke="#D8C8AC" stroke-width="1.6"/></g>`},
+  {w:'炒肉',c:'客家小炒',u:'9651_44855dd6ce58714bf4dbc1c92ec0e6f4',
+   svg:`<g><ellipse cx="450" cy="300" rx="36" ry="13" fill="#FDFBF5"/><path d="M420 298 q30 16 60 0Z" fill="#EFE6D2"/>
+     <path d="M428 294 l16 -8 M440 297 l18 -6 M452 296 l16 -9" stroke="#B85C3C" stroke-width="5" stroke-linecap="round"/>
+     <path d="M436 292 l12 -3 M456 293 l12 -4" stroke="#4A7A5E" stroke-width="4" stroke-linecap="round"/></g>`},
+  {w:'子孫',c:'子孫',u:'9145_1e69024ca6e17d45fdbd2d2de226ed32',
+   svg:P(208,304,"#4A7A5E",{s:.82})+P(252,310,"#C0392B",{s:.74})},
+  {w:'叔伯阿哥',c:'堂哥',u:'9610_5744b1fe8a1ee8f90656a354607a190b',
+   svg:P(664,296,"#2C5580")},
+  {w:'親戚',c:'親戚',u:'9702_a5da24412b58350c49864e8e5860d4a3',
+   svg:P(120,300,"#7A5238",{s:.9,hair:"#3E3226"})+P(760,300,"#4A7A5E",{s:.9})+P(818,306,"#C0392B",{s:.84,hair:"#3E3226"})},
+  {w:'擐',c:'提',u:'8984_ca18556a85c176fbb0ef10e38a839da3',
+   svg:P(60,300,"#B08355",{extra:`<path d="M15 6 h10" stroke="#F2C9A0" stroke-width="7" stroke-linecap="round"/>
+     <path d="M28 6 v-10" stroke="#8B6039" stroke-width="3"/><rect x="16" y="10" width="26" height="22" rx="3" fill="#C0392B"/>
+     <path d="M29 10 v22 M16 20 h26" stroke="#E8C87A" stroke-width="3"/>`})},
+ ]},
+];
+
+const SENT={
+ '3-1-1':{
+  '古蹟':{r:'阿晴',h:'𠊎兜參觀了「范姜古屋」，先生講該搭仔係有名个古蹟。',p:'ngaiˇ deuˊ camˊ gonˊ eˇ  fam giongˊ guˋ vugˋ   xinˊ sangˊ gongˋ ge dab eˋ he iuˊ miangˇ ge guˋ jidˋ',u:'https://dn9mvjhbyvvpc.cloudfront.net/files/513_2e3b144e4f1310138087ade7e9b922c2.mp3'},
+  '伙房屋':{r:'阿松',h:'𠊎兜看著伙房屋，也看著在屋仔中央个「公廳」，',p:'ngaiˇ deuˊ kon doˋ foˋ fongˇ vugˋ  ia kon doˋ di vugˋ eˋ dungˊ ongˊ ge  gungˊ tangˊ',u:'https://dn9mvjhbyvvpc.cloudfront.net/files/547_b11aaaa6ae278ed187de28d4141aae45.mp3'},
+  '公廳':{r:'阿松',h:'𠊎兜看著伙房屋，也看著在屋仔中央个「公廳」，',p:'ngaiˇ deuˊ kon doˋ foˋ fongˇ vugˋ  ia kon doˋ di vugˋ eˋ dungˊ ongˊ ge  gungˊ tangˊ',u:'https://dn9mvjhbyvvpc.cloudfront.net/files/547_b11aaaa6ae278ed187de28d4141aae45.mp3'},
+  '儘採':{r:'阿婆',h:'細人仔做毋得儘採走入去搞哦！',p:'se nginˇ eˋ zo mˇ dedˋ qinˋ caiˋ zeuˋ ngib hi gauˋ oˊ',u:'https://dn9mvjhbyvvpc.cloudfront.net/files/4302_f171129fafa8f88e7cb326385353e44a.mp3'},
+  '打拚':{r:'阿婆',h:'有佢兜煞猛打拚，後代子孫正有恁好个生活。',p:'iuˊ giˇ deuˊ sadˋ mangˊ daˋ biang  heu toi ziiˋ sunˊ zang iuˊ anˋ hoˋ ge senˊ fad',u:'https://dn9mvjhbyvvpc.cloudfront.net/files/635_034a685c2071a0ef823fb472eb86c93f.mp3'},
+  '正月半':{r:'阿婆',h:'在年三十、過年、正月半、五月節、八月半都愛拜。',p:'di ngienˇ samˊ siib  go ngienˇ  zangˊ ngied ban  ngˋ ngied jiedˋ  badˋ ngied ban du oi bai',u:'https://dn9mvjhbyvvpc.cloudfront.net/files/608_ecd527c883ee1db2bc0264f5f40e6db7.mp3'},
+  '五月節':{r:'阿婆',h:'在年三十、過年、正月半、五月節、八月半都愛拜。',p:'di ngienˇ samˊ siib  go ngienˇ  zangˊ ngied ban  ngˋ ngied jiedˋ  badˋ ngied ban du oi bai',u:'https://dn9mvjhbyvvpc.cloudfront.net/files/608_ecd527c883ee1db2bc0264f5f40e6db7.mp3'},
+  '拜喏':{r:'阿松',h:'下二擺𠊎也愛點香拜喏，感謝祖先！',p:'ha ngi baiˋ ngaiˇ ia oi diamˋ hiongˊ bai iaˊ  gamˋ qia zuˋ xienˊ',u:'https://dn9mvjhbyvvpc.cloudfront.net/files/696_02a9ab0f4ff8cbfcdf6223ea7d2a935b.mp3'},
+  '知人我':{r:'阿婆',h:'阿松正經知人我了，還好哦！',p:'aˊ qiungˇ ziin ginˊ diˊ nginˇ ngoˊ leˊ  hanˇ hoˋ oˊ',u:'https://dn9mvjhbyvvpc.cloudfront.net/files/710_70bd61fca5269b25b83ad0faec7f32c6.mp3'},
+  '鬧熱':{r:'阿婆',h:'係啊！大家戴共下正鬧熱哦！',p:'he a  tai gaˊ dai kiung ha zang nau ngied oˊ',u:'https://dn9mvjhbyvvpc.cloudfront.net/files/823_3241c4d2bb9eb5294a529bd4fe8ff6fb.mp3'},
+ },
+ '3-2-1':{
+  '飯甑':{r:'旁白',h:'阿松擺好碗筷，早就企在飯甑脣，笑咪咪恬恬仔同大人添飯。',p:'aˊ qiungˇ baiˋ hoˋ vonˋ kuai  zoˋ qiu kiˊ di fan zen sunˇ  seu miˊ miˊ diamˊ diamˊ eˋ tungˇ tai nginˇ tiamˊ fan',u:'https://dn9mvjhbyvvpc.cloudfront.net/files/18493_14912f8cbbf7165d17761b5e70003b1b.mp3'},
+  '嘴恁翹':{r:'阿爸',h:'阿雨，毋使嘴恁翹，愛知人我。你係細老妹，毋好恁計較。',p:'aˊ iˋ  mˇ siiˋ zoi anˋ kieu  oi diˊ nginˇ ngoˊ  ngˇ he se loˋ moi  mˇ hoˋ anˋ gie gau',u:'https://dn9mvjhbyvvpc.cloudfront.net/files/18525_214ee90919d26eb03cce72a50959e599.mp3'},
+  '添飯':{r:'旁白',h:'阿松擺好碗筷，早就企在飯甑脣，笑咪咪恬恬仔同大人添飯。',p:'aˊ qiungˇ baiˋ hoˋ vonˋ kuai  zoˋ qiu kiˊ di fan zen sunˇ  seu miˊ miˊ diamˊ diamˊ eˋ tungˇ tai nginˇ tiamˊ fan',u:'https://dn9mvjhbyvvpc.cloudfront.net/files/18493_14912f8cbbf7165d17761b5e70003b1b.mp3'},
+  '豆腐':{r:'阿松',h:'嘴嘟嘟，想食鹹豆腐；嘴圓圓，想食甜粄圓；嘴長長，想食炒豬腸。',p:'zoi du du  xiongˋ siid hamˇ teu fu  zoi ienˇ ienˇ  xiongˋ siid tiamˇ banˋ ienˇ  zoi congˇ congˇ  xiongˋ siid cauˋ zuˊ congˇ',u:'https://dn9mvjhbyvvpc.cloudfront.net/files/14687_31044ae723b803daae0b8ad50e95231e.mp3'},
+  '炒豬腸':{r:'阿松',h:'嘴嘟嘟，想食鹹豆腐；嘴圓圓，想食甜粄圓；嘴長長，想食炒豬腸。',p:'zoi du du  xiongˋ siid hamˇ teu fu  zoi ienˇ ienˇ  xiongˋ siid tiamˇ banˋ ienˇ  zoi congˇ congˇ  xiongˋ siid cauˋ zuˊ congˇ',u:'https://dn9mvjhbyvvpc.cloudfront.net/files/14687_31044ae723b803daae0b8ad50e95231e.mp3'},
+  '挑事':{r:'阿晴',h:'阿松，莫挑事㖸佢啦！',p:'aˊ qiungˇ  mog tiauˊ sii nagˋ giˇ laˇ',u:'https://dn9mvjhbyvvpc.cloudfront.net/files/14695_9c63388bb000ab7e361f96fcb0f29a39.mp3'},
+  '世大人':{r:'阿爸',h:'你兩儕，愛較有規矩兜仔，愛請世大人先食，正做得開始挾菜。',p:'nˇ liongˋ saˇ  oi ka iuˊ guiˊ giˋ deuˊ eˋ  oi qiangˋ sii tai nginˇ xienˊ siid  zang zo dedˋ koiˊ siiˋ giabˋ coi',u:'https://dn9mvjhbyvvpc.cloudfront.net/files/14729_48003d3005ba6d8906e8b0c17f6f0dd9.mp3'},
+  '挾菜':{r:'旁白',h:'阿雨摎阿松兩儕當趕緊，筷仔擎起來搶等想愛挾菜。',p:'aˊ iˋ lauˊ aˊ qiungˇ liongˋ saˇ dongˊ gonˋ ginˋ  kuai eˋ kiaˇ hiˋ loiˇ qiongˋ denˋ xiongˋ oi giabˋ coi',u:'https://dn9mvjhbyvvpc.cloudfront.net/files/14721_e14b4d2aa4eeb2c4e21d157e76aeb500.mp3'},
+  '定定仔':{r:'阿婆',h:'人講「飯愛一口一口食，路愛一步一步行。」定定仔來。',p:'nginˇ gongˋ  fan oi idˋ heuˋ idˋ heuˋ siid  lu oi idˋ pu idˋ pu hangˇ   tin tin eˋ loiˇ',u:'https://dn9mvjhbyvvpc.cloudfront.net/files/14778_bf51458e2084cea9d850922d9b5cad53.mp3'},
+  '鬥緊':{r:'阿公',h:'定定仔食，毋使鬥緊。',p:'tin tin eˋ siid  mˇ siiˋ deu ginˋ',u:'https://dn9mvjhbyvvpc.cloudfront.net/files/18676_118170158961d27aa851fbd7e1690cb5.mp3'},
+ },
+ '4-1-1':{
+  '焙肉':{r:'阿爸',h:'今晡日係八月半，大家來焙肉囉！',p:'gimˊ buˊ ngidˋ he badˋ ngied ban  tai gaˊ loiˇ poi ngiugˋ loˊ',u:'https://dn9mvjhbyvvpc.cloudfront.net/files/247_e4e1d8ce42f1c5bc45ee745de3e1eee6.mp3'},
+  '包粟':{r:'阿姆',h:'哦！該係包粟，恁樣較遽熟又毋會臭火𤊶。',p:'oˊ  ge he bauˊ xiugˋ  anˋ ngiongˇ ka giagˋ sug iu mˇ voi cu foˋ ladˋ',u:'https://dn9mvjhbyvvpc.cloudfront.net/files/289_43967ecadabcf428cf8b3bd904d5c1d2.mp3'},
+  '茭筍':{r:'阿雨',h:'𠊎想愛焙茭筍。',p:'ngaiˇ xiongˋ oi poi gauˊ sunˋ',u:'https://dn9mvjhbyvvpc.cloudfront.net/files/299_96b83b188458e981b1e9471a7cb08d34.mp3'},
+  '鹽':{r:'阿晴',h:'𠊎來洗。焙好个茭筍掞兜仔鹽，當好食。',p:'ngaiˇ loiˇ seˋ  poi hoˋ ge gauˊ sunˋ iam deuˊ eˋ iamˇ  dongˊ hoˋ siid',u:'https://dn9mvjhbyvvpc.cloudfront.net/files/318_e6fe2517cd201915e8a0aa995980795d.mp3'},
+  '蝦公':{r:'阿松',h:'蝦公做得食吂？',p:'haˇ gungˊ zo dedˋ siid mangˇ',u:'https://dn9mvjhbyvvpc.cloudfront.net/files/328_631992b7c6022040e39c016180bfb290.mp3'},
+  '煙腸':{r:'阿姆',h:'阿雨，這煙腸熟了，先拿去分阿公、阿婆食。',p:'aˊ iˋ  iaˋ ienˊ congˇ sug leˊ  xienˊ naˊ hi bunˊ aˊ gungˊ  aˊ poˇ siid',u:'https://dn9mvjhbyvvpc.cloudfront.net/files/351_ed533c7fd39cbf161a3ee4ee30202d22.mp3'},
+  '蒜頭':{r:'阿雨',h:'好。阿公食煙腸好傍蒜頭，𠊎來擇一隻較大个分阿公。',p:'hoˋ  aˊ gungˊ siid ienˊ congˇ hau bongˋ son teuˇ  ngaiˇ loiˇ tog idˋ zagˋ ka tai ge bunˊ aˊ gungˊ',u:'https://dn9mvjhbyvvpc.cloudfront.net/files/362_621a108e893cecdeb3168472a85c1183.mp3'},
+  '涼水':{r:'阿松',h:'食煙腸傍涼水，一等好食！',p:'siid ienˊ congˇ bongˋ liongˇ suiˋ  idˋ denˋ hoˋ siid',u:'https://dn9mvjhbyvvpc.cloudfront.net/files/396_cf8a3191c14f0687b336a650a00bb080.mp3'},
+  '月餅':{r:'阿公',h:'頭擺八月半係用月餅、柚仔拜月光，',p:'teuˇ baiˋ badˋ ngied ban he iung ngied biangˋ  iu eˋ bai ngied gongˊ',u:'https://dn9mvjhbyvvpc.cloudfront.net/files/438_68933995757c6d896621bdcf0530998e.mp3'},
+  '柚仔':{r:'阿公',h:'頭擺八月半係用月餅、柚仔拜月光，',p:'teuˇ baiˋ badˋ ngied ban he iung ngied biangˋ  iu eˋ bai ngied gongˊ',u:'https://dn9mvjhbyvvpc.cloudfront.net/files/438_68933995757c6d896621bdcf0530998e.mp3'},
+ },
+ '4-1-2':{
+  '長袖':{r:'阿婆',h:'𠊎中意燒暖个春天，著等薄長袖去公園賞花，當浪漫。',p:'ngaiˇ zung i seuˊ nonˊ ge cunˊ tienˊ  zogˋ denˋ pog congˇ qiu hi gungˊ ienˇ songˋ faˊ  dongˊ long man',u:'https://dn9mvjhbyvvpc.cloudfront.net/files/4770_2d419c6fdae1e638a80bab1a8349769d.mp3'},
+  '熱𤐰𤐰仔':{r:'阿雨',h:'𠊎無幾中意熱𤐰𤐰仔个熱天，毋過著等短褲去公園騎自行車，當鬆爽。',p:'ngaiˇ moˇ giˋ zung i ngied fag fag eˋ ge ngied tienˊ  mˇ go zogˋ denˋ donˋ fu hi gungˊ ienˇ kiˇ cii hangˇ caˊ  dongˊ sungˊ songˋ',u:'https://dn9mvjhbyvvpc.cloudfront.net/files/4783_047ef729dd436950fd5004db2fd30f7f.mp3'},
+  '短褲':{r:'阿雨',h:'𠊎無幾中意熱𤐰𤐰仔个熱天，毋過著等短褲去公園騎自行車，當鬆爽。',p:'ngaiˇ moˇ giˋ zung i ngied fag fag eˋ ge ngied tienˊ  mˇ go zogˋ denˋ donˋ fu hi gungˊ ienˇ kiˇ cii hangˇ caˊ  dongˊ sungˊ songˋ',u:'https://dn9mvjhbyvvpc.cloudfront.net/files/4783_047ef729dd436950fd5004db2fd30f7f.mp3'},
+  '涼爽':{r:'阿晴',h:'𠊎中意涼爽个秋天，著等底衫仔加一領外衫去遶山花，當自在。',p:'ngaiˇ zung i liongˇ songˋ ge qiuˊ tienˊ  zogˋ denˋ daiˋ samˊ eˋ gaˊ idˋ liangˊ ngoi samˊ hi lauˊ sanˊ faˊ  dongˊ cii cai',u:'https://dn9mvjhbyvvpc.cloudfront.net/files/4791_eca4af3a58bbd471ccef8c8f90fd1759.mp3'},
+  '底衫仔':{r:'阿晴',h:'𠊎中意涼爽个秋天，著等底衫仔加一領外衫去遶山花，當自在。',p:'ngaiˇ zung i liongˇ songˋ ge qiuˊ tienˊ  zogˋ denˋ daiˋ samˊ eˋ gaˊ idˋ liangˊ ngoi samˊ hi lauˊ sanˊ faˊ  dongˊ cii cai',u:'https://dn9mvjhbyvvpc.cloudfront.net/files/4791_eca4af3a58bbd471ccef8c8f90fd1759.mp3'},
+  '外衫':{r:'阿晴',h:'𠊎中意涼爽个秋天，著等底衫仔加一領外衫去遶山花，當自在。',p:'ngaiˇ zung i liongˇ songˋ ge qiuˊ tienˊ  zogˋ denˋ daiˋ samˊ eˋ gaˊ idˋ liangˊ ngoi samˊ hi lauˊ sanˊ faˊ  dongˊ cii cai',u:'https://dn9mvjhbyvvpc.cloudfront.net/files/4791_eca4af3a58bbd471ccef8c8f90fd1759.mp3'},
+  '冷颼颼仔':{r:'阿松',h:'𠊎無幾中意冷颼颼仔个寒天，毋過著等羽絨衫戴頸圍仔、手落仔去賞雪，當生趣。',p:'ngaiˇ moˇ giˋ zung i langˊ xiuˇ xiuˇ eˋ ge honˇ tienˊ  mˇ go zogˋ denˋ iˋ iungˇ samˊ dai giangˋ viˇ eˋ  suˋ labˋ eˋ hi sanˊ xiedˋ  dongˊ senˊ qi',u:'https://dn9mvjhbyvvpc.cloudfront.net/files/4804_c8a3f82405d1fe7d0d2cce094efcc5c5.mp3'},
+  '羽絨衫':{r:'阿松',h:'𠊎無幾中意冷颼颼仔个寒天，毋過著等羽絨衫戴頸圍仔、手落仔去賞雪，當生趣。',p:'ngaiˇ moˇ giˋ zung i langˊ xiuˇ xiuˇ eˋ ge honˇ tienˊ  mˇ go zogˋ denˋ iˋ iungˇ samˊ dai giangˋ viˇ eˋ  suˋ labˋ eˋ hi sanˊ xiedˋ  dongˊ senˊ qi',u:'https://dn9mvjhbyvvpc.cloudfront.net/files/4804_c8a3f82405d1fe7d0d2cce094efcc5c5.mp3'},
+  '頸圍仔':{r:'阿松',h:'𠊎無幾中意冷颼颼仔个寒天，毋過著等羽絨衫戴頸圍仔、手落仔去賞雪，當生趣。',p:'ngaiˇ moˇ giˋ zung i langˊ xiuˇ xiuˇ eˋ ge honˇ tienˊ  mˇ go zogˋ denˋ iˋ iungˇ samˊ dai giangˋ viˇ eˋ  suˋ labˋ eˋ hi sanˊ xiedˋ  dongˊ senˊ qi',u:'https://dn9mvjhbyvvpc.cloudfront.net/files/4804_c8a3f82405d1fe7d0d2cce094efcc5c5.mp3'},
+  '手落仔':{r:'阿松',h:'𠊎無幾中意冷颼颼仔个寒天，毋過著等羽絨衫戴頸圍仔、手落仔去賞雪，當生趣。',p:'ngaiˇ moˇ giˋ zung i langˊ xiuˇ xiuˇ eˋ ge honˇ tienˊ  mˇ go zogˋ denˋ iˋ iungˇ samˊ dai giangˋ viˇ eˋ  suˋ labˋ eˋ hi sanˊ xiedˋ  dongˊ senˊ qi',u:'https://dn9mvjhbyvvpc.cloudfront.net/files/4804_c8a3f82405d1fe7d0d2cce094efcc5c5.mp3'},
+ },
+ '4-1-3':{
+  '擐':{r:'阿松',h:'阿公，你仰擐恁多東西？𠊎同你𢯭手。',p:'aˊ gungˊ  nˇ ngiongˋ kuan anˋ doˊ dungˊ xiˊ  ngaiˇ tungˇ nˇ ten suˋ',u:'https://dn9mvjhbyvvpc.cloudfront.net/files/13055_0d8169905eb97a59c61ec759459b336d.mp3'},
+  '年三十':{r:'阿公',h:'今晡日係年三十，愛轉公廳拜阿公婆啊。',p:'gimˊ buˊ ngidˋ he ngienˇ samˊ siib  oi zonˋ gungˊ tangˊ bai aˊ gungˊ poˇ a',u:'https://dn9mvjhbyvvpc.cloudfront.net/files/9269_cd3c52fc4e89979dc0ff789e1942bd28.mp3'},
+  '阿公婆':{r:'阿公',h:'今晡日係年三十，愛轉公廳拜阿公婆啊。',p:'gimˊ buˊ ngidˋ he ngienˇ samˊ siib  oi zonˋ gungˊ tangˊ bai aˊ gungˊ poˇ a',u:'https://dn9mvjhbyvvpc.cloudfront.net/files/9269_cd3c52fc4e89979dc0ff789e1942bd28.mp3'},
+  '叔伯阿哥':{r:'阿松',h:'𠊎盡久無看著叔伯阿哥了，𠊎想愛去尋佢尞。',p:'ngaiˇ qin giuˋ moˇ kon doˋ sugˋ bagˋ aˊ goˊ eˇ  ngaiˇ xiongˋ oi hi qimˇ giˇ liau',u:'https://dn9mvjhbyvvpc.cloudfront.net/files/9278_a0f33d2f923d1d2a7a2111ea86b70b5c.mp3'},
+  '牲儀':{r:'阿公',h:'好啊！阿公擐這副牲儀，阿松擐這包果子，阿雨擐該包金香。',p:'hoˋ a  aˊ gungˊ kuan iaˋ fu senˊ ngiˇ  aˊ qiungˇ kuan iaˋ bauˊ goˋ ziiˋ  aˊ iˋ kuan ge bauˊ gimˊ hiongˊ',u:'https://dn9mvjhbyvvpc.cloudfront.net/files/9298_1aecdcf1f616021652987166d9b4b63f.mp3'},
+  '金香':{r:'阿公',h:'好啊！阿公擐這副牲儀，阿松擐這包果子，阿雨擐該包金香。',p:'hoˋ a  aˊ gungˊ kuan iaˋ fu senˊ ngiˇ  aˊ qiungˇ kuan iaˋ bauˊ goˋ ziiˋ  aˊ iˋ kuan ge bauˊ gimˊ hiongˊ',u:'https://dn9mvjhbyvvpc.cloudfront.net/files/9298_1aecdcf1f616021652987166d9b4b63f.mp3'},
+  '子孫':{r:'阿公',h:'等阿公婆享用，正輪著後代子孫來食。',p:'denˋ aˊ gungˊ poˇ hiongˋ iung  zang linˇ doˋ heu toi ziiˋ sunˊ loiˇ siid',u:'https://dn9mvjhbyvvpc.cloudfront.net/files/9356_fb816faad18f51fab9cc663c26c95457.mp3'},
+  '炒肉':{r:'阿公',h:'三層肉同魷魚乾就做得做炒肉。',p:'samˊ cenˇ ngiugˋ tungˇ iuˇ ngˇ gonˊ qiu zo dedˋ zo cauˋ ngiugˋ',u:'https://dn9mvjhbyvvpc.cloudfront.net/files/9469_486f9a14088435c5e41a55eac03c90b5.mp3'},
+  '粄圓':{r:'阿公',h:'比論講：五月節拜粽仔、八月半拜月餅、冬節拜粄圓。',p:'biˋ lun gongˋ  ngˋ ngied jiedˋ bai zung eˋ  badˋ ngied ban bai ngied biangˋ  dungˊ jiedˋ bai banˋ ienˇ',u:'https://dn9mvjhbyvvpc.cloudfront.net/files/9504_9c1bc67f3099ce984033f1528862542c.mp3'},
+  '親戚':{r:'阿公',h:'除忒感念祖先，乜做得聯絡親戚間个感情。',p:'cuˇ tedˋ gamˋ ngiam zuˋ xienˊ  me zo dedˋ lienˇ log qinˊ qidˋ gienˊ ge gamˋ qinˇ',u:'https://dn9mvjhbyvvpc.cloudfront.net/files/9546_dce148c7780eedff550f892417104f10.mp3'},
+ },
+};
+
+/* 拼著詞了後，帶出該詞在課文肚个原句 */
+let sentAudio=null;
+function showSentence(word){
+  const box=$("textBox"), rec=(SENT[L.id]||{})[word];
+  if(!rec){ box.classList.remove("on"); return; }
+  $("tWho").textContent=rec.r;
+  $("tLab").textContent = (cur && cur.w===word ? cur.c : (L.words.find(o=>o.w===word)||{}).c) || "華 語";
+  $("tHa").innerHTML = rec.h.replaceAll(word, `<em>${word}</em>`);
+  $("tPy").textContent=rec.p;
+  const btn=$("tSpk");
+  btn.className="spk"; btn.textContent="🔊 聽這句";
+  btn.onclick=()=>{
+    if(sentAudio) sentAudio.pause();
+    if(audio) audio.pause();
+    sentAudio=new Audio(rec.u); sentAudio.play().catch(()=>{});
+  };
+  box.classList.add("on");
+}
+
+/* ===================== 引擎 ===================== */
+const BASE="https://dn9mvjhbyvvpc.cloudfront.net/files/";
+const $=id=>document.getElementById(id);
+const say=$("say"), slotsEl=$("slots"), trayEl=$("tray");
+let L=null, audio=null, pool=[], idx=0, cur=null, placed=[],
+    solved=new Set(), given=new Set(), demoUsed=false, curTint=null;
+
+/* 分頁 */
+LESSONS.forEach((les,i)=>{
+  const b=document.createElement("button");
+  b.className="tab";
+  b.innerHTML=`<small>${les.tab}</small><b>${les.name.split(" · ")[0]}</b>`;
+  b.onclick=()=>load(i);
+  $("tabs").appendChild(b);
+});
+
+function load(i){
+  [...$("tabs").children].forEach((t,j)=>t.classList.toggle("on",i===j));
+  L=LESSONS[i];
+  $("bg").innerHTML = L.room==="yard" ? YARD : L.room==="bare" ? YARD_BARE : BRICK;
+  $("furn").innerHTML = L.furn;
+  $("objs").innerHTML = L.words.map(o=>`<g class="obj" id="o_${o.w}">${o.svg}</g>`).join("");
+  $("tint").setAttribute("fill", "#E8942E");
+  reset();
+}
+
+function reset(){
+  if(audio) audio.pause();
+  solved.clear(); given.clear(); placed=[]; idx=0; cur=null; curTint=null;
+  L.words.forEach(o=>{ const g=$("o_"+o.w); if(g) g.classList.remove("on","pop"); });
+  $("tint").setAttribute("opacity","0");
+  $("heat").style.transform="scaleX(0)";
+  $("count").textContent=`0 / ${L.words.length}`;
+  $("btnPlay").disabled=$("btnDemo").disabled=$("btnSkip").disabled=$("btnAns").disabled=false;
+  const n=L.words.reduce((a,o)=>a+o.w.length,0);
+  $("hint").textContent=`${L.name} —— 字盤有 ${n} 塊字磚，揣出正確个字照順序排。`;
+  $("textBox").classList.remove("on");
+  if(sentAudio) sentAudio.pause();
+  buildTray(); nextWord();
+}
+
+function buildTray(){
+  pool=L.words.flatMap((o,wi)=>[...o.w].map((ch,ci)=>({ch,id:`${wi}-${ci}`})));
+  for(let i=pool.length-1;i>0;i--){const j=(Math.random()*(i+1))|0;[pool[i],pool[j]]=[pool[j],pool[i]];}
+  trayEl.innerHTML="";
+  pool.forEach(t=>{
+    const b=document.createElement("button");
+    b.className="tile"; b.textContent=t.ch;
+    b.onclick=()=>pick(t,b);
+    trayEl.appendChild(b);
+  });
+}
+
+const line=(t,ms=2200)=>{say.textContent=t;say.classList.add("on");
+  clearTimeout(line.t);line.t=setTimeout(()=>say.classList.remove("on"),ms);};
+function play(u){ if(audio) audio.pause(); audio=new Audio(BASE+u+".mp3"); audio.play().catch(()=>{}); }
+
+function nextWord(){
+  const left=L.words.map((o,i)=>i).filter(i=>!solved.has(i));
+  if(!left.length) return finish();
+  idx = left.includes(idx) ? idx : left[0];
+  cur=L.words[idx]; placed=[]; demoUsed=false;
+  $("btnDemo").disabled=false; $("btnAns").disabled=false;
+  $("clue").textContent=cur.c;
+  slotsEl.innerHTML="";
+  [...cur.w].forEach((_,i)=>{
+    const d=document.createElement("div");
+    d.className="slot"; d.onclick=()=>unplace(i);
+    slotsEl.appendChild(d);
+  });
+  setTimeout(()=>play(cur.u),350);
+}
+
+function pick(t,btn){
+  if(!cur||placed.length>=cur.w.length) return;
+  placed.push({ch:t.ch,btn}); btn.classList.add("used");
+  const s=slotsEl.children[placed.length-1];
+  s.textContent=t.ch; s.classList.add("filled");
+  if(placed.length===cur.w.length) check();
+}
+function unplace(i){
+  if(i>=placed.length) return;
+  for(let k=placed.length-1;k>=i;k--){
+    placed[k].btn.classList.remove("used");
+    const s=slotsEl.children[k]; s.textContent=""; s.classList.remove("filled");
+  }
+  placed.length=i;
+}
+
+function score(){
+  $("count").textContent=`${solved.size} / ${L.words.length}`;
+  const p=solved.size/L.words.length;
+  $("heat").style.transform=`scaleX(${p})`;
+  if(curTint){
+    $("tint").setAttribute("fill",curTint.c);
+    $("tint").setAttribute("opacity",curTint.a);
+  }else{
+    $("tint").setAttribute("fill","#E8942E");
+    $("tint").setAttribute("opacity",(p*0.12).toFixed(3));
+  }
+}
+
+function check(){
+  const got=placed.map(p=>p.ch).join("");
+  if(got===cur.w){
+    [...slotsEl.children].forEach(s=>{s.classList.remove("filled");s.classList.add("good");});
+    play(cur.u); reveal(cur.w); solved.add(idx); score();
+    showSentence(cur.w);
+    line(`${cur.w} —— 著咧！`,2200);
+    setTimeout(nextWord,2500);
+  }else{
+    [...slotsEl.children].forEach(s=>s.classList.add("bad"));
+    line("毋著，再聽一擺看啊",2000);
+    setTimeout(()=>{
+      [...slotsEl.children].forEach(s=>s.classList.remove("bad"));
+      unplace(0); play(cur.u);
+    },520);
+  }
+}
+
+function reveal(w){
+  const word=L.words.find(o=>o.w===w);
+  /* 互斥群組：同一組內只留最新一個（例：天氣） */
+  if(word&&word.excl){
+    L.words.filter(o=>o.excl===word.excl&&o.w!==w).forEach(o=>{
+      const sib=$("o_"+o.w); if(sib) sib.classList.remove("on","pop");
+    });
+  }
+  if(word&&word.tint){ curTint={c:word.tint,a:word.tintAmt}; }
+  const g=$("o_"+w);
+  if(g){ g.classList.add("on","pop"); setTimeout(()=>g.classList.remove("pop"),720); }
+}
+
+$("btnPlay").onclick=()=>{ if(cur) play(cur.u); };
+$("btnAns").onclick=()=>{
+  if(!cur) return;
+  $("btnAns").disabled=true; $("btnDemo").disabled=true;
+  unplace(0);
+  const used=new Set();
+  [...cur.w].forEach((ch,i)=>{
+    const btn=[...trayEl.children].find(b=>b.textContent===ch&&!used.has(b)&&!b.classList.contains("used"));
+    if(btn){ used.add(btn); btn.classList.add("used"); placed.push({ch,btn}); }
+    const s=slotsEl.children[i]; s.textContent=ch; s.classList.add("given");
+  });
+  play(cur.u); reveal(cur.w); given.add(idx); solved.add(idx); score();
+  showSentence(cur.w);
+  line(`${cur.w}（${cur.c}）`,2400);
+  setTimeout(nextWord,2500);
+};
+$("btnSkip").onclick=()=>{
+  const left=L.words.map((o,i)=>i).filter(i=>!solved.has(i));
+  if(left.length<2) return line("賰這個爾咧",1800);
+  unplace(0);
+  idx=left[(left.indexOf(idx)+1)%left.length];
+  nextWord();
+};
+$("btnDemo").onclick=async()=>{
+  if(!cur||demoUsed) return;
+  demoUsed=true; $("btnDemo").disabled=true;
+  unplace(0); play(cur.u);
+  const used=new Set();
+  for(const ch of [...cur.w]){
+    const btn=[...trayEl.children].find(b=>b.textContent===ch&&!used.has(b)&&!b.classList.contains("used"));
+    if(btn){ used.add(btn); btn.classList.add("demo");
+      await new Promise(r=>setTimeout(r,620));
+      btn.classList.remove("demo");
+      await new Promise(r=>setTimeout(r,120));
+    }
+  }
+};
+$("btnReset").onclick=reset;
+
+function finish(){
+  cur=null; slotsEl.innerHTML="";
+  $("clue").textContent="全部好咧";
+  $("btnPlay").disabled=$("btnDemo").disabled=$("btnSkip").disabled=$("btnAns").disabled=true;
+  line("全部到齊咧！",3600);
+  const self=L.words.length-given.size;
+  $("hint").textContent = given.size
+    ? `十個詞全部到齊。其中 ${self} 個係你自家拼出來个，${given.size} 個看過解答。`
+    : "十個詞全部係你自家拼出來个，一擺解答都無看。";
+}
+
+load(0);
+</script>
+</body>
+</html>
+
+

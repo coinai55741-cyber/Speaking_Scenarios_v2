@@ -1,3 +1,14 @@
+window.addEventListener("pageshow", () => {
+  const target = sessionStorage.getItem("homeReturnTarget");
+  if (target !== "basic") return;
+  sessionStorage.removeItem("homeReturnTarget");
+  const section = document.querySelector("#basic");
+  if (!section) return;
+  if (window.location.hash !== "#basic") {
+    history.replaceState(null, "", "#basic");
+  }
+  requestAnimationFrame(() => section.scrollIntoView({ block: "start" }));
+});
 const scenarios = [
   {
     id: "holiday",
@@ -18,6 +29,7 @@ const scenarios = [
     artClass: "art-food",
     image: "./assets/scenario-shopping-food.png",
     description: "和同學出門逛街，到了中午去吃飯，練習在餐廳用客語表達需求。",
+    disabled: true,
     flow: [
       "先說：明天我要跟同學去逛街。",
       "再說：準備吃午餐了！",
@@ -31,6 +43,7 @@ const scenarios = [
     artClass: "art-day",
     image: "./assets/scenario-aming-day.png",
     description: "看著早上、白天和晚上的圖片，照順序說出阿明一天的安排。",
+    disabled: true,
     flow: [
       "先練：你每天早上幾點起床？",
       "再練：六點半起床，先刷牙洗臉。",
@@ -47,13 +60,16 @@ function createScenarioCard(scenario) {
   card.className = "scenario-card";
 
   const demoUrl = scenario.id === "holiday" ? "./holiday.html" : `../demo_v1/?step=${scenario.demoStep}`;
+  const actionButton = scenario.disabled
+    ? `<button class="card-link is-disabled" type="button" disabled aria-disabled="true">開始任務</button>` 
+    : `<a class="card-link" href="${demoUrl}">開始任務</a>`;
 
   card.innerHTML = `
     <img class="scenario-art ${scenario.artClass}" src="${scenario.image}" alt="" aria-hidden="true">
     <div class="scenario-body">
       <h3>${scenario.title}</h3>
       <p>${scenario.description}</p>
-      <a class="card-link" href="${demoUrl}">開始任務</a>
+      ${actionButton}
     </div>
   `;
 
@@ -74,3 +90,5 @@ if (sidebar && btnOut && btnIn) {
     sidebar.classList.add('collapsed');
   });
 }
+
+

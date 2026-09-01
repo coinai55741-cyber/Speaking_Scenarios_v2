@@ -644,7 +644,7 @@ h1 {
   display: inline-flex;
   margin-top: 8px;
   padding: 7px 14px;
-  border: none;
+  border: 0;
   border-radius: 999px;
   color: #8a5c14;
   background: #fff3cf;
@@ -1341,3 +1341,32 @@ h1 {
     font-size: 42px;
   }
 }
+.learning-card,
+.wide-card {
+  position: relative;
+  padding-bottom: 62px;
+}
+
+.learning-card .start-learning-btn,
+.wide-card .start-learning-btn {
+  position: absolute;
+  right: 18px;
+  bottom: 18px;
+  margin-top: 0;
+  border: 1px solid #f0d250; 
+}
+
+.card-link.is-disabled,
+.card-link:disabled {
+  color: #8392a0;
+  background: #e2e8f0;
+  box-shadow: 0 0px 0 #cbd5e1;
+  cursor: not-allowed;
+}
+
+.card-link.is-disabled:hover,
+.card-link:disabled:hover {
+  transform: none;
+  opacity: 1;
+}
+

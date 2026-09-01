@@ -1,0 +1,1110 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>庄頭一年｜客語大富翁</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;600;700;900&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{--ink:#2E2418;--dim:#8A7B62;--paper:#FDF6E8;--card:#FBF2DE;--line:#D8C7A4;
+    --red:#D15C50;--gold:#D9A93C;--jade:#3E8A6E;--blue:#4E86B8;--purple:#A78BD0;--olive:#8FA84C}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:#20303A;font-family:"Noto Sans TC",system-ui,sans-serif;color:var(--ink);
+    min-height:100vh;display:flex;align-items:center;justify-content:center;padding:14px}
+  .frame{width:100%;max-width:1230px;display:grid;grid-template-columns:1fr 300px;gap:14px;align-items:start}
+  @media(max-width:1000px){.frame{grid-template-columns:1fr}}
+
+  /* ── 棋盤 ── */
+  .board{position:relative;background:#F0E4C8;border-radius:20px;padding:10px;
+    box-shadow:0 24px 60px rgba(0,0,0,.45);aspect-ratio:1;
+    display:grid;grid-template-columns:repeat(10,1fr);grid-template-rows:repeat(10,1fr);gap:3px}
+  .sq{border-radius:7px;padding:4px 3px;display:flex;flex-direction:column;align-items:center;
+    justify-content:center;gap:1px;font-size:9.5px;line-height:1.25;text-align:center;
+    background:var(--card);border:1.5px solid var(--line);cursor:pointer;transition:.18s;overflow:hidden}
+  .sq:hover{transform:scale(1.06);z-index:5;box-shadow:0 6px 16px rgba(0,0,0,.28)}
+  .sq b{font-family:"Noto Serif TC",serif;font-size:11px;font-weight:900;letter-spacing:.02em}
+  .sq .t{font-size:8px;color:#fff;padding:1px 5px;border-radius:99px;letter-spacing:.06em}
+  .sq.here{border-color:var(--gold);border-width:3px;box-shadow:0 0 0 3px rgba(217,169,60,.35)}
+  .sq.own::after{content:"";position:absolute}
+  .sq .own{font-size:8px;color:var(--jade)}
+  .tk{position:absolute;width:22px;height:22px;border-radius:50%;background:var(--red);
+    border:2.5px solid #fff;box-shadow:0 3px 9px rgba(0,0,0,.4);transition:.45s cubic-bezier(.3,1.2,.4,1);
+    z-index:9;pointer-events:none}
+
+  /* 中央 */
+  .mid{grid-column:2/10;grid-row:2/10;background:#FBF2DE;border-radius:14px;
+    border:1.5px solid var(--line);padding:16px 18px;display:flex;flex-direction:column;overflow-y:auto}
+  .mtitle{display:flex;align-items:center;gap:9px;margin-bottom:10px}
+  .seal{width:28px;height:28px;border-radius:5px;background:var(--red);color:#fff;display:flex;
+    align-items:center;justify-content:center;font-family:"Noto Serif TC",serif;font-weight:900;font-size:15px}
+  .mtitle b{font-family:"Noto Serif TC",serif;font-size:17px;font-weight:900;letter-spacing:.08em}
+  .mtitle small{margin-left:auto;font-size:11px;color:var(--dim)}
+  .body{font-family:"Noto Serif TC",serif;font-size:16px;line-height:2.05;letter-spacing:.01em}
+  .kw{display:inline-block;white-space:nowrap;transition:.4s}
+  .kw.blur{color:transparent;background:#B9AB90;border-radius:6px;padding:1px 5px;margin:0 2px;
+    cursor:pointer;user-select:none;position:relative;vertical-align:-3px;
+    box-shadow:inset 0 2px 4px rgba(0,0,0,.2)}
+  .kw.blur::after{content:"？";position:absolute;inset:0;display:flex;align-items:center;
+    justify-content:center;color:rgba(255,255,255,.8);font-size:12px}
+  .kw.blur:hover{background:var(--gold)}
+  .kw.know{color:var(--red);font-weight:700}
+  .kw.just{animation:rv .9s cubic-bezier(.2,1.3,.4,1)}
+  @keyframes rv{0%{background:#F5D77C;box-shadow:0 0 0 9px rgba(245,215,124,.55)}
+    100%{background:transparent;box-shadow:0 0 0 0 rgba(245,215,124,0)}}
+
+  .opts{margin-top:12px;display:flex;flex-direction:column;gap:7px}
+  .opt{border:1.5px solid var(--line);background:rgba(255,255,255,.6);border-radius:11px;
+    padding:9px 12px;cursor:pointer;transition:.16s;display:flex;gap:9px;align-items:flex-start;font-size:13.5px}
+  .opt:hover{border-color:var(--gold);background:#fff}
+  .opt .tag{flex:0 0 auto;width:21px;height:21px;border-radius:50%;border:1.5px solid var(--line);
+    display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--dim)}
+  .opt .txt{flex:1}
+  .hakline{font-family:"Noto Serif TC",serif;font-size:15.5px;font-weight:700;line-height:1.65}
+  .zhline{font-size:11.5px;color:var(--dim);margin-top:2px}
+  .opt .hak{margin-top:3px;display:flex;gap:4px;flex-wrap:wrap}
+  .opt .hak span{font-family:"Noto Serif TC",serif;font-size:12.5px;background:rgba(209,92,80,.1);
+    border-radius:5px;padding:1px 6px;color:var(--red)}
+  .opt .hak span.b{background:#B9AB90;color:transparent;position:relative}
+  .opt .hak span.b::after{content:"？";position:absolute;inset:0;display:flex;align-items:center;
+    justify-content:center;color:rgba(255,255,255,.8);font-size:11px}
+  .opt .out{flex:0 0 auto;font-size:11px;color:var(--dim);text-align:right;white-space:nowrap;padding-top:2px}
+  .opt.lock{opacity:.45;cursor:not-allowed}
+  .opt.far{opacity:.55;cursor:default;border-style:dashed}
+  .opt.far:hover{border-color:var(--line);background:rgba(255,255,255,.6)}
+  .peek{margin-top:8px;font-size:11.5px;color:var(--dim);background:rgba(0,0,0,.04);
+    border-radius:8px;padding:6px 10px}
+  .after{margin-top:10px;padding:10px 13px;background:rgba(217,169,60,.12);border-left:3px solid var(--gold);
+    border-radius:0 9px 9px 0;font-size:13px;line-height:1.8;display:none}
+  .after.on{display:block}
+  .mbtn{margin-top:auto;padding-top:12px;display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+  .btn{border:0;border-radius:999px;padding:11px 26px;font-weight:700;font-size:14px;cursor:pointer;
+    font-family:"Noto Sans TC";background:linear-gradient(180deg,#F0CE8A,#D9A93C);color:#2E2418}
+  .btn:disabled{opacity:.35;cursor:default}
+  .btn.g{background:transparent;border:1.5px solid var(--line);color:var(--dim)}
+  .dice{font-family:"Noto Serif TC",serif;font-size:26px;font-weight:900;color:var(--red);min-width:34px;text-align:center}
+  .dice.roll{animation:dr .6s} @keyframes dr{0%,100%{transform:rotate(0)}50%{transform:rotate(360deg) scale(1.4)}}
+
+  /* ── 側欄 ── */
+  .side{display:flex;flex-direction:column;gap:12px}
+  .box{background:#1A2830;border:1px solid #33454F;border-radius:16px;padding:14px 15px;color:#EDE6D8}
+  .box h3{font-family:"Noto Serif TC",serif;font-size:13px;font-weight:900;letter-spacing:.18em;
+    color:#D9A93C;margin-bottom:10px}
+  .res{display:flex;gap:8px}
+  .r{flex:1;background:#22333C;border:1px solid #33454F;border-radius:11px;padding:9px 6px;text-align:center}
+  .r span{display:block;font-size:9.5px;letter-spacing:.14em;color:#8A9AA6}
+  .r b{display:block;font-family:"Noto Serif TC",serif;font-size:20px;font-weight:900;margin-top:2px}
+  .r b.up{animation:u .5s} @keyframes u{50%{transform:scale(1.45);color:#7FC49A}}
+  .r b.dn{animation:n .5s} @keyframes n{50%{transform:scale(1.45);color:#E08A80}}
+  .yr{font-size:12px;color:#8A9AA6;margin-top:9px;line-height:1.7}
+  .yr b{color:#EDE6D8}
+  .log{max-height:190px;overflow-y:auto;display:flex;flex-direction:column;gap:5px}
+  .lg{font-size:12px;color:#B8C4CC;line-height:1.6;padding:6px 9px;background:#22333C;border-radius:8px}
+  .lg b{color:#D9A93C}
+  .own{display:flex;flex-wrap:wrap;gap:5px}
+  .ow{font-family:"Noto Serif TC",serif;font-size:12px;background:#25382E;border:1px solid #3E6B53;
+    color:#9FD4B4;border-radius:7px;padding:3px 8px}
+
+  /* 天時卡 */
+  .sky{position:fixed;inset:0;z-index:70;background:rgba(14,22,28,.9);display:flex;align-items:center;
+    justify-content:center;padding:22px;opacity:0;pointer-events:none;transition:.45s}
+  .sky.on{opacity:1;pointer-events:auto}
+  .skc{background:#FBF2DE;border-radius:20px;overflow:hidden;max-width:340px;width:100%;
+    box-shadow:0 30px 70px rgba(0,0,0,.55);transform:translateY(30px) scale(.92);transition:.6s cubic-bezier(.2,1.2,.3,1)}
+  .sky.on .skc{transform:none}
+  .skc svg{display:block;width:100%;height:auto}
+  .skb{padding:17px 20px 20px;text-align:center}
+  .skb .tag{font-size:10.5px;letter-spacing:.24em;color:var(--dim)}
+  .skb h3{font-family:"Noto Serif TC",serif;font-size:25px;font-weight:900;margin:5px 0 6px;color:var(--red)}
+  .skb p{font-size:13px;color:var(--dim);line-height:1.85}
+  .skb .eff{margin-top:11px;background:rgba(217,169,60,.16);border-radius:10px;padding:9px 12px;
+    font-family:"Noto Serif TC",serif;font-size:15px;font-weight:700}
+  /* 庄民問話 */
+  .ask{margin-top:12px;background:rgba(62,138,110,.1);border:1.5px solid rgba(62,138,110,.4);
+    border-radius:13px;padding:13px 15px}
+  .askh{display:flex;align-items:center;gap:10px;margin-bottom:9px}
+  .askh b{font-family:"Noto Serif TC",serif;font-size:15px}
+  .askh small{color:var(--dim);font-size:11.5px}
+  .rw{margin-left:auto;background:var(--jade);color:#fff;border-radius:999px;padding:5px 13px;
+    font-family:"Noto Serif TC",serif;font-size:14px;font-weight:900;animation:rwin .6s cubic-bezier(.3,1.5,.4,1)}
+  @keyframes rwin{0%{transform:scale(0) rotate(-14deg);opacity:0}100%{transform:none;opacity:1}}
+  .askq{font-family:"Noto Serif TC",serif;font-size:19px;font-weight:900;text-align:center;margin:8px 0 11px}
+  .askg{display:flex;gap:7px;flex-wrap:wrap;justify-content:center}
+  .ag{border:1.5px solid var(--line);background:#fff;border-radius:9px;padding:7px 13px;
+    font-size:13px;cursor:pointer;transition:.16s}
+  .ag:hover{border-color:var(--jade)}
+  .ag.ok{background:#E6F2EA;border-color:var(--jade);color:var(--jade);font-weight:700}
+  .ag.no{background:#F8E3E0;border-color:var(--red);color:var(--red)}
+  .over{position:fixed;inset:0;z-index:60;background:rgba(16,24,30,.94);display:flex;align-items:center;
+    justify-content:center;padding:24px;opacity:0;pointer-events:none;transition:.5s}
+  .over.on{opacity:1;pointer-events:auto}
+  .op{background:#FBF2DE;border-radius:20px;padding:30px 34px;max-width:560px;text-align:center}
+  .op h2{font-family:"Noto Serif TC",serif;font-size:27px;font-weight:900;color:var(--red);letter-spacing:.08em}
+  .op .en{font-family:"Noto Serif TC",serif;font-size:18px;margin:12px 0;line-height:1.9}
+  .op p{font-size:13.5px;color:var(--dim);line-height:1.9}
+  @media (prefers-reduced-motion:reduce){*{animation:none!important}}
+
+  .back-link{position:fixed;left:18px;top:18px;z-index:50;display:inline-flex;align-items:center;justify-content:center;min-height:38px;padding:0 16px;border:2px solid #2f946f;border-radius:999px;color:#2f946f;background:rgba(255,255,255,.92);font-weight:900;text-decoration:none;box-shadow:0 8px 18px rgba(0,0,0,.12)}
+  .back-link:hover{background:#2f946f;color:#fff}
+  @media(max-width:560px){.back-link{left:12px;top:12px;min-height:34px;padding:0 13px;font-size:13px}}
+</style>
+</head>
+<body>
+  <a class="back-link" href="./Vocabulary.html">返回</a>
+<div class="frame">
+  <div class="board" id="board">
+    <div class="mid" id="mid"></div>
+    <div class="tk" id="tk"></div>
+  </div>
+
+  <div class="side">
+    <div class="box">
+      <h3>手 頭</h3>
+      <div class="res">
+        <div class="r"><span>錢</span><b id="money">190</b></div>
+        <div class="r"><span>人 情</span><b id="favor">30</b></div>
+        <div class="r"><span>詞</span><b id="wc">0</b></div>
+      </div>
+      <div style="margin-top:10px"><div style="height:8px;border-radius:99px;background:#22333C;overflow:hidden">
+        <i id="wbar" style="display:block;height:100%;width:0;background:linear-gradient(90deg,#D15C50,#D9A93C,#3E8A6E);transition:.6s"></i></div>
+        <div style="font-size:11px;color:#8A9AA6;margin-top:5px">詞庫 <b id="wpct" style="color:#EDE6D8">0%</b>　·　通關＝學透全部个詞（學透就贏，毋使等五年）</div></div>
+      <p class="yr">第 <b id="year">1</b> 年 / 5　行過 <b id="step">0</b>/36 格<br>
+        學一隻詞愛 <b id="costTxt">8</b> 銀（人情愈高愈便宜）</p>
+    </div>
+    <div class="box"><h3>天 時</h3>
+      <div id="skyBox" style="font-size:13px;color:#B8C4CC;line-height:1.8">
+        <span style="color:#8A9AA6">行到季頭正抽</span></div></div>
+    <div class="box" style="display:flex;align-items:center;gap:10px;padding:11px 14px">
+      <button id="mus" style="border:1.5px solid #33454F;background:#22333C;color:#EDE6D8;
+        border-radius:999px;padding:8px 18px;font-size:13px;cursor:pointer;font-family:'Noto Sans TC'">♪ 音樂　關</button>
+      <span style="font-size:11.5px;color:#8A9AA6;line-height:1.6">五聲音階，程式即時生成</span>
+    </div>
+    <div class="box"><h3>人 情 摎 學 費</h3>
+      <div style="font-size:12px;line-height:2.1;color:#B8C4CC">
+        人情 <b style="color:#7FC49A">75 以上</b>　一隻詞 <b>3</b> 銀　<span style="color:#7FC49A">＋年頭送 3 隻</span><br>
+        人情 <b style="color:#D9A93C">45–74</b>　　一隻詞 <b>5</b> 銀<br>
+        人情 <b style="color:#D9A93C">20–44</b>　　一隻詞 <b>8</b> 銀<br>
+        人情 <b style="color:#E08A80">20 以下</b>　一隻詞 <b>13</b> 銀</div>
+      <p style="font-size:11.5px;color:#8A9AA6;margin-top:8px;line-height:1.7">
+        庄民愈熟你，愈肯教你。通關看个係詞 —— 人情就係學費个折扣。</p></div>
+    <div class="box"><h3>庄 頭 產 業</h3><div class="own" id="ownList"><span style="font-size:12px;color:#8A9AA6">還吂有</span></div></div>
+    <div class="box"><h3>記 事</h3><div class="log" id="log"></div></div>
+  </div>
+</div>
+
+<div class="sky" id="sky"><div class="skc" id="skc"></div></div>
+<div class="over" id="over"><div class="op" id="opBody"></div></div>
+
+<script>
+const VOC={
+'䟓䟓':{c:'專程、特地',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/88689.wav'},
+'一搭搭仔':{c:'一塊塊',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/114414.wav'},
+'一生人':{c:'一輩子',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/37264.wav'},
+'一路里來':{c:'向來、一向',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/36750.wav'},
+'一踢三通':{c:'舉一反三、觸類旁通',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/20258.wav'},
+'七層塔':{c:'九層塔、羅勒',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/125961.wav'},
+'三腳採茶戲':{c:'客家傳統戲曲',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/101741.wav'},
+'三角鹹草':{c:'三角藺草。又名燈心草、石草',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/34069.wav'},
+'上坵田':{c:'上畝田',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/33991.wav'},
+'上教':{c:'比喻悟性高容易上手',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/101772.wav'},
+'下車':{c:'下車',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/19580.wav'},
+'乙未戰爭':{c:'1895年臺灣人民抵抗日本統治而發起的戰爭',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/95161.wav'},
+'乜':{c:'也',u:''},
+'乜做得':{c:'也可以',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/88537.wav'},
+'九腔十八調':{c:'指客家歌謠種類很多的意思',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/97071.wav'},
+'交關':{c:'買賣、消費',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/101244.wav'},
+'仰般':{c:'怎麼、怎樣',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/35503.wav'},
+'伶俐':{c:'愛乾淨；反應敏捷，聰明機靈',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/81718.wav'},
+'倚恃':{c:'信任依賴，這裡是指「藉由」',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/88693.wav'},
+'做家':{c:'勤儉持家',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/114295.wav'},
+'價值':{c:'物品的價格或代價',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/101605.wav'},
+'儆惜':{c:'珍惜；珍視愛惜',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/118667.wav'},
+'儘採':{c:'隨意、隨便',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/18926.wav'},
+'兩儕':{c:'兩人',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/100992.wav'},
+'六堆':{c:'高屏地區前、後、左、右、中、先鋒六個隊',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/34129.wav'},
+'刀嫲':{c:'柴刀',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/20161.wav'},
+'利便':{c:'便利',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/113388.wav'},
+'刺額嫲':{c:'刺額嫲指女子行為不莊重、好賣弄，文中為小太妹之義',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/114067.wav'},
+'剪黏':{c:'中國南方所特有的一種嵌鑲藝術',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/101600.wav'},
+'勸話':{c:'勸說',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/81610.wav'},
+'包容':{c:'寬容、容忍',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/18503.wav'},
+'包心白':{c:'大白菜',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/101183.wav'},
+'厥脣項':{c:'身邊',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/37260.wav'},
+'口涎水':{c:'口水',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/19726.wav'},
+'古蹟':{c:'古代的遺蹟',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/101606.wav'},
+'同':{c:'後接代名詞或名詞，意為「連」',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/88858.wav'},
+'吹笛仔':{c:'吹嗩吶',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/19722.wav'},
+'哯':{c:'不嘔而吐、吃到嘴裡再吐出來',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/88823.wav'},
+'喊毋著':{c:'叫不對、叫錯',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/81742.wav'},
+'單淨用':{c:'只用',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/113396.wav'},
+'嗄':{c:'卻、反而',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/88953.wav'},
+'嚴重':{c:'嚴重',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/37263.wav'},
+'四海客話':{c:'四海腔是由四縣腔和海陸腔相互接觸後而形成的一種混合型客語',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/18501.wav'},
+'四縣腔':{c:'源自於大陸廣東的蕉嶺縣、平遠縣、興寧縣、五華縣等四個縣的客語',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/18495.wav'},
+'囥':{c:'放',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/82001.wav'},
+'囥步':{c:'隱藏自己所有的，不完全展露',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/101607.wav'},
+'堵':{c:'頂嘴',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/33994.wav'},
+'壁背鬼':{c:'指竊聽的人',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/81771.wav'},
+'大埔腔':{c:'源自於大陸廣東大埔縣的客語',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/18497.wav'},
+'大方':{c:'大方',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/101767.wav'},
+'大行大嫁':{c:'明媒正娶',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/19723.wav'},
+'大衿衫':{c:'客家婦女平時所穿著的一種傳統服飾',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/88612.wav'},
+'天年各變':{c:'時代大大的改變',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/18852.wav'},
+'好展風神':{c:'很愛出風頭、愛表現',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/82040.wav'},
+'好性體':{c:'性情好',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/36752.wav'},
+'妹仔':{c:'女兒',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/82003.wav'},
+'學師仔':{c:'當學徒',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/101603.wav'},
+'學老話':{c:'閩南語。漢語之一，分布於臺灣、中國地區福建省南部、廣東省的潮州汕頭一帶及海南島',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/113324.wav'},
+'安名':{c:'取名字',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/81744.wav'},
+'安然自在':{c:'輕鬆自如、從容不迫',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/97132.wav'},
+'定票':{c:'訂票',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/88538.wav'},
+'客家八音':{c:'客人特有个音樂文化 ，主要有鑼鼓樂同笛仔類吹个樂器',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/19721.wav'},
+'客家藍衫':{c:'客家人的傳統服裝',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/88614.wav'},
+'展手路':{c:'展現本事、大顯身手',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/113425.wav'},
+'已聰明':{c:'很聰慧。屬具特殊能力的聰明',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/20256.wav'},
+'幾多':{c:'多少',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/113427.wav'},
+'廟坪':{c:'廟口廣場',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/101739.wav'},
+'廳下':{c:'客廳',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/81687.wav'},
+'弄神弄鬼':{c:'裝神弄鬼',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/82042.wav'},
+'影著':{c:'瞄到',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/101738.wav'},
+'後尾':{c:'後來',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/81746.wav'},
+'後斗':{c:'車子後面載貨的地方。亦指靠山；後臀',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/81716.wav'},
+'後生人':{c:'年輕人',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/18851.wav'},
+'後背':{c:'背後，後面',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/88650.wav'},
+'心臼':{c:'媳婦',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/19634.wav'},
+'恬恬仔':{c:'靜靜地',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/97070.wav'},
+'愐著':{c:'想到、感覺到',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/114062.wav'},
+'慶':{c:'指才能出眾，辦事能力強',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/20361.wav'},
+'戲棚頂':{c:'戲臺上',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/101740.wav'},
+'打嘴鼓':{c:'閒聊',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/88536.wav'},
+'打爽':{c:'可惜；浪費',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/114292.wav'},
+'打粗胚':{c:'做雛型',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/97028.wav'},
+'打觔斗':{c:'翻跟斗',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/101742.wav'},
+'抓捉':{c:'掌握',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/101773.wav'},
+'抽間':{c:'抽空',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/88824.wav'},
+'拈':{c:'撿，用手指捏取',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/88939.wav'},
+'拳頭嫲':{c:'拳頭',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/113331.wav'},
+'挷大索':{c:'拔河',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/34126.wav'},
+'捩捩轉':{c:'轉個不停',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/97125.wav'},
+'掛吊':{c:'擔心、牽掛',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/101092.wav'},
+'接嘴':{c:'接話',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/113431.wav'},
+'揇':{c:'摟抱',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/18855.wav'},
+'換工':{c:'換工',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/34135.wav'},
+'揹穀包':{c:'扛穀包',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/34133.wav'},
+'搞':{c:'玩耍',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/19720.wav'},
+'搞電動':{c:'玩電動',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/81924.wav'},
+'搣晝畀食':{c:'弄午餐給他們吃',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/88825.wav'},
+'搶光鬼':{c:'罵愛出風頭的人',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/81772.wav'},
+'撍印仔':{c:'蓋印章',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/100977.wav'},
+'撿錢':{c:'付錢',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/101243.wav'},
+'擋恬落來':{c:'停下來',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/114417.wav'},
+'擛手':{c:'招手',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/81715.wav'},
+'擲':{c:'擲',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/20358.wav'},
+'攉忒':{c:'丟掉、拋棄',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/113397.wav'},
+'放冗':{c:'放鬆',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/81654.wav'},
+'敨':{c:'流通，這裡有嘆氣的意思',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/30056.wav'},
+'斡頭':{c:'倒頭、回過頭',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/114450.wav'},
+'時生月日':{c:'出生的年、月、日與時辰或稱為八字',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/81743.wav'},
+'時菜':{c:'當季蔬菜',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/101562.wav'},
+'時行':{c:'流行',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/18853.wav'},
+'晟光':{c:'此處指打光',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/81892.wav'},
+'會失禮':{c:'道歉、賠不是',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/34458.wav'},
+'有伸':{c:'有剩餘',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/114363.wav'},
+'有影':{c:'真的',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/35502.wav'},
+'束':{c:'束縛、綑綁',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/81655.wav'},
+'枵死':{c:'餓死',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/114291.wav'},
+'極樂仔':{c:'陀螺',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/33689.wav'},
+'樣式':{c:'樣式',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/88615.wav'},
+'橫渡烏水溝':{c:'橫渡臺灣海峽',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/81928.wav'},
+'欸奶':{c:'安撫、撫慰',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/33690.wav'},
+'欽服':{c:'敬佩而心服',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/113430.wav'},
+'正板':{c:'道地的、標準的，常用來指專門技術或能力',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/113335.wav'},
+'歸群':{c:'整群',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/88856.wav'},
+'毋單淨':{c:'不只、不僅',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/37221.wav'},
+'毋盼得':{c:'捨不得',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/35505.wav'},
+'毋記得':{c:'忘記',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/88943.wav'},
+'毋識':{c:'不曾',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/88579.wav'},
+'毋靈活':{c:'不靈活、不靈巧',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/81894.wav'},
+'毋驚':{c:'不怕',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/82041.wav'},
+'水漣漣':{c:'水氣很足',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/33992.wav'},
+'汙染':{c:'沾染、感染',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/114531.wav'},
+'決截':{c:'簡潔有力；果斷、毫不猶豫',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/81850.wav'},
+'沉浸式教學':{c:'創造類似母語習得的語言環境，讓語言學習者自然習得與精熟的教學方式',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/88616.wav'},
+'流膿流血':{c:'傷口流膿或血水',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/35506.wav'},
+'海蜆仔':{c:'海蛤蜊；雙殼綱蛤蜊科蛤蜊屬動物的統稱',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/114360.wav'},
+'海陸腔':{c:'源自於大陸廣東的海豐縣與陸豐縣的客語',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/18496.wav'},
+'涼水':{c:'飲料；汽水、冷飲',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/81611.wav'},
+'淨伸':{c:'只剩',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/88950.wav'},
+'淨看':{c:'只看，僅看',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/81925.wav'},
+'清領時期':{c:'臺灣及澎湖由清朝統治的時期',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/81926.wav'},
+'渡':{c:'帶領',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/34335.wav'},
+'準':{c:'將就、當成、姑且如此',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/81719.wav'},
+'溫馴':{c:'溫柔和善',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/81851.wav'},
+'滷':{c:'醃漬',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/114298.wav'},
+'漯落去':{c:'陷下去、套進去',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/114454.wav'},
+'激激顫':{c:'發抖，主要指身體的抖動，原因可能為寒冷或驚嚇',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/114452.wav'},
+'為著':{c:'為了',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/571.wav'},
+'烏斑':{c:'黑斑',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/114061.wav'},
+'烏蠅拑烏蠅啄':{c:'蒼蠅在物體上啄食',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/35507.wav'},
+'無共樣':{c:'不一樣',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/22045.wav'},
+'無堵好':{c:'不湊巧',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/34450.wav'},
+'無安無生':{c:'坐立難安',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/35508.wav'},
+'無毋著':{c:'沒錯',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/100982.wav'},
+'無結煞':{c:'不知如何是好',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/33995.wav'},
+'無花無字':{c:'素面的',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/88853.wav'},
+'無閒洎杈':{c:'忙碌不堪',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/20362.wav'},
+'煞猛打拚':{c:'勤奮努力工作',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/18923.wav'},
+'熟絡':{c:'熟悉',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/114514.wav'},
+'熱𤐰𤐰仔':{c:'形容炎熱',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/114524.wav'},
+'燒罐':{c:'熱水瓶',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/573.wav'},
+'爛爛擐擐':{c:'形容衣服破破爛爛的樣子',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/30051.wav'},
+'生事':{c:'原指生活中的大小事，此指製作巧克力的工序',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/18921.wav'},
+'生到榮榮':{c:'長的枝繁葉茂',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/114059.wav'},
+'生活':{c:'生動靈活',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/101604.wav'},
+'畜得起':{c:'養得起',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/34074.wav'},
+'略略仔':{c:'一些、稍微的',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/22044.wav'},
+'痛惜':{c:'珍惜',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/101091.wav'},
+'白鯧仔':{c:'白鯧魚；動物名，硬骨魚綱鯧目鯧科',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/114362.wav'},
+'目勾勾仔':{c:'望眼欲穿的樣子',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/33692.wav'},
+'目汁濫泔':{c:'淚流不止的樣子',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/33688.wav'},
+'直直':{c:'形容很直、筆直的樣子；持久不變、連續不斷',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/97032.wav'},
+'相借問':{c:'打招呼',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/19581.wav'},
+'相賽':{c:'爭相、競相',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/101287.wav'},
+'省儉':{c:'節儉',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/34461.wav'},
+'看慣慣':{c:'看習慣',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/114060.wav'},
+'看毋多真':{c:'看不太清楚',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/81961.wav'},
+'看著':{c:'看見',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/88647.wav'},
+'眼晶晶仔':{c:'張大眼睛專注看',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/112329.wav'},
+'眼茫鼻花':{c:'本指「頭昏眼花、目不暇給」，引申為「眼花撩亂」',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/88822.wav'},
+'眾人嫌':{c:'大家都討厭',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/114065.wav'},
+'硬硬':{c:'幾乎',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/88949.wav'},
+'硬鉸':{c:'僵硬',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/81653.wav'},
+'硬頸':{c:'原形容一個人個性強硬頑固，具貶義；後誤指人個性剛硬不屈服，具有褒義',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/18922.wav'},
+'禾埕':{c:'晒穀場',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/30054.wav'},
+'禾稈':{c:'稻稈',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/572.wav'},
+'等毋掣':{c:'等不及',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/88584.wav'},
+'箭入來':{c:'直射進來',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/81652.wav'},
+'箭自行車':{c:'用力踩腳踏車',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/81717.wav'},
+'納錢':{c:'繳錢',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/88760.wav'},
+'細不仔':{c:'戲稱小鬼、小蘿蔔頭',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/83551.wav'},
+'細細垤':{c:'很小一塊',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/101181.wav'},
+'結瘌':{c:'結痂',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/35509.wav'},
+'緊打嘴鼓':{c:'一直聊天',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/20254.wav'},
+'罕得':{c:'難得',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/88948.wav'},
+'老虎哥':{c:'螳螂',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/88649.wav'},
+'耕種':{c:'從事農耕',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/34332.wav'},
+'耳劇劇仔':{c:'很得意的樣子',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/35457.wav'},
+'胞衣跡':{c:'原指出生地；後引申為原鄉、故鄉',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/101090.wav'},
+'脣項':{c:'旁邊',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/114510.wav'},
+'腔調':{c:'成系統的聲音、語調等',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/18494.wav'},
+'腳跡':{c:'腳印',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/35458.wav'},
+'臭頭':{c:'頭頂長瘡化膿',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/34070.wav'},
+'臺灣褲':{c:'傳統客家婦女的傳統服飾，特色為寬褲頭、大檔褲',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/88854.wav'},
+'興擳擳仔':{c:'興沖沖的樣子',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/81714.wav'},
+'興頭':{c:'興致正高',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/101286.wav'},
+'舊曆':{c:'農曆',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/81773.wav'},
+'芥菜':{c:'芥菜',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/114297.wav'},
+'茶壽':{c:'稻稈做的保溫罐',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/570.wav'},
+'茶箍':{c:'肥皂、香皂',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/19583.wav'},
+'莫':{c:'別；勿、不要',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/81612.wav'},
+'莫打爽':{c:'不要浪費',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/88581.wav'},
+'萋魚仔':{c:'鮮魚；新鮮的魚類',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/114359.wav'},
+'著':{c:'正確的、對的',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/37219.wav'},
+'蒔田':{c:'插秧',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/92719.mp4'},
+'蒔田笐':{c:'插秧管',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/20160.wav'},
+'藝術':{c:'藝術，此指和他人分享有深意情感的過程',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/81852.wav'},
+'行兼':{c:'走近一點',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/81962.wav'},
+'衰過':{c:'可憐',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/118754.wav'},
+'襯鬧熱':{c:'湊熱鬧',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/81777.wav'},
+'詔安腔':{c:'源自於大陸福建詔安縣的客語',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/18500.wav'},
+'話屎仔':{c:'閒言閒語、不必要的廢話',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/97131.wav'},
+'話著':{c:'以為、認為',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/18925.wav'},
+'該央時':{c:'那時候、當時',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/22773.wav'},
+'講毋出':{c:'說不出',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/101188.wav'},
+'豐沛个菜':{c:'意指菜色很豐盛，又作豐沛',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/19725.wav'},
+'豐湧':{c:'豐裕、富有，衣食不缺',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/113393.wav'},
+'費工':{c:'耗時',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/22770.wav'},
+'走出來':{c:'跑出來',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/88899.wav'},
+'走相逐':{c:'接力賽跑',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/34125.wav'},
+'起膘':{c:'起水泡',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/34073.wav'},
+'起雞嫲皮':{c:'起雞皮疙瘩 ',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/81927.wav'},
+'趕緊':{c:'趕緊',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/82000.wav'},
+'跈':{c:'跟隨',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/575.wav'},
+'跈毋著':{c:'跟不上',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/30053.wav'},
+'跈等':{c:'跟隨',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/20357.wav'},
+'身體':{c:'身體',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/88894.wav'},
+'車枋':{c:'車班',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/20157.wav'},
+'較便宜兜仔':{c:'更便宜一點',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/101242.wav'},
+'逐':{c:'追',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/88900.wav'},
+'逐年':{c:'每年',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/88687.wav'},
+'這搭仔':{c:'這一帶，這裡',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/113330.wav'},
+'連續':{c:'頻頻、持續不斷',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/113428.wav'},
+'運動衫':{c:'運動服裝',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/88613.wav'},
+'過':{c:'繼續，再',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/81849.wav'},
+'道嘆':{c:'感嘆、怨嘆',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/81775.wav'},
+'遽':{c:'快、趕緊',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/34124.wav'},
+'還吂':{c:'還沒',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/88580.wav'},
+'重視':{c:'重視',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/34336.wav'},
+'金金':{c:'亮晶晶。此處指頭髮梳得油亮樣',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/97076.wav'},
+'钁頭':{c:'鋤頭',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/81688.wav'},
+'長透':{c:'經常',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/19637.wav'},
+'閕出':{c:'甩出、撒出',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/97124.wav'},
+'閼拶':{c:'鬱悶',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/113426.wav'},
+'除忒':{c:'除了',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/113332.wav'},
+'離鄉不離腔':{c:'喻人不忘本',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/20253.wav'},
+'順嗄':{c:'順便',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/88761.wav'},
+'順續仔':{c:'順便',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/88692.wav'},
+'顛倒':{c:'反而',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/22778.wav'},
+'風光':{c:'風景',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/101191.wav'},
+'風神哎哎':{c:'洋洋得意，志得意滿的樣子',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/115273.wav'},
+'食毋去':{c:'吃不完',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/114296.wav'},
+'食雜':{c:'飲食',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/19636.wav'},
+'食飽晝':{c:'吃完午餐',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/114289.wav'},
+'餳':{c:'吸引',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/19727.wav'},
+'餳毋著':{c:'吸引不到',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/81774.wav'},
+'饒平腔':{c:'源自於大陸廣東饒平縣的客語',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/18499.wav'},
+'香絲仔':{c:'相思樹',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/88941.wav'},
+'鬆爽':{c:'舒適；舒服',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/101194.wav'},
+'鬧熱煎煎':{c:'鬧哄哄，形容非常熱鬧的樣子',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/88688.wav'},
+'鬼面殼':{c:'鬼面具',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/81776.wav'},
+'鰭菇仔':{c:'魚鰭；魚類的運動器官，以鰭條支撐系膜連接而成',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/118668.wav'},
+'鵲':{c:'鵲',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/88645.wav'},
+'麻煩':{c:'麻煩',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/82004.wav'},
+'點著':{c:'點燃',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/34131.wav'},
+'鼻等':{c:'聞著',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/101192.wav'},
+'齊齊':{c:'齊備、齊全',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/20158.wav'},
+'齧察':{c:'小氣',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/34453.wav'},
+'𢯭手':{c:'幫忙',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/22774.wav'},
+'𫟧':{c:'迴旋、迴盪',u:'https://d3vbrku2h1b6nu.cloudfront.net/storage/app/public/files/81651.wav'},
+};
+const BOARD=[
+{i:0,k:'7-1-1',name:'網路時代',type:'現代',body:'【乜做得】用網路【定票】【順嗄】付錢，上網又【遽】又省錢。愛尋朋友【打嘴鼓】，掛號、【納錢】，全做得用網路，',obj:[],opts:[{h:'𠊎用網路尋資料、看新聞',t:'跟著上網查資料、看新聞，把網路當工具用',m:-5,f:8},{h:'𠊎歸日在網路頂高打嘴鼓',t:'整天掛在網路上打嘴鼓，什麼都不做',m:0,f:-12},{h:'𠊎毋用網路',t:'完全不碰，說網路是年輕人的東西',m:0,f:-6}]},
+{i:1,k:'7-1-2',name:'泡麵攤',type:'生活',body:'就愛【抽間】轉來【搣晝畀食】，三十年來【毋識】買泡麵了！到這下【還吂】打開半包來食。【莫打爽】！',obj:['眼茫鼻花','哯'],opts:[{h:'買一包分等食，莫打爽',t:'買一包，兩儕分等食，毋好剩',m:-8,f:8},{h:'餳到等毋掣，自家拆來食',t:'嘴饞等毋掣，自家拆一包來食',m:-8,f:-2},{h:'𠊎長透食泡麵，無麼个',t:'𠊎長透食泡麵，無麼个大事',m:-16,f:-6}]},
+{i:2,k:'7-1-3',name:'藍衫工坊',type:'文化',body:'今屏東縣竹田鄉西勢國小【同】細人个【運動衫】設計做【客家藍衫】个【樣式】，會著衫面【無花無字】、藍色个【大衿衫】【同】【臺灣褲】，校園肚【歸群】細阿哥仔、細阿姊仔在運動坪項比賽【走相逐】，過營造出客語【沉浸式教學】个教育環境，',obj:['大衿衫','運動衫','客家藍衫','沉浸式教學','臺灣褲','同'],opts:[{h:'𠊎愛著大衿衫去學校',t:'穿藍衫參加學校的客家日，被同學笑也不在意',m:-10,f:18},{h:'翕相个時節正著',t:'只在照片裡穿一下，回家就換掉',m:0,f:2},{h:'該係老人家个衫',t:'拒絕，說那是老一輩的衣服',m:0,f:-14}]},
+{i:3,k:'7-1-4',name:'莊子个園',type:'文學',body:'怪【鵲】跈在【老虎哥】个【後背】愛捉佢。這時節，顧栗園个人【嗄】【走出來】愛【逐】佢，【嗄】【毋記得】自家个【身體】；【看著】一隻【鵲】對南方飛來。',obj:[],opts:[{h:'𠊎愛看該隻鵲仔做麼个',t:'停下來看那隻鵲要做什麼，看出螳螂捕蟬的道理',m:0,f:12},{h:'將佢逐走就好',t:'把鵲趕走就算了',m:0,f:-4},{h:'打下來拿轉去',t:'拿彈弓打下來，帶回去給人看',m:-6,f:-16}]},
+{i:4,k:'7-1-5',name:'桐花坪',type:'自然',body:'【香絲仔】【乜】開歸片个黃花。【順續仔】看頭擺【拈】油桐子行過个路，【乜】漸漸分人【毋記得】了。【逐年】四、五月，',obj:['鬧熱煎煎','倚恃'],opts:[{h:'𠊎䟓䟓轉去𢯭手',t:'專程回庄裡看桐花，順便幫忙擺攤',m:-14,f:20},{h:'去翕兩張相就轉',t:'只去拍幾張照就走',m:-4,f:2},{h:'逐年共樣，毋使去',t:'留在都市，說每年都一樣',m:0,f:-10}]},
+{i:5,k:'7-1-6',name:'茶壽人家',type:'產業',body:'【為著】消磨時間就去【跈】鄰舍學做【茶壽】，用【禾稈】編起來做个【燒罐】，這種【罕得】个傳統手藝【硬硬】會失傳了！【淨伸】在汶水地區幾個老師傅曉得做【茶壽】。',obj:[],opts:[{h:'𠊎摎阿婆學編茶壽',t:'學阿婆用禾稈編一個茶壽，花整個下午',m:-6,f:16},{h:'買一隻燒罐較遽',t:'直接買現成的保溫瓶',m:-18,f:0},{h:'編茶壽去街路賣，趁兜錢',t:'編幾隻茶壽拿去街路賣',m:18,f:2}]},
+{i:6,k:'7-2-1',name:'六腔調路口',type:'語言',body:'南、北兩地【四縣腔】个詞彙【略略仔】【無共樣】，像北【四縣腔】講講【海陸腔】个人在新竹地區較多，聲調同【四縣腔】顛倒，共樣个話，講做另外，還有人講【四海客話】，【四縣腔】講不管係講哪種【腔調】个客話，𠊎兜都愛互相【包容】、學習。',obj:['腔調','四縣腔','海陸腔','大埔腔','饒平腔','詔安腔','四海客話'],opts:[{h:'𠊎學佢兜个腔調來講',t:'學隔壁庄的腔調，跟他們用他們的話講',m:-8,f:18},{h:'𠊎淨講自家个腔',t:'堅持只講自己的腔，聽不懂就算了',m:0,f:-10},{h:'講華語較遽',t:'兩邊都不講，改用華語比較快',m:0,f:-16}]},
+{i:7,k:'7-2-2',name:'電競間',type:'現代',body:'「這位先生！這下恁樣著，安到【時行】哦！像你兜講个——【天年各變】囉！【天年各變】囉！」「你看這下【後生人】著个衫褲還生趣哪！長長短短又【爛爛擐擐】，實在哦！俚毋好【跈毋著】時代哦！像你兜講个——【天年各變】囉！【天年各變】囉！」「狗仔毋好【揇】落屋肚，分佢在【禾埕】尞！」',obj:['爛爛擐擐','敨'],opts:[{h:'𠊎𢯭後生人尋場所',t:'支持後生人去比電競，幫他找場地',m:-16,f:14},{h:'先讀好書正講',t:'要他先把書讀好再說',m:0,f:-6},{h:'去比電競，趁著獎金',t:'去比電競拿獎金，書先囥等',m:30,f:-10}]},
+{i:8,k:'7-2-3',name:'可可亞園',type:'產業',body:'故所這兜當【費工】个【生事】，分【該央時】無麼个加工經驗个農民，一度想愛放忒，無愛種。經過這恁多年个【煞猛打拚】，乜【餳】了已多後生人轉來，共下做這「烏金產業」。「原旦【話著】用可可亞豆做巧克力个方法，上網【儘採】尋斯有，佢兜用15％个【硬頸】精神，加上85％个苦澀甜，做出【餳】人个巧克力，',obj:['生事','硬頸'],opts:[{h:'𠊎摎佢兜共下種可可亞',t:'跟農民一起種可可亞，等三年才收成',m:-34,f:20},{h:'先種一垤試看啊',t:'先買一小塊試種',m:-14,f:8},{h:'摘可可亞交分工廠',t:'摘可可亞交分工廠，先趁錢',m:22,f:-2}]},
+{i:9,k:'7-2-4',name:'山路日落',type:'自然',body:'若係坐火車來，做得在南勢角火車頭【下車】，無麼个人，乜無麼个【車枋】。樟腦油、香茅【茶箍】、菊花、番薯，逐項都買到【齊齊】。【蒔田笐】、牛鼻桊、【刀嫲】、钁頭柄，像歲月个獎狀，排列在壁項。𠊎駛車來，先去摎魚藤坪斷橋【相借問】，續等正去勝興車站，',obj:[],opts:[{h:'下車摎佢兜相借問',t:'停下車跟山上的人相借問，聊了半晌',m:-4,f:14},{h:'撳喇叭喊佢兜讓路',t:'按喇叭要他們讓路',m:0,f:-16},{h:'行別條路',t:'繞另一條路，避開',m:-8,f:-2}]},
+{i:10,k:'7-2-5',name:'料理比賽',type:'生活',body:'佢毋單止話語毋通，連【食雜】、生活習慣摎大家都無共樣，【長透】慍慍悴悴。阿雪一看啊著同鄉，就親暱暱哦，佢兜【離鄉不離腔】，用越南話【緊打嘴鼓】，阿雪【已聰明】曉得【一踢三通】，學會煮客家菜了後，還會結合越南菜來變新花樣。因為佢个【心臼】阿雪，在社區舉辦个客家料理比賽得獎，愛上臺去領獎了。',obj:['離鄉不離腔','已聰明'],opts:[{h:'𠊎𢯭心臼準備',t:'幫心臼準備比賽的菜，忙了兩天',m:-12,f:20},{h:'𠊎在堘頭看就好',t:'只在旁邊看，說我不會煮',m:0,f:0},{h:'𢯭手辦桌，趁一日工錢',t:'𢯭忙辦桌，趁一日个工錢',m:26,f:-4}]},
+{i:11,k:'7-2-6',name:'婚禮廳下',type:'文化',body:'安達：𠊎乜知，頭擺个新娘坐轎仔，討親團裡肚有【客家八音】摎【吹笛仔】，意思係講【大行大嫁】。安達：講了恁多，𠊎看著恁【豐沛个菜】，就緊流【口涎水】了。【擲】扇仔係【攉忒】舊个壞習慣，乜講新娘同外家親情毋會散忒。正言：看著人打紙炮仔，𠊎个手就癢癢，乜盡想愛【搞】！',obj:['客家八音','豐沛个菜','慶'],opts:[{h:'照舊規矩大行大嫁',t:'按老規矩辦一場大行大嫁的婚禮',m:-40,f:24},{h:'辦簡單兜仔就好',t:'辦簡單一點，人到就好',m:-14,f:6},{h:'去登記就好',t:'說儀式麻煩，直接登記',m:0,f:-14}]},
+{i:12,k:'8-1-1',name:'羅隱个田',type:'文學',body:'「【上坵田】【水漣漣】；下坵田【水漣漣】。「羅隱啊，騎條馬【耳劇劇仔】，請問你，昨晡日行幾多千，幾多百，幾多十隻【腳跡】呢？」去到老阿伯个屋下，細阿妹仔同老弟【【堵】【堵】】行到大門口，羅隱分佢【堵】到【無結煞】，黏時講：',obj:[],opts:[{h:'老阿伯講个著，𠊎來學蒔田',t:'承認老阿伯講得有理，跟他學蒔田',m:-4,f:16},{h:'𠊎係才子，做麼个愛聽佢',t:'硬要頂嘴，說自己是才子',m:0,f:-14},{h:'𠊎斡頭就走',t:'轉頭就走，不想理',m:0,f:-6}]},
+{i:13,k:'8-1-2',name:'鹹草文化館',type:'產業',body:'歸日【流膿流血】、【烏蠅拑烏蠅啄】，艱苦到【無安無生】，手指做到【起膘】、【結瘌】，賺著个錢【畜得起】歸家屋人呢！」品妤：「𠊎還知洪鴦女士【毋盼得】厥倈仔生【臭頭】，千慧：「【有影】當香哦！先生，這位个地名【仰般】來个啊？」',obj:['三角鹹草'],opts:[{h:'𠊎摎奉工學編三角鹹草',t:'跟導覽志工學編三角鹹草，編了一個袋子',m:-8,f:16},{h:'翕相就好，手藝傷難',t:'只拍照，說手藝太難',m:0,f:2},{h:'編鹹草袋仔去寄賣',t:'編鹹草袋仔去文化館寄賣',m:20,f:2}]},
+{i:14,k:'8-1-3',name:'運動坪',type:'生活',body:'聖火會在忠義祠【點著】，愛【𫟧】【六堆】地區一輪，表現傳承保鄉衛土个精神。「該片愛【挷大索】了，【遽】【遽】來去看！」有球類同田徑賽、傳統文化个項目：【揹穀包】，來懷念【換工】互助个精神。這下係【走相逐】比賽，阿旺伯个孫仔瑞明用力搭手，跈等大聲喊。',obj:['六堆'],opts:[{h:'𠊎報名走相逐',t:'報名走相逐，跟同學一起練',m:-6,f:18},{h:'去挷大索出兜力就好',t:'只去挷大索，出點力就好',m:-2,f:8},{h:'顧攤賣涼水，趁兜錢',t:'顧攤賣涼水，趁兜錢',m:16,f:-8}]},
+{i:15,k:'8-1-4',name:'阿爸个間房',type:'生活',body:'根本無時間好【欸奶】細人仔，故所，𠊎就逐日【目勾勾仔】等阿爸下班轉屋。𠊎還細个時節，吾姆一日到暗【無閒洎杈】，像【極樂仔】樣轉無停，【一路里來】，吾爸對人就盡【好性體】，尤其對𠊎兜子女；「若爸盡無用，你兜姊妹嫁忒恁久了，佢見擺打開你兜个間門，還【目汁濫泔】。」',obj:[],opts:[{h:'𠊎摎阿爸講心肚个話',t:'跟阿爸說出心裡話，兩個人和好',m:0,f:22},{h:'做無事樣，莫講',t:'裝作沒事，繼續冷戰',m:0,f:-12},{h:'𠊎徙出去戴',t:'搬出去住，眼不見為淨',m:-24,f:-16}]},
+{i:16,k:'8-1-5',name:'導盲犬之家',type:'現代',body:'阿爸：「後來這個細妹仔厥爸，就【渡】佢去同客家鄉親【會失禮】，希望得【著】鄉親个原諒。」該央時票選第一名个就係講，客家人當【省儉】、【齧察】。阿爸：「【著】啊！這下網路當利便，𫣆俚【毋單淨】在網路項講話愛細義，愛思考過後正行動，【無堵好】摎村民个觀賞雞咬死了，村民要求厥爸愛賠錢。',obj:[],opts:[{h:'分導盲犬入來，摎人客解說',t:'讓導盲犬進店裡，跟客人解釋',m:-4,f:20},{h:'請佢兜坐外背',t:'請他們到外面坐，比較不麻煩',m:0,f:-14},{h:'毋做得入來',t:'直接拒絕，說會嚇到客人',m:0,f:-22}]},
+{i:17,k:'8-1-6',name:'鍾鐵民故居',type:'人物',body:'當愛文學、毋會【耕種】个佢，文章寫个全係在【厥脣項】【耕種】个朋友、農村變遷个故事，惜情、寫實，用慈悲心去關心【【耕種】人】个生活同這片土地，佢知：語言斷去，文化就會【跈等】消失，較【嚴重】个甚至族群意識乜會末忒。【一生人】全戴在美濃，因為佢嶄然【重視】在地个自然生態環境，故所積極參加社會事務。',obj:[],opts:[{h:'讀煞就寫一篇心得',t:'讀完鍾鐵民的書，寫一篇心得投稿',m:-4,f:18},{h:'擛兩頁就放下',t:'翻兩頁就放下',m:0,f:0},{h:'投稿去，得著稿費',t:'抄佢个文章去投稿，得著稿費',m:20,f:6}]},
+{i:18,k:'8-2-1',name:'環保講壇',type:'現代',body:'詠秀：「𠊎兜个【勸話】愛【決截】、態度愛【溫馴】，愛講著重點！」詠秀：「自家帶杯仔來裝外賣个【涼水】、早朝，【莫】用塑膠杯仔、盒仔咧！」「做【藝術】个人係一個導體，像通電恁樣，【過】去就【過】去吔，該句「你兜仰恁敢？」【顛倒】變做世界新聞。',obj:['決截','藝術'],opts:[{h:'𠊎自家先擐環保杯',t:'跟著發起校園減塑，自己先帶環保杯',m:-6,f:18},{h:'簽名支持，毋過無做',t:'簽名支持但不行動',m:0,f:2},{h:'一儕人做無效',t:'說一個人做沒有用',m:0,f:-10}]},
+{i:19,k:'8-2-2',name:'安養院',type:'生活',body:'佢兜【硬鉸】个身體【放冗】，輪椅毋係【束】佢等个囹仔，日頭光偷偷仔對天窗【箭入來】，像翕相師傅个電火珠，趕過來【晟光】！【硬鉸】个手指，【毋靈活】；簡簡單單个舞步，做毋來；「阿公、阿婆，𠊎兜這陣【細不仔】又來哩喲！」',obj:[],opts:[{h:'逐禮拜去安養院𢯭手',t:'每週去安養院陪老人家做操',m:-4,f:22},{h:'去一擺交作業就好',t:'去一次交作業就好',m:0,f:4},{h:'𠊎驚看著老人家',t:'說自己怕面對老人',m:0,f:-12}]},
+{i:20,k:'8-2-3',name:'廳下書架',type:'文學',body:'阿公：「無法度，頭擺先民【橫渡烏水溝】來臺，盡【衰過】呢！姿靜：「𠊎看你這幾下日都無【搞電動】，【淨看】這本書！銘均：「就係這儕！你看，佢兜擎等擔竿、【钁頭】同刀嫲相拚，𠊎看啊緊【起雞嫲皮】。」（放尞日朝晨，銘均一屋下人在【廳下】尞。）',obj:['乙未戰爭','清領時期'],opts:[{h:'先寫煞報告正去搞',t:'放假先把報告寫完，再去玩',m:-2,f:12},{h:'一片搞電動一片寫',t:'邊玩電動邊寫，兩邊都沒做好',m:0,f:-8},{h:'拖到尾日正寫',t:'報告拖到最後一天',m:0,f:-14}]},
+{i:21,k:'8-2-4',name:'虎頭山',type:'自然',body:'𠊎看等面書講：「嗯，佢看起來已【伶俐】，細細个車【後斗】【準】工作臺，一轉到屋下就【興擳擳仔】點開面書，【擛手】講：車脣放等【看毋多真】个東西，【行兼】正知係賣米𥺆：面書畫往下，就看得著佢尞日會滿哪仔【箭自行車】去山頂賣咖啡。',obj:['後斗','伶俐'],opts:[{h:'𠊎爬上虎頭山看日頭出',t:'爬上虎頭山看日出，拍照傳給阿婆看',m:-8,f:14},{h:'行一半就斡轉',t:'走一半就回頭',m:-2,f:0},{h:'戴在屋下滑手機',t:'留在家裡滑手機',m:0,f:-8}]},
+{i:22,k:'8-2-5',name:'名仔碑',type:'語言',body:'阿婆講：「將【妹仔】【安名】大概較簡單，無恁【麻煩】，配合【時生月日】來【安名】。像若爸安到『應來』，你安到『日麟』。頭擺有人會將【後尾】降个【妹仔】安到『滿妹』，就係希望毋好過降【妹仔】啊。放學轉到屋下，𠊎【趕緊】將【囥】在心肝裡肚个疑問提出來問：',obj:['時生月日'],opts:[{h:'𠊎教先生𠊎个名仰般唸',t:'跟老師解釋客語的名該怎麼唸，教全班一次',m:-2,f:20},{h:'喊毋著乜莫講',t:'被叫錯也不糾正',m:0,f:-8},{h:'改用華語名較省事',t:'乾脆改用華語名',m:0,f:-16}]},
+{i:23,k:'8-2-6',name:'鬼月廟埕',type:'文化',body:'逐年【舊曆】七月在花蓮鳳林鎮，就有一群【毋驚】鬼个人，在北林社區【弄神弄鬼】。抑係專門偷聽人講話个【壁背鬼】？還係【好展風神】个【搶光鬼】？毋過，社區總幹事發現【餳毋著】後生人轉來，老人家【道嘆】頭擺个光景。餳來已多後生人摎遊客戴等【鬼面殼】，來社區【襯鬧熱】。',obj:[],opts:[{h:'𠊎去𢯭手擺牲儀',t:'參加鬼月的普渡，幫忙擺牲儀',m:-18,f:20},{h:'去看鬧熱就好',t:'只去看熱鬧，不出力',m:-2,f:4},{h:'去廟項𢯭手，領工錢',t:'去廟項𢯭手，領著工錢',m:16,f:0}]},
+{i:24,k:'9-1-1',name:'客語商店街',type:'產業',body:'【兩儕】擇好麵包去【撿錢】。先生：【無毋著】，大家多去客語商店，用客話買東西，就做得【撍印仔】集點換獎品。放學吔，阿祥【興擳擳仔】湊阿寧共下去【撍印仔】集點。講客話毋單淨做得【撍印仔】，還會算【較便宜兜仔】哦！',obj:[],opts:[{h:'𠊎用客話同頭家交關',t:'用客話跟頭家交關，順便集點',m:-12,f:16},{h:'用華語問價數',t:'用華語問，結果沒有折扣',m:-18,f:2},{h:'在店肚做半工，學交關',t:'在店肚做半工，學交關乜趁錢',m:24,f:-2}]},
+{i:25,k:'9-1-2',name:'公車詩牆',type:'文學',body:'大家越讀越有【興頭】，【相賽】上網查詢詩人个作品。希望做得餳較多个人，共下來【痛惜】、關心佢日夜【掛吊】个家鄉文化同語言。【除忒】【欽服】詩人豐富个創作靈感，還看著佢用心生活、體現生命个感動。𠊎在公車肚【影著】一首詩，',obj:['胞衣跡'],opts:[{h:'𠊎將該首詩抄下來',t:'把公車上看到的詩抄下來，自己也寫一首',m:0,f:16},{h:'看過就毋記得',t:'看過就忘',m:0,f:0},{h:'詩看毋識',t:'嫌詩看不懂',m:0,f:-8}]},
+{i:26,k:'9-1-3',name:'姐婆个菜園',type:'產業',body:'姐婆：毋好看𠊎个菜園【細細垤】定定，冷天食得著个【時菜】都有，阿芳：菜頭、【包心白】、【七層塔】……哇！項項有。阿芳：故所，姐婆个菜園，有一種【講毋出】个好【風光】。逐日經過中庭，【鼻等】淡淡个清香，試著當【鬆爽】。',obj:[],opts:[{h:'𠊎留下來𢯭姐婆種菜',t:'留下來幫姐婆種菜，學會分辨時菜',m:-4,f:20},{h:'在堘頭挷兩枝七層塔',t:'只在旁邊看，摘幾根七層塔',m:0,f:6},{h:'挷時菜去街路賣',t:'挷時菜去街路賣',m:20,f:-2}]},
+{i:27,k:'9-1-4',name:'剪黏工坊',type:'文化',body:'阿宏試著學這【剪黏】愛一等認真，做出來个成品正會【生活】，難怪徐先生个作品當有【價值】，這下做下變【古蹟】了。阿華講：「徐先生無【囥步】教大家，餳著𠊎想深入了解【剪黏】。」徐先生講著，該下【學師仔】个人，麼个㧡水、攪泥、【打粗胚】……項項事頭都愛做，',obj:['剪黏','囥步','直直'],opts:[{h:'𠊎拜師學剪黏',t:'拜師學剪黏，先從打粗胚做起',m:-20,f:22},{h:'買一隻轉去囥',t:'只買一個成品回家擺',m:-14,f:2},{h:'先做粗工趁錢',t:'先做粗工趁錢，手藝慢慢學',m:18,f:-6}]},
+{i:28,k:'9-1-5',name:'戲曲棚',type:'文化',body:'【廟坪】鬧熱煎煎，還有看著【戲棚頂】做【三腳採茶戲】，真餳𠊎。𠊎坐在臺下【恬恬仔】欣賞客家戲曲【九腔十八調】恁豐富个音樂，感覺真享受呢。有一日，在學校公布欄【影著】戲曲學校个招生海報，佢兜還分享在學校个生活：學講客話、唱山歌、【打觔斗】、寫劇本。',obj:['九腔十八調','金金'],opts:[{h:'𠊎去戲曲學校試上課',t:'去戲曲學校試上一堂課',m:-6,f:16},{h:'在棚下看就好',t:'只在台下看表演',m:-2,f:6},{h:'在棚下賣點心，順續看戲',t:'在棚下賣點心，順續看戲',m:14,f:-2}]},
+{i:29,k:'9-1-6',name:'舞場',type:'生活',body:'舞場項，自信又【大方】个阿樂牯，餳著逐儕人【眼晶晶仔】跈佢滿場𫟧。【上教】个佢，一起勢就【抓捉】著要領，乜試著比搞電動還較生趣。一輪、兩輪、三輪……，【閕出】圓圈个裙像紅色个極樂仔，【捩捩轉】，莫插別儕个【話屎仔】，笑咪咪个阿樂牯逐日【安然自在】出入學校，',obj:['話屎仔'],opts:[{h:'𠊎上台跳，分人笑乜無相干',t:'上台跳舞，就算被笑也大方跳完',m:0,f:22},{h:'𠊎囥在後背毋上台',t:'躲在後面不上台',m:0,f:-10},{h:'笑別儕跳無好',t:'笑別人跳不好',m:0,f:-18}]},
+{i:30,k:'9-2-1',name:'學堂老樹',type:'自然',body:'佢【擋恬落來】笑等應：「其實，𠊎還細時，係【眾人嫌】个【刺額嫲】，長透分世大人同先生愁慮。學校圍牆脣个老樹，一溜【生到榮榮】，大家上下都【看慣慣】咧！這站仔樹葉仔嗄緊來緊黃，還起【一搭搭仔】个【烏斑】呢！麼个係樹醫生？佢會仰般治療這頭老樹呢？𠊎【愐著】已生趣呢！',obj:['刺額嫲'],opts:[{h:'𠊎去查老樹做麼个會發病',t:'查出老樹生病的原因，發起搶救',m:-10,f:20},{h:'摎大家共樣講兩句',t:'跟大家一樣抱怨，沒有行動',m:0,f:-6},{h:'將樹剁忒較安全',t:'同意把樹砍掉，說比較安全',m:-2,f:-16}]},
+{i:31,k:'9-2-2',name:'灶下',type:'生活',body:'阿婆：𫣆客人當【做家】，同【食毋去】个蘿蔔仔晒做蘿蔔乾，【芥菜】【滷】做覆菜、鹹菜，留來慢慢食。教室肚，大家正【食飽晝】，同學在整理碗筷。先生：當多人因爭戰爭、天災，無飯好食嗄【枵死】。平常時，你兜斯愛珍惜食物。想看仔該兜肚飢个人，這兜倒忒个飯菜，毋係當【打爽】？',obj:[],opts:[{h:'食幾多裝幾多，莫打爽',t:'吃多少裝多少，把廚餘減到最少',m:0,f:16},{h:'裝淰再講，食毋煞就攉忒',t:'裝滿再說，吃不完倒掉',m:0,f:-12},{h:'賰菜滷起來拿去賣',t:'將賰菜滷起來拿去賣',m:14,f:4}]},
+{i:32,k:'9-2-3',name:'天時觀測站',type:'自然',body:'比論講：冷天，無像頭擺冷到【激激顫】；熱天，嗄變到【熱𤐰𤐰仔】。雖然魚塭為漁民帶來【豐湧】个收入，毋過嗄造成地層【漯落去】。針對這議題，有人建議：「節能減碳對自家開始做起，減少【單淨用】一擺就【攉忒】个東西」。人類个文明帶來生活个【利便】；乜帶來了大災難。',obj:['激激顫'],opts:[{h:'𠊎開始記天時，做防災計畫',t:'開始記錄天氣，跟同學一起做防災計畫',m:-6,f:18},{h:'天時變化摎𠊎無相干',t:'覺得氣候變遷離自己很遠',m:0,f:-8},{h:'壞忒就買新个',t:'東西壞了就丟，買新的',m:-16,f:-10}]},
+{i:33,k:'9-2-4',name:'客家餐廳',type:'語言',body:'阿爸：哈！【這搭仔】个「以牙還牙」，客語意思係「用厥【拳頭嫲】打厥嘴角」，妹仔：聽起來，翻譯想愛譯到好，【除忒】意思愛正確，還愛考慮融入在地語言个特色，恁樣譯出來个客語正會盡【正板】哦！頭下在【脣項】點菜个人客就同頭家講：「你猶閣有畜烏貓（【學老話】發音）哦！」係講譯者做得【熟絡】客話个諺語摎師傅話，恁樣譯出來个客語正會盡【正板】哦！',obj:['學老話','正板'],opts:[{h:'𠊎慢慢用客話同人客講菜名',t:'耐心用客話跟學老話的客人解釋菜名',m:-2,f:20},{h:'改用華語點菜較遽',t:'直接改用華語點菜',m:0,f:-4},{h:'笑人客講毋著',t:'笑客人講錯，讓他難堪',m:0,f:-18}]},
+{i:34,k:'9-2-5',name:'音樂廳',type:'人物',body:'無【幾多】年，鄧先生【連續】創作出臨臨仔 百過條歌仔，分人盡【欽服】。該時節，臺灣現代流行音樂个發源地「大禾埕」，就係佢【展手路】个舞台。阿宏又講：「看著先民个生命之歌同歡欣【閼拶】。」芳美【接嘴】講：「大家共下用桐花來創作一首歌仔，同鄧先生表達尊敬。」',obj:['風神哎哎'],opts:[{h:'𠊎去聽，轉來介紹分同學',t:'去聽《四月望雨》，回來跟同學介紹鄧雨賢',m:-8,f:18},{h:'聽一條就走',t:'只聽了一首就走',m:-4,f:2},{h:'老歌無麼个好聽',t:'說老歌沒什麼好聽',m:0,f:-12}]},
+{i:35,k:'9-2-6',name:'漁市場',type:'產業',body:'「來買【萋魚仔】哦！海魚仔、【海蜆仔】做下有哦！」紅燈區色目較打眼个，魚肉同【鰭菇仔】受著【汙染】个風險當大，莫買莫食正係根本！ 」阿婆講：「這【白鯧仔】恁細尾仔定定，愛千過銀？」「海產做得變出好味緒！『年年有餘』有食【有伸】！」',obj:['海蜆仔','白鯧仔','鰭菇仔'],opts:[{h:'淨買萋魚仔，賰个儆惜用',t:'挑最新鮮的萋魚仔，其餘的珍惜著用',m:-24,f:14},{h:'歸攤買轉去分鄰舍',t:'整攤買下來分給鄰居',m:-46,f:20},{h:'摎魚販𢯭手賣魚',t:'摎魚販𢯭手賣魚，趁工錢',m:26,f:-4}]},
+];
+/* ══ 一、講分庄民聽 ══ */
+const FOLK=[
+ {n:"阿婆",c:"#D15C50",h:"#B8A99A"},{n:"阿公",c:"#4E86B8",h:"#B8A99A"},
+ {n:"阿松",c:"#3E8A6E",h:"#3E2A1E"},{n:"阿晴",c:"#D9A93C",h:"#3E2A1E"},
+ {n:"頭家",c:"#A78BD0",h:"#3E2A1E"},{n:"先生",c:"#5E8CA8",h:"#3E2A1E"},
+];
+function folkFace(f,s){
+  return `<svg viewBox="0 0 92 92" style="width:${s}px;height:${s}px">
+    <circle cx="46" cy="46" r="44" fill="${f.c}" opacity=".16"/>
+    <circle cx="46" cy="50" r="26" fill="#FBD3AC"/>
+    <path d="M20 42 q4 -26 26 -26 q22 0 26 26 q-13 -13 -26 -13 q-13 0 -26 13Z" fill="${f.h}"/>
+    <path d="M34 46 q4 -6 8 0" stroke="#3E2A1E" stroke-width="3" fill="none" stroke-linecap="round"/>
+    <path d="M50 46 q4 -6 8 0" stroke="#3E2A1E" stroke-width="3" fill="none" stroke-linecap="round"/>
+    <path d="M41 60 q5 6 10 0" stroke="#3E2A1E" stroke-width="3" fill="none" stroke-linecap="round"/>
+    <circle cx="30" cy="57" r="5" fill="#F2907E" opacity=".6"/>
+    <circle cx="62" cy="57" r="5" fill="#F2907E" opacity=".6"/>
+    <path d="M22 92 q6 -22 24 -22 q18 0 24 22Z" fill="${f.c}"/></svg>`;
+}
+
+
+/* ── 天時卡：厚雲團、飽和色、前景框景 ── */
+const LEAF_L=`<g><path d="M-6 190 q6 -46 40 -60 q-8 44 -40 60Z" fill="#8FC33E"/>
+  <path d="M-6 190 q6 -46 40 -60 q-22 26 -30 58Z" fill="#6FA82E"/>
+  <path d="M14 200 q10 -40 48 -46 q-14 36 -48 46Z" fill="#A8D452"/>
+  <path d="M2 176 q-14 -30 4 -52" stroke="#5E9226" stroke-width="4" fill="none"/></g>`;
+const LEAF_R=`<g transform="translate(300,0) scale(-1,1)">
+  <path d="M-6 190 q6 -46 40 -60 q-8 44 -40 60Z" fill="#8FC33E"/>
+  <path d="M-6 190 q6 -46 40 -60 q-22 26 -30 58Z" fill="#6FA82E"/>
+  <path d="M14 200 q10 -40 48 -46 q-14 36 -48 46Z" fill="#A8D452"/></g>`;
+function cloudBank(c1,c2,y){
+  return `<g><path d="M-10 ${y} q0 -26 26 -26 q4 -30 36 -30 q14 -26 44 -18 q18 -30 52 -20
+      q22 -26 50 -8 q30 -8 40 20 q26 2 26 26 q0 24 -26 24 H-10Z" fill="${c1}"/>
+    <g fill="${c2}" opacity=".55">
+      <ellipse cx="52" cy="${y-16}" rx="34" ry="19"/><ellipse cx="140" cy="${y-24}" rx="40" ry="22"/>
+      <ellipse cx="228" cy="${y-14}" rx="32" ry="18"/></g></g>`;
+}
+function house(x,y,s,roof,wall){
+  return `<g transform="translate(${x},${y}) scale(${s})">
+    <path d="M-42 0 h84 v-46 h-84Z" fill="${wall}"/>
+    <path d="M-42 0 h84 v-10 h-84Z" fill="#000" opacity=".15"/>
+    <path d="M-54 -46 L0 -80 L54 -46Z" fill="${roof}"/>
+    <path d="M-54 -46 L0 -80 L0 -46Z" fill="#000" opacity=".12"/>
+    <rect x="-30" y="-36" width="22" height="22" rx="2" fill="#FDF3D8"/>
+    <rect x="8" y="-36" width="22" height="22" rx="2" fill="#FDF3D8"/>
+    <g stroke="${roof}" stroke-width="3"><path d="M-19 -36v22M-30 -25h22M19 -36v22M8 -25h22"/></g>
+    <rect x="-11" y="-22" width="22" height="22" rx="2" fill="#8E5A3C"/>
+    <circle cx="5" cy="-11" r="2" fill="#FFD056"/></g>`;
+}
+const FENCE=`<g fill="#FDF3D8">${[0,1,2,3,4,5].map(i=>
+  `<path d="M${228+i*13} 176 v-22 l5 -6 l5 6 v22Z"/>`).join("")}
+  <rect x="226" y="160" width="72" height="4"/></g>`;
+
+const SKY=[
+{id:"sun",name:"好天",zh:"連續好天，田項收成當好",eff:{inc:2,money:0,favor:0},line:"產業收入變兩倍",
+ art:`<defs><linearGradient id="sk1" x1="0" y1="0" x2="0" y2="1">
+   <stop offset="0%" stop-color="#3EA8D8"/><stop offset="70%" stop-color="#96DCEC"/></linearGradient>
+   <radialGradient id="su1"><stop offset="0%" stop-color="#FFF3C4"/><stop offset="100%" stop-color="#FFC93C"/></radialGradient></defs>
+  <rect width="300" height="200" fill="url(#sk1)"/>
+  <circle cx="228" cy="46" r="42" fill="#FFE07A" opacity=".35"/>
+  <circle cx="228" cy="46" r="27" fill="url(#su1)"/>
+  <g stroke="#FFD447" stroke-width="5" stroke-linecap="round" opacity=".9">
+    <path d="M228 0v11M228 81v11M187 46h-11M280 46h-11M199 17l-8-8M265 83l8 8M265 17l8-8M199 75l-8 8"/></g>
+  ${cloudBank("#FFFFFF","#DCEFF6",64)}
+  <path d="M0 132 q60 -20 108 -6 q54 16 96 -2 q46 -14 96 4 v72 H0Z" fill="#7FBF3E"/>
+  <path d="M0 152 q70 -14 140 0 q80 14 160 -6 v54 H0Z" fill="#63A62E"/>
+  ${house(148,152,1,"#E8B44C","#D6483A")}
+  ${FENCE}
+  <g fill="#4E8C22" opacity=".5">${[24,60,96,196,240,278].map(x=>`<ellipse cx="${x}" cy="${170+(x%3)*5}" rx="14" ry="5"/>`).join("")}</g>
+  ${LEAF_L}${LEAF_R}`},
+
+{id:"rain",name:"落大雨",zh:"雨落毋停，屋頂漏水",eff:{inc:1,money:-20,favor:0},line:"開 20 銀補屋頂",
+ art:`<defs><linearGradient id="sk2" x1="0" y1="0" x2="0" y2="1">
+   <stop offset="0%" stop-color="#2B4256"/><stop offset="100%" stop-color="#5C7E96"/></linearGradient></defs>
+  <rect width="300" height="200" fill="url(#sk2)"/>
+  ${cloudBank("#7D97A8","#5C7386",70)}
+  <g stroke="#BFE0F0" stroke-width="3" stroke-linecap="round" opacity=".75">
+    ${[14,38,62,86,110,134,158,182,206,230,254,278].map((x,i)=>
+      `<path d="M${x} ${86+(i%4)*13} l-6 22"/>`).join("")}
+    ${[26,50,74,98,122,146,170,194,218,242,266,290].map((x,i)=>
+      `<path d="M${x} ${120+(i%3)*15} l-6 20"/>`).join("")}</g>
+  <path d="M0 146 q70 -14 140 0 q80 14 160 -8 v62 H0Z" fill="#3E6A48"/>
+  ${house(150,164,1,"#C4913C","#B03A2E")}
+  <g fill="#BFE0F0" opacity=".7">${[120,150,182].map((x,i)=>`<ellipse cx="${x}" cy="${172+i*3}" rx="${9+i*3}" ry="3"/>`).join("")}</g>
+  <g><path d="M56 168 v-30" stroke="#5A4030" stroke-width="4"/>
+    <path d="M22 138 q34 -32 68 0 q-34 -14 -68 0Z" fill="#D6483A"/>
+    <path d="M22 138 q34 -32 68 0 q-34 -6 -68 0Z" fill="#E8604E" opacity=".6"/></g>
+  ${LEAF_L}${LEAF_R}`},
+
+{id:"cold",name:"冷颼颼",zh:"寒流來，庄民毋出門",eff:{inc:1,money:0,favor:-10},line:"人情 -10，庄頭恬恬",
+ art:`<defs><linearGradient id="sk3" x1="0" y1="0" x2="0" y2="1">
+   <stop offset="0%" stop-color="#4A6B8C"/><stop offset="100%" stop-color="#A8C8DC"/></linearGradient></defs>
+  <rect width="300" height="200" fill="url(#sk3)"/>
+  ${cloudBank("#E4EFF6","#C0D6E4",62)}
+  <g fill="#FFFFFF">${[[26,96,7],[68,112,5],[112,90,8],[170,106,6],[214,88,7],[258,110,5],[46,140,4],[248,146,4]]
+    .map(([x,y,r])=>`<g transform="translate(${x},${y})" stroke="#FFF" stroke-width="${r/2.6}" stroke-linecap="round">
+      <path d="M0 ${-r}V${r}M${-r} 0H${r}M${-r*.7} ${-r*.7}L${r*.7} ${r*.7}M${-r*.7} ${r*.7}L${r*.7} ${-r*.7}"/></g>`).join("")}</g>
+  <path d="M0 148 q60 -22 120 -6 q70 18 180 -10 v68 H0Z" fill="#E8F2F8"/>
+  <path d="M0 162 q70 -12 140 2 q80 14 160 -8 v44 H0Z" fill="#FFFFFF"/>
+  ${house(150,166,1,"#8C6E5A","#A8564A")}
+  <path d="M96 122 L150 88 L204 122 l-9 -8 L150 84 L105 114Z" fill="#FFFFFF"/>
+  <g fill="#2E7D5A"><path d="M244 166 l-17 -34 h34Z"/><path d="M244 142 l-13 -28 h26Z"/>
+    <path d="M244 122 l-10 -22 h20Z"/><rect x="240" y="166" width="8" height="12" fill="#5A4030"/>
+    <g fill="#FFF" opacity=".9"><path d="M244 132 l-12 0 l6 -8Z"/><path d="M244 152 l-14 0 l7 -9Z"/></g></g>
+  ${LEAF_L}${LEAF_R}`},
+
+{id:"wind",name:"風颱",zh:"風颱掃過，屋瓦分風捲走",eff:{inc:0,money:-10,favor:14},line:"產業無收入，人情 +14",
+ art:`<defs><linearGradient id="sk4" x1="0" y1="0" x2="0" y2="1">
+   <stop offset="0%" stop-color="#22384C"/><stop offset="100%" stop-color="#4E6E86"/></linearGradient>
+   <linearGradient id="tw" x1="0" y1="0" x2="1" y2="1">
+   <stop offset="0%" stop-color="#DCEFF8"/><stop offset="100%" stop-color="#9CC4DC"/></linearGradient></defs>
+  <rect width="300" height="200" fill="url(#sk4)"/>
+  ${cloudBank("#6E8A9E","#4E6678",58)}
+  <!-- 龍捲風 -->
+  <g opacity=".95">
+    <path d="M18 26 q56 -6 92 12 q-38 20 -74 12 q30 12 62 6 q-30 22 -60 16
+             q26 14 48 8 q-22 22 -44 20 q18 12 32 8 q-16 20 -30 22 q10 10 20 8
+             q-10 16 -22 20 l-12 4 q-6 -30 4 -54 q-14 -32 -6 -60 q-12 -14 -10 -22Z" fill="url(#tw)"/>
+    <g stroke="#FFFFFF" stroke-width="2.5" fill="none" opacity=".55">
+      <path d="M28 44 q40 6 68 -2M32 76 q34 8 56 0M40 108 q26 8 42 2M48 138 q18 6 28 0"/></g></g>
+  <!-- 飛出去个板仔 -->
+  <g>${[[116,66,-24,"#C9453A"],[138,96,32,"#E8C88A"],[100,120,-46,"#C9453A"],[152,52,18,"#E8C88A"],
+        [122,146,-14,"#A8362C"]].map(([x,y,r,c])=>
+    `<rect x="${x}" y="${y}" width="26" height="8" rx="2" fill="${c}" transform="rotate(${r} ${x+13} ${y+4})"/>`).join("")}</g>
+  <!-- 閃電 -->
+  <path d="M236 44 l-16 40 h16 l-14 40 l38 -50 h-18 l16 -30Z" fill="#FFE87A"/>
+  <path d="M236 44 l-16 40 h16 l-14 40 l38 -50 h-18 l16 -30Z" fill="#FFF" opacity=".45"/>
+  <g stroke="#BFE0F0" stroke-width="2.6" stroke-linecap="round" opacity=".6">
+    ${[190,214,238,262,286].map((x,i)=>`<path d="M${x} ${96+(i%3)*14} l-5 20"/>`).join("")}</g>
+  <path d="M0 150 q70 -12 140 2 q80 14 160 -10 v58 H0Z" fill="#3E6A48"/>
+  ${house(212,168,.92,"#E8C88A","#C9453A")}
+  <g><path d="M266 168 v-46" stroke="#8E6A4A" stroke-width="4"/>
+    <path d="M252 122 h28M258 132 l-10 -10M274 132 l10 -10" stroke="#8E6A4A" stroke-width="3"/></g>
+  ${LEAF_L}${LEAF_R}`},
+
+{id:"harvest",name:"大出",zh:"物產大出，擔擔都係穀",eff:{inc:2,money:15,favor:0},line:"產業兩倍，另外加 15 銀",
+ art:`<defs><linearGradient id="sk5" x1="0" y1="0" x2="0" y2="1">
+   <stop offset="0%" stop-color="#4EB0D8"/><stop offset="100%" stop-color="#FFD9A0"/></linearGradient></defs>
+  <rect width="300" height="200" fill="url(#sk5)"/>
+  <circle cx="246" cy="42" r="34" fill="#FFB84C" opacity=".4"/>
+  <circle cx="246" cy="42" r="22" fill="#FFD056"/>
+  ${cloudBank("#FFF6E4","#F0DCC0",62)}
+  <path d="M0 116 q70 -16 140 -2 q80 16 160 -8 v94 H0Z" fill="#E8B83C"/>
+  <path d="M0 138 q70 -12 140 2 q80 14 160 -8 v68 H0Z" fill="#D19E28"/>
+  <g>${[10,36,62,88,114,140,166,192,218,244,270,294].map((x,i)=>`
+    <g transform="translate(${x},${152+(i%3)*9})">
+      <path d="M0 0 v-32" stroke="#B8871E" stroke-width="3.4"/>
+      <g fill="#F5D24E"><ellipse cx="-5" cy="-24" rx="5" ry="8"/><ellipse cx="5" cy="-28" rx="5" ry="8"/>
+        <ellipse cx="0" cy="-36" rx="5" ry="8"/></g></g>`).join("")}</g>
+  <g transform="translate(52,178)">
+    <path d="M-30 0 q3 -28 30 -28 q27 0 30 28 q-30 14 -60 0Z" fill="#C4884A"/>
+    <path d="M-30 0 q30 14 60 0" stroke="#9E6832" stroke-width="3" fill="none"/>
+    <g><circle cx="-12" cy="-32" r="10" fill="#D6483A"/><circle cx="10" cy="-35" r="10" fill="#E8604E"/>
+      <circle cx="0" cy="-43" r="9" fill="#F5D24E"/></g></g>
+  ${LEAF_L}${LEAF_R}`},
+
+{id:"guest",name:"人客來",zh:"外地个親戚轉來庄頭",eff:{inc:1,money:-15,favor:20},line:"開 15 銀請人客，人情 +20",
+ art:`<defs><linearGradient id="sk6" x1="0" y1="0" x2="0" y2="1">
+   <stop offset="0%" stop-color="#5AB4D8"/><stop offset="100%" stop-color="#C4EAE4"/></linearGradient></defs>
+  <rect width="300" height="200" fill="url(#sk6)"/>
+  <circle cx="52" cy="40" r="24" fill="#FFD056"/>
+  <circle cx="52" cy="40" r="34" fill="#FFD056" opacity=".28"/>
+  ${cloudBank("#FFFFFF","#DCEFF6",60)}
+  <path d="M0 140 q70 -14 140 0 q80 14 160 -8 v68 H0Z" fill="#7FBF3E"/>
+  <path d="M0 158 q70 -10 140 2 q80 12 160 -8 v48 H0Z" fill="#63A62E"/>
+  ${house(150,158,1.08,"#4A6C6A","#D6483A")}
+  <g><path d="M120 118 v-8" stroke="#3E2A1E" stroke-width="3"/>
+    <ellipse cx="120" cy="128" rx="10" ry="13" fill="#E8564A"/>
+    <path d="M180 118 v-8" stroke="#3E2A1E" stroke-width="3"/>
+    <ellipse cx="180" cy="128" rx="10" ry="13" fill="#E8564A"/>
+    <g stroke="#FFD056" stroke-width="2.4" fill="none">
+      <path d="M114 120 q6 -5 12 0M114 136 q6 5 12 0M174 120 q6 -5 12 0M174 136 q6 5 12 0"/></g></g>
+  <g>${[[236,178,"#4E86B8"],[266,182,"#3E8A6E"]].map(([x,y,c],i)=>`
+    <g transform="translate(${x},${y})">
+      <ellipse cx="0" cy="4" rx="15" ry="4" fill="#000" opacity=".14"/>
+      <path d="M-11 0 q-2 -26 11 -26 q13 0 11 26Z" fill="${c}"/>
+      <circle cx="0" cy="-32" r="12" fill="#FBD3AC"/>
+      <path d="M-12 -34 q12 -14 24 0 q-12 -7 -24 0Z" fill="#3E2A1E"/>
+      <path d="M-5 -32 q3 -4 6 0M1 -32 q3 -4 6 0" stroke="#3E2A1E" stroke-width="2" fill="none" stroke-linecap="round"/>
+      <path d="M-4 -25 q4 4 8 0" stroke="#3E2A1E" stroke-width="2" fill="none" stroke-linecap="round"/>
+      ${i?"":'<path d="M11 -14 q14 -8 12 -22" stroke="#FBD3AC" stroke-width="7" fill="none" stroke-linecap="round"/>'}</g>`).join("")}</g>
+  ${LEAF_L}${LEAF_R}`},
+];
+
+
+const $=id=>document.getElementById(id);
+let AC=null;
+function tick(t,g,f){
+  if(!AC) return;
+  const o=AC.createOscillator(), gn=AC.createGain();
+  o.type="triangle"; o.frequency.setValueAtTime(f,t);
+  o.frequency.exponentialRampToValueAtTime(f*.45,t+.07);
+  gn.gain.setValueAtTime(g,t); gn.gain.exponentialRampToValueAtTime(.0008,t+.12);
+  o.connect(gn).connect(AC.destination); o.start(t); o.stop(t+.14);
+}
+
+/* ── 細聲个背景樂：五聲音階，程式生成，無用外部檔 ── */
+const SCALE=[261.63,293.66,329.63,392.00,440.00,523.25,587.33,659.25];  // C D E G A C D E
+const BASS=[130.81,146.83,164.81,196.00];
+let musOn=false, musT=null, musGain=null, beat=0;
+function pluck(f,t,g,dur){
+  if(!AC) return;
+  const o=AC.createOscillator(), gn=AC.createGain(), lp=AC.createBiquadFilter();
+  o.type="triangle"; o.frequency.value=f;
+  lp.type="lowpass"; lp.frequency.value=2300;
+  gn.gain.setValueAtTime(0,t);
+  gn.gain.linearRampToValueAtTime(g,t+.012);
+  gn.gain.exponentialRampToValueAtTime(.0001,t+dur);
+  o.connect(lp).connect(gn).connect(musGain); o.start(t); o.stop(t+dur+.05);
+}
+function musicStep(){
+  if(!musOn||!AC) return;
+  const t=AC.currentTime+.03;
+  const b=beat%16;
+  if(b%4===0) pluck(BASS[(beat>>2)%4], t, .34, 2.2);
+  if(b%2===0){
+    const n=SCALE[Math.floor(Math.random()*SCALE.length)];
+    pluck(n, t, .26, 1.8);
+  }
+  if(b===6||b===14) pluck(SCALE[Math.floor(Math.random()*4)+3], t+.22, .15, 1.4);
+  beat++;
+  musT=setTimeout(musicStep, 430);
+}
+function toggleMusic(){
+  try{
+    AC=AC||new (window.AudioContext||window.webkitAudioContext)();
+    if(AC.state==="suspended") AC.resume();
+    if(!musGain){ musGain=AC.createGain(); musGain.gain.value=.45; musGain.connect(AC.destination); }
+    musOn=!musOn;
+    const b=$("mus"); if(b) b.textContent = musOn?"♪ 音樂　開":"♪ 音樂　關";
+    if(musOn) musicStep(); else clearTimeout(musT);
+  }catch(e){}
+}
+function diceSound(){
+  try{
+    AC=AC||new (window.AudioContext||window.webkitAudioContext)();
+    if(AC.state==="suspended") AC.resume();
+    const t0=AC.currentTime;
+    [0,.07,.13,.2,.29,.4,.54].forEach((d,i)=>
+      tick(t0+d, .60-i*.063, 480-i*38+Math.random()*90));
+  }catch(e){}
+}
+function stepSound(){
+  try{ AC=AC||new (window.AudioContext||window.webkitAudioContext)();
+    tick(AC.currentTime,.30,760); }catch(e){}
+}
+const TYPE={產業:"#8FA84C",文化:"#D15C50",自然:"#3E8A6E",人物:"#A78BD0",
+            語言:"#4E86B8",生活:"#D9A93C",現代:"#5E8CA8",文學:"#B08050"};
+const MAXYEAR=5, TOTALW=Object.keys(VOC).length;
+let known=new Set(), money=190, favor=30, pos=0, step=0, year=1, audio=null, hist=[];
+let chosen={}, owned=[], rolling=false;
+let incMul=1, skyNow=null, quiz={}, prize={}, lastSeason=-1;   // 天時倍率、當今天時、逐格个庄民問答
+
+/* 棋盤格仔位置：10×10 外圈 = 36 格 */
+function cell(i){
+  if(i<10) return [1,i+1];                 // 頂：左→右
+  if(i<19) return [i-8,10];                // 右：頂→底
+  if(i<28) return [10,10-(i-18)];          // 底：右→左
+  return [10-(i-27),1];                    // 左：底→頂
+}
+function buildBoard(){
+  const b=$("board");
+  [...b.querySelectorAll(".sq")].forEach(x=>x.remove());
+  BOARD.forEach((s,i)=>{
+    const [r,c]=cell(i);
+    const d=document.createElement("div");
+    d.className="sq"+(i===pos?" here":"");
+    d.style.gridRow=r; d.style.gridColumn=c;
+    d.dataset.i=i;
+    d.innerHTML=`<div class="t" style="background:${TYPE[s.type]}">${s.type}</div>
+      <b>${s.name}</b>${owned.includes(i)?'<div class="own">◆ 已有</div>':""}`;
+    d.onclick=()=>open(i,true);
+    b.appendChild(d);
+  });
+  moveToken();
+}
+function moveToken(){
+  const [r,c]=cell(pos), b=$("board").getBoundingClientRect();
+  const cw=(b.width-20-27)/10, ch=(b.height-20-27)/10;
+  $("tk").style.left=(10+(c-1)*(cw+3)+cw/2-11)+"px";
+  $("tk").style.top=(10+(r-1)*(ch+3)+ch/2-11)+"px";
+}
+function winCheck(){
+  if(known.size<TOTALW || winCheck.done) return false;
+  winCheck.done=true;
+  const rank = year<=2?"你當𠲿力，兩年就學透咧！" : year<=3?"三年學透，庄頭个話你攏聽得識。"
+             : "毋使到五年，你就學透咧。";
+  $("opBody").innerHTML=`<h2>恭 喜 通 關</h2>
+    <div class="en" style="color:var(--jade)">${TOTALW} 隻詞，全部學透咧</div>
+    <p>${rank}</p>
+    <p style="margin-top:12px">用咧 <b>${year}</b> 年　·　錢 <b>${money}</b>　人情 <b>${favor}</b>　產業 <b>${owned.length}</b> 項</p>
+    <p style="margin-top:12px;color:var(--red)"><b>這下庄頭个話，你一句都毋會聽毋識。</b><br>
+      逐張卡个灰格仔攏無忒咧 —— 做得慢慢仔讀轉頭看。</p>
+    <div style="display:flex;gap:9px;justify-content:center;margin-top:16px">
+      <button class="btn" id="wAgain">對頭再行</button>
+      <button class="btn g" id="wStay" style="border:1.5px solid var(--line)">留下來行完</button></div>`;
+  $("over").classList.add("on");
+  $("wAgain").onclick=()=>location.reload();
+  $("wStay").onclick=()=>$("over").classList.remove("on");
+  log("<b>詞全部學透咧 —— 通關！</b>");
+  return true;
+}
+function refreshCost(){ const c=cost(); const e=$("costTxt"); if(e) e.textContent=c; }
+function bump(id,v,d){const e=$(id);e.textContent=v;e.classList.remove("up","dn");void e.offsetWidth;e.classList.add(d>0?"up":"dn");}
+function log(h){const d=document.createElement("div");d.className="lg";d.innerHTML=h;
+  $("log").prepend(d); while($("log").children.length>30) $("log").lastChild.remove();}
+function play(w){try{if(audio){audio.pause();audio.src="";}audio=new Audio(VOC[w].u);audio.play().catch(()=>{});}catch(e){}}
+
+/* 該句客語肚真正出現个生詞 */
+function veil(h){
+  let out=h;
+  Object.keys(VOC).filter(w=>w.length>=2&&h.includes(w)&&!known.has(w))
+    .sort((a,b)=>b.length-a.length)
+    .forEach(w=>{ out=out.split(w).join(`<span class="kw blur" data-w="${w}">${"　".repeat(w.length)}</span>`); });
+  return out;
+}
+function inSent(o){
+  const h=o.h||"";
+  const hit=Object.keys(VOC).filter(w=>w.length>=2 && h.includes(w));
+  hit.sort((a,b)=>b.length-a.length);
+  const out=[]; let rest=h;
+  hit.forEach(w=>{ if(rest.includes(w)){ out.push(w); rest=rest.replace(w,""); } });
+  return out.length?out:o.w.filter(w=>h.includes(w));
+}
+function mark(s,just){
+  return s.replace(/【(.+?)】/g,(m,w)=>{
+    if(!VOC[w]) return w;
+    const k=known.has(w);
+    return `<span class="kw ${k?"know":"blur"} ${just===w&&k?"just":""}" data-w="${w}"
+      title="${k?VOC[w].c:"點就學（8 銀）"}">${k?w:"　".repeat(Math.max(1,w.length))}</span>`;
+  });
+}
+/* 人情愈高，庄民愈肯教你 —— 學詞愈便宜 */
+function cost(){ return favor>=75?3 : favor>=45?5 : favor>=20?8 : 13; }
+/* 這張卡（含卡文、物件、選項）用著个詞 */
+function cardWords(i){
+  const s=BOARD[i], set=new Set();
+  (s.body.match(/【(.+?)】/g)||[]).forEach(m=>{const w=m.slice(1,-1); if(VOC[w]) set.add(w);});
+  s.obj.forEach(w=>{ if(VOC[w]) set.add(w); });
+  s.opts.forEach(o=>Object.keys(VOC).forEach(w=>{ if(w.length>=2&&(o.h||"").includes(w)) set.add(w); }));
+  return [...set];
+}
+function learn(w){
+  if(known.has(w)){ play(w); return; }
+  const c=cost();
+  if(money<c){ log(`<b>錢無罅</b>，學一隻詞愛 ${c} 銀。`); return; }
+  money-=c; known.add(w); bump("money",money,-1); bump("wc",known.size,1);
+  const p=known.size/TOTALW*100; $("wbar").style.width=p+"%"; $("wpct").textContent=p.toFixed(0)+"%";
+  play(w); log(`學著 <b>${w}</b>（${VOC[w].c}）　-${c} 銀`);
+  open(pos,true,w); winCheck();
+}
+
+function open(i,peek,just){
+  const s=BOARD[i];
+  const done=chosen[i]!=null;
+  const objHtml=s.obj.length? `<div style="margin-top:9px;font-size:12px;color:var(--dim)">
+     格上物件：${s.obj.map(w=>known.has(w)?`<b style="color:var(--jade)">${w}</b>`:`<span class="kw blur" data-w="${w}">${"　".repeat(w.length)}</span>`).join("、")}</div>`:"";
+  $("mid").innerHTML=`
+    <div class="mtitle"><div class="seal">${s.name[0]}</div><b>${s.name}</b>
+      <small>${s.k}　${s.type}${i!==pos?"　·　淨看":""}</small></div>
+    <div class="body">${mark(s.body,just)}</div>
+    ${i!==pos?'<div class="peek">還吂行到這格 —— 做得先讀、先學詞，總係做毋得揀。</div>':""}
+    ${objHtml}
+    ${prizeHtml(i)}${askHtml(i)}
+    <div class="opts">${s.opts.map((o,j)=>{
+      const om=o.m+4;
+      const lockM=(om<0)&&(money+om<0);
+      const far=(i!==pos);
+      return `<div class="opt ${far?"far":""} ${lockM&&!done&&!far?"lock":""}" data-j="${j}" data-lock="${lockM?1:0}">
+        <div class="tag">${chosen[i]===j?"✓":"ABC"[j]}</div>
+        <div class="txt"><div class="hakline">${veil(o.h||o.t)}</div>
+          <div class="zhline">${o.t}</div>
+          </div>
+        <div class="out">${done?`${om>=0?"+":""}${om} 銀<br>${o.f>=0?"+":""}${o.f} 人情`
+          : far?"還吂行到" : "？"}</div></div>`;
+    }).join("")}</div>
+    <div class="after ${done?"on":""}">${done?`揀了 <b>${"ABC"[chosen[i]]}</b> —— 三條路个後果攏顯出來咧，比比看。`:""}</div>
+    <div class="mbtn">
+      <button class="btn" id="roll" ${peek&&!done&&i===pos?"":""}>擲骰仔</button>
+      <span class="dice" id="dice">–</span>
+      ${owned.includes(i)?"":s.type==="產業"?`<button class="btn g" id="buy">買落來（30 銀，逐年年頭生 32）</button>`:""}
+      ${(()=>{const u=cardWords(i).filter(w=>!known.has(w));
+        return u.length? `<button class="btn g" id="all" style="border-color:var(--gold);color:var(--gold)">
+          一擺全部解開（${u.length} 隻 · ${u.length*cost()} 銀）</button>`:"";})()}
+      ${money<8?`<button class="btn g" id="odd" style="border-color:var(--jade);color:var(--jade)">打零工（+15 銀 · 人情 -5）</button>`:""}
+      <span style="font-size:11.5px;color:var(--dim);margin-left:auto">點灰格仔學詞（${cost()} 銀）</span>
+    </div>`;
+  $("mid").querySelectorAll("[data-w]").forEach(el=>el.onclick=e=>{e.stopPropagation();learn(el.dataset.w);});
+  const gp=$("getPrize");
+  if(gp&&i===pos) gp.onclick=()=>{
+    prize[i].done=true; money+=14; bump("money",money,14);
+    log("庄頭活動中獎　<b>+14 銀</b>"); open(i,true);
+  };
+  const q=quiz[i];
+  if(q&&!q.done&&i===pos) $("mid").querySelectorAll(".ag").forEach(el=>el.onclick=()=>{
+    const a=el.dataset.a;
+    if(a===q.w){ q.done=true; el.classList.add("ok");
+      favor+=10; bump("favor",favor,10); refreshCost();
+      play(q.w); log(`教 <b>${q.f.n}</b>「${q.w}」　人情 <b>+10</b>`);
+      setTimeout(()=>open(i,true),700);
+    }else{ el.classList.add("no");
+      log(`${q.f.n} 聽無 —— 「${q.w}」毋係該个意思，佢行忒咧`);
+      setTimeout(()=>{ quiz[i]=null; open(i,true); },800); }
+  });
+  if(!done && i===pos) $("mid").querySelectorAll(".opt").forEach(el=>el.onclick=()=>{
+    if(el.dataset.lock==="1"){ log("<b>錢無罅</b>，這條路行毋得。"); return; }
+    const j=+el.dataset.j, o=s.opts[j];
+    const blind=(o.h||"").split("").some(()=>false) ||
+      Object.keys(VOC).some(w=>w.length>=2&&(o.h||"").includes(w)&&!known.has(w));
+    chosen[i]=j; const gain=o.m+4;
+    money=Math.max(0,money+gain); favor=Math.max(0,favor+o.f);
+    bump("money",money,o.m); bump("favor",favor,o.f); refreshCost();
+    log(`${s.name}：揀 <b>${"ABC"[j]}</b>　${gain>=0?"+":""}${gain} 銀、${o.f>=0?"+":""}${o.f} 人情${blind?"　<b>（盲揀）</b>":""}`);
+    open(i,true);
+  });
+  const bb=$("buy"); if(bb) bb.onclick=()=>{
+    if(money<30){ log("<b>錢無罅</b>，買毋起。"); return; }
+    money-=30; owned.push(i); bump("money",money,-1);
+    log(`買著 <b>${s.name}</b>　-30 銀　（下年年頭起，逐年生 32）`);
+    buildBoard(); open(i,true);
+  };
+  const ab=$("all"); if(ab) ab.onclick=()=>{
+    const u=cardWords(i).filter(w=>!known.has(w)), c=cost(), need=u.length*c;
+    if(money<need){ log(`<b>錢無罅</b>　全部解開愛 ${need} 銀`); return; }
+    money-=need; u.forEach(w=>known.add(w));
+    bump("money",money,-1); bump("wc",known.size,1);
+    const p=known.size/TOTALW*100; $("wbar").style.width=p+"%"; $("wpct").textContent=p.toFixed(0)+"%";
+    log(`一擺解開 <b>${u.length} 隻詞</b>　-${need} 銀`);
+    open(i,true,u[0]); winCheck();
+  };
+  const ob=$("odd"); if(ob) ob.onclick=()=>{
+    money+=15; favor=Math.max(0,favor-5);
+    bump("money",money,1); bump("favor",favor,-1); refreshCost();
+    log("去打零工　<b>+15 銀</b>、人情 -5");
+    open(i,true);
+  };
+  $("roll").onclick=roll;
+  $("roll").disabled = rolling || (chosen[pos]==null && step>0);
+  buildBoard();
+}
+
+/* ── 天時：一年四季，逐九格一擺 ── */
+function skyCard(cb){
+  const k=SKY[Math.floor(Math.random()*SKY.length)];
+  skyNow=k; incMul=k.eff.inc;
+  if(k.eff.money){ money=Math.max(0,money+k.eff.money); bump("money",money,k.eff.money); }
+  if(k.eff.favor){ favor+=k.eff.favor; bump("favor",favor,k.eff.favor); refreshCost(); }
+  $("skc").innerHTML=`<svg viewBox="0 0 300 180">${k.art}</svg>
+    <div class="skb"><div class="tag">天　時</div><h3>${k.name}</h3>
+      <p>${k.zh}</p><div class="eff">${k.line}</div>
+      <button class="btn" id="skOk" style="margin-top:14px">知咧</button></div>`;
+  $("sky").classList.add("on");
+  log(`天時：<b>${k.name}</b>　${k.line}`);
+  $("skyBox").innerHTML=`<b style="color:#D9A93C;font-family:'Noto Serif TC',serif;font-size:17px">${k.name}</b><br>
+    <span style="font-size:12px">${k.line}</span>`;
+  $("skOk").onclick=()=>{ $("sky").classList.remove("on"); cb&&cb(); };
+}
+
+/* ── 庄民問話：考你學過个詞 ── */
+function makeQuiz(i){
+  const kn=[...known];
+  if(kn.length<4) return null;
+  const w=kn[Math.floor(Math.random()*kn.length)];
+  const pool=Object.keys(VOC).filter(x=>x!==w&&VOC[x].c!==VOC[w].c);
+  const wrong=[];
+  while(wrong.length<2&&pool.length){
+    const p=pool.splice(Math.floor(Math.random()*pool.length),1)[0];
+    if(!wrong.some(y=>VOC[y].c===VOC[p].c)) wrong.push(p);
+  }
+  return {w, f:FOLK[Math.floor(Math.random()*FOLK.length)],
+          opts:[w,...wrong].sort(()=>Math.random()-.5), done:false};
+}
+function prizeHtml(i){
+  const p=prize[i]; if(!p) return "";
+  return `<div class="ask" style="background:rgba(217,169,60,.14);border-color:rgba(217,169,60,.6)">
+    <div class="askh">
+      <svg viewBox="0 0 92 92" style="width:38px;height:38px">
+        <circle cx="46" cy="46" r="44" fill="#D9A93C" opacity=".2"/>
+        <path d="M22 44 h48 v34 h-48Z" fill="#D6483A"/>
+        <path d="M18 32 h56 v13 h-56Z" fill="#E8604E"/>
+        <path d="M42 32 h8 v46 h-8Z" fill="#FFD056"/>
+        <path d="M46 32 q-16 -22 -24 -6 q-2 8 24 6Z" fill="#FFD056"/>
+        <path d="M46 32 q16 -22 24 -6 q2 8 -24 6Z" fill="#FFD056"/></svg>
+      <div><b>庄頭活動</b><br><small>${p.done?"你抽著獎咧！":"抽著獎品 —— 撳下去領"}</small></div>
+      ${p.done?`<div class="rw" style="background:var(--gold);color:#2E2418">錢 +14</div>`:""}</div>
+    ${p.done?"":`<div class="askg"><div class="ag" id="getPrize" style="border-color:var(--gold)">領獎品</div></div>`}</div>`;
+}
+function askHtml(i){
+  const q=quiz[i]; if(!q) return "";
+  return `<div class="ask">
+    <div class="askh">${folkFace(q.f,38)}<div><b>${q.f.n}</b><br>
+      <small>${q.done?"多謝你教𠊎":"這隻詞係麼个意思？講分𠊎聽"}</small></div>
+      ${q.done?`<div class="rw">人情 +10</div>`:""}</div>
+    <div class="askq" style="color:${q.f.c}">${q.w}</div>
+    <div class="askg">${q.opts.map(o=>
+      `<div class="ag ${q.done?(o===q.w?"ok":""):""}" data-a="${o}">${VOC[o].c}</div>`).join("")}</div></div>`;
+}
+
+function roll(){
+  if(rolling) return;
+  if(chosen[pos]==null && step>0){ log("先在這格做決定。"); return; }
+  rolling=true; $("roll").disabled=true; diceSound();
+  const n=1+Math.floor(Math.random()*6);
+  const d=$("dice"); d.textContent=n; d.classList.remove("roll"); void d.offsetWidth; d.classList.add("roll");
+  let left=n;
+  const walk=()=>{
+    pos=(pos+1)%36; step++;
+    if(pos===0){ endYear(); return; }
+    moveToken(); buildBoard(); stepSound();
+    if(--left>0) setTimeout(walk,220);
+    else {
+      rolling=false;
+      if(prize[pos]===undefined) prize[pos]= (Math.random()<.05) ? {done:false} : null;
+      if(quiz[pos]===undefined) quiz[pos]= (!prize[pos] && known.size>=4 && Math.random()<.30) ? makeQuiz(pos) : null;
+      const season=Math.floor(pos/9);
+      if(season!==lastSeason){ lastSeason=season; skyCard(()=>open(pos,true)); }
+      else open(pos,true);
+    }
+  };
+  setTimeout(walk,320);
+}
+
+function endYear(){
+  rolling=false;
+
+  const e=(favor>=70&&money>=100)?["庄頭辦得起義民祭","人對外地轉來，庄頭鬧熱煎煎。你个話同你个錢，攏用在著个所在。"]
+    :(favor>=70)?["庄頭當團結","逐儕都肯㧡手，總係手頭還當緊。"]
+    :(money>=150)?["你發財咧","錢有咧，總係行過庄頭，無人同你打招呼。"]
+    :["庄頭一年比一年冷清","無錢乜無人情。有兜話，你到今還係聽毋識。"];
+  hist.push({y:year,m:money,f:favor,w:known.size,o:owned.length,e:e[0]});
+  const pct=(known.size/TOTALW*100).toFixed(0);
+  const fin = year>=MAXYEAR;
+  if(fin){
+    const grade = known.size>=TOTALW ? "話全部聽得識咧"
+      : known.size>=TOTALW*.9 ? "賰無幾隻詞爾"
+      : known.size>=TOTALW*.7 ? "庄頭个話，你大半聽得識"
+      : known.size>=TOTALW*.45 ? "有兜話還聽毋識" : "你行過五年，話還係生份";
+    $("opBody").innerHTML=`<h2>五年過忒</h2>
+      <div class="en">${grade}</div>
+      <p>識著 <b>${known.size}</b> / ${TOTALW} 隻詞（<b>${pct}%</b>）</p>
+      <div style="margin:14px 0;text-align:left;font-size:12.5px;line-height:2">
+        ${hist.map(h=>`第 ${h.y} 年　${h.e}　·　詞 ${h.w}`).join("<br>")}</div>
+      <p style="color:var(--red)"><b>通關看个係詞，毋係錢。</b><br>
+        錢摎人情逐年歸零，詞留一世人。</p>
+      <button class="btn" id="nx" style="margin-top:16px">對頭再行</button>`;
+    $("over").classList.add("on");
+    $("nx").onclick=()=>location.reload();
+    return;
+  }
+  $("opBody").innerHTML=`<h2>第 ${year} 年　過忒咧</h2>
+    <div class="en">${e[0]}</div><p>${e[1]}</p>
+    <p style="margin-top:14px">錢 <b>${money}</b>　人情 <b>${favor}</b>　產業 <b>${owned.length}</b> 項<br>
+      識著 <b>${known.size}</b> / ${TOTALW} 隻詞（${pct}%）</p>
+    <p style="margin-top:10px;color:var(--red)"><b>詞摎產業留下來，錢摎人情歸零。</b><br>
+      ${owned.length?`下年年頭產業會生 <b>${owned.length*32} 銀</b>。<br>`:""}
+      第 ${year+1} 年共樣个卡，你看得識較多咧。</p>
+    <button class="btn" id="nx" style="margin-top:16px">行第 ${year+1} 年</button>`;
+  $("over").classList.add("on");
+  $("nx").onclick=()=>{
+    const favor0=favor;
+    year++; const inc=Math.round(owned.length*32*incMul);
+    money=190+inc; favor=30; pos=0; step=0; chosen={};
+    if(favor0>=75){
+      const pool=Object.keys(VOC).filter(w=>!known.has(w));
+      for(let g=0;g<3&&pool.length;g++){
+        const w=pool.splice(Math.floor(Math.random()*pool.length),1)[0];
+        known.add(w);
+      }
+      bump("wc",known.size,1);
+      const p=known.size/TOTALW*100; $("wbar").style.width=p+"%"; $("wpct").textContent=p.toFixed(0)+"%";
+      log(`人情厚，庄民白白教你 <b>3 隻詞</b>`);
+      setTimeout(winCheck,400);
+    }
+    if(inc) log(`第 ${year} 年頭　產業收入 <b>+${inc} 銀</b>（${owned.length} 項 × 32 × 天時 ${incMul}）`);
+    else if(owned.length) log(`天時毋好，產業今年無收入。`);
+    lastSeason=-1; quiz={}; prize={}; incMul=1;
+    $("year").textContent=year; $("money").textContent=money; $("favor").textContent=favor;
+    $("step").textContent=0; refreshCost();
+    $("over").classList.remove("on"); open(0,true);
+  };
+}
+const _b=buildBoard;
+buildBoard=function(){ _b(); $("step").textContent=step%36;
+  $("ownList").innerHTML=owned.length?owned.map(i=>`<span class="ow">${BOARD[i].name}</span>`).join("")
+    :'<span style="font-size:12px;color:#8A9AA6">還吂有</span>'; };
+
+addEventListener("resize",moveToken);
+buildBoard(); open(0,true);
+$("mus").onclick=toggleMusic;
+log("第 1 年開始。<b>灰色格仔係你還吂識个詞</b>，點就學得著。");
+</script>
+</body>
+</html>
+
+
