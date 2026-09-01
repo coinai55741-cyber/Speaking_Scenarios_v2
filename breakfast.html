@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>第1課 𠊎好食个東西｜客語生活任務</title>
-  <link rel="stylesheet" href="./breakfast.css?v=20260831-27">
+  <link rel="stylesheet" href="./breakfast.css?v=20260901-14">
 </head>
 <body>
   <main class="game-shell">
@@ -39,7 +39,7 @@
                 <span class="complete-badge" data-complete-badge hidden>已完成</span>
                 <img src="./assets/lesson-card-1-breakfast.png" alt="學生進行早餐圖卡測驗">
                 <span>第1課</span>
-                <strong>早餐圖卡小廚師</strong>
+                <strong>我要吃早餐</strong>
                 <small>看早餐圖卡，選出正確詞語。</small>
               </button>
               <button class="lesson-card is-locked" type="button" data-lesson="2" disabled>
@@ -60,13 +60,18 @@
     </section>
 
     <section id="playScreen" class="screen play-screen" hidden aria-live="polite">
-      <aside class="status-panel">
-        <p class="eyebrow">第 <span id="questionNumber">1</span> 題 / 5</p>
-        <div class="star-row" id="starRow" aria-label="目前星星數"></div>
+      <button id="wordMenuBtn" class="word-menu-button" type="button" aria-controls="statusPanel" aria-expanded="false">單字</button>
+      <div id="wordMenuBackdrop" class="word-menu-backdrop" hidden></div>
+      <aside id="statusPanel" class="status-panel" aria-label="單字選單">
+        <button id="wordMenuCloseBtn" class="word-menu-close" type="button">關閉</button>
         <div class="word-bank" id="wordBank"></div>
       </aside>
 
       <article class="question-panel">
+        <div class="player-progress" aria-label="答題星星">
+          <span>第 <span id="visibleQuestionNumber">1</span> 題 / 5</span>
+          <div class="star-row visible-star-row" id="visibleStarRow"></div>
+        </div>
         <div class="question-head">
           <p id="questionType" class="question-type">看華語選客語</p>
           <h2 id="questionTitle">白飯</h2>
@@ -85,10 +90,10 @@
     </section>
 
     <section id="completeScreen" class="screen complete-screen" hidden>
-      <div class="badge">早餐小達人</div>
-      <h2>通過測驗～</h2>
-      <p>恭喜你完成第1課「𠊎好食个東西」！</p>
-      <div class="result-list">
+      <img class="badge medal-badge" src="./assets/holiday-completion-medal.png" alt="完成測驗獎牌">
+      <h2 id="completeTitle">恭喜你完成第1課「𠊎好食个東西」！</h2>
+      <div id="completeStars" class="complete-stars" aria-label="結算星星"></div>
+      <div id="resultList" class="result-list">
         <span>看懂食物圖片</span>
         <span>選出生詞</span>
         <span>認得拼音</span>
@@ -101,9 +106,24 @@
     </section>
   </main>
 
-  <script src="./breakfast.js?v=20260831-27"></script>
+  <script src="./breakfast.js?v=20260901-14"></script>
 </body>
 </html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>休假日任務｜客語生活任務</title>
-  <link rel="stylesheet" href="./holiday.css?v=20260831-03">
+  <link rel="stylesheet" href="./holiday.css?v=20260901-07">
 </head>
 <body>
   <main class="task-shell">
@@ -27,7 +27,19 @@
       </section>
     </header>
 
-    <section class="mission-layout">
+        <section id="storyIntro" class="story-intro" aria-labelledby="storyTitle">
+      <div class="story-visual">
+        <img src="./assets/holiday-task-1-invite.png" alt="阿明在休假日邀請小達一起打籃球">
+      </div>
+      <div class="story-copy">
+        <h2 id="storyTitle">阿明的休假日開始了</h2>
+        <p>下午，阿明來到公園打籃球。小達抱著球站在旁邊，看起來也想一起玩。</p>
+        <p>先幫阿明開口邀請小達，再陪小達說出他的煩惱。最後看圖說一說，今天發生了什麼事。</p>
+        <button id="storyStartBtn" class="story-start-button" type="button">開始任務</button>
+      </div>
+    </section>
+
+    <section class="mission-layout" hidden>
       <article class="scene-panel">
         <img id="sceneImage" src="./assets/holiday-task-1-invite.png" alt="小達抱著籃球，阿明邀請他一起打籃球">
         <button id="scenePlayBtn" class="scene-play-button" type="button" aria-label="播放音檔">
@@ -117,8 +129,12 @@
     </aside>
   </main>
 
-  <script src="./holiday.js?v=20260831-03"></script>
+  <script src="./holiday.js?v=20260901-07"></script>
 </body>
 </html>
+
+
+
+
 
 

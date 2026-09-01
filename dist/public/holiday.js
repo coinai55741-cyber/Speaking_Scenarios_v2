@@ -196,8 +196,25 @@ const els = {
   asrProviderSelect: document.querySelector("#asrProviderSelect"),
   asrProviderNote: document.querySelector("#asrProviderNote"),
   debugProvider: document.querySelector("#debugProvider"),
-  hitTags: document.querySelector("#hitTags")
+  hitTags: document.querySelector("#hitTags"),
+  storyIntro: document.querySelector("#storyIntro"),
+  storyStartBtn: document.querySelector("#storyStartBtn")
 };
+
+function getFirstLockedStep() {
+  const firstIncomplete = answers.findIndex(answer => !answer.completed);
+  return firstIncomplete === -1 ? tasks.length : firstIncomplete + 1;
+}
+
+function updateStepLocks() {
+  const firstLockedStep = getFirstLockedStep();
+  els.steps.forEach((step, index) => {
+    const isLocked = index > 0 && index >= firstLockedStep;
+    step.disabled = isLocked;
+    step.setAttribute("aria-disabled", String(isLocked));
+    step.classList.toggle("is-locked", isLocked);
+  });
+}
 
 function renderTask() {
   const task = tasks[currentStep];
@@ -217,6 +234,7 @@ function renderTask() {
   resetRecording({ keepSaved: true });
   restoreRecordingPreview(saved);
   els.steps.forEach((step, index) => step.classList.toggle("is-active", index === currentStep));
+  updateStepLocks();
   els.dialects.forEach(button => button.classList.toggle("is-active", button.dataset.dialect === currentDialect));
 
   if (sentence) {
@@ -234,6 +252,7 @@ function renderTask() {
     setAudioButtonState(false);
   }
   updateDeveloperMode();
+  updateStepLocks();
   updateFinishPanel();
   updateProviderUi();
   updateHitStatus(saved.transcript);
@@ -546,9 +565,20 @@ els.dialects.forEach(button => {
 
 els.steps.forEach((button, index) => {
   button.addEventListener("click", () => {
+    if (button.disabled || button.classList.contains("is-locked")) return;
     currentStep = index;
     renderTask();
   });
+});
+
+els.storyStartBtn?.addEventListener("click", () => {
+  els.storyIntro.classList.add("is-leaving");
+  window.setTimeout(() => {
+    els.storyIntro.hidden = true;
+    els.missionLayout.hidden = false;
+    els.missionLayout.classList.add("is-entering");
+    renderTask();
+  }, 520);
 });
 
 els.debugToggle.addEventListener("change", event => {
@@ -608,6 +638,7 @@ els.retryBtn.addEventListener("click", () => {
   if (els.answerInput) els.answerInput.value = "";
   els.asrStatus.textContent = "尚未送出";
   els.missCount.textContent = "0";
+  updateStepLocks();
   updateFinishPanel();
 });
 
@@ -626,10 +657,11 @@ els.checkBtn.addEventListener("click", () => {
     needsPractice: needsMorePractice(answer || "")
   });
   updateDeveloperMode();
+  updateStepLocks();
   updateFinishPanel();
 });
 
+els.missionLayout.hidden = true;
 renderTask();
-
 
 

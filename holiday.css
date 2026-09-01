@@ -653,3 +653,136 @@ textarea {
   font-weight: 900;
   cursor: pointer;
 }
+
+/* Story intro before task flow */
+.story-intro {
+  display: grid;
+  grid-template-columns: minmax(360px, 0.95fr) minmax(0, 1.05fr);
+  gap: 0;
+  align-items: stretch;
+  border: 2px solid var(--line);
+  border-radius: 18px;
+  background: var(--paper);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+  animation: storyIntroIn 0.48s ease both;
+}
+
+.story-intro.is-leaving {
+  animation: storyIntroOut 0.52s ease both;
+}
+
+.story-visual {
+  display: grid;
+  place-items: center;
+  min-height: 520px;
+  padding: 54px 28px;
+  border-right: 0px solid rgba(228, 210, 171, 0.9);
+}
+
+.story-visual img {
+  display: block;
+  width: 100%;
+  max-height: 440px;
+  object-fit: contain;
+  mix-blend-mode: multiply;
+}
+
+.story-copy {
+  display: grid;
+  align-content: center;
+  justify-items: start;
+  min-height: 520px;
+  padding: 44px 48px;
+}
+
+.story-kicker {
+  margin-bottom: 10px;
+  color: #08724e;
+  font-size: 15px;
+  font-weight: 900;
+}
+
+.story-copy h2 {
+  margin-bottom: 16px;
+  font-size: 38px;
+  line-height: 1.18;
+}
+
+.story-copy p:not(.story-kicker) {
+  max-width: 520px;
+  color: var(--muted);
+  font-size: 19px;
+  font-weight: 800;
+  line-height: 1.75;
+}
+
+.story-start-button {
+  min-height: 50px;
+  margin-top: 12px;
+  padding: 0 28px;
+  border: 2px solid var(--green);
+  border-radius: 999px;
+  color: #fff;
+  background: var(--green);
+  font: inherit;
+  font-weight: 900;
+  cursor: pointer;
+  box-shadow: 0 12px 24px rgba(47, 148, 111, 0.22);
+}
+
+.mission-layout.is-entering {
+  animation: missionEnter 0.58s ease both;
+}
+
+@keyframes storyIntroIn {
+  from { opacity: 0; transform: translateY(18px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes storyIntroOut {
+  from { opacity: 1; transform: translateY(0) scale(1); }
+  to { opacity: 0; transform: translateY(-18px) scale(0.985); }
+}
+
+@keyframes missionEnter {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 900px) {
+  .story-intro {
+    grid-template-columns: 1fr;
+  }
+
+  .story-visual {
+    min-height: 320px;
+    border-right: 0;
+    border-bottom: 0px solid rgba(228, 210, 171, 0.9);
+  }
+
+  .story-copy {
+    min-height: 0;
+    padding: 32px 24px 38px;
+  }
+
+  .story-copy h2 {
+    font-size: 30px;
+  }
+}
+
+/* Ordered task unlocks */
+.step:disabled,
+.step.is-locked {
+  color: #8d9aa3;
+  background: #eef1ee;
+  border-color: rgba(30, 49, 91, 0.12);
+  cursor: not-allowed;
+  opacity: 0.68;
+}
+
+.step:disabled.is-active,
+.step.is-locked.is-active {
+  color: #8d9aa3;
+  background: #eef1ee;
+}

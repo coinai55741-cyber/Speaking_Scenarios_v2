@@ -9,17 +9,27 @@ const foods = [
 ];
 
 const questions = [
-  { type: "看圖選拼音", title: "這係麼个？", prompt: "請選出它的拼音。", answer: "飯", field: "hakka", food: "飯", hint: "白白一碗，吃飯時常看到。" },
-  { type: "看圖選拼音", title: "這係麼个？", prompt: "請選出它的拼音。", answer: "卵包", field: "hakka", food: "卵包", hint: "和雞蛋有關，客語裡會看到「卵」。" },
-  { type: "看圖選拼音", title: "這係麼个？", prompt: "請選出它的拼音。", answer: "loˇ ped banˋ", field: "pinyin", food: "蘿蔔粄", hint: "這個詞有三段音。" },
-  { type: "看圖選拼音", title: "這係麼个？", prompt: "請選出它的拼音。", answer: "豆乳", field: "hakka", food: "豆乳", hint: "是用豆做的飲品。" },
-  { type: "綜合挑戰", title: "今晡日阿公好食麼个？", prompt: "𠊎好食mien bauˊ，也愛啉ngiuˇ nen。", answer: ["麵包", "牛乳"], field: "hakka", choiceMode: "image", image: "./assets/lesson-1-question-grandpa-breakfast.png", alt: "阿公和小孩在早餐情境中思考吃什麼", hint: "再試試看！" }
+  { type: "看圖選拼音", title: "這係麼个？", prompt: "請看拼音，選出正確的早餐圖卡。", answer: "飯", field: "hakka", food: "飯", hint: "再看看拼音 fan。", playMode: "scene" },
+  { type: "看圖選拼音", title: "這係麼个？", prompt: "請看拼音，選出正確的早餐圖卡。", answer: "卵包", field: "hakka", food: "卵包", hint: "再看看拼音 lonˋ bauˊ。", playMode: "scene" },
+  { type: "看圖選拼音", title: "這係麼个？", prompt: "請看拼音，選出正確的早餐圖卡。", answer: "蘿蔔粄", field: "hakka", food: "蘿蔔粄", hint: "再看看拼音 loˇ ped banˋ。", playMode: "scene" },
+  { type: "看圖選拼音", title: "這係麼个？", prompt: "請看拼音，選出正確的早餐圖卡。", answer: "豆乳", field: "hakka", food: "豆乳", hint: "再看看拼音 teu nen。", playMode: "scene" },
+  { type: "綜合挑戰", title: "今晡日阿公好食麼个？", prompt: "阿公：「𠊎好食mien bauˊ，也愛啉ngiuˇ nen。」", answer: ["麵包", "牛乳"], field: "hakka", choiceMode: "image", image: "./assets/lesson-1-question-grandpa-breakfast.png", alt: "阿公和小孩在早餐情境中思考吃什麼", hint: "再試試看！" }
 ];
 
 let currentIndex = 0;
 let earnedStars = 0;
+let earnedQuestions = new Set();
+let missedQuestions = new Set();
 let selectedAnswers = [];
 let selectedDialect = "";
+let buttonSoundEnabled = false;
+const soundEffects = {
+  click: new Audio("./assets/music/S2_m1_click.mp3"),
+  correct: new Audio("./assets/music/S2_m1_next.mp3"),
+  wrong: new Audio("./assets/music/S2_m1_false.mp3"),
+  complete: new Audio("./assets/music/S2_m1_correct.mp3")
+};
+Object.values(soundEffects).forEach(audio => { audio.preload = "auto"; });
 
 
 let completedLessons = new Set(JSON.parse(localStorage.getItem("breakfastCompletedLessons") || "[]"));
@@ -33,8 +43,17 @@ const els = {
   
   completeBadges: [...document.querySelectorAll("[data-complete-badge]")],
 questionNumber: document.querySelector("#questionNumber"),
+  visibleQuestionNumber: document.querySelector("#visibleQuestionNumber"),
   starRow: document.querySelector("#starRow"),
+  visibleStarRow: document.querySelector("#visibleStarRow"),
+  completeTitle: document.querySelector("#completeTitle"),
+  completeStars: document.querySelector("#completeStars"),
+  resultList: document.querySelector("#resultList"),
   wordBank: document.querySelector("#wordBank"),
+  statusPanel: document.querySelector("#statusPanel"),
+  wordMenuBtn: document.querySelector("#wordMenuBtn"),
+  wordMenuCloseBtn: document.querySelector("#wordMenuCloseBtn"),
+  wordMenuBackdrop: document.querySelector("#wordMenuBackdrop"),
   questionType: document.querySelector("#questionType"),
   questionTitle: document.querySelector("#questionTitle"),
   questionPrompt: document.querySelector("#questionPrompt"),
@@ -98,27 +117,75 @@ function updateLessonCards() {
   updateCarouselButtons();
 }
 
+function playSound(name = "click") {
+  if (!buttonSoundEnabled) return;
+  const audio = soundEffects[name] || soundEffects.click;
+  audio.currentTime = 0;
+  audio.play().catch(() => {});
+}
+
+function playButtonSound() {
+  playSound("click");
+}
+
 function startLesson(lesson) {
   if (lesson !== "1" || selectedDialect !== "sixian") return;
+  buttonSoundEnabled = true;
+  playButtonSound();
   currentIndex = 0;
   earnedStars = 0;
+  earnedQuestions = new Set();
+  missedQuestions = new Set();
   renderQuestion();
   showScreen("play");
 }
 
+
+function setWordMenuOpen(isOpen) {
+  els.playScreen.classList.toggle("is-word-menu-open", isOpen);
+  if (els.wordMenuBackdrop) els.wordMenuBackdrop.hidden = !isOpen;
+  if (els.wordMenuBtn) els.wordMenuBtn.setAttribute("aria-expanded", String(isOpen));
+}
 function showScreen(name) {
   els.introScreen.hidden = name !== "intro";
   els.playScreen.hidden = name !== "play";
   els.completeScreen.hidden = name !== "complete";
 }
 
-function renderStars() {
-  els.starRow.innerHTML = "";
+function awardCurrentQuestionStar() {
+  if (missedQuestions.has(currentIndex)) return;
+  earnedQuestions.add(currentIndex);
+  earnedStars = earnedQuestions.size;
+}
+
+function markCurrentQuestionMissed() {
+  missedQuestions.add(currentIndex);
+}
+
+function renderCompleteResult() {
+  const score = earnedQuestions.size;
+  els.completeStars.innerHTML = "";
   questions.forEach((_, index) => {
     const star = document.createElement("span");
-    star.className = `star${index < earnedStars ? " is-earned" : ""}`;
+    star.className = `star${earnedQuestions.has(index) ? " is-earned" : ""}`;
     star.textContent = "★";
-    els.starRow.appendChild(star);
+    els.completeStars.appendChild(star);
+  });
+
+  els.completeTitle.textContent = score === questions.length
+    ? "恭喜你完成第1課「𠊎好食个東西」！"
+    : `完成第1課！你拿到 ${score} 顆星，可繼續挑戰滿星喔！`;
+  els.resultList.hidden = score < questions.length;
+}
+function renderStars() {
+  [els.starRow, els.visibleStarRow].filter(Boolean).forEach(row => {
+    row.innerHTML = "";
+    questions.forEach((_, index) => {
+      const star = document.createElement("span");
+      star.className = `star${earnedQuestions.has(index) ? " is-earned" : ""}`;
+      star.textContent = "★";
+      row.appendChild(star);
+    });
   });
 }
 
@@ -144,7 +211,37 @@ function getChoices(question) {
     .sort((a, b) => a.label.localeCompare(b.label, "zh-Hant"));
 }
 
+function getQuestionFood(question) {
+  return findFood(question.food || question.answer);
+}
+
+function renderSceneStage(question, selectedChoice = null) {
+  const targetFood = getQuestionFood(question);
+  const systemText = targetFood?.pinyin || question.answer;
+  const selectedImage = selectedChoice?.image
+    ? `<img class="plate-choice-image" src="${selectedChoice.image}" alt="${selectedChoice.alt || "已選圖卡"}">`
+    : `<span class="plate-placeholder">?</span>`;
+
+  els.imageStage.innerHTML = `
+    <div class="breakfast-scene">
+      <img class="scene-bg" src="./assets/lesson-1-breakfast-game-scene.png" alt="早餐廚房情境">
+      <div class="scene-question">${question.title}</div>
+      <div class="plate-answer" aria-label="盤子答題區">${selectedImage}</div>
+      <div class="plate-system-text">${systemText}</div>
+    </div>
+  `;
+}
+
+function renderChoiceCard(choice) {
+  return `<img src="${choice.image}" alt="${choice.alt || choice.label}">`;
+}
+
 function renderQuestionImage(question) {
+  if (question.playMode === "scene") {
+    renderSceneStage(question);
+    return;
+  }
+
   if (question.image) {
     els.imageStage.innerHTML = `<img src="${question.image}" alt="${question.alt || "題目圖片"}">`;
     return;
@@ -159,10 +256,12 @@ function renderQuestionImage(question) {
 function renderQuestion() {
   const question = questions[currentIndex];
   selectedAnswers = [];
-  els.questionNumber.textContent = String(currentIndex + 1);
+  if (els.questionNumber) els.questionNumber.textContent = String(currentIndex + 1);
+  if (els.visibleQuestionNumber) els.visibleQuestionNumber.textContent = String(currentIndex + 1);
   els.questionType.textContent = question.type;
   els.questionTitle.textContent = question.title;
   els.questionPrompt.textContent = question.prompt;
+  els.playScreen.classList.toggle("is-scene-question", question.playMode === "scene");
   els.feedback.hidden = true;
   els.feedback.textContent = "";
   els.nextBtn.disabled = true;
@@ -173,13 +272,14 @@ function renderQuestion() {
 
   els.choiceGrid.innerHTML = "";
   els.choiceGrid.classList.toggle("is-image-grid", question.choiceMode === "image");
+  els.choiceGrid.classList.toggle("scene-choice-grid", question.playMode === "scene");
   getChoices(question).forEach(choice => {
     const button = document.createElement("button");
-    button.className = question.choiceMode === "image" ? "choice-button image-choice" : "choice-button";
+    button.className = question.choiceMode === "image" || question.playMode === "scene" ? "choice-button image-choice" : "choice-button";
     button.type = "button";
     button.dataset.value = choice.value;
-    button.innerHTML = question.choiceMode === "image"
-      ? `<img src="${choice.image}" alt="${choice.alt}">`
+    button.innerHTML = question.choiceMode === "image" || question.playMode === "scene"
+      ? renderChoiceCard(choice)
       : `<strong>${choice.pinyin || choice.label}</strong>`;
     button.addEventListener("click", () => chooseAnswer(button));
     els.choiceGrid.appendChild(button);
@@ -196,7 +296,16 @@ function chooseAnswer(button) {
     selectedAnswers = buttons
       .filter(item => item.classList.contains("is-correct"))
       .map(item => item.dataset.value);
+    const hasWrongPick = selectedAnswers.some(answer => !question.answer.includes(answer)) || selectedAnswers.length > question.answer.length;
     const pass = question.answer.every(answer => selectedAnswers.includes(answer)) && selectedAnswers.length === question.answer.length;
+    if (pass) {
+      awardCurrentQuestionStar();
+      renderStars();
+      playSound("correct");
+    } else if (hasWrongPick) {
+      markCurrentQuestionMissed();
+      playSound("wrong");
+    }
     els.feedback.hidden = false;
     els.feedback.textContent = pass ? "答對了！這兩樣就是句子裡的食物。" : question.hint;
     els.nextBtn.disabled = !pass;
@@ -204,29 +313,51 @@ function chooseAnswer(button) {
   }
 
   buttons.forEach(item => {
-    item.disabled = true;
-    item.classList.remove("is-correct", "is-wrong");
+    item.classList.remove("is-correct", "is-wrong", "is-shaking", "is-locked");
+    item.disabled = false;
   });
 
-  const pass = value === question.answer;
-  button.classList.add(pass ? "is-correct" : "is-wrong");
-  els.feedback.hidden = false;
-  els.feedback.textContent = pass ? "答對了！得到一顆星星。" : question.hint;
-  els.nextBtn.disabled = !pass;
-}
+  const selectedChoice = getChoices(question).find(choice => choice.value === value);
+  if (question.playMode === "scene") {
+    renderSceneStage(question, selectedChoice);
+  }
 
+  const pass = value === question.answer;
+  if (pass) {
+    button.classList.add("is-correct", "is-locked");
+    awardCurrentQuestionStar();
+    renderStars();
+    buttons.forEach(item => { item.disabled = true; });
+    els.feedback.hidden = false;
+    els.feedback.textContent = "答對了！得到一顆星星。";
+    playSound("correct");
+    els.nextBtn.disabled = false;
+    return;
+  }
+
+  button.classList.add("is-wrong", "is-shaking");
+  markCurrentQuestionMissed();
+  playSound("wrong");
+  els.feedback.hidden = false;
+  els.feedback.textContent = question.hint;
+  els.nextBtn.disabled = true;
+  window.setTimeout(() => {
+    button.classList.remove("is-wrong", "is-shaking");
+    button.disabled = false;
+  }, 500);
+}
 function retryQuestion() {
   renderQuestion();
 }
 
 function nextQuestion() {
-  earnedStars = Math.max(earnedStars, currentIndex + 1);
   if (currentIndex >= questions.length - 1) {
     
+    playSound("complete");
     completedLessons.add("1");
     localStorage.setItem("breakfastCompletedLessons", JSON.stringify([...completedLessons]));
     updateLessonCards();
-renderStars();
+    renderCompleteResult();
     showScreen("complete");
     return;
   }
@@ -237,6 +368,8 @@ renderStars();
 function restartGame() {
   currentIndex = 0;
   earnedStars = 0;
+  earnedQuestions = new Set();
+  missedQuestions = new Set();
   selectedDialect = "";
   updateLessonCards();
   showScreen("intro");
@@ -262,13 +395,36 @@ els.lessonCarousel.addEventListener("pointerup", endLessonDrag);
 els.lessonCarousel.addEventListener("pointerleave", endLessonDrag);
 els.lessonCarousel.addEventListener("pointercancel", endLessonDrag);
 window.addEventListener("resize", updateCarouselButtons);
+els.wordMenuBtn?.addEventListener("click", () => setWordMenuOpen(true));
+els.wordMenuCloseBtn?.addEventListener("click", () => setWordMenuOpen(false));
+els.wordMenuBackdrop?.addEventListener("click", () => setWordMenuOpen(false));
 els.retryBtn.addEventListener("click", retryQuestion);
 els.nextBtn.addEventListener("click", nextQuestion);
 els.againBtn.addEventListener("click", restartGame);
+document.addEventListener("click", event => {
+  const control = event.target.closest("button, .primary-link");
+  if (!control || control.disabled || control.getAttribute("aria-disabled") === "true") return;
+  if (control.matches(".choice-button, .lesson-card, #nextBtn")) return;
+  playButtonSound();
+});
 
 updateLessonCards();
 updateCarouselButtons();
 showScreen("intro");
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
