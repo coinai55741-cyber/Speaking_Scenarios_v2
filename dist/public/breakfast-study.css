@@ -1,0 +1,123 @@
+.study-screen {
+  padding: 28px;
+}
+
+.study-topbar {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 18px;
+  padding-bottom: 18px;
+  border-bottom: 2px solid rgba(228, 210, 171, 0.72);
+}
+
+.study-heading h2 {
+  margin: 2px 0 0;
+  font-size: clamp(28px, 5vw, 42px);
+  line-height: 1.1;
+}
+
+.study-hero {
+  display: grid;
+  grid-template-columns: minmax(220px, 0.88fr) minmax(220px, 1fr);
+  align-items: center;
+  gap: 24px;
+  padding: 22px 0 20px;
+}
+
+.study-hero img {
+  width: 100%;
+  max-height: 240px;
+  object-fit: cover;
+  border-radius: 14px;
+  mix-blend-mode: multiply;
+}
+
+.study-hero p {
+  max-width: 460px;
+  color: var(--muted);
+  font-size: clamp(18px, 2.4vw, 24px);
+  font-weight: 900;
+  line-height: 1.55;
+}
+
+.vocab-card-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.vocab-card {
+  position: relative;
+  display: grid;
+  min-height: 190px;
+  padding: 14px;
+  border: 2px solid rgba(30, 49, 91, 0.14);
+  border-radius: 14px;
+  color: var(--ink);
+  background: #fff;
+  cursor: pointer;
+  overflow: hidden;
+}
+
+.vocab-card-front,
+.vocab-card-back {
+  grid-area: 1 / 1;
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: 8px;
+  transition: opacity 0.18s ease, transform 0.18s ease;
+}
+
+.vocab-card img {
+  width: 100%;
+  max-width: 138px;
+  aspect-ratio: 1 / 1;
+  object-fit: contain;
+}
+
+.vocab-card strong {
+  font-size: clamp(20px, 2.6vw, 28px);
+  line-height: 1.15;
+}
+
+.vocab-card small {
+  color: var(--muted);
+  font-size: 15px;
+  font-weight: 900;
+  line-height: 1.25;
+}
+
+.vocab-card-back {
+  opacity: 0;
+  transform: translateY(8px);
+}
+
+.vocab-card.is-flipped {
+  border-color: var(--green);
+  background: #f2fbf5;
+}
+
+.vocab-card.is-flipped .vocab-card-front {
+  opacity: 0;
+  transform: translateY(-8px);
+}
+
+.vocab-card.is-flipped .vocab-card-back {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+@media (max-width: 900px) {
+  .study-screen { padding: 32px 24px; }
+  .study-topbar,
+  .study-hero { grid-template-columns: 1fr; }
+  .study-topbar { align-items: start; }
+  .vocab-card-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 460px) {
+  .vocab-card-grid { grid-template-columns: 1fr; }
+  .vocab-card { min-height: 168px; }
+}

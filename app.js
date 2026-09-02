@@ -25,7 +25,7 @@ const scenarios = [
   },
   {
     id: "scene-game-1-2",
-    title: "屋下在哪",
+    title: "你家在哪",
     artClass: "art-home",
     image: "./assets/scene-game-1-2/intro-school-friends.png",
     description: "放學後大家討論要去誰家玩，聽一聽、問一問，完成客語交通與住家情境任務。",
