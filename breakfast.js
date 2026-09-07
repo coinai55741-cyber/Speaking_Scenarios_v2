@@ -136,7 +136,37 @@ function recognizedFoodCards(text) {
     .map(cleanSpeechText)
     .some(variant => source.includes(variant)));
 }
+function developerDialectLabel(provider = breakfastSpeechProvider()) {
+  return provider === "mandarin" ? "華語" : (selectedDialect || "四縣腔");
+}
 
+function answerPairLabel(food, provider = breakfastSpeechProvider()) {
+  if (!food) return "";
+  return provider === "mandarin"
+    ? `${food.chinese}；${food.hakka}`
+    : `${food.hakka}；${food.chinese}`;
+}
+
+function answerDisplayLabel(answer, provider = breakfastSpeechProvider()) {
+  const food = findFood(answer);
+  if (!food) return answer;
+  return provider === "mandarin" ? food.chinese : food.hakka;
+}
+
+function answerSupportLabel(answer, provider = breakfastSpeechProvider()) {
+  const food = findFood(answer);
+  if (!food) return "";
+  const paired = provider === "mandarin" ? food.hakka : food.chinese;
+  return `${paired}｜${food.pinyin}`;
+}
+
+function answerMainLine(answerList, provider = breakfastSpeechProvider()) {
+  return answerList.map(answer => answerDisplayLabel(answer, provider)).join("、");
+}
+
+function answerSupportLine(answerList, provider = breakfastSpeechProvider()) {
+  return answerList.map(answer => answerSupportLabel(answer, provider)).filter(Boolean).join(" / ");
+}
 function renderDeveloperPanel() {
   if (!els.developerPanel || !els.developerContent) return;
   if (els.debugToggle) els.debugToggle.checked = debugMode;
@@ -149,26 +179,23 @@ function renderDeveloperPanel() {
   const answerList = acceptedAnswers(question);
   const details = speechHitDetails(recognizedSpeechText, question);
   const hitCount = details.filter(item => item.hit).length;
-  const hitTags = details.map(item => `<span class="${item.hit ? "is-hit" : ""}">${escapeHtml(item.answer)}</span>`).join("");
+  const speechProvider = breakfastSpeechProvider();
+  const hitTags = details.map(item => `<span class="${item.hit ? "is-hit" : ""}">${escapeHtml(answerDisplayLabel(item.answer, speechProvider))}</span>`).join("");
   const convertedCards = recognizedFoodCards(recognizedSpeechText);
   const convertedTags = convertedCards.length
-    ? convertedCards.map(food => `<span class="is-hit">${escapeHtml(food.hakka)}</span>`).join("")
+    ? convertedCards.map(food => `<span class="is-hit">${escapeHtml(speechProvider === "mandarin" ? food.chinese : food.hakka)}</span>`).join("")
     : `<span>尚未填入</span>`;
-  const answerLine = answerList.map(answer => {
-    const food = findFood(answer);
-    return food ? `${food.hakka}（${food.pinyin}）` : answer;
-  }).join(" / ");
+  const answerLine = answerMainLine(answerList, speechProvider);
+  const answerSubline = answerSupportLine(answerList, speechProvider);
   const rawPayload = lastRecognitionPayload ? JSON.stringify(lastRecognitionPayload, null, 2) : "尚無回傳資料";
   const statusText = recognitionError || (isSpeechRecognizing ? "辨識中" : (recognizedSpeechText ? "已回傳辨識資料" : "尚未送出"));
   const recognitionMode = breakfastRecognitionMode();
-  const speechProvider = breakfastSpeechProvider();
-
   els.developerContent.innerHTML = `
     <div class="developer-item target-sentence">
       <span class="developer-label">正確答案</span>
-      <span class="sentence-label">${escapeHtml(selectedDialect || "四縣腔")}</span>
+      <span class="sentence-label">${escapeHtml(developerDialectLabel(speechProvider))}</span>
       <strong>${escapeHtml(answerLine || "尚無正確答案")}</strong>
-      <small>${escapeHtml(els.questionPrompt?.textContent || question.prompt || "")}</small>
+      <small>${escapeHtml(answerSubline || els.questionPrompt?.textContent || question.prompt || "")}</small>
     </div>
     <div class="developer-item">
       <span class="developer-label">標準 ASR</span>
@@ -839,6 +866,9 @@ updateLessonCards();
 updateCarouselButtons();
 showScreen("intro");
 renderDeveloperPanel();
+
+
+
 
 
 
