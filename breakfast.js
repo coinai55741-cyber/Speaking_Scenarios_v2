@@ -23,10 +23,16 @@ let activeQuestions = questions;
 
 const BREAKFAST_ASR_ENDPOINT = window.SPEECH_API?.endpoint() || "http://localhost:5000/api/speech/recognize";
 const BREAKFAST_RECOGNITION_MODE_KEY = "speakingDemoRecognitionMode";
+const BREAKFAST_PROVIDER_KEY = "breakfastSpeechProvider";
 
 function breakfastRecognitionMode() {
   const value = localStorage.getItem(BREAKFAST_RECOGNITION_MODE_KEY) || "file";
   return value === "realtime" ? "realtime" : "file";
+}
+
+function breakfastSpeechProvider() {
+  const value = localStorage.getItem(BREAKFAST_PROVIDER_KEY) || "hakka";
+  return value === "mandarin" ? "mandarin" : "hakka";
 }
 let currentIndex = 0;
 let earnedStars = 0;
@@ -105,8 +111,9 @@ function escapeHtml(value) {
   }[char]));
 }
 
-function currentProviderLabel() {
-  return selectedDialect === "sixian" ? "客委會 API（四縣腔）" : "尚未選擇";
+function currentProviderLabel(provider = breakfastSpeechProvider()) {
+  if (provider === "mandarin") return "華語本機辨識";
+  return selectedDialect === "sixian" ? "客委會 API（四縣腔）" : "客委會 API（客語）";
 }
 
 function recognitionModeLabel(mode = breakfastRecognitionMode()) {
@@ -133,9 +140,10 @@ function recognizedFoodCards(text) {
 function renderDeveloperPanel() {
   if (!els.developerPanel || !els.developerContent) return;
   if (els.debugToggle) els.debugToggle.checked = debugMode;
-  els.developerPanel.hidden = !debugMode;
-  document.body.classList.toggle("debug-mode", debugMode);
-  if (!debugMode) return;
+  const canShowDeveloperPanel = debugMode && !els.playScreen.hidden;
+  els.developerPanel.hidden = !canShowDeveloperPanel;
+  document.body.classList.toggle("debug-mode", canShowDeveloperPanel);
+  if (!canShowDeveloperPanel) return;
 
   const question = activeQuestions[currentIndex] || activeQuestions[0] || questions[0];
   const answerList = acceptedAnswers(question);
@@ -153,6 +161,7 @@ function renderDeveloperPanel() {
   const rawPayload = lastRecognitionPayload ? JSON.stringify(lastRecognitionPayload, null, 2) : "尚無回傳資料";
   const statusText = recognitionError || (isSpeechRecognizing ? "辨識中" : (recognizedSpeechText ? "已回傳辨識資料" : "尚未送出"));
   const recognitionMode = breakfastRecognitionMode();
+  const speechProvider = breakfastSpeechProvider();
 
   els.developerContent.innerHTML = `
     <div class="developer-item target-sentence">
@@ -187,10 +196,11 @@ function renderDeveloperPanel() {
     </div>
     <div class="developer-item">
       <span class="developer-label">辨識 API</span>
-      <select id="developerProviderSelect" disabled>
-        <option selected>${escapeHtml(currentProviderLabel())}</option>
+      <select id="developerProviderSelect">
+        <option value="hakka" ${speechProvider === "hakka" ? "selected" : ""}>客委會 API（四縣腔）</option>
+        <option value="mandarin" ${speechProvider === "mandarin" ? "selected" : ""}>華語本機辨識</option>
       </select>
-      <p class="developer-subnote">目前可用：${escapeHtml(currentProviderLabel())} / ${escapeHtml(BREAKFAST_ASR_ENDPOINT)}</p>
+      <p class="developer-subnote">目前可用：${escapeHtml(currentProviderLabel(speechProvider))} / ${escapeHtml(BREAKFAST_ASR_ENDPOINT)}</p>
     </div>
     <div class="developer-item">
       <span class="developer-label">辨識模式</span>
@@ -211,6 +221,11 @@ function renderDeveloperPanel() {
     recognitionError = "";
     lastRecognitionPayload = recognizedSpeechText ? { text: recognizedSpeechText, source: "developer" } : null;
     handleSpeechAnswer(recognizedSpeechText, question, { silent: true });
+    renderDeveloperPanel();
+  });
+
+  els.developerContent.querySelector("#developerProviderSelect")?.addEventListener("change", event => {
+    localStorage.setItem(BREAKFAST_PROVIDER_KEY, event.target.value === "mandarin" ? "mandarin" : "hakka");
     renderDeveloperPanel();
   });
 
@@ -322,6 +337,10 @@ function showScreen(name) {
   els.introScreen.hidden = name !== "intro";
   els.playScreen.hidden = name !== "play";
   els.completeScreen.hidden = name !== "complete";
+  document.body.classList.toggle("screen-intro", name === "intro");
+  document.body.classList.toggle("screen-play", name === "play");
+  document.body.classList.toggle("screen-complete", name === "complete");
+  renderDeveloperPanel();
 }
 
 function awardCurrentQuestionStar() {
@@ -524,11 +543,15 @@ async function recognizeBreakfastSpeech(blob) {
   try {
     const formData = new FormData();
     formData.append("audio", blob, "breakfast.webm");
+    const speechProvider = breakfastSpeechProvider();
+    const providerConfig = speechProvider === "mandarin"
+      ? window.SPEECH_API?.providers?.mandarinLocal
+      : window.SPEECH_API?.providers?.hakkaApi;
     formData.append("dialect", selectedDialect || "sixian");
-    formData.append("recognizer", `hakka-${selectedDialect || "sixian"}`);
-    formData.append("provider", "hakka_api");
-    formData.append("provider_id", "hakka_api_hak");
-    formData.append("language", "hak");
+    formData.append("recognizer", speechProvider === "mandarin" ? "mandarin" : `hakka-${selectedDialect || "sixian"}`);
+    formData.append("provider", providerConfig?.provider || (speechProvider === "mandarin" ? "taiwan_tongues" : "hakka_api"));
+    formData.append("provider_id", providerConfig?.id || (speechProvider === "mandarin" ? "taiwan_tongues_zh" : "hakka_api_hak"));
+    formData.append("language", providerConfig?.language || (speechProvider === "mandarin" ? "zh" : "hak"));
     formData.append("scene_id", "breakfast");
     formData.append("recognition_mode", breakfastRecognitionMode());
     const response = await fetch(BREAKFAST_ASR_ENDPOINT, { method: "POST", body: formData });
@@ -546,10 +569,10 @@ async function recognizeBreakfastSpeech(blob) {
     const raw = await response.json();
     lastRecognitionPayload = raw;
     const result = window.SPEECH_API?.normalizeResponse(raw, {
-      provider: "hakka_api",
-      provider_id: "hakka_api_hak",
+      provider: providerConfig?.provider || (speechProvider === "mandarin" ? "taiwan_tongues" : "hakka_api"),
+      provider_id: providerConfig?.id || (speechProvider === "mandarin" ? "taiwan_tongues_zh" : "hakka_api_hak"),
       dialect: selectedDialect || "sixian",
-      recognizer: `hakka-${selectedDialect || "sixian"}`,
+      recognizer: speechProvider === "mandarin" ? "mandarin" : `hakka-${selectedDialect || "sixian"}`,
       scene_id: "breakfast"
     }) || raw;
     recognizedSpeechText = result.text || "";
@@ -816,6 +839,10 @@ updateLessonCards();
 updateCarouselButtons();
 showScreen("intro");
 renderDeveloperPanel();
+
+
+
+
 
 
 

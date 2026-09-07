@@ -1209,3 +1209,9 @@ body.debug-mode .game-shell {
 }
 
 
+
+body.screen-intro .mode-toggle,
+body.screen-complete .mode-toggle {
+  display: none;
+}
+
