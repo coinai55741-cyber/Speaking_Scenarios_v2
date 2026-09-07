@@ -16,6 +16,18 @@ const questions = [
   { type: "綜合挑戰", title: "今晡日阿公好食麼个？", prompt: "阿公：「𠊎好食mien bauˊ，也愛啉ngiuˇ nen。」", answer: ["麵包", "牛乳"], field: "hakka", choiceMode: "image", image: "./assets/lesson-1-question-grandpa-breakfast.png", alt: "阿公和小孩在早餐情境中思考吃什麼", hint: "再試試看！" }
 ];
 
+const LESSON_QUESTIONS = {
+  "1": questions
+};
+let activeQuestions = questions;
+
+const BREAKFAST_ASR_ENDPOINT = window.SPEECH_API?.endpoint() || "http://localhost:5000/api/speech/recognize";
+const BREAKFAST_RECOGNITION_MODE_KEY = "speakingDemoRecognitionMode";
+
+function breakfastRecognitionMode() {
+  const value = localStorage.getItem(BREAKFAST_RECOGNITION_MODE_KEY) || "file";
+  return value === "realtime" ? "realtime" : "file";
+}
 let currentIndex = 0;
 let earnedStars = 0;
 let earnedQuestions = new Set();
@@ -23,6 +35,17 @@ let missedQuestions = new Set();
 let selectedAnswers = [];
 let selectedDialect = "";
 let buttonSoundEnabled = false;
+let speechRecorder = null;
+let speechStream = null;
+let speechChunks = [];
+let speechAudioUrl = "";
+let speechAudioBlob = null;
+let isSpeechRecording = false;
+let isSpeechRecognizing = false;
+let recognizedSpeechText = "";
+let debugMode = false;
+let lastRecognitionPayload = null;
+let recognitionError = "";
 const soundEffects = {
   click: new Audio("./assets/music/S2_m1_click.mp3"),
   correct: new Audio("./assets/music/S2_m1_next.mp3"),
@@ -62,8 +85,107 @@ questionNumber: document.querySelector("#questionNumber"),
   feedback: document.querySelector("#feedback"),
   retryBtn: document.querySelector("#retryBtn"),
   nextBtn: document.querySelector("#nextBtn"),
-  againBtn: document.querySelector("#againBtn")
+  recordSpeechBtn: document.querySelector("#recordSpeechBtn"),
+  playSpeechBtn: document.querySelector("#playSpeechBtn"),
+  speechStatus: document.querySelector("#speechStatus"),
+  skipBtn: document.querySelector("#skipBtn"),
+  againBtn: document.querySelector("#againBtn"),
+  debugToggle: document.querySelector("#debugToggle"),
+  developerPanel: document.querySelector("#developerPanel"),
+  developerContent: document.querySelector("#developerContent")
 };
+
+
+function escapeHtml(value) {
+  return String(value ?? "").replace(/[&<>"]/g, char => ({
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    "\"": "&quot;"
+  }[char]));
+}
+
+function currentProviderLabel() {
+  return selectedDialect === "sixian" ? "客委會 API（四縣腔）" : "尚未選擇";
+}
+
+function renderDeveloperPanel() {
+  if (!els.developerPanel || !els.developerContent) return;
+  if (els.debugToggle) els.debugToggle.checked = debugMode;
+  els.developerPanel.hidden = !debugMode;
+  document.body.classList.toggle("debug-mode", debugMode);
+  if (!debugMode) return;
+
+  const question = activeQuestions[currentIndex] || activeQuestions[0] || questions[0];
+  const answerList = acceptedAnswers(question);
+  const cleanText = cleanSpeechText(recognizedSpeechText);
+  const hitTags = answerList.map(answer => {
+    const hit = answerVariants(answer).some(variant => cleanText.includes(variant));
+    return `<span class="${hit ? "is-hit" : ""}">${escapeHtml(answer)}</span>`;
+  }).join("");
+  const rawPayload = lastRecognitionPayload ? JSON.stringify(lastRecognitionPayload, null, 2) : "尚無回傳資料";
+
+  els.developerContent.innerHTML = `
+    <div class="developer-item target-sentence">
+      <span class="developer-label">題目</span>
+      <span class="sentence-label">${escapeHtml(selectedDialect || "未選腔別")}</span>
+      <strong>${escapeHtml(question.title || "")}</strong>
+      <small>${escapeHtml(els.questionPrompt?.textContent || question.prompt || "")}</small>
+    </div>
+    <div class="developer-item">
+      <span class="developer-label">辨識文字</span>
+      <strong>${escapeHtml(recognizedSpeechText || recognitionError || "尚未送出")}</strong>
+    </div>
+    <div class="developer-item">
+      <span class="developer-label">正確答案</span>
+      <p>${escapeHtml(answerList.join(" / "))}</p>
+    </div>
+    <div class="developer-item">
+      <span class="developer-label">命中狀態</span>
+      <div class="hit-tags">${hitTags}</div>
+    </div>
+    <div class="developer-item">
+      <span class="developer-label">完整度</span>
+      <p>${answerList.filter(answer => answerVariants(answer).some(variant => cleanText.includes(variant))).length} / ${answerList.length}</p>
+    </div>
+    <div class="developer-item">
+      <span class="developer-label">辨識 API</span>
+      <p>${escapeHtml(currentProviderLabel())} / ${escapeHtml(BREAKFAST_ASR_ENDPOINT)}</p>
+      <p class="developer-subnote">${breakfastRecognitionMode() === "realtime" ? "即時辨識 WebSocket" : "錄完判斷（檔案辨識）"}</p>
+    </div>
+    <div class="answer-box">
+      <label for="developerAnswerInput">辨識文字 / 開放式音檔</label>
+      <textarea id="developerAnswerInput" rows="3" placeholder="可手動修正測試">${escapeHtml(recognizedSpeechText)}</textarea>
+    </div>
+    <div class="developer-item">
+      <span class="developer-label">後端原始回傳</span>
+      <pre>${escapeHtml(rawPayload)}</pre>
+    </div>
+  `;
+
+  els.developerContent.querySelector("#developerAnswerInput")?.addEventListener("input", event => {
+    recognizedSpeechText = event.target.value.trim();
+    recognitionError = "";
+    lastRecognitionPayload = recognizedSpeechText ? { text: recognizedSpeechText, source: "developer" } : null;
+    handleSpeechAnswer(recognizedSpeechText, question, { silent: true });
+    renderDeveloperPanel();
+  });
+}
+function iconSvg(name) {
+  const icons = {
+    speaker: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.75 8.25 11.47 3.53a.75.75 0 0 1 1.28.53v15.88a.75.75 0 0 1-1.28.53l-4.72-4.72H4.5A2.25 2.25 0 0 1 2.25 14v-4A2.25 2.25 0 0 1 4.5 7.75h2.25Z"/><path d="M16.46 8.29a5.25 5.25 0 0 1 0 7.42M19.11 5.64a9 9 0 0 1 0 12.72"/></svg>',
+    mic: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><path d="M12 19v3"></path><path d="M8 22h8"></path></svg>',
+    stop: '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="7" y="7" width="10" height="10" rx="1"></rect></svg>'
+  };
+  return icons[name] || icons.mic;
+}
+
+function setIconButton(button, iconName, label) {
+  if (!button) return;
+  button.innerHTML = iconSvg(iconName);
+  button.setAttribute("aria-label", label);
+  button.setAttribute("title", label);
+}
 
 function findFood(value) {
   return foods.find(food => food.hakka === value || food.chinese === value || food.pinyin === value);
@@ -129,7 +251,8 @@ function playButtonSound() {
 }
 
 function startLesson(lesson) {
-  if (lesson !== "1" || selectedDialect !== "sixian") return;
+  if (!LESSON_QUESTIONS[lesson] || selectedDialect !== "sixian") return;
+  activeQuestions = LESSON_QUESTIONS[lesson];
   buttonSoundEnabled = true;
   playButtonSound();
   currentIndex = 0;
@@ -138,6 +261,7 @@ function startLesson(lesson) {
   missedQuestions = new Set();
   renderQuestion();
   showScreen("play");
+  renderDeveloperPanel();
 }
 
 
@@ -165,22 +289,22 @@ function markCurrentQuestionMissed() {
 function renderCompleteResult() {
   const score = earnedQuestions.size;
   els.completeStars.innerHTML = "";
-  questions.forEach((_, index) => {
+  activeQuestions.forEach((_, index) => {
     const star = document.createElement("span");
     star.className = `star${earnedQuestions.has(index) ? " is-earned" : ""}`;
     star.textContent = "★";
     els.completeStars.appendChild(star);
   });
 
-  els.completeTitle.textContent = score === questions.length
+  els.completeTitle.textContent = score === activeQuestions.length
     ? "恭喜你完成第1課「𠊎好食个東西」！"
     : `完成第1課！你拿到 ${score} 顆星，可繼續挑戰滿星喔！`;
-  els.resultList.hidden = score < questions.length;
+  els.resultList.hidden = score < activeQuestions.length;
 }
 function renderStars() {
   [els.starRow, els.visibleStarRow].filter(Boolean).forEach(row => {
     row.innerHTML = "";
-    questions.forEach((_, index) => {
+    activeQuestions.forEach((_, index) => {
       const star = document.createElement("span");
       star.className = `star${earnedQuestions.has(index) ? " is-earned" : ""}`;
       star.textContent = "★";
@@ -215,9 +339,219 @@ function getQuestionFood(question) {
   return findFood(question.food || question.answer);
 }
 
+
+function shuffleItems(items) {
+  const list = [...items];
+  for (let index = list.length - 1; index > 0; index -= 1) {
+    const swapIndex = Math.floor(Math.random() * (index + 1));
+    [list[index], list[swapIndex]] = [list[swapIndex], list[index]];
+  }
+  return list;
+}
+
+function cleanSpeechText(text) {
+  if (window.SPEECH_API?.cleanText) return window.SPEECH_API.cleanText(text);
+  return String(text || "").replace(/[\s，,。！？!?、；;：「」『』（）()]/g, "").trim();
+}
+
+function acceptedAnswers(question) {
+  return Array.isArray(question.answer) ? question.answer : [question.answer];
+}
+
+function answerVariants(answer) {
+  const food = findFood(answer);
+  return [answer, food?.hakka, food?.chinese, food?.pinyin]
+    .filter(Boolean)
+    .map(cleanSpeechText)
+    .filter(Boolean);
+}
+
+function speechMatchesQuestion(text, question) {
+  const source = cleanSpeechText(text);
+  return acceptedAnswers(question).every(answer => (
+    answerVariants(answer).some(variant => source.includes(variant))
+  ));
+}
+
+function selectedChoiceForQuestion(question) {
+  const answer = Array.isArray(question.answer) ? question.answer[0] : question.answer;
+  const food = findFood(answer);
+  return food ? { label: food.pinyin, pinyin: food.pinyin, sub: food.chinese, value: food.hakka, image: food.image, alt: food.alt } : null;
+}
+
+function resetSpeechAnswer(options = {}) {
+  if (speechRecorder && isSpeechRecording) {
+    try { speechRecorder.stop(); } catch (error) { /* already stopped */ }
+  }
+  if (speechStream) {
+    speechStream.getTracks().forEach(track => track.stop());
+    speechStream = null;
+  }
+  speechRecorder = null;
+  speechChunks = [];
+  isSpeechRecording = false;
+  isSpeechRecognizing = false;
+  recognizedSpeechText = "";
+  speechAudioBlob = null;
+  if (speechAudioUrl && !options.keepAudio) URL.revokeObjectURL(speechAudioUrl);
+  if (!options.keepAudio) speechAudioUrl = "";
+  if (els.recordSpeechBtn) {
+    els.recordSpeechBtn.classList.remove("is-recording");
+    els.recordSpeechBtn.disabled = false;
+    setIconButton(els.recordSpeechBtn, "mic", "錄音");
+  }
+  if (els.playSpeechBtn) {
+    els.playSpeechBtn.disabled = !speechAudioUrl;
+    setIconButton(els.playSpeechBtn, "speaker", "聽自己念");
+  }
+  recognitionError = "";
+  lastRecognitionPayload = null;
+  if (els.speechStatus) els.speechStatus.textContent = "點擊錄音鈕。";
+  renderDeveloperPanel();
+}
+
+async function toggleSpeechRecording() {
+  if (isSpeechRecording) {
+    stopSpeechRecording();
+    return;
+  }
+  await startSpeechRecording();
+}
+
+async function startSpeechRecording() {
+  if (!navigator.mediaDevices?.getUserMedia || typeof MediaRecorder === "undefined") {
+    if (els.speechStatus) els.speechStatus.textContent = "這個瀏覽器目前不能錄音。";
+    return;
+  }
+  resetSpeechAnswer();
+  try {
+    speechStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    const mimeType = MediaRecorder.isTypeSupported("audio/webm;codecs=opus") ? "audio/webm;codecs=opus" : "";
+    speechRecorder = new MediaRecorder(speechStream, mimeType ? { mimeType } : undefined);
+    speechRecorder.addEventListener("dataavailable", event => {
+      if (event.data?.size) speechChunks.push(event.data);
+    });
+    speechRecorder.addEventListener("stop", finishSpeechRecording, { once: true });
+    speechRecorder.start();
+    isSpeechRecording = true;
+    els.recordSpeechBtn?.classList.add("is-recording");
+    setIconButton(els.recordSpeechBtn, "stop", "停止錄音");
+    if (els.speechStatus) els.speechStatus.textContent = "錄音中，再按一次停止。";
+  } catch (error) {
+    resetSpeechAnswer();
+    if (els.speechStatus) els.speechStatus.textContent = "無法開始錄音，請確認麥克風權限。";
+  }
+}
+
+function stopSpeechRecording() {
+  if (!speechRecorder || !isSpeechRecording) return;
+  isSpeechRecording = false;
+  if (els.recordSpeechBtn) {
+    els.recordSpeechBtn.classList.remove("is-recording");
+    els.recordSpeechBtn.disabled = true;
+    setIconButton(els.recordSpeechBtn, "stop", "辨識中");
+  }
+  if (els.speechStatus) els.speechStatus.textContent = "辨識中...";
+  try { speechRecorder.stop(); } catch (error) { resetSpeechAnswer(); }
+}
+
+async function finishSpeechRecording() {
+  const type = speechRecorder?.mimeType || "audio/webm";
+  const blob = new Blob(speechChunks, { type });
+  speechAudioBlob = blob;
+  if (speechAudioUrl) URL.revokeObjectURL(speechAudioUrl);
+  speechAudioUrl = URL.createObjectURL(blob);
+  if (speechStream) {
+    speechStream.getTracks().forEach(track => track.stop());
+    speechStream = null;
+  }
+  if (els.playSpeechBtn) els.playSpeechBtn.disabled = false;
+  await recognizeBreakfastSpeech(blob);
+}
+
+async function recognizeBreakfastSpeech(blob) {
+  const question = activeQuestions[currentIndex];
+  isSpeechRecognizing = true;
+  if (els.speechStatus) els.speechStatus.textContent = "辨識中...";
+  try {
+    const formData = new FormData();
+    formData.append("audio", blob, "breakfast.webm");
+    formData.append("dialect", selectedDialect || "sixian");
+    formData.append("recognizer", `hakka-${selectedDialect || "sixian"}`);
+    formData.append("provider", "hakka_api");
+    formData.append("provider_id", "hakka_api_hak");
+    formData.append("language", "hak");
+    formData.append("scene_id", "breakfast");
+    formData.append("recognition_mode", breakfastRecognitionMode());
+    const response = await fetch(BREAKFAST_ASR_ENDPOINT, { method: "POST", body: formData });
+    if (!response.ok) {
+      let message = `辨識後端回應失敗：${response.status}`;
+      try {
+        const payload = await response.json();
+        message = payload.detail || payload.message || message;
+      } catch (error) {
+        const text = await response.text().catch(() => "");
+        if (text) message = text;
+      }
+      throw new Error(message);
+    }
+    const raw = await response.json();
+    lastRecognitionPayload = raw;
+    const result = window.SPEECH_API?.normalizeResponse(raw, {
+      provider: "hakka_api",
+      provider_id: "hakka_api_hak",
+      dialect: selectedDialect || "sixian",
+      recognizer: `hakka-${selectedDialect || "sixian"}`,
+      scene_id: "breakfast"
+    }) || raw;
+    recognizedSpeechText = result.text || "";
+    handleSpeechAnswer(recognizedSpeechText, question);
+  } catch (error) {
+    markCurrentQuestionMissed();
+    playSound("wrong");
+    els.feedback.hidden = false;
+    els.feedback.textContent = question.hint;
+    recognitionError = error.message || "辨識失敗，請再錄一次。";
+    lastRecognitionPayload = { error: recognitionError };
+    if (els.speechStatus) els.speechStatus.textContent = recognitionError;
+    renderDeveloperPanel();
+  } finally {
+    isSpeechRecognizing = false;
+    if (els.recordSpeechBtn) {
+      els.recordSpeechBtn.disabled = false;
+      setIconButton(els.recordSpeechBtn, "mic", "重新錄音");
+    }
+  }
+}
+
+function handleSpeechAnswer(text, question, options = {}) {
+  const pass = speechMatchesQuestion(text, question);
+  els.feedback.hidden = false;
+  if (!pass) {
+    markCurrentQuestionMissed();
+    if (!options.silent) playSound("wrong");
+    els.feedback.textContent = question.hint;
+    els.nextBtn.disabled = true;
+    if (els.speechStatus) els.speechStatus.textContent = text ? `辨識：${text}` : "沒有辨識到文字。";
+    return;
+  }
+  const selectedChoice = selectedChoiceForQuestion(question);
+  if (question.playMode === "scene" && selectedChoice) renderSceneStage(question, selectedChoice);
+  awardCurrentQuestionStar();
+  renderStars();
+  if (!options.silent) playSound("correct");
+  els.feedback.textContent = Array.isArray(question.answer) ? "答對了！這兩樣就是句子裡的食物。" : "答對了！得到一顆星星。";
+  els.nextBtn.disabled = false;
+  if (els.speechStatus) els.speechStatus.textContent = text ? `辨識：${text}` : "辨識正確。";
+}
+
+function playSpeechAudio() {
+  if (!speechAudioUrl) return;
+  new Audio(speechAudioUrl).play().catch(() => {});
+}
 function renderSceneStage(question, selectedChoice = null) {
   const targetFood = getQuestionFood(question);
-  const systemText = targetFood?.pinyin || question.answer;
+  const systemText = targetFood ? `這係 ${targetFood.pinyin}` : question.answer;
   const selectedImage = selectedChoice?.image
     ? `<img class="plate-choice-image" src="${selectedChoice.image}" alt="${selectedChoice.alt || "已選圖卡"}">`
     : `<span class="plate-placeholder">?</span>`;
@@ -254,26 +588,29 @@ function renderQuestionImage(question) {
 }
 
 function renderQuestion() {
-  const question = questions[currentIndex];
+  const question = activeQuestions[currentIndex];
   selectedAnswers = [];
+  resetSpeechAnswer();
   if (els.questionNumber) els.questionNumber.textContent = String(currentIndex + 1);
   if (els.visibleQuestionNumber) els.visibleQuestionNumber.textContent = String(currentIndex + 1);
   els.questionType.textContent = question.type;
   els.questionTitle.textContent = question.title;
-  els.questionPrompt.textContent = question.prompt;
+  const targetFood = getQuestionFood(question);
+  els.questionPrompt.textContent = question.playMode === "scene" && targetFood ? `這係 ${targetFood.pinyin}` : question.prompt;
   els.playScreen.classList.toggle("is-scene-question", question.playMode === "scene");
   els.feedback.hidden = true;
   els.feedback.textContent = "";
   els.nextBtn.disabled = true;
-  els.nextBtn.textContent = currentIndex === questions.length - 1 ? "完成測驗" : "下一題";
+  els.nextBtn.textContent = currentIndex === activeQuestions.length - 1 ? "完成測驗" : "下一題";
   renderStars();
   renderWordBank();
   renderQuestionImage(question);
+  renderDeveloperPanel();
 
   els.choiceGrid.innerHTML = "";
   els.choiceGrid.classList.toggle("is-image-grid", question.choiceMode === "image");
   els.choiceGrid.classList.toggle("scene-choice-grid", question.playMode === "scene");
-  getChoices(question).forEach(choice => {
+  shuffleItems(getChoices(question)).forEach(choice => {
     const button = document.createElement("button");
     button.className = question.choiceMode === "image" || question.playMode === "scene" ? "choice-button image-choice" : "choice-button";
     button.type = "button";
@@ -281,13 +618,18 @@ function renderQuestion() {
     button.innerHTML = question.choiceMode === "image" || question.playMode === "scene"
       ? renderChoiceCard(choice)
       : `<strong>${choice.pinyin || choice.label}</strong>`;
-    button.addEventListener("click", () => chooseAnswer(button));
+    button.disabled = true;
+    button.setAttribute("aria-disabled", "true");
+    button.addEventListener("click", () => {
+      els.feedback.hidden = false;
+      els.feedback.textContent = "請用口說回答。";
+    });
     els.choiceGrid.appendChild(button);
   });
 }
 
 function chooseAnswer(button) {
-  const question = questions[currentIndex];
+  const question = activeQuestions[currentIndex];
   const value = button.dataset.value;
   const buttons = [...els.choiceGrid.querySelectorAll(".choice-button")];
 
@@ -350,8 +692,14 @@ function retryQuestion() {
   renderQuestion();
 }
 
+function skipQuestion() {
+  markCurrentQuestionMissed();
+  playButtonSound();
+  nextQuestion();
+}
+
 function nextQuestion() {
-  if (currentIndex >= questions.length - 1) {
+  if (currentIndex >= activeQuestions.length - 1) {
     
     playSound("complete");
     completedLessons.add("1");
@@ -373,6 +721,7 @@ function restartGame() {
   selectedDialect = "";
   updateLessonCards();
   showScreen("intro");
+  renderDeveloperPanel();
 }
 
 els.dialects.forEach(button => {
@@ -398,8 +747,15 @@ window.addEventListener("resize", updateCarouselButtons);
 els.wordMenuBtn?.addEventListener("click", () => setWordMenuOpen(true));
 els.wordMenuCloseBtn?.addEventListener("click", () => setWordMenuOpen(false));
 els.wordMenuBackdrop?.addEventListener("click", () => setWordMenuOpen(false));
+els.debugToggle?.addEventListener("change", event => {
+  debugMode = event.target.checked;
+  renderDeveloperPanel();
+});
+els.recordSpeechBtn?.addEventListener("click", toggleSpeechRecording);
+els.playSpeechBtn?.addEventListener("click", playSpeechAudio);
 els.retryBtn.addEventListener("click", retryQuestion);
 els.nextBtn.addEventListener("click", nextQuestion);
+els.skipBtn?.addEventListener("click", skipQuestion);
 els.againBtn.addEventListener("click", restartGame);
 document.addEventListener("click", event => {
   const control = event.target.closest("button, .primary-link");
@@ -411,6 +767,22 @@ document.addEventListener("click", event => {
 updateLessonCards();
 updateCarouselButtons();
 showScreen("intro");
+renderDeveloperPanel();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

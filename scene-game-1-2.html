@@ -1,21 +1,25 @@
 <!doctype html>
 <html lang="zh-Hant">
 <head>
+  <link rel="stylesheet" href="./hakka-font.css?v=20260907-font4">
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>屋下在哪 - 情境遊戲復刻</title>
-  <link rel="stylesheet" href="scene-game-1-2.css?v=20260902-18">
+  <title>你家在哪</title>
+  <link rel="stylesheet" href="scene-game-1-2.css?v=20260907-avatar1">
 </head>
 <body>
   <main class="page-shell">
-    <header class="lesson-header">
-      <a class="back-link" href="./index.html#situations">返回</a>
+    <header class="lesson-header"><a class="back-link" href="./index.html#situations">返回</a>
       <div>
-        <h1>屋下在哪</h1>
+        <h1>你家在哪</h1>
       </div>
       <div class="header-actions">
         <label class="select-label" for="dialectSelect">腔調</label>
         <select id="dialectSelect"></select>
+        <label class="mode-toggle" title="顯示後端辨識狀態與辨識文字">
+          <input id="debugToggle" type="checkbox">
+          <span>開發者模式</span>
+        </label>
         <button id="resetStage" class="ghost-button" type="button">重新整理</button>
       </div>
     </header>
@@ -28,6 +32,11 @@
       <div id="stageView" class="stage-view"></div>
     </section>
 
+    <aside id="developerPanel" class="developer-panel" hidden>
+      <h2>內部檢視</h2>
+      <div id="developerContent"></div>
+    </aside>
+
     <aside class="control-strip" aria-label="音量設定">
       <label>背景音量 <input id="bgmVolume" type="range" min="0" max="100" value="20"></label>
       <label>效果音量 <input id="seVolume" type="range" min="0" max="100" value="40"></label>
@@ -35,9 +44,51 @@
     </aside>
   </main>
 
-  <script src="scene-game-1-2.js?v=20260902-18"></script>
+  <script src="speech-api-config.js?v=20260907-realtime1"></script>
+  <script src="scene-game-1-2.js?v=20260907-shuffle1"></script>
 </body>
 </html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

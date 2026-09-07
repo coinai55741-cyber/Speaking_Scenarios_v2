@@ -1,3 +1,18 @@
+@font-face {
+  font-family: "GenSekiGothic2TW";
+  src: url("./assets/fonts/GenSekiGothic2TW-R.otf") format("opentype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "GenSekiGothic2TW";
+  src: url("./assets/fonts/GenSekiGothic2TW-B.otf") format("opentype");
+  font-weight: 700 900;
+  font-style: normal;
+  font-display: swap;
+}
 :root {
   --ink: #18344a;
   --muted: #60717b;
@@ -917,4 +932,259 @@ h1 {
   .plate-system-text { bottom: 4px; }
 }
 
+
+
+
+/* Hakka text font */
+.question-type,
+.choice-button,
+.food-card strong,
+#completeTitle,
+.hakka-text,
+.hakka-word {
+  font-family: "GenSekiGothic2TW", "Noto Sans TC", "Microsoft JhengHei", sans-serif;
+}
+
+
+
+.skip-button {
+  min-height: 42px;
+  padding: 0 20px;
+  border: 2px solid rgba(228, 210, 171, 0.86);
+  border-radius: 999px;
+  color: var(--ink);
+  background: #fff;
+  font: inherit;
+  font-size: 16px;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.skip-button:hover {
+  border-color: var(--green);
+  background: #eff9f6;
+}
+
+.speech-status {
+  margin: 10px 0 0;
+  color: var(--muted);
+  font-size: 15px;
+  font-weight: 800;
+}
+
+.choice-button[aria-disabled="true"] {
+  cursor: default;
+}
+
+.voice-button {
+  display: inline-grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  min-width: 42px;
+  min-height: 42px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  color: #fff;
+  background: var(--green);
+  cursor: pointer;
+}
+
+.voice-button svg {
+  width: 21px;
+  height: 21px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.voice-button:disabled {
+  opacity: 0.52;
+  cursor: not-allowed;
+}
+
+.record-button,
+.record-speech-button {
+  color: #fff;
+  background: var(--green);
+}
+
+.record-button.is-recording,
+.record-speech-button.is-recording {
+  background: var(--rose);
+  box-shadow: 0 10px 20px rgba(230, 92, 80, 0.24);
+}
+
+.record-button:disabled,
+.record-speech-button:disabled {
+  cursor: wait;
+}
+
+.own-voice {
+  color: #fff;
+  background: var(--green);
+}
+
+.mode-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 36px;
+  padding: 0 14px;
+  border: 2px solid rgba(30, 49, 91, 0.14);
+  border-radius: 999px;
+  color: var(--ink);
+  background: rgba(255, 253, 250, 0.9);
+  font-size: 14px;
+  font-weight: 900;
+  white-space: nowrap;
+}
+
+.mode-toggle input {
+  accent-color: var(--green);
+}
+
+.developer-panel {
+  position: fixed;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  z-index: 80;
+  width: 280px;
+  padding: 18px 14px;
+  overflow-y: auto;
+  border-right: 2px solid var(--line);
+  background: rgba(255, 253, 250, 0.98);
+  box-shadow: 12px 0 28px rgba(91, 67, 35, 0.14);
+}
+
+.developer-panel h2 {
+  margin: 0 0 18px;
+  color: var(--ink);
+  font-size: 20px;
+}
+
+.developer-item {
+  margin-bottom: 13px;
+}
+
+.developer-label,
+.developer-item span:not(.sentence-label) {
+  display: block;
+  color: var(--teal);
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.developer-item strong,
+.developer-item p {
+  margin: 4px 0 0;
+  color: var(--ink);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.developer-item small {
+  display: block;
+  margin-top: 4px;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.sentence-label {
+  display: inline-flex;
+  width: fit-content;
+  margin-bottom: 5px;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: #eef8f5;
+  color: var(--teal);
+}
+
+.hit-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-top: 5px;
+}
+
+.hit-tags span {
+  display: inline-flex;
+  padding: 4px 9px;
+  border: 1px solid rgba(49, 136, 150, 0.34);
+  border-radius: 999px;
+  background: #fff;
+  color: var(--ink);
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.hit-tags span.is-hit {
+  border-color: var(--green);
+  background: #dff8ea;
+  color: #17623f;
+}
+
+.developer-panel .answer-box label {
+  display: block;
+  margin-bottom: 5px;
+  color: var(--teal);
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.developer-panel textarea {
+  width: 100%;
+  min-height: 82px;
+  padding: 9px;
+  border: 1px solid rgba(30, 49, 91, 0.25);
+  border-radius: 8px;
+  color: var(--ink);
+  background: #fff;
+  font: inherit;
+  font-size: 13px;
+  resize: vertical;
+}
+
+.developer-panel pre {
+  max-height: 180px;
+  margin: 6px 0 0;
+  padding: 10px;
+  overflow: auto;
+  border: 1px solid rgba(30, 49, 91, 0.12);
+  border-radius: 8px;
+  background: #f7fbfa;
+  color: var(--ink);
+  font-size: 11px;
+  line-height: 1.45;
+  white-space: pre-wrap;
+}
+
+.developer-subnote {
+  color: var(--muted) !important;
+  font-size: 12px !important;
+}
+
+body.debug-mode .game-shell {
+  margin-left: 280px;
+}
+
+@media (max-width: 900px) {
+  .developer-panel {
+    position: static;
+    width: auto;
+    margin: 0 auto 12px;
+    border: 2px solid var(--line);
+    border-radius: 8px;
+    box-shadow: none;
+  }
+
+  body.debug-mode .game-shell {
+    margin-left: auto;
+  }
+}
 

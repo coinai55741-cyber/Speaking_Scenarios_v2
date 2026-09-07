@@ -1,15 +1,15 @@
 <!doctype html>
 <html lang="zh-Hant">
 <head>
+  <link rel="stylesheet" href="./hakka-font.css?v=20260907-font4">
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>休假日任務｜客語生活任務</title>
-  <link rel="stylesheet" href="./holiday.css?v=20260901-08">
+  <link rel="stylesheet" href="./holiday.css?v=20260907-font1">
 </head>
 <body>
   <main class="task-shell">
-    <header class="task-topbar">
-      <a class="back-link" href="./index.html#situations">返回</a>
+    <header class="task-topbar"><a class="back-link" href="./index.html#situations">返回</a>
       <div>
         <h1>休假日</h1>
       </div>
@@ -123,15 +123,34 @@
           <option value="taiwan_tongues_zh">Taiwan-Tongues-ASR-CE（華語 v2）</option>
           <option value="hakka_api_hak">客委會 API（客語預留）</option>
         </select>
+        <label class="developer-label" for="recognitionModeSelect">辨識模式</label>
+        <select id="recognitionModeSelect" class="developer-select">
+          <option value="file">錄完判斷（檔案辨識）</option>
+          <option value="realtime">即時辨識 WebSocket</option>
+        </select>
         <p id="asrProviderNote" class="developer-note"></p>
         <p id="debugProvider" class="developer-subnote"></p>
       </div>
     </aside>
   </main>
 
-  <script src="./holiday.js?v=20260901-08"></script>
+  <script src="./speech-api-config.js?v=20260907-realtime1"></script>
+  <script src="./holiday.js?v=20260907-realtime1"></script>
 </body>
 </html>
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

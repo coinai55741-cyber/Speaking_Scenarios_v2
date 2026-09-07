@@ -1,4 +1,6 @@
-const DEFAULT_ASR_ENDPOINT = "https://reversal-batboy-bust.ngrok-free.dev/transcribe";
+const DEFAULT_ASR_ENDPOINT = window.SPEECH_API?.endpoint() || "http://localhost:5000/api/speech/recognize";
+const ASR_ENDPOINT_STORAGE_KEY = window.SPEECH_API?.storageKey || "speakingDemoSpeechEndpoint";
+const RECOGNITION_MODE_STORAGE_KEY = "speakingDemoRecognitionMode";
 const ASR_ENDPOINT = getAsrEndpoint();
 const ASR_PROVIDERS = {
   taiwan_tongues_zh: {
@@ -12,8 +14,8 @@ const ASR_PROVIDERS = {
     label: "客委會 API（客語預留）",
     provider: "hakka_api",
     language: "hak",
-    enabled: false,
-    note: "接口已預留；需申請 API key 後由後端串接，key 不會放在前端。"
+    enabled: true,
+    note: "已接後端分流；需在 hf_space_asr/.env 填入客委會帳密後才會真正辨識。"
   }
 };
 
@@ -23,12 +25,18 @@ function getSelectedAsrProvider() {
   return ASR_PROVIDERS[providerId] && hasVisibleOption ? providerId : "taiwan_tongues_zh";
 }
 
+function getRecognitionMode() {
+  const value = els.recognitionModeSelect?.value || localStorage.getItem(RECOGNITION_MODE_STORAGE_KEY) || "file";
+  return value === "realtime" ? "realtime" : "file";
+}
+
 function updateProviderUi() {
   if (!els.asrProviderSelect) return;
   const providerId = getSelectedAsrProvider();
   const config = ASR_PROVIDERS[providerId];
   els.asrProviderSelect.value = providerId;
-  if (els.asrProviderNote) els.asrProviderNote.textContent = config.note;
+  if (els.recognitionModeSelect) els.recognitionModeSelect.value = getRecognitionMode();
+  if (els.asrProviderNote) els.asrProviderNote.textContent = `${config.note} / ${getRecognitionMode() === "realtime" ? "即時辨識" : "檔案辨識"}`;
   if (els.debugProvider) {
     els.debugProvider.textContent = `${config.label} / ${config.enabled ? "可用" : "預留"}`;
   }
@@ -43,11 +51,11 @@ function getAsrEndpoint() {
   const paramUrl = urlParams.get('asr');
   
   if (paramUrl && isAllowedAsrEndpoint(paramUrl)) {
-    localStorage.setItem('asrEndpoint', paramUrl);
+    localStorage.setItem(ASR_ENDPOINT_STORAGE_KEY, paramUrl);
     return paramUrl;
   }
   
-  const savedUrl = localStorage.getItem('asrEndpoint');
+  const savedUrl = localStorage.getItem(ASR_ENDPOINT_STORAGE_KEY);
   if (savedUrl && isAllowedAsrEndpoint(savedUrl)) {
     return savedUrl;
   }
@@ -60,7 +68,7 @@ function isAllowedAsrEndpoint(value) {
     const url = new URL(value);
     const allowedLocal = url.hostname === "127.0.0.1" || url.hostname === "localhost";
     const allowedTunnel = url.hostname.endsWith(".trycloudflare.com") || url.hostname.endsWith(".ngrok-free.app") || url.hostname.endsWith(".ngrok-free.dev") || url.hostname.endsWith(".onrender.com");
-    return url.pathname === "/transcribe" && (allowedLocal || allowedTunnel);
+    return (window.SPEECH_API?.isAllowedEndpoint(value) || ( ["/api/speech/recognize", "/recognize", "/transcribe"].includes(url.pathname) && (allowedLocal || allowedTunnel) ));
   } catch (error) {
     return false;
   }
@@ -196,6 +204,7 @@ const els = {
   asrProviderSelect: document.querySelector("#asrProviderSelect"),
   asrProviderNote: document.querySelector("#asrProviderNote"),
   debugProvider: document.querySelector("#debugProvider"),
+  recognitionModeSelect: document.querySelector("#recognitionModeSelect"),
   hitTags: document.querySelector("#hitTags"),
   storyIntro: document.querySelector("#storyIntro"),
   storyStartBtn: document.querySelector("#storyStartBtn")
@@ -525,6 +534,10 @@ async function transcribeAudioBlob(blob) {
   formData.append("provider_id", providerId);
   formData.append("provider", providerConfig.provider);
   formData.append("language", providerConfig.language);
+  formData.append("dialect", currentDialect);
+  formData.append("recognizer", providerConfig.language === "hak" ? `hakka-${currentDialect}` : "mandarin");
+  formData.append("scene_id", "holiday");
+  formData.append("recognition_mode", getRecognitionMode());
 
   try {
     const response = await fetch(ASR_ENDPOINT, {
@@ -535,15 +548,21 @@ async function transcribeAudioBlob(blob) {
       const message = await response.text();
       throw new Error(message || `HTTP ${response.status}`);
     }
-    const result = await response.json();
+    const result = window.SPEECH_API?.normalizeResponse(await response.json(), {
+      provider: providerConfig.provider,
+      provider_id: providerId,
+      dialect: currentDialect,
+      recognizer: providerConfig.language === "hak" ? `hakka-${currentDialect}` : "mandarin",
+      scene_id: "holiday"
+    }) || { text: "", ok: false };
     if (result.status === "not_enabled") {
       throw new Error(result.message || "此辨識 API 尚未啟用");
     }
-    const text = (result.text || "").trim();
+    const text = result.text;
     if (text) {
       els.answerInput.value = text;
       els.asrStatus.textContent = text;
-      els.recordingStatus.textContent = "辨識完成，可以送出辨識。";
+      els.recordingStatus.textContent = `辨識完成：${text}`;
     } else {
       els.asrStatus.textContent = "未辨識出文字";
       els.recordingStatus.textContent = "沒有辨識到文字。開發者模式可手動修正，或重新錄音。";
@@ -667,6 +686,14 @@ els.checkBtn.addEventListener("click", () => {
 
 els.missionLayout.hidden = true;
 renderTask();
+
+
+
+
+
+
+
+
 
 
 

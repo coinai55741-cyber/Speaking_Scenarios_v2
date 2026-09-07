@@ -1,3 +1,18 @@
+@font-face {
+  font-family: "GenSekiGothic2TW";
+  src: url("./assets/fonts/GenSekiGothic2TW-R.otf") format("opentype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "GenSekiGothic2TW";
+  src: url("./assets/fonts/GenSekiGothic2TW-B.otf") format("opentype");
+  font-weight: 700 900;
+  font-style: normal;
+  font-display: swap;
+}
 :root {
   --ink: #18344a;
   --muted: #60717b;
@@ -947,3 +962,18 @@ h1 {
     grid-template-columns: 1fr;
   }
 }
+
+
+/* Hakka text font */
+.question-type,
+.choice-button,
+.food-card strong,
+#completeTitle,
+.hakka-text,
+.hakka-word,
+.vocab-hakka,
+.word-hakka {
+  font-family: "GenSekiGothic2TW", "Noto Sans TC", "Microsoft JhengHei", sans-serif;
+}
+
+

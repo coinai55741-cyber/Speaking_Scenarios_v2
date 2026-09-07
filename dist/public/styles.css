@@ -1,3 +1,18 @@
+@font-face {
+  font-family: "GenSekiGothic2TW";
+  src: url("./assets/fonts/GenSekiGothic2TW-R.otf") format("opentype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "GenSekiGothic2TW";
+  src: url("./assets/fonts/GenSekiGothic2TW-B.otf") format("opentype");
+  font-weight: 700 900;
+  font-style: normal;
+  font-display: swap;
+}
 :root {
   --ink: #18344a;
   --muted: #5f6f78;
@@ -26,7 +41,7 @@ html {
 
 body {
   margin: 0;
-  font-family: "Noto Sans TC", "Microsoft JhengHei", "GenSekiGothic2TW-R", "Zen Maru Gothic", Arial, sans-serif;
+  font-family: "Noto Sans TC", "Microsoft JhengHei", "GenSekiGothic2TW", "Zen Maru Gothic", Arial, sans-serif;
   color: var(--ink);
   background:
     linear-gradient(180deg, rgba(255, 250, 235, 0.95), rgba(242, 250, 231, 0.96)),
@@ -604,11 +619,27 @@ h1 {
   line-height: 1.65;
 }
 
-.learning-grid,
-.scenario-grid {
+.learning-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 18px;
+}
+
+.scenario-grid {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(280px, 360px);
+  gap: 18px;
+  overflow-x: auto;
+  overscroll-behavior-inline: contain;
+  scroll-snap-type: inline mandatory;
+  padding: 2px 2px 18px;
+  scrollbar-color: var(--green) rgba(255, 255, 255, 0.7);
+}
+
+.scenario-grid::after {
+  content: "";
+  width: 1px;
 }
 
 .learning-card,
@@ -844,6 +875,7 @@ h1 {
   display: flex;
   flex-direction: column;
   min-height: 500px;
+  scroll-snap-align: start;
 }
 
 .scenario-art {
@@ -1009,6 +1041,10 @@ h1 {
 
 .art-day {
   background: linear-gradient(#cfeeff 0 32%, #fff 32% 35%, #fff0c7 35% 66%, #fff 66% 69%, #f5d7b4 69%);
+}
+
+.art-home {
+  object-position: center 42%;
 }
 
 .art-day .person-a {
@@ -1194,8 +1230,9 @@ h1 {
 }
 
 .hero-bubble span {
+  font-family: "GenSekiGothic2TW", "Noto Sans TC", "Microsoft JhengHei", sans-serif;
   position: absolute;
-  inset: 12px 22px 31px 10px;
+  inset: 13px 20px 29px 12px;
   display: grid;
   place-items: center;
   text-align: center;
@@ -1217,8 +1254,9 @@ h1 {
 }
 
 .bubble-two span {
-  inset: 11px 32px 38px 14px;
-  font-size: 18px;
+  inset: 13px 34px 36px 18px;
+  font-size: 17px;
+  line-height: 1.18;
 }
 
 .area-card .area-art {
@@ -1277,9 +1315,12 @@ h1 {
 
   .hero-section,
   .classroom-layout,
-  .learning-grid,
-  .scenario-grid {
+  .learning-grid {
     grid-template-columns: 1fr;
+  }
+
+  .scenario-grid {
+    grid-auto-columns: minmax(260px, 84vw);
   }
 
 
@@ -1315,31 +1356,9 @@ h1 {
   }
 
   .bubble-two span {
-    font-size: 15px;
-  }
-
-  .quick-links {
-    grid-template-columns: 1fr;
-  }
-
-  .wide-card {
-    grid-template-columns: 1fr;
-  }
-
-  .section-heading {
-    grid-template-columns: 44px minmax(0, 1fr);
-  }
-
-  .section-index {
-    width: 40px;
-    height: 40px;
-    border-radius: 14px;
-    font-size: 20px;
-  }
-
-  h1 {
-    font-size: 42px;
-  }
+  inset: 13px 34px 36px 18px;
+  font-size: 17px;
+  line-height: 1.18;
 }
 .learning-card,
 .wide-card {
@@ -1369,4 +1388,18 @@ h1 {
   transform: none;
   opacity: 1;
 }
+
+
+/* Hakka text font */
+.sentence-art::before,
+.hakka-text,
+.hakka-word,
+.lesson-card strong,
+.scenario-card h3 {
+  font-family: "GenSekiGothic2TW", "Noto Sans TC", "Microsoft JhengHei", sans-serif;
+}
+
+
+
+
 

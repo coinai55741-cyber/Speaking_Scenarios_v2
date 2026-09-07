@@ -1,0 +1,49 @@
+@font-face {
+  font-family: "GenSekiGothic2TW";
+  src: url("./assets/fonts/GenSekiGothic2TW-R.otf") format("opentype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "GenSekiGothic2TW";
+  src: url("./assets/fonts/GenSekiGothic2TW-B.otf") format("opentype");
+  font-weight: 700 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+.hakka-font,
+[lang="hak"],
+.hakka-line,
+.hakka-text,
+.hakka-word,
+.vocab-hakka,
+.word-hakka,
+.answer-token,
+.token-chip,
+.hit-tags span,
+.target-sentence strong,
+.sentence-line-text {
+  font-family: "GenSekiGothic2TW", "Noto Sans TC", "Microsoft JhengHei", sans-serif;
+}
+
+/* Hakka lighter weights */
+.hakka-font,
+[lang="hak"],
+.hakka-line,
+.hakka-text,
+.hakka-word,
+.vocab-hakka,
+.word-hakka,
+.answer-token,
+.token-chip,
+.hit-tags span,
+.sentence-line-text {
+  font-weight: 500;
+}
+
+.target-sentence strong {
+  font-weight: 600;
+}

@@ -2,23 +2,69 @@ const MEDIA_ROOT = "https://d1b8el2rvgr6a8.cloudfront.net/ihakka/public/media/sc
 const BGM_ROOT = "https://d1b8el2rvgr6a8.cloudfront.net/ihakka/public/media/scene_game/BGM";
 const ASSET_ROOT = "assets/scene-game-1-2";
 const LOCAL_MUSIC_ROOT = "assets/music";
+const WRONG_SENTENCE_AUDIO = `${LOCAL_MUSIC_ROOT}/S2_m1_false.mp3`;
 const PROGRESS_KEY = "scene-game-1-2-progress";
 
 const DIALECTS = [
-  { id: "sixian", label: "四縣腔", enabled: true },
-  { id: "hailu", label: "海陸腔", enabled: false },
-  { id: "dapu", label: "大埔腔", enabled: false },
-  { id: "raoping", label: "饒平腔", enabled: false },
-  { id: "zhaoan", label: "詔安腔", enabled: false },
-  { id: "southSixian", label: "南四縣腔", enabled: false }
+  { id: "mandarin", label: "華語", enabled: true, recognizer: "mandarin" },
+  { id: "sixian", label: "四縣腔", enabled: true, recognizer: "hakka-sixian" },
+  { id: "hailu", label: "海陸腔", enabled: false, recognizer: "hakka-hailu" },
+  { id: "dapu", label: "大埔腔", enabled: false, recognizer: "hakka-dapu" },
+  { id: "raoping", label: "饒平腔", enabled: false, recognizer: "hakka-raoping" },
+  { id: "zhaoan", label: "詔安腔", enabled: false, recognizer: "hakka-zhaoan" },
+  { id: "southSixian", label: "南四縣腔", enabled: false, recognizer: "hakka-south-sixian" }
 ];
+
+const SPEECH_BACKENDS = {
+  mandarin: {
+    label: "華語辨識",
+    endpoint: window.SPEECH_API?.endpoint() || "http://localhost:5000/api/speech/recognize",
+    tokenMap: "mission1Mandarin"
+  },
+  "hakka-sixian": {
+    label: "四縣腔辨識",
+    provider: "hakka_api",
+    providerId: "hakka_api_hak",
+    endpoint: window.SPEECH_API?.endpoint() || "http://localhost:5000/api/speech/recognize",
+    tokenMap: "mission1Sixian"
+  },
+  "hakka-hailu": { label: "海陸腔辨識", provider: "hakka_api", providerId: "hakka_api_hak", endpoint: "", tokenMap: "mission1Hakka" },
+  "hakka-dapu": { label: "大埔腔辨識", endpoint: "", tokenMap: "mission1Hakka" },
+  "hakka-raoping": { label: "饒平腔辨識", endpoint: "", tokenMap: "mission1Hakka" },
+  "hakka-zhaoan": { label: "詔安腔辨識", endpoint: "", tokenMap: "mission1Hakka" },
+  "hakka-south-sixian": { label: "南四縣腔辨識", endpoint: "", tokenMap: "mission1Hakka" }
+};
+
+const TOKEN_MAPS = {
+  mission1Mandarin: {
+    "要": "愛",
+    "哪個": "若个",
+    "你": "你",
+    "哪時候": "哪央時",
+    "來": "來",
+    "在哪": "在哪",
+    "我家": "吾屋下",
+    "幾": "幾",
+    "如何": "仰仔"
+  },
+  mission1Sixian: {
+    "愛": "愛",
+    "若个": "若个",
+    "你": "你",
+    "哪央時": "哪央時",
+    "來": "來",
+    "在哪": "在哪",
+    "吾屋下": "吾屋下",
+    "幾": "幾",
+    "仰仔": "仰仔"
+  },
+  mission1Hakka: {}
+};
 
 const STAGES = [
   { id: "intro", label: "情境介紹" },
   { id: "teaching", label: "情境教學" },
-  { id: "mission1", label: "任務遊戲1" },
-  { id: "mission2", label: "任務遊戲2" },
-  { id: "mission3", label: "任務遊戲3" }
+  { id: "mission1", label: "任務遊戲" }
 ];
 
 const PEOPLE = [
@@ -30,6 +76,15 @@ const PEOPLE = [
 ];
 
 const PERSON_BY_NAME = Object.fromEntries(PEOPLE.map((person) => [person.name, person]));
+
+function currentDialect() {
+  return DIALECTS.find((dialect) => dialect.id === state.dialect) || DIALECTS[0];
+}
+
+function currentSpeechBackend() {
+  const dialect = currentDialect();
+  return SPEECH_BACKENDS[dialect.recognizer] || SPEECH_BACKENDS.mandarin;
+}
 
 function avatarClassByName(name, context = "default") {
   const person = PERSON_BY_NAME[name];
@@ -130,7 +185,7 @@ const LESSON = {
 
 const state = {
   stageIndex: 0,
-  dialect: "sixian",
+  dialect: "mandarin",
   teachingIndex: 0,
   chineseVisible: true,
   textExpanded: true,
@@ -138,6 +193,19 @@ const state = {
   selectedPerson: "",
   answerTokens: [],
   tokenOrder: [],
+  recording: false,
+  recognizing: false,
+  mediaRecorder: null,
+  mediaStream: null,
+  audioChunks: [],
+  recordedAudioUrl: "",
+  recordedAudioBlob: null,
+  recognizedText: "",
+  recognitionError: "",
+  lastRecognitionPayload: null,
+  recognitionMode: localStorage.getItem("speakingDemoRecognitionMode") || "file",
+  sentenceMissCount: 0,
+  debugMode: false,
   sentenceResult: "",
   sentenceHinted: false,
   askedPerson: "",
@@ -160,7 +228,10 @@ const els = {
   scene: document.querySelector("#sceneLayer"),
   characters: document.querySelector("#charactersLayer"),
   dialect: document.querySelector("#dialectSelect"),
-  reset: document.querySelector("#resetStage")
+  reset: document.querySelector("#resetStage"),
+  debugToggle: document.querySelector("#debugToggle"),
+  developerPanel: document.querySelector("#developerPanel"),
+  developerContent: document.querySelector("#developerContent")
 };
 
 function init() {
@@ -199,6 +270,10 @@ function bindGlobalControls() {
     state.teachingIndex = 0;
     render();
   });
+  els.debugToggle.addEventListener("change", (event) => {
+    state.debugMode = event.target.checked;
+    renderDeveloperPanel(STAGES[state.stageIndex].id);
+  });
   els.reset.addEventListener("click", () => {
     clearProgress();
     resetStageState();
@@ -223,7 +298,6 @@ function saveProgress() {
     selectedCommand: state.selectedCommand,
     selectedPerson: state.selectedPerson,
     answerTokens: state.answerTokens,
-    tokenOrder: state.tokenOrder,
     sentenceResult: state.sentenceResult,
     sentenceHinted: state.sentenceHinted,
     askedPerson: state.askedPerson,
@@ -231,7 +305,9 @@ function saveProgress() {
     responseReady: state.responseReady,
     completedMission1: state.completedMission1,
     mission1OkPlayed: state.mission1OkPlayed,
-    transportResult: state.transportResult
+    transportResult: state.transportResult,
+    sentenceMissCount: state.sentenceMissCount,
+    debugMode: state.debugMode
   };
   localStorage.setItem(PROGRESS_KEY, JSON.stringify(progress));
 }
@@ -242,7 +318,9 @@ function loadProgress() {
   try {
     const progress = JSON.parse(raw);
     Object.assign(state, progress);
+    state.tokenOrder = [];
     state.questionPlaying = false;
+    resetRecordingState({ keepAnswer: true });
     if (state.askedPerson) state.responseReady = true;
   } catch (error) {
     localStorage.removeItem(PROGRESS_KEY);
@@ -254,6 +332,7 @@ function clearProgress() {
 }
 function resetStageState() {
   stopCallAudio();
+  resetRecordingState();
   state.teachingIndex = 0;
   state.chineseVisible = true;
   state.textExpanded = true;
@@ -268,6 +347,7 @@ function resetStageState() {
   state.responseReady = false;
   state.questionPlaying = false;
   state.transportResult = "";
+  state.sentenceMissCount = 0;
   if (STAGES[state.stageIndex].id === "mission1") {
     state.completedMission1 = [];
     state.mission1OkPlayed = false;
@@ -285,6 +365,128 @@ function render() {
   if (stage === "teaching") renderTeaching();
   if (stage.startsWith("mission")) renderMission(stage);
   syncBgm(stage);
+  renderDeveloperPanel(stage);
+}
+
+function escapeHtml(value) {
+  return String(value ?? "").replace(/[&<>"]/g, (char) => ({
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    "\"": "&quot;"
+  }[char]));
+}
+
+function targetSentenceForDebug(mission) {
+  if (!mission) return { label: currentDialect().label, text: "尚無題目", mandarin: "" };
+  if (state.dialect === "mandarin") {
+    return { label: "華語", text: "你要如何來我家？", mandarin: mission.sentence || "" };
+  }
+  return { label: currentDialect().label, text: mission.sentence || "尚無題目", mandarin: "你要如何來我家？" };
+}
+
+function developerStatusLabel() {
+  if (state.recording) return "錄音中";
+  if (state.recognizing) return "辨識中";
+  if (state.recognitionError) return "辨識失敗";
+  if (state.recognizedText) return state.recognizedText;
+  return "尚未送出";
+}
+
+function renderDeveloperPanel(stage) {
+  if (!els.developerPanel || !els.developerContent || !els.debugToggle) return;
+  els.debugToggle.checked = state.debugMode;
+  document.body.classList.toggle("debug-mode", state.debugMode);
+  els.developerPanel.hidden = !state.debugMode;
+  if (!state.debugMode) return;
+
+  const mission = LESSON.missions[stage] || LESSON.missions.mission1;
+  const backend = currentSpeechBackend();
+  const target = targetSentenceForDebug(mission);
+  const correctTokens = mission.correctTokens || [];
+  const mappedTokens = state.answerTokens.length ? state.answerTokens.join(" / ") : "尚未填入";
+  const rawPayload = state.lastRecognitionPayload ? JSON.stringify(state.lastRecognitionPayload, null, 2) : "尚無回傳資料";
+  const hitTags = correctTokens.length
+    ? correctTokens.map((token) => `<span class="${state.answerTokens.includes(token) ? "is-hit" : ""}">${escapeHtml(token)}</span>`).join("")
+    : `<span>此階段無字卡判定</span>`;
+  const completeness = correctTokens.length
+    ? `${state.answerTokens.filter((token) => correctTokens.includes(token)).length} / ${correctTokens.length}`
+    : "此題無額外完整度項目";
+
+  els.developerContent.innerHTML = `
+    <div class="developer-item target-sentence">
+      <span class="developer-label">正確答案</span>
+      <span class="sentence-label">${escapeHtml(target.label)}</span>
+      <strong>${escapeHtml(target.text)}</strong>
+      <small>${escapeHtml(target.mandarin)}</small>
+    </div>
+    <div class="developer-item">
+      <span class="developer-label">模擬 ASR</span>
+      <strong>${escapeHtml(developerStatusLabel())}</strong>
+    </div>
+    <div class="developer-item">
+      <span class="developer-label">失敗次數</span>
+      <strong>${state.sentenceMissCount || 0}</strong>
+    </div>
+    <div class="developer-item">
+      <span class="developer-label">命中狀態</span>
+      <div class="hit-tags">${hitTags}</div>
+    </div>
+    <div class="developer-item">
+      <span class="developer-label">完整度</span>
+      <p>${escapeHtml(completeness)}</p>
+    </div>
+    <div class="developer-item">
+      <span class="developer-label">前端轉成字卡</span>
+      <p>${escapeHtml(mappedTokens)}</p>
+    </div>
+    <div class="answer-box">
+      <label for="developerAnswerInput">辨識文字 / 開放式音檔</label>
+      <textarea id="developerAnswerInput" rows="4" placeholder="錄音辨識完成後會顯示在這裡，也可以手動修正測試">${escapeHtml(state.recognizedText)}</textarea>
+    </div>
+    <div class="developer-item">
+      <span class="developer-label">辨識 API</span>
+      <select id="developerAsrProvider" class="developer-select">
+        <option value="mandarin" ${state.dialect === "mandarin" ? "selected" : ""}>Taiwan-Tongues-ASR-CE（華語 v2）</option>
+        <option value="sixian" ${state.dialect === "sixian" ? "selected" : ""}>客委會 API（四縣腔預留）</option>
+      </select>
+      <label class="developer-label" for="developerRecognitionMode">辨識模式</label>
+      <select id="developerRecognitionMode" class="developer-select">
+        <option value="file" ${state.recognitionMode === "file" ? "selected" : ""}>錄完判斷（檔案辨識）</option>
+        <option value="realtime" ${state.recognitionMode === "realtime" ? "selected" : ""}>即時辨識 WebSocket</option>
+      </select>
+      <p class="developer-note">目前可用：${escapeHtml(backend.label)} / ${escapeHtml(backend.endpoint || "尚未設定 API")} / ${state.recognitionMode === "realtime" ? "即時辨識" : "檔案辨識"}</p>
+      <p class="developer-subnote">${escapeHtml(state.recognitionError || "可看辨識原文、字卡轉換與命中狀態。")}</p>
+    </div>
+    <div class="developer-item">
+      <span class="developer-label">後端原始回傳</span>
+      <pre>${escapeHtml(rawPayload)}</pre>
+    </div>
+  `;
+
+  const answerInput = els.developerContent.querySelector("#developerAnswerInput");
+  answerInput?.addEventListener("input", (event) => {
+    state.recognizedText = event.target.value.trim();
+    state.recognitionError = "";
+    state.lastRecognitionPayload = state.recognizedText ? { text: state.recognizedText, source: "developer" } : null;
+    state.answerTokens = mapRecognitionToCards(state.recognizedText, mission);
+    renderMission(stage);
+  });
+
+  const modeSelect = els.developerContent.querySelector("#developerRecognitionMode");
+  modeSelect?.addEventListener("change", (event) => {
+    state.recognitionMode = event.target.value;
+    localStorage.setItem("speakingDemoRecognitionMode", state.recognitionMode);
+    renderDeveloperPanel(stage);
+  });
+
+  const providerSelect = els.developerContent.querySelector("#developerAsrProvider");
+  providerSelect?.addEventListener("change", (event) => {
+    state.dialect = event.target.value;
+    els.dialect.value = state.dialect;
+    resetRecordingState();
+    render();
+  });
 }
 
 function sceneClass(stage) {
@@ -383,8 +585,15 @@ function renderTeaching() {
   });
 }
 
+function ensureMissionTokenOrder(stage, mission) {
+  if (stage === "mission1" && mission?.tokens?.length && !state.tokenOrder.length) {
+    state.tokenOrder = shuffleItems(mission.tokens);
+  }
+}
+
 function renderMission(stage) {
   const mission = LESSON.missions[stage];
+  ensureMissionTokenOrder(stage, mission);
   const complete = stage === "mission1" && state.completedMission1.length === 4;
   const sideContent = missionSideContent(stage, mission);
   els.view.innerHTML = `
@@ -406,6 +615,7 @@ function renderMission(stage) {
     </div>
   `;
   bindMissionEvents(stage, mission);
+  renderDeveloperPanel(stage);
 }
 function missionFlowSteps() {
   const steps = ["打電話", "選朋友", "排問句", "聽回答", "寫下交通方式"];
@@ -488,6 +698,7 @@ function bindMissionEvents(stage, mission) {
       state.selectedCommand = state.selectedCommand === command ? "" : command;
       state.selectedPerson = "";
       state.travelPerson = "";
+      resetRecordingState();
       state.answerTokens = [];
       state.tokenOrder = [];
       state.sentenceResult = "";
@@ -507,6 +718,7 @@ function bindMissionEvents(stage, mission) {
       }
       if (state.completedMission1.includes(button.dataset.person)) return;
       state.selectedPerson = button.dataset.person;
+      resetRecordingState();
       state.answerTokens = [];
       state.tokenOrder = shuffleItems(mission.tokens);
       state.sentenceResult = "";
@@ -516,22 +728,16 @@ function bindMissionEvents(stage, mission) {
   });
   document.querySelectorAll("[data-token]").forEach((button) => {
     button.addEventListener("click", () => {
-      state.answerTokens.push(button.dataset.token);
-      state.sentenceResult = "";
-      state.sentenceHinted = false;
-      playSe(5);
-      renderMission(stage);
+      flashHint("請用錄音辨識填入字卡。");
     });
   });
   document.querySelectorAll("[data-remove-token]").forEach((button) => {
     button.addEventListener("click", () => {
-      state.answerTokens.splice(Number(button.dataset.removeToken), 1);
-      state.sentenceResult = "";
-      state.sentenceHinted = false;
-      renderMission(stage);
+      flashHint("錄音辨識填入後不能手動移除，請重新錄音。");
     });
   });
   bindOptional("#clearSentence", "click", () => {
+    resetRecordingState();
     state.answerTokens = [];
     state.sentenceResult = "";
       state.sentenceHinted = false;
@@ -548,19 +754,17 @@ function bindMissionEvents(stage, mission) {
       state.sentenceResult = "";
       const askedName = state.selectedPerson;
       renderMission(stage);
-      playAudio(audioUrl(mission.askAudio), () => {
+      playAudio(audioUrl(mission.responseAudio[askedName]), () => {
         if (state.askedPerson !== askedName) return;
-        playAudio(audioUrl(mission.responseAudio[askedName]), () => {
-          if (state.askedPerson !== askedName) return;
-          state.questionPlaying = false;
-          state.responseReady = true;
-          state.selectedCommand = "";
-          state.travelPerson = askedName;
-          renderMission(stage);
-        });
+        state.questionPlaying = false;
+        state.responseReady = true;
+        state.selectedCommand = "";
+        state.travelPerson = askedName;
+        renderMission(stage);
       });
       return;
     } else {
+      state.sentenceMissCount = (state.sentenceMissCount || 0) + 1;
       playWrongAudio();
       state.sentenceResult = "";
       state.sentenceHinted = false;
@@ -573,11 +777,13 @@ function bindMissionEvents(stage, mission) {
     state.sentenceHinted = true;
     renderMission(stage);
   });
+  bindOptional("#recordSentence", "click", () => handleRecordSentence(stage, mission));
   bindOptional("#playAskVoice", "click", () => playAudio(audioUrl(mission.askAudio)));
+  bindOptional("#playOwnVoice", "click", playRecordedAudio);
   bindOptional("#pauseVoice", "click", pauseAudio);
   bindOptional("#playResponseVoice", "click", () => playAudio(audioUrl(mission.responseAudio[state.askedPerson])));
   bindOptional("#goMission2", "click", () => {
-    state.stageIndex = 3;
+    state.stageIndex = 2;
     resetStageState();
     render();
   });
@@ -601,6 +807,7 @@ function bindMissionEvents(stage, mission) {
         state.travelPerson = "";
         state.responseReady = false;
         state.questionPlaying = false;
+    resetRecordingState({ keepAnswer: true });
         state.answerTokens = [];
         state.tokenOrder = [];
         state.sentenceResult = "";
@@ -617,8 +824,8 @@ function bindMissionEvents(stage, mission) {
 
 function missionHint(stage) {
   if (stage !== "mission1") return "請依照任務順序完成挑戰。";
-  if (state.questionPlaying) return "正在播放問句，請先聽完。";
-  if (state.askedPerson && !state.responseReady) return "請稍等問句播放完成。";
+  if (state.questionPlaying) return "正在播放朋友回答，請先聽完。";
+  if (state.askedPerson && !state.responseReady) return "請稍等回答播放完成。";
   if (state.selectedCommand === "call" && !state.selectedPerson) return "請選一位朋友。";
   if (state.selectedCommand === "call" && state.selectedPerson) return "請依照順序排出問句詞卡。";
   if (state.askedPerson && state.responseReady) return `請幫${state.askedPerson}選交通方式。`;
@@ -630,44 +837,255 @@ function sentencePanel(mission) {
   const correctTokens = mission.correctTokens || mission.sentence.replace(/[？?。！!，,]/g, "").split(/\s+/).filter(Boolean);
   const tokenSource = state.tokenOrder.length ? state.tokenOrder : mission.tokens;
   const tokens = tokenSource.map((token) => {
-    const disabled = state.answerTokens.includes(token) || state.askedPerson ? "disabled" : "";
+    const disabled = "disabled";
     const hinted = state.sentenceHinted && correctTokens.includes(token) ? " is-answer-hint" : "";
-    return `<button class="token-chip${hinted}" type="button" data-token="${token}" ${disabled}>${token}</button>`;
+    const recognized = state.answerTokens.includes(token) ? " is-recognized" : "";
+    return `<button class="token-chip${hinted}${recognized}" type="button" data-token="${token}" ${disabled}>${token}</button>`;
   }).join("");
   const answer = state.askedPerson
     ? `<span class="sentence-line-text">${mission.sentence}</span>`
     : state.answerTokens.length
-      ? state.answerTokens.map((token, index) => `<button class="answer-token" type="button" data-remove-token="${index}">${token}</button>`).join("")
-      : `<span class="empty-answer">點選下方詞卡來組句</span>`;
+      ? state.answerTokens.map((token) => `<span class="answer-token is-recognition-token">${token}</span>`).join("")
+      : `<span class="recognition-status">${recognitionStatusText()}</span>`;
   const hintClass = state.sentenceHinted ? " is-hinted" : "";
   const hintLabel = state.sentenceHinted ? "已提示" : "提示";
   const activePerson = state.askedPerson || state.selectedPerson;
+  const questionAvatarClass = "person-avatar avatar-ruirong2";
+  const responseAvatarClass = activePerson ? avatarClassByName(activePerson) : "";
   const responseButton = state.askedPerson
     ? `<button class="voice-button response-voice" type="button" id="playResponseVoice" aria-label="播放回答" title="播放回答">${iconSvg("speaker")}</button>`
     : `<button class="voice-button response-voice" type="button" aria-label="播放回答" title="尚未有回答" disabled>${iconSvg("speaker")}</button>`;
   const transportChoices = state.responseReady && state.askedPerson ? inlineTransportPanel(mission) : "";
+  const recordLabel = state.recording ? "停止錄音" : state.recognizing ? "辨識中" : state.recordedAudioUrl ? "重新錄音" : "錄音";
+  const recordIcon = state.recording ? "stop" : "mic";
+  const recordClass = state.recording ? " is-recording" : state.recognizing ? " is-recognizing" : "";
+  const canSubmit = state.answerTokens.length && !state.recording && !state.recognizing;
   return `
-    <div class="sentence-panel flat-sentence-panel">
+    <div class="sentence-panel flat-sentence-panel recognition-mode">
       <div class="flat-compose-row">
-        <span class="sentence-avatar ${avatarClassByName(activePerson, "sentence")}" aria-hidden="true">${activePerson ? "" : "問"}</span>
+        <span class="sentence-avatar ${questionAvatarClass}" aria-hidden="true"></span>
+        <button class="voice-button record-button${recordClass}" type="button" id="recordSentence" aria-label="${recordLabel}" title="${recordLabel}" ${state.askedPerson || state.recognizing ? "disabled" : ""}>${iconSvg(recordIcon)}</button>
         <div class="answer-zone ${state.askedPerson ? "is-sentence-line" : ""}">${answer}</div>
-        <button class="voice-button ask-voice" type="button" id="playAskVoice" aria-label="播放問句" title="播放問句">${iconSvg("speaker")}</button>
         <div class="sentence-actions">
-          <button class="icon-button submit-button" type="button" id="submitSentence" ${state.askedPerson ? "disabled" : ""}>送出</button>
-          <button class="icon-button clear-button" type="button" id="clearSentence" ${state.askedPerson ? "disabled" : ""}>清空</button>
+          <button class="voice-button own-voice" type="button" id="playOwnVoice" aria-label="聽自己念" title="聽自己念" ${state.recordedAudioUrl ? "" : "disabled"}>${iconSvg("speaker")}</button>
+          <button class="icon-button submit-button" type="button" id="submitSentence" ${state.askedPerson || !canSubmit ? "disabled" : ""}>送出</button>
         </div>
       </div>
       <div class="flat-tool-row">
-        <span class="sentence-avatar ${avatarClassByName(activePerson, "sentence")}" aria-hidden="true">${activePerson ? "" : "答"}</span>
+        <span class="sentence-avatar ${responseAvatarClass}" aria-hidden="true">${activePerson ? "" : "答"}</span>
         ${responseButton}
         <button class="hint-button${hintClass}" type="button" id="hintSentence" ${state.askedPerson ? "disabled" : ""}>${hintLabel}</button>
       </div>
-      <div class="token-bank">${tokens}</div>
+      <div class="token-bank is-recognition-bank">${tokens}</div>
       ${transportChoices}
     </div>
   `;
 }
+function recognitionStatusText() {
+  if (state.recording) return "錄音中，再按一次停止。";
+  if (state.recognizing) return "辨識中....";
+  if (state.recognitionError) return state.recognitionError;
+  if (state.recognizedText) return `辨識：${state.recognizedText}`;
+  if (state.recordedAudioUrl) return "可聽自己念，或重新錄音。";
+  return "點擊錄音鈕。";
+}
 
+async function handleRecordSentence(stage, mission) {
+  if (state.recording) {
+    stopSentenceRecording();
+    return;
+  }
+  await startSentenceRecording(stage, mission);
+}
+
+async function startSentenceRecording(stage, mission) {
+  resetRecognitionAnswer();
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    state.mediaStream = stream;
+    state.audioChunks = [];
+    state.mediaRecorder = new MediaRecorder(stream);
+    state.mediaRecorder.addEventListener("dataavailable", (event) => {
+      if (event.data && event.data.size) state.audioChunks.push(event.data);
+    });
+    state.mediaRecorder.addEventListener("stop", () => finishSentenceRecording(stage, mission), { once: true });
+    state.recording = true;
+    state.mediaRecorder.start();
+    renderMission(stage);
+  } catch (error) {
+    resetRecordingState();
+    flashHint("無法開始錄音，請確認瀏覽器麥克風權限。");
+    renderMission(stage);
+  }
+}
+
+function stopSentenceRecording() {
+  if (!state.mediaRecorder || state.mediaRecorder.state === "inactive") return;
+  state.mediaRecorder.stop();
+}
+
+async function finishSentenceRecording(stage, mission) {
+  if (state.recordedAudioUrl) URL.revokeObjectURL(state.recordedAudioUrl);
+  const blob = new Blob(state.audioChunks, { type: state.mediaRecorder?.mimeType || "audio/webm" });
+  state.recordedAudioBlob = blob;
+  state.recordedAudioUrl = URL.createObjectURL(blob);
+  cleanupRecordingStream();
+  state.recording = false;
+  state.recognizing = true;
+  state.answerTokens = [];
+  state.recognizedText = "";
+  state.recognitionError = "";
+  state.lastRecognitionPayload = null;
+  renderMission(stage);
+  try {
+    const payload = await recognizeSpeech(blob);
+    state.lastRecognitionPayload = payload.raw ?? payload;
+    state.recognizedText = payload.text;
+    state.answerTokens = mapRecognitionToCards(payload, mission);
+    renderDeveloperPanel(stage);
+    state.recognitionError = state.recognizedText
+      ? (state.answerTokens.length ? "" : "有辨識到文字，但沒有對應的字卡。")
+      : "辨識完成，但沒有讀到文字。";
+  } catch (error) {
+    state.lastRecognitionPayload = null;
+    state.recognitionError = error.message || "辨識失敗，請確認華語後端已開啟。";
+    state.recognizedText = "";
+  } finally {
+    state.recognizing = false;
+    renderMission(stage);
+  }
+}
+
+async function recognizeSpeech(blob) {
+  const backend = currentSpeechBackend();
+  if (!backend?.endpoint) throw new Error(`${backend?.label || "目前腔調"}尚未設定辨識後端。`);
+  const formData = new FormData();
+  formData.append("audio", blob, "speech.webm");
+  formData.append("dialect", state.dialect);
+  formData.append("recognizer", currentDialect().recognizer);
+  formData.append("provider", backend.provider || "taiwan_tongues");
+  formData.append("provider_id", backend.providerId || "taiwan_tongues_zh");
+  formData.append("language", state.dialect === "mandarin" ? "zh" : "hak");
+  formData.append("scene_id", "scene-game-1-2");
+  formData.append("recognition_mode", state.recognitionMode || "file");
+  const response = await fetch(backend.endpoint, {
+    method: "POST",
+    body: formData
+  });
+  if (!response.ok) {
+    let message = `辨識後端回應失敗：${response.status}`;
+    try {
+      const errorPayload = await response.json();
+      message = errorPayload.detail || errorPayload.message || message;
+    } catch (error) {
+      const errorText = await response.text().catch(() => "");
+      if (errorText) message = errorText;
+    }
+    throw new Error(message);
+  }
+  const contentType = response.headers.get("content-type") || "";
+  const rawPayload = contentType.includes("application/json") ? await response.json() : { text: await response.text() };
+  return window.SPEECH_API?.normalizeResponse(rawPayload, {
+    provider: backend.provider || "taiwan_tongues",
+    provider_id: backend.providerId || "taiwan_tongues_zh",
+    dialect: state.dialect,
+    recognizer: currentDialect().recognizer,
+    scene_id: "scene-game-1-2"
+  }) || rawPayload;
+}
+
+function mapRecognitionToCards(payload, mission) {
+  const backend = currentSpeechBackend();
+  const tokenMap = TOKEN_MAPS[backend.tokenMap] || {};
+  const rawTokens = extractRecognitionTokens(payload);
+  const text = normalizeRecognitionPayload(payload);
+  const source = rawTokens.length ? rawTokens.join("") : text;
+  return matchMappedTokens(source, tokenMap, mission.tokens);
+}
+
+function extractRecognitionTokens(payload) {
+  if (window.SPEECH_API?.tokensFromPayload) return window.SPEECH_API.tokensFromPayload(payload);
+  if (payload == null) return [];
+  if (Array.isArray(payload)) return payload.map(String).filter(Boolean);
+  if (typeof payload !== "object") return [];
+  const value = payload.tokens ?? payload.words ?? payload.result ?? payload.data;
+  if (Array.isArray(value)) return value.map(String).filter(Boolean);
+  if (value && typeof value === "object") return extractRecognitionTokens(value);
+  return [];
+}
+
+function matchMappedTokens(text, tokenMap, availableTokens) {
+  const source = cleanRecognitionText(text);
+  const entries = Object.entries(tokenMap)
+    .filter(([, hakkaToken]) => availableTokens.includes(hakkaToken))
+    .sort((a, b) => b[0].length - a[0].length);
+  const matched = [];
+  let index = 0;
+  while (index < source.length) {
+    const entry = entries.find(([mandarinToken]) => source.startsWith(mandarinToken, index));
+    if (entry) {
+      matched.push(entry[1]);
+      index += entry[0].length;
+    } else {
+      index += 1;
+    }
+  }
+  return matched;
+}
+function normalizeRecognitionPayload(payload) {
+  if (window.SPEECH_API?.textFromPayload) return window.SPEECH_API.textFromPayload(payload);
+  if (payload == null) return "";
+  if (typeof payload === "string") return cleanRecognitionText(payload);
+  if (Array.isArray(payload)) return cleanRecognitionText(payload.join(""));
+  const value = payload.text ?? payload.result ?? payload.transcript ?? payload.tokens ?? payload.data;
+  if (Array.isArray(value)) return cleanRecognitionText(value.join(""));
+  if (value && typeof value === "object") return normalizeRecognitionPayload(value);
+  return cleanRecognitionText(String(value || ""));
+}
+
+function cleanRecognitionText(text) {
+  if (window.SPEECH_API?.cleanText) return window.SPEECH_API.cleanText(text);
+  return text.replace(/[\s，,。！？!?、；;：「」『』（）()]/g, "").trim();
+}
+function playRecordedAudio() {
+  if (!state.recordedAudioUrl) return;
+  playAudio(state.recordedAudioUrl);
+}
+
+function resetRecognitionAnswer() {
+  state.answerTokens = [];
+  state.sentenceResult = "";
+  state.sentenceHinted = false;
+  state.recognizing = false;
+  state.recognizedText = "";
+  state.recognitionError = "";
+  state.lastRecognitionPayload = null;
+  state.recordedAudioBlob = null;
+  if (state.recordedAudioUrl) URL.revokeObjectURL(state.recordedAudioUrl);
+  state.recordedAudioUrl = "";
+}
+
+function resetRecordingState(options = {}) {
+  if (state.mediaRecorder && state.mediaRecorder.state !== "inactive") state.mediaRecorder.stop();
+  cleanupRecordingStream();
+  state.recording = false;
+  state.recognizing = false;
+  state.mediaRecorder = null;
+  state.audioChunks = [];
+  state.recordedAudioBlob = null;
+  state.recognitionError = "";
+  state.lastRecognitionPayload = null;
+  if (state.recordedAudioUrl) URL.revokeObjectURL(state.recordedAudioUrl);
+  state.recordedAudioUrl = "";
+  state.recognizedText = "";
+  if (!options.keepAnswer) state.answerTokens = [];
+}
+
+function cleanupRecordingStream() {
+  if (!state.mediaStream) return;
+  state.mediaStream.getTracks().forEach((track) => track.stop());
+  state.mediaStream = null;
+}
 function inlineTransportPanel(mission) {
   return `
     <div class="inline-transport-panel">
@@ -745,6 +1163,8 @@ function iconSvg(name) {
     speaker: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.75 8.25 11.47 3.53a.75.75 0 0 1 1.28.53v15.88a.75.75 0 0 1-1.28.53l-4.72-4.72H4.5A2.25 2.25 0 0 1 2.25 14v-4A2.25 2.25 0 0 1 4.5 7.75h2.25Z"/><path d="M16.46 8.29a5.25 5.25 0 0 1 0 7.42M19.11 5.64a9 9 0 0 1 0 12.72"/></svg>',
     play: '<svg viewBox="0 0 24 24" aria-hidden="true"><polygon points="6 3 20 12 6 21 6 3"></polygon></svg>',
     pause: '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="6" y="4" width="4" height="16" rx="1"></rect><rect x="14" y="4" width="4" height="16" rx="1"></rect></svg>',
+    mic: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><path d="M12 19v3"></path><path d="M8 22h8"></path></svg>',
+    stop: '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="7" y="7" width="10" height="10" rx="1"></rect></svg>',
     phone: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.8 19.8 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.12 4.18 2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.35 1.9.66 2.81a2 2 0 0 1-.45 2.11L8.05 9.91a16 16 0 0 0 6.04 6.04l1.27-1.27a2 2 0 0 1 2.11-.45c.91.31 1.85.53 2.81.66A2 2 0 0 1 22 16.92Z"></path></svg>',
     language: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v18M4 7h10M6 7c.85 3.86 3.1 6.85 7 9M13 7c-.72 3.3-2.82 6.15-7 9M14 18l3.5-8 3.5 8M15.25 15.25h4.5"/></svg>',
     collapse: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m8 10 4-4 4 4M16 14l-4 4-4-4"/></svg>',
@@ -803,7 +1223,7 @@ function playMissionOkAudio() {
   playLocalAudio(`${LOCAL_MUSIC_ROOT}/S2_m1_ok.mp3`);
 }
 function playWrongAudio() {
-  playLocalAudio(`${LOCAL_MUSIC_ROOT}/S2_m1_false.mp3`);
+  playLocalAudio(WRONG_SENTENCE_AUDIO);
 }
 
 function playLocalAudio(src, onEnded) {
@@ -846,6 +1266,41 @@ function flashHint(message) {
 }
 
 init();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
