@@ -109,6 +109,27 @@ function currentProviderLabel() {
   return selectedDialect === "sixian" ? "客委會 API（四縣腔）" : "尚未選擇";
 }
 
+function recognitionModeLabel(mode = breakfastRecognitionMode()) {
+  return mode === "realtime" ? "即時辨識 WebSocket" : "錄完判斷（檔案辨識）";
+}
+
+function speechHitDetails(text, question) {
+  const source = cleanSpeechText(text);
+  return acceptedAnswers(question).map(answer => {
+    const variants = answerVariants(answer);
+    const hit = variants.some(variant => source.includes(variant));
+    return { answer, hit, variants };
+  });
+}
+
+function recognizedFoodCards(text) {
+  const source = cleanSpeechText(text);
+  return foods.filter(food => [food.hakka, food.chinese, food.pinyin]
+    .filter(Boolean)
+    .map(cleanSpeechText)
+    .some(variant => source.includes(variant)));
+}
+
 function renderDeveloperPanel() {
   if (!els.developerPanel || !els.developerContent) return;
   if (els.debugToggle) els.debugToggle.checked = debugMode;
@@ -118,27 +139,35 @@ function renderDeveloperPanel() {
 
   const question = activeQuestions[currentIndex] || activeQuestions[0] || questions[0];
   const answerList = acceptedAnswers(question);
-  const cleanText = cleanSpeechText(recognizedSpeechText);
-  const hitTags = answerList.map(answer => {
-    const hit = answerVariants(answer).some(variant => cleanText.includes(variant));
-    return `<span class="${hit ? "is-hit" : ""}">${escapeHtml(answer)}</span>`;
-  }).join("");
+  const details = speechHitDetails(recognizedSpeechText, question);
+  const hitCount = details.filter(item => item.hit).length;
+  const hitTags = details.map(item => `<span class="${item.hit ? "is-hit" : ""}">${escapeHtml(item.answer)}</span>`).join("");
+  const convertedCards = recognizedFoodCards(recognizedSpeechText);
+  const convertedTags = convertedCards.length
+    ? convertedCards.map(food => `<span class="is-hit">${escapeHtml(food.hakka)}</span>`).join("")
+    : `<span>尚未填入</span>`;
+  const answerLine = answerList.map(answer => {
+    const food = findFood(answer);
+    return food ? `${food.hakka}（${food.pinyin}）` : answer;
+  }).join(" / ");
   const rawPayload = lastRecognitionPayload ? JSON.stringify(lastRecognitionPayload, null, 2) : "尚無回傳資料";
+  const statusText = recognitionError || (isSpeechRecognizing ? "辨識中" : (recognizedSpeechText ? "已回傳辨識資料" : "尚未送出"));
+  const recognitionMode = breakfastRecognitionMode();
 
   els.developerContent.innerHTML = `
     <div class="developer-item target-sentence">
-      <span class="developer-label">題目</span>
-      <span class="sentence-label">${escapeHtml(selectedDialect || "未選腔別")}</span>
-      <strong>${escapeHtml(question.title || "")}</strong>
+      <span class="developer-label">正確答案</span>
+      <span class="sentence-label">${escapeHtml(selectedDialect || "四縣腔")}</span>
+      <strong>${escapeHtml(answerLine || "尚無正確答案")}</strong>
       <small>${escapeHtml(els.questionPrompt?.textContent || question.prompt || "")}</small>
     </div>
     <div class="developer-item">
-      <span class="developer-label">辨識文字</span>
+      <span class="developer-label">標準 ASR</span>
       <strong>${escapeHtml(recognizedSpeechText || recognitionError || "尚未送出")}</strong>
     </div>
     <div class="developer-item">
-      <span class="developer-label">正確答案</span>
-      <p>${escapeHtml(answerList.join(" / "))}</p>
+      <span class="developer-label">失敗次數</span>
+      <p>${missedQuestions.has(currentIndex) ? 1 : 0}</p>
     </div>
     <div class="developer-item">
       <span class="developer-label">命中狀態</span>
@@ -146,16 +175,30 @@ function renderDeveloperPanel() {
     </div>
     <div class="developer-item">
       <span class="developer-label">完整度</span>
-      <p>${answerList.filter(answer => answerVariants(answer).some(variant => cleanText.includes(variant))).length} / ${answerList.length}</p>
+      <p>${hitCount} / ${answerList.length}</p>
     </div>
     <div class="developer-item">
-      <span class="developer-label">辨識 API</span>
-      <p>${escapeHtml(currentProviderLabel())} / ${escapeHtml(BREAKFAST_ASR_ENDPOINT)}</p>
-      <p class="developer-subnote">${breakfastRecognitionMode() === "realtime" ? "即時辨識 WebSocket" : "錄完判斷（檔案辨識）"}</p>
+      <span class="developer-label">前端轉成字卡</span>
+      <div class="hit-tags">${convertedTags}</div>
     </div>
     <div class="answer-box">
       <label for="developerAnswerInput">辨識文字 / 開放式音檔</label>
-      <textarea id="developerAnswerInput" rows="3" placeholder="可手動修正測試">${escapeHtml(recognizedSpeechText)}</textarea>
+      <textarea id="developerAnswerInput" rows="3" placeholder="錄音辨識完成後會顯示在這裡，也可以手動修正測試">${escapeHtml(recognizedSpeechText)}</textarea>
+    </div>
+    <div class="developer-item">
+      <span class="developer-label">辨識 API</span>
+      <select id="developerProviderSelect" disabled>
+        <option selected>${escapeHtml(currentProviderLabel())}</option>
+      </select>
+      <p class="developer-subnote">目前可用：${escapeHtml(currentProviderLabel())} / ${escapeHtml(BREAKFAST_ASR_ENDPOINT)}</p>
+    </div>
+    <div class="developer-item">
+      <span class="developer-label">辨識模式</span>
+      <select id="developerRecognitionMode">
+        <option value="realtime" ${recognitionMode === "realtime" ? "selected" : ""}>即時辨識 WebSocket</option>
+        <option value="file" ${recognitionMode === "file" ? "selected" : ""}>錄完判斷（檔案辨識）</option>
+      </select>
+      <p class="developer-subnote">可等待狀態：${escapeHtml(statusText)}</p>
     </div>
     <div class="developer-item">
       <span class="developer-label">後端原始回傳</span>
@@ -168,6 +211,11 @@ function renderDeveloperPanel() {
     recognitionError = "";
     lastRecognitionPayload = recognizedSpeechText ? { text: recognizedSpeechText, source: "developer" } : null;
     handleSpeechAnswer(recognizedSpeechText, question, { silent: true });
+    renderDeveloperPanel();
+  });
+
+  els.developerContent.querySelector("#developerRecognitionMode")?.addEventListener("change", event => {
+    localStorage.setItem(BREAKFAST_RECOGNITION_MODE_KEY, event.target.value === "realtime" ? "realtime" : "file");
     renderDeveloperPanel();
   });
 }
@@ -768,6 +816,7 @@ updateLessonCards();
 updateCarouselButtons();
 showScreen("intro");
 renderDeveloperPanel();
+
 
 
 

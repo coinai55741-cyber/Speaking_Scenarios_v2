@@ -1137,6 +1137,26 @@ h1 {
   font-weight: 900;
 }
 
+
+.developer-panel select {
+  width: 100%;
+  margin-top: 6px;
+  padding: 8px 10px;
+  border: 1px solid rgba(30, 49, 91, 0.18);
+  border-radius: 8px;
+  background: #fff;
+  color: var(--ink);
+  font: inherit;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.developer-panel select:disabled {
+  color: var(--ink);
+  opacity: 1;
+  background: #f7fbfa;
+}
+
 .developer-panel textarea {
   width: 100%;
   min-height: 82px;
@@ -1187,4 +1207,5 @@ body.debug-mode .game-shell {
     margin-left: auto;
   }
 }
+
 
