@@ -582,20 +582,39 @@
   // 檔案式辨識發送
   async function sendAudioFile(blob, q) {
     setAsrState("recording", "⏳ 辨識中", "音訊上傳處理中⋯", "（分析中⋯）");
+    const isMandarin = isMandarinMode();
+    const providerId = asrProviderSelect?.value || (isMandarin ? "taiwan_tongues_zh" : "hakka_api_hak");
+
     try {
       const form = new FormData();
       form.append("audio", blob, "speaking-field-trip.webm");
-      form.append("provider_id", asrProviderSelect?.value || "hakka_api_hak");
-      form.append("language", isMandarinMode() ? "zh" : "hak");
-      form.append("recognizer", isMandarinMode() ? "mandarin" : "hakka-sixian");
+      form.append("provider_id", providerId);
+      form.append("provider", isMandarin ? "taiwan_tongues" : "hakka_api");
+      form.append("language", isMandarin ? "zh" : "hak");
+      form.append("dialect", isMandarin ? "mandarin" : "sixian");
+      form.append("recognizer", isMandarin ? "mandarin" : "hakka-sixian");
 
       const endpoint = window.SPEECH_API?.endpoint() || "http://localhost:5000/api/speech/recognize";
       const response = await fetch(endpoint, { method: "POST", body: form });
       const payload = await response.json();
-      const text = window.SPEECH_API ? window.SPEECH_API.textFromPayload(payload) : (payload.text || payload.result || "");
+
+      let text = "";
+      if (payload && payload.status !== "not_enabled" && !payload.error) {
+        if (typeof payload.text === "string") text = payload.text;
+        else if (typeof payload.transcript === "string") text = payload.transcript;
+        else if (typeof payload.result === "string") text = payload.result;
+        else if (Array.isArray(payload.result)) text = payload.result.join("");
+        else if (window.SPEECH_API) text = window.SPEECH_API.textFromPayload(payload);
+      }
+
+      // 清理任何 mock 描述字串
+      if (text.includes("dialect=") || text.includes("recognizer=")) {
+        text = "";
+      }
+
       handleRecognitionResult(q, text);
     } catch (e) {
-      setAsrState("retry", "⚠️ 辨識失敗", "無法取得檔案辨識結果，請重試或切換即時串流。");
+      setAsrState("retry", "⚠️ 辨識提示", "無法連線至檔案辨識伺服器（建議將辨識模式切換為即時串流 WebSocket）");
     }
   }
 

@@ -70,10 +70,13 @@
     if (payload == null) return "";
     if (typeof payload === "string") return cleanText(payload);
     if (Array.isArray(payload)) return cleanText(payload.join(""));
-    const value = payload.text ?? payload.result ?? payload.transcript ?? payload.sentence ?? payload.tokens ?? payload.data;
+    if (payload.status === "not_enabled" || payload.error) return "";
+    const value = payload.text ?? payload.result ?? payload.transcript ?? payload.sentence ?? payload.tokens ?? (typeof payload.data === "string" ? payload.data : (payload.data?.text ?? payload.data?.result ?? payload.data?.transcript ?? ""));
     if (Array.isArray(value)) return cleanText(value.join(""));
     if (value && typeof value === "object") return textFromPayload(value);
-    return cleanText(value);
+    const cleaned = cleanText(value);
+    if (cleaned.includes("dialect=") || cleaned.includes("recognizer=")) return "";
+    return cleaned;
   }
 
   function tokensFromPayload(payload) {
