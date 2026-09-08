@@ -105,7 +105,10 @@ function updateLessonCards() {
   });
 
   els.lessonCards.forEach(card => {
-    const isOpen = selectedDialect === "sixian";
+// 只有四縣腔 且 沒有 is-locked 的卡片（也就是第 3 階段）才會開放
+const isLocked = card.classList.contains("is-locked");
+const isOpen = selectedDialect === "sixian" && !isLocked;
+
     card.disabled = !isOpen;
     card.setAttribute("aria-disabled", String(!isOpen));
   });
@@ -408,6 +411,13 @@ updateCarouselButtons();
 showScreen("intro");
 
 
+  els.lessonCards.forEach(card => {
+    // 只要有 is-locked 或是非四縣腔就不解鎖
+    const isLocked = card.classList.contains("is-locked");
+    const isOpen = selectedDialect === "sixian" && !isLocked;
+    card.disabled = !isOpen;
+    card.setAttribute("aria-disabled", String(!isOpen));
+  });
 
 
 

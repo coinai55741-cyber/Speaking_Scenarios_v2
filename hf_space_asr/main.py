@@ -513,6 +513,36 @@ async def transcribe(
     return await run_transcription(audio, provider_id, language)
 
 
+@app.api_route("/ticket", methods=["GET", "POST"])
+async def get_realtime_ticket():
+    if not hakka_realtime_asr_enabled():
+        raise HTTPException(
+            status_code=503,
+            detail="客委會即時辨識尚未設定，請在 hf_space_asr/.env 填入 HAKKA_API_USERNAME 與 HAKKA_API_PASSWORD。"
+        )
+    try:
+        token, _ = hakka_login(HAKKA_REALTIME_ASR_BASE_URL)
+        headers = {"Authorization": f"Bearer {token}"}
+        access_response = requests.get(
+            f"{HAKKA_REALTIME_ASR_BASE_URL}/api/v1/streaming/transcript/access-info",
+            headers=headers,
+            timeout=20
+        )
+        access_response.raise_for_status()
+        access_payload = access_response.json()
+        access_data = payload_data(access_payload)
+        ws_url = access_payload.get("url") or access_data.get("url")
+        ticket = access_payload.get("ticket") or access_data.get("ticket")
+        if not ws_url or not ticket:
+            raise HTTPException(status_code=502, detail="客委會即時辨識沒有回傳 WebSocket URL 或 ticket。")
+        return {"url": ws_url, "ticket": ticket}
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=502, detail=str(e))
+
+
+
 
 
 

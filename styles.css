@@ -1374,17 +1374,27 @@ h1 {
   margin-top: 0;
   border: 1px solid #f0d250; 
 }
-
-.card-link.is-disabled,
-.card-link:disabled {
-  color: #8392a0;
-  background: #e2e8f0;
-  box-shadow: 0 0px 0 #cbd5e1;
-  cursor: not-allowed;
 }
 
-.card-link.is-disabled:hover,
-.card-link:disabled:hover {
+.scenario-card .card-link.is-disabled,
+.scenario-card .card-link:disabled {
+  color: #8392a0;
+  background: #e2e8f0;
+  border-color: #cbd5e1;
+  box-shadow: 0 0px 0 #cbd5e1;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.scenario-card.is-disabled {
+  opacity: .78;
+}
+
+.scenario-card .card-link.is-disabled:hover,
+.scenario-card .card-link:disabled:hover {
+  color: #8392a0;
+  background: #e2e8f0;
+  border-color: #cbd5e1;
   transform: none;
   opacity: 1;
 }
@@ -1398,8 +1408,5 @@ h1 {
 .scenario-card h3 {
   font-family: "GenSekiGothic2TW", "Noto Sans TC", "Microsoft JhengHei", sans-serif;
 }
-
-
-
 
 

@@ -323,7 +323,7 @@ function updateLessonCards() {
   });
 
   els.lessonCards.forEach(card => {
-    const isOpen = selectedDialect === "sixian" && card.dataset.lesson === "1";
+    const isOpen = selectedDialect === "sixian" && ["1", "2"].includes(card.dataset.lesson);
     card.disabled = !isOpen;
     card.setAttribute("aria-disabled", String(!isOpen));
   });
@@ -845,6 +845,11 @@ els.dialects.forEach(button => {
 els.lessonCards.forEach(card => {
   card.addEventListener("click", () => {
     if (lessonDrag.moved) return;
+    if (card.dataset.href) {
+      playButtonSound();
+      window.location.href = card.dataset.href;
+      return;
+    }
     startLesson(card.dataset.lesson);
   });
 });

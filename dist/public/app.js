@@ -57,7 +57,10 @@ const grid = document.querySelector("#scenarioGrid");
 
 function createScenarioCard(scenario) {
   const card = document.createElement("article");
-  card.className = "scenario-card";
+  card.className = `scenario-card${scenario.disabled ? " is-disabled" : ""}`;
+  if (scenario.disabled) {
+    card.setAttribute("aria-disabled", "true");
+  }
 
   const demoUrl = scenario.id === "holiday" ? "./holiday.html" : `../demo_v1/?step=${scenario.demoStep}`;
   const actionButton = scenario.disabled

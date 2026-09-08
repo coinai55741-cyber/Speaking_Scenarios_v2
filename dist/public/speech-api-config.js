@@ -1,9 +1,11 @@
 (function () {
   const DEFAULT_BASE_URL = "http://localhost:5000";
+  const DEFAULT_REALTIME_TICKET_URL = "http://localhost:8788/ticket";
   const ENDPOINTS = {
     recognize: "/api/speech/recognize",
     legacyRecognize: "/recognize",
-    legacyTranscribe: "/transcribe"
+    legacyTranscribe: "/transcribe",
+    ticket: "/ticket"
   };
 
   const RECOGNITION_MODES = {
@@ -36,12 +38,25 @@
     return `${baseUrl()}${path}`;
   }
 
+  function realtimeTicketUrl() {
+    if (window.SPEECH_API_REALTIME_URL) return window.SPEECH_API_REALTIME_URL;
+    if (window.SPEECH_API_TICKET_URL) return window.SPEECH_API_TICKET_URL;
+    try {
+      const stored = localStorage.getItem("speakingDemoRealtimeTicketEndpoint");
+      if (stored) return stored;
+    } catch (e) {}
+    if (window.SPEECH_API_BASE_URL && window.SPEECH_API_BASE_URL !== DEFAULT_BASE_URL) {
+      return `${baseUrl().replace(/\/+$/, "")}/ticket`;
+    }
+    return DEFAULT_REALTIME_TICKET_URL;
+  }
+
   function isAllowedEndpoint(value) {
     try {
       const url = new URL(value);
       const allowedLocal = url.hostname === "127.0.0.1" || url.hostname === "localhost";
       const allowedTunnel = url.hostname.endsWith(".trycloudflare.com") || url.hostname.endsWith(".ngrok-free.app") || url.hostname.endsWith(".ngrok-free.dev") || url.hostname.endsWith(".onrender.com");
-      return Object.values(ENDPOINTS).includes(url.pathname) && (allowedLocal || allowedTunnel);
+      return (Object.values(ENDPOINTS).includes(url.pathname) || url.pathname === "/ticket") && (allowedLocal || allowedTunnel);
     } catch (error) {
       return false;
     }
@@ -95,6 +110,7 @@
   window.SPEECH_API = {
     baseUrl,
     endpoint,
+    realtimeTicketUrl,
     isAllowedEndpoint,
     normalizeResponse,
     textFromPayload,
@@ -103,7 +119,7 @@
     endpoints: ENDPOINTS,
     providers: PROVIDERS,
     recognitionModes: RECOGNITION_MODES,
-    storageKey: "speakingDemoSpeechEndpoint"
+    storageKey: "speakingDemoSpeechEndpoint",
+    realtimeStorageKey: "speakingDemoRealtimeTicketEndpoint"
   };
 }());
-

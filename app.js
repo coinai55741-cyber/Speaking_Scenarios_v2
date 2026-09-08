@@ -37,6 +37,14 @@ const scenarios = [
     demoStep: 0
   },
   {
+    id: "reading-1",
+    title: "繪本朗讀",
+    href: "./reading.html",
+    artClass: "art-reading",
+    image: "./assets/scenario-picture-book-reading.png",
+    description: "陪故事中的主角找一位聽眾，把〈𠊎中意讀書〉讀出來，完成三段客語朗讀任務。"
+  },
+  {
     id: "shopping-food",
     title: "逛街吃飯記",
     artClass: "art-food",
@@ -70,13 +78,16 @@ const grid = document.querySelector("#scenarioGrid");
 
 function createScenarioCard(scenario) {
   const card = document.createElement("article");
-  card.className = "scenario-card";
+  card.className = `scenario-card${scenario.disabled ? " is-disabled" : ""}`;
+  if (scenario.disabled) {
+    card.setAttribute("aria-disabled", "true");
+  }
 
-  const demoUrl = scenario.id === "holiday"
+  const demoUrl = scenario.href || (scenario.id === "holiday"
     ? "./holiday.html"
     : scenario.id === "scene-game-1-2"
       ? "./scene-game-1-2.html"
-      : `../demo_v1/?step=${scenario.demoStep}`;
+      : `../demo_v1/?step=${scenario.demoStep}`);
   const actionButton = scenario.disabled
     ? `<button class="card-link is-disabled" type="button" disabled aria-disabled="true">開始任務</button>` 
     : `<a class="card-link" href="${demoUrl}">開始任務</a>`;
@@ -107,5 +118,3 @@ if (sidebar && btnOut && btnIn) {
     sidebar.classList.add('collapsed');
   });
 }
-
-
