@@ -274,7 +274,8 @@ function iconSvg(name) {
   const icons = {
     speaker: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.75 8.25 11.47 3.53a.75.75 0 0 1 1.28.53v15.88a.75.75 0 0 1-1.28.53l-4.72-4.72H4.5A2.25 2.25 0 0 1 2.25 14v-4A2.25 2.25 0 0 1 4.5 7.75h2.25Z"/><path d="M16.46 8.29a5.25 5.25 0 0 1 0 7.42M19.11 5.64a9 9 0 0 1 0 12.72"/></svg>',
     mic: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><path d="M12 19v3"></path><path d="M8 22h8"></path></svg>',
-    stop: '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="7" y="7" width="10" height="10" rx="1"></rect></svg>'
+    stop: '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="7" y="7" width="10" height="10" rx="1"></rect></svg>',
+    talkBubbles: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7.5 5.5h6.8a4.2 4.2 0 0 1 0 8.4H11l-3.6 3.1v-3.1A4.2 4.2 0 0 1 7.5 5.5Z"></path><path d="M14.5 8.3h2.1a3.7 3.7 0 0 1 0 7.4h-.8v2.4l-2.8-2.4h-2"></path></svg>'
   };
   return icons[name] || icons.mic;
 }
@@ -673,7 +674,7 @@ function renderSceneStage(question, selectedChoice = null) {
       <img class="scene-bg" src="./assets/lesson-1-breakfast-game-scene.png" alt="早餐廚房情境">
       <div class="scene-question">${question.title}</div>
       <div class="plate-answer" aria-label="盤子答題區">${selectedImage}</div>
-      <div class="plate-system-text">${systemText}</div>
+      <div class="plate-system-text"><span class="plate-speak-icon">${iconSvg("talkBubbles")}</span><span>${escapeHtml(systemText)}</span></div>
     </div>
   `;
 }
@@ -880,6 +881,7 @@ updateLessonCards();
 updateCarouselButtons();
 showScreen("intro");
 renderDeveloperPanel();
+
 
 
 
