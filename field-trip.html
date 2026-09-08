@@ -3,8 +3,9 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>客庄聲音小達人 - 情境口說互動</title>
+  <title>客庄聲音小達人 - 客語口說辨識挑戰</title>
   <link rel="stylesheet" href="./field-trip.css">
+  <script src="./speech-api-config.js?v=20260908-fieldtrip1"></script>
 </head>
 <body>
   <main class="shell">
@@ -18,19 +19,6 @@
         <div id="hotspots" class="hotspots"></div>
         <div id="toast" class="toast" hidden></div>
 
-        <!-- 模擬 AI 辨識對話框 -->
-        <div id="demoPanel" class="overlay" hidden>
-          <div class="card">
-            <h2>Demo AI辨識</h2>
-            <p id="demoPrompt"></p>
-            <div class="actions">
-              <button id="demoCorrect" class="ok" type="button">✓ 模擬辨識正確</button>
-              <button id="demoRetry" class="retry" type="button">↻ 再試一次</button>
-            </div>
-            <button id="demoClose" class="secondary" type="button">關閉</button>
-          </div>
-        </div>
-
         <!-- 說明與提示對話框 -->
         <div id="helpPanel" class="overlay" hidden>
           <div class="card">
@@ -42,10 +30,24 @@
       </div>
     </section>
 
+    <!-- 辨識回饋面板與操作區 (紅框處) -->
     <footer class="below">
-      <span class="badge">單檔離線 DEMO</span>
-      <span>直接點擊畫面按鈕即可互動體驗。</span>
-      <button id="resetBtn" type="button">重新開始</button>
+      <section id="asrBar" class="asr-bar asr-idle" aria-live="polite">
+        <div class="asr-status-row">
+          <span class="asr-dot" aria-hidden="true"></span>
+          <span class="asr-badge" id="asrBadge">客語辨識</span>
+          <span class="asr-msg" id="asrMsg">點擊或按住右側「換你講看啊」開始進行口說挑戰</span>
+        </div>
+        <div id="asrLiveRow" class="asr-live-row" hidden>
+          <span class="asr-tag">即時辨識</span>
+          <span class="asr-text" id="asrLiveText" lang="hak">（聆聽中⋯）</span>
+        </div>
+      </section>
+
+      <div class="below-toolbar">
+        <span class="badge">即時語音辨識</span>
+        <button id="resetBtn" type="button">重新開始遊戲</button>
+      </div>
     </footer>
   </main>
 

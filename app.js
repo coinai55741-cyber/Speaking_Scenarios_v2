@@ -28,7 +28,7 @@ const scenarios = [
     title: "你家在哪",
     artClass: "art-home",
     image: "./assets/scene-game-1-2/intro-school-friends.png",
-    description: "放學後大家討論要去誰家玩，聽一聽、問一問，完成客語交通與住家情境任務。",
+    description: "放學後大家討論要去誰家玩，聽一聽、問一問，完成任務吧！",
     flow: [
       "先聽同學討論要去哪裡。",
       "再用客語問朋友怎麼來。",
