@@ -3,14 +3,20 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>客庄聲音小達人 - 客語口說辨識挑戰</title>
+  <title>客庄聲音小達人 - 客語/華語口說辨識挑戰</title>
   <link rel="stylesheet" href="./field-trip.css">
-  <script src="./speech-api-config.js?v=20260908-fieldtrip1"></script>
+  <script src="./speech-api-config.js?v=20260908-fieldtrip2"></script>
 </head>
 <body>
   <main class="shell">
     <header class="game-topbar">
       <a class="back-link" href="./breakfast.html">← 返回情境</a>
+      
+      <!-- 開發者模式切換開關 (同 holiday.html) -->
+      <label class="mode-toggle" title="顯示內部檢視、手動輸入與 API 切換">
+        <input id="debugToggle" type="checkbox">
+        <span>開發者模式</span>
+      </label>
     </header>
 
     <section class="frame">
@@ -36,7 +42,7 @@
         <div class="asr-status-row">
           <span class="asr-dot" aria-hidden="true"></span>
           <span class="asr-badge" id="asrBadge">客語辨識</span>
-          <span class="asr-msg" id="asrMsg">點擊或按住右側「換你講看啊」開始進行口說挑戰</span>
+          <span class="asr-msg" id="asrMsg">點擊或按住右側「換你講看啊」開始說話</span>
         </div>
         <div id="asrLiveRow" class="asr-live-row" hidden>
           <span class="asr-tag">即時辨識</span>
@@ -45,10 +51,52 @@
       </section>
 
       <div class="below-toolbar">
-        <span class="badge">即時語音辨識</span>
+        <span class="badge" id="currentApiBadge">即時語音辨識（客語）</span>
+        <button id="skipBtn" class="skip-btn" type="button">跳過本題 ➔</button>
         <button id="resetBtn" type="button">重新開始遊戲</button>
       </div>
     </footer>
+
+    <!-- 內部檢視 / 開發者面板 (同 holiday.html) -->
+    <aside id="developerPanel" class="developer-panel" hidden>
+      <h2>內部檢視</h2>
+      <div id="targetSentence" class="developer-item target-sentence">
+        <span id="sentenceLabel" class="sentence-label">目前題目目標</span>
+        <strong id="sentenceText">公廳</strong>
+        <small id="sentenceMandarin">華語對應：宗祠 / 祖堂</small>
+      </div>
+
+      <div class="developer-item">
+        <span class="developer-label">辨識狀態</span>
+        <strong id="asrStatusText">尚未送出</strong>
+      </div>
+
+      <div class="developer-item">
+        <span class="developer-label">當前得分</span>
+        <strong id="debugScore">0 分</strong>
+      </div>
+
+      <div class="answer-box">
+        <label for="answerInput">辨識文字 / 模擬手動輸入</label>
+        <textarea id="answerInput" rows="3" placeholder="錄音辨識後會顯示在這裡，也可手動輸入文字點測試"></textarea>
+        <button id="debugCompareBtn" class="developer-btn" type="button">測試比對當前題目</button>
+      </div>
+
+      <div class="developer-item">
+        <label class="developer-label" for="asrProviderSelect">辨識 API</label>
+        <select id="asrProviderSelect" class="developer-select">
+          <option value="hakka_api_hak" selected>客委會 API（客語）</option>
+          <option value="taiwan_tongues_zh">Taiwan-Tongues-ASR-CE（華語測試）</option>
+        </select>
+        
+        <label class="developer-label" for="recognitionModeSelect" style="margin-top: 10px;">辨識模式</label>
+        <select id="recognitionModeSelect" class="developer-select">
+          <option value="realtime" selected>即時串流（WebSocket）</option>
+          <option value="file">錄完判斷（檔案辨識）</option>
+        </select>
+        <p id="asrProviderNote" class="developer-note">預設使用客語辨識。選擇華語時將切換為華語標準答案比對。</p>
+      </div>
+    </aside>
   </main>
 
   <!-- 載入遊戲資料與資源庫 -->

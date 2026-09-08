@@ -1,4 +1,4 @@
-// 客庄聲音小達人 - 互動邏輯與即時語音辨識
+// 客庄聲音小達人 - 互動邏輯、即時語音辨識與開發者模式 (客/華語切換)
 (() => {
   // 從資料檔取得遊戲資料
   const { screens, questions, SFX, hotspots, lessonUrl } = window.FIELD_TRIP_DATA || {};
@@ -22,6 +22,20 @@
   const asrMsg = document.getElementById("asrMsg");
   const asrLiveRow = document.getElementById("asrLiveRow");
   const asrLiveText = document.getElementById("asrLiveText");
+  const currentApiBadge = document.getElementById("currentApiBadge");
+
+  // 開發者模式元素 (同 holiday.html)
+  const debugToggle = document.getElementById("debugToggle");
+  const developerPanel = document.getElementById("developerPanel");
+  const sentenceText = document.getElementById("sentenceText");
+  const sentenceMandarin = document.getElementById("sentenceMandarin");
+  const asrStatusText = document.getElementById("asrStatusText");
+  const debugScore = document.getElementById("debugScore");
+  const answerInput = document.getElementById("answerInput");
+  const debugCompareBtn = document.getElementById("debugCompareBtn");
+  const asrProviderSelect = document.getElementById("asrProviderSelect");
+  const recognitionModeSelect = document.getElementById("recognitionModeSelect");
+  const asrProviderNote = document.getElementById("asrProviderNote");
 
   // 遊戲狀態
   let state = {
@@ -36,6 +50,13 @@
   let toastTimer = null;
   let isRecording = false;
   let recTimeout = null;
+  let mediaRecorder = null;
+  let audioChunks = [];
+
+  // 是否切換至華語辨識
+  function isMandarinMode() {
+    return asrProviderSelect?.value === "taiwan_tongues_zh";
+  }
 
   // 根據當前畫面找出對應題目
   const qForScreen = (s) => questions.find((q) => q.before === s || q.after === s);
@@ -91,24 +112,36 @@
     }
   }
 
+  // 更新開發者面板資訊
+  function updateDeveloperPanel() {
+    if (!developerPanel || developerPanel.hidden) return;
+    const q = qForScreen(state.screen) || questions[0];
+    if (sentenceText) sentenceText.textContent = q.answer;
+    if (sentenceMandarin) sentenceMandarin.textContent = `華語對應：${q.mandarinAnswer || q.answer}`;
+    if (debugScore) debugScore.textContent = `${state.score} 分`;
+  }
+
   // 渲染當前畫面與熱區按鈕
   function render() {
     screenImg.src = screens[state.screen];
     hotspotLayer.innerHTML = "";
 
+    const isMandarin = isMandarinMode();
     const q = qForScreen(state.screen);
+
     if (q) {
+      const targetTxt = isMandarin ? (q.mandarinAnswer || q.answer) : q.answer;
       if (q.before === state.screen) {
         setAsrState(
           "idle",
-          `第 ${q.id} 題`,
-          `請點擊右側「換你講看啊」，說出客語「${q.answer}」`
+          isMandarin ? `第 ${q.id} 題 (華語)` : `第 ${q.id} 題 (客語)`,
+          `請點擊右側「換你講看啊」，說出「${targetTxt}」`
         );
       } else if (q.after === state.screen) {
         setAsrState(
           "success",
           `第 ${q.id} 題 通過`,
-          `✓ 答對了！命中「${q.answer}」，請點擊右下角「下一題」繼續`
+          `✓ 答對了！命中「${targetTxt}」，請點擊右下角「下一題」繼續`
         );
       }
     } else if (state.screen === 0) {
@@ -116,6 +149,8 @@
     } else if (state.screen >= 11) {
       setAsrState("success", "全部通關", `🎉 恭喜完成 5 題挑戰！總得分：${state.score} 分`);
     }
+
+    updateDeveloperPanel();
 
     const currentHotspots = hotspots[state.screen] || [];
     currentHotspots.forEach((h) => {
@@ -139,7 +174,7 @@
   }
 
   /* ─────────────────────────────────────────────────────────────
-   * 客語即時串流 ASR 核心模組 (WebSocket + 16kHz PCM)
+   * 客語/華語即時串流 ASR 核心模組 (WebSocket + 16kHz PCM)
    * ───────────────────────────────────────────────────────────── */
   const ASR = (() => {
     let ws = null;
@@ -320,84 +355,132 @@
   })();
 
   /* ─────────────────────────────────────────────────────────────
-   * 題目比對演算法 (支援客語同音/異體字與模糊命中)
+   * 題目比對演算法 (支援客語/華語雙語比對與同義詞容錯)
    * ───────────────────────────────────────────────────────────── */
   function normalizeText(str) {
     return String(str || "")
-      .replace(/[\s，,。！？!?、；;：「」『』（）()]/g, "")
+      .replace(/[\s，,。！？!?、；;：「」『』（）()/]/g, "")
       .trim();
   }
 
-  function checkAnswerMatch(targetAnswer, recognizedText, qId) {
+  function checkAnswerMatch(q, recognizedText) {
     const rawGot = normalizeText(recognizedText);
-    const rawTarget = normalizeText(targetAnswer);
-
     if (!rawGot) return false;
 
-    // 第 1 題：公廳
-    if (qId === 1) {
-      return (
-        rawGot.includes("公廳") ||
-        rawGot.includes("公亭") ||
-        rawGot.includes("廳") ||
-        rawGot.includes("公")
-      );
-    }
+    const isMandarin = isMandarinMode();
 
-    // 第 2 題：伙房屋
-    if (qId === 2) {
-      return (
-        rawGot.includes("伙房屋") ||
-        rawGot.includes("伙房") ||
-        rawGot.includes("火房屋") ||
-        rawGot.includes("火房") ||
-        rawGot.includes("房屋")
-      );
-    }
-
-    // 第 3 題：正月半
-    if (qId === 3) {
-      return (
-        rawGot.includes("正月半") ||
-        rawGot.includes("正月") ||
-        rawGot.includes("月半")
-      );
-    }
-
-    // 第 4 題：拜牙 (支援 拜𠊎 / 拜厓 / 拜牙 / 拜喏)
-    if (qId === 4) {
-      return (
-        rawGot.includes("拜牙") ||
-        rawGot.includes("拜𠊎") ||
-        rawGot.includes("拜厓") ||
-        rawGot.includes("拜喏") ||
-        rawGot.includes("拜芽") ||
-        rawGot.includes("拜")
-      );
-    }
-
-    // 第 5 題：該係公廳，乜係伙房屋。
-    if (qId === 5) {
-      // 關鍵詞匹配
-      const hasGongTing = rawGot.includes("公廳") || rawGot.includes("公亭");
-      const hasHuoFang = rawGot.includes("伙房") || rawGot.includes("火房");
-      if (hasGongTing && hasHuoFang) return true;
-
-      // 字元命中率計算
-      let hitCount = 0;
-      for (const ch of rawTarget) {
-        if (rawGot.includes(ch)) hitCount++;
+    if (isMandarin) {
+      // ── 華語比對 ──
+      // 第 1 題：宗祠 / 祖堂
+      if (q.id === 1) {
+        return (
+          rawGot.includes("宗祠") ||
+          rawGot.includes("祖堂") ||
+          rawGot.includes("祠堂") ||
+          rawGot.includes("宗廟")
+        );
       }
-      const matchRate = hitCount / rawTarget.length;
-      return matchRate >= 0.65;
+      // 第 2 題：三合院 / 四合院
+      if (q.id === 2) {
+        return (
+          rawGot.includes("三合院") ||
+          rawGot.includes("四合院") ||
+          rawGot.includes("合院") ||
+          rawGot.includes("三合") ||
+          rawGot.includes("四合")
+        );
+      }
+      // 第 3 題：元宵節
+      if (q.id === 3) {
+        return (
+          rawGot.includes("元宵節") ||
+          rawGot.includes("元宵") ||
+          rawGot.includes("上元節")
+        );
+      }
+      // 第 4 題：拜拜 / 拜神 / 祭拜
+      if (q.id === 4) {
+        return (
+          rawGot.includes("拜拜") ||
+          rawGot.includes("拜神") ||
+          rawGot.includes("祭拜") ||
+          rawGot.includes("拜")
+        );
+      }
+      // 第 5 題：這是宗祠 / 祖堂，也是三合院 / 四合院
+      if (q.id === 5) {
+        const hasZong = rawGot.includes("宗祠") || rawGot.includes("祖堂");
+        const hasYuan = rawGot.includes("三合院") || rawGot.includes("四合院") || rawGot.includes("合院");
+        if (hasZong && hasYuan) return true;
+
+        const rawTarget = normalizeText(q.mandarinAnswer || "");
+        let hitCount = 0;
+        for (const ch of rawTarget) {
+          if (rawGot.includes(ch)) hitCount++;
+        }
+        return hitCount / rawTarget.length >= 0.55;
+      }
+    } else {
+      // ── 客語比對 ──
+      // 第 1 題：公廳
+      if (q.id === 1) {
+        return (
+          rawGot.includes("公廳") ||
+          rawGot.includes("公亭") ||
+          rawGot.includes("廳") ||
+          rawGot.includes("公")
+        );
+      }
+      // 第 2 題：伙房屋
+      if (q.id === 2) {
+        return (
+          rawGot.includes("伙房屋") ||
+          rawGot.includes("伙房") ||
+          rawGot.includes("火房屋") ||
+          rawGot.includes("火房") ||
+          rawGot.includes("房屋")
+        );
+      }
+      // 第 3 題：正月半
+      if (q.id === 3) {
+        return (
+          rawGot.includes("正月半") ||
+          rawGot.includes("正月") ||
+          rawGot.includes("月半")
+        );
+      }
+      // 第 4 題：拜牙 (支援 拜𠊎 / 拜厓 / 拜牙 / 拜喏)
+      if (q.id === 4) {
+        return (
+          rawGot.includes("拜牙") ||
+          rawGot.includes("拜𠊎") ||
+          rawGot.includes("拜厓") ||
+          rawGot.includes("拜喏") ||
+          rawGot.includes("拜芽") ||
+          rawGot.includes("拜")
+        );
+      }
+      // 第 5 題：該係公廳，乜係伙房屋。
+      if (q.id === 5) {
+        const hasGongTing = rawGot.includes("公廳") || rawGot.includes("公亭");
+        const hasHuoFang = rawGot.includes("伙房") || rawGot.includes("火房");
+        if (hasGongTing && hasHuoFang) return true;
+
+        const rawTarget = normalizeText(q.answer);
+        let hitCount = 0;
+        for (const ch of rawTarget) {
+          if (rawGot.includes(ch)) hitCount++;
+        }
+        return hitCount / rawTarget.length >= 0.65;
+      }
     }
 
-    // 通用比對
-    return rawGot.includes(rawTarget) || rawTarget.includes(rawGot);
+    const rawDefault = normalizeText(isMandarin ? q.mandarinAnswer : q.answer);
+    return rawGot.includes(rawDefault) || rawDefault.includes(rawGot);
   }
 
   /* ─────────────────────────────────────────────────────────────
-   * 錄音與辨識流程控制
+   * 錄音與檔案/串流辨識流程
    * ───────────────────────────────────────────────────────────── */
   let mediaStream = null;
 
@@ -410,6 +493,10 @@
       return;
     }
 
+    const isMandarin = isMandarinMode();
+    const mode = recognitionModeSelect?.value || "realtime";
+    const targetLabel = isMandarin ? (q.mandarinAnswer || q.answer) : q.answer;
+
     try {
       mediaStream = await navigator.mediaDevices.getUserMedia({ audio: true });
       isRecording = true;
@@ -417,10 +504,11 @@
 
       setAsrState(
         "recording",
-        "🎙️ 錄音辨識中",
-        `正在收音⋯ 請說出客語「${q.answer}」`,
+        isMandarin ? "🎙️ 錄音中 (華語)" : "🎙️ 錄音中 (客語)",
+        `正在收音⋯ 請說出「${targetLabel}」`,
         "（聆聽中⋯）"
       );
+      if (asrStatusText) asrStatusText.textContent = "錄音收音中⋯";
 
       const maxSec = q.id === 5 ? 9000 : 6500;
       clearTimeout(recTimeout);
@@ -428,27 +516,40 @@
         if (isRecording) stopRecording();
       }, maxSec);
 
-      await ASR.start(
-        mediaStream,
-        // 即時逐字更新
-        (liveTranscript) => {
-          setAsrState(
-            "recording",
-            "🎙️ 錄音辨識中",
-            `正在收音⋯ 請說出客語「${q.answer}」`,
-            liveTranscript
-          );
-        },
-        // 辨識結束 (分支流轉)
-        (finalTranscript) => {
-          handleRecognitionResult(q, finalTranscript);
-        },
-        // 錯誤處理
-        (errMsg) => {
-          isRecording = false;
-          setAsrState("retry", "⚠️ 連線提示", errMsg);
-        }
-      );
+      if (mode === "file" || (isMandarin && !window.SPEECH_API?.realtimeTicketUrl)) {
+        // 檔案式辨識模式 (POST Blob)
+        audioChunks = [];
+        mediaRecorder = new MediaRecorder(mediaStream);
+        mediaRecorder.ondataavailable = (e) => audioChunks.push(e.data);
+        mediaRecorder.onstop = async () => {
+          const blob = new Blob(audioChunks, { type: "audio/webm" });
+          await sendAudioFile(blob, q);
+        };
+        mediaRecorder.start();
+      } else {
+        // WebSocket 即時串流模式
+        await ASR.start(
+          mediaStream,
+          (liveTranscript) => {
+            setAsrState(
+              "recording",
+              isMandarin ? "🎙️ 錄音中 (華語)" : "🎙️ 錄音中 (客語)",
+              `正在收音⋯ 請說出「${targetLabel}」`,
+              liveTranscript
+            );
+            if (answerInput) answerInput.value = liveTranscript;
+            if (asrStatusText) asrStatusText.textContent = `即時文字：${liveTranscript}`;
+          },
+          (finalTranscript) => {
+            handleRecognitionResult(q, finalTranscript);
+          },
+          (errMsg) => {
+            isRecording = false;
+            setAsrState("retry", "⚠️ 連線提示", errMsg);
+            if (asrStatusText) asrStatusText.textContent = errMsg;
+          }
+        );
+      }
     } catch (err) {
       isRecording = false;
       setAsrState(
@@ -463,7 +564,13 @@
     if (!isRecording) return;
     isRecording = false;
     clearTimeout(recTimeout);
-    ASR.stop();
+
+    if (mediaRecorder && mediaRecorder.state === "recording") {
+      mediaRecorder.stop();
+    } else {
+      ASR.stop();
+    }
+
     setTimeout(() => {
       if (mediaStream) {
         mediaStream.getTracks().forEach((t) => t.stop());
@@ -472,9 +579,32 @@
     }, 600);
   }
 
+  // 檔案式辨識發送
+  async function sendAudioFile(blob, q) {
+    setAsrState("recording", "⏳ 辨識中", "音訊上傳處理中⋯", "（分析中⋯）");
+    try {
+      const form = new FormData();
+      form.append("audio", blob, "speaking-field-trip.webm");
+      form.append("provider_id", asrProviderSelect?.value || "hakka_api_hak");
+      form.append("language", isMandarinMode() ? "zh" : "hak");
+      form.append("recognizer", isMandarinMode() ? "mandarin" : "hakka-sixian");
+
+      const endpoint = window.SPEECH_API?.endpoint() || "http://localhost:5000/api/speech/recognize";
+      const response = await fetch(endpoint, { method: "POST", body: form });
+      const payload = await response.json();
+      const text = window.SPEECH_API ? window.SPEECH_API.textFromPayload(payload) : (payload.text || payload.result || "");
+      handleRecognitionResult(q, text);
+    } catch (e) {
+      setAsrState("retry", "⚠️ 辨識失敗", "無法取得檔案辨識結果，請重試或切換即時串流。");
+    }
+  }
+
   // 處理辨識結果 (分支 A / 分支 B)
   async function handleRecognitionResult(q, transcript) {
-    const isPassed = checkAnswerMatch(q.answer, transcript, q.id);
+    if (answerInput) answerInput.value = transcript || "";
+    const isPassed = checkAnswerMatch(q, transcript);
+    const isMandarin = isMandarinMode();
+    const targetTxt = isMandarin ? (q.mandarinAnswer || q.answer) : q.answer;
 
     if (isPassed) {
       // ── 分支 A：辨識成功（通過） ──
@@ -486,9 +616,10 @@
       setAsrState(
         "success",
         "✅ 辨識成功",
-        `命中「${q.answer}」！獲得 20 分！請點擊右下角「下一題」繼續。`,
-        transcript || q.answer
+        `命中「${targetTxt}」！獲得 20 分！請點擊右下角「下一題」繼續。`,
+        transcript || targetTxt
       );
+      if (asrStatusText) asrStatusText.textContent = `✓ 辨識成功（命中 ${targetTxt}）`;
 
       await playSfx("correct");
       await playSfx("sparkle");
@@ -498,15 +629,46 @@
       render();
     } else {
       // ── 分支 B：辨識未通過（不吻合 / 沒聲音） ──
-      const gotDisplay = transcript ? `「${transcript}」` : "（未偵測到清晰客語）";
+      const gotDisplay = transcript ? `「${transcript}」` : "（未偵測到清晰語音）";
       setAsrState(
         "retry",
         "⚠️ 請再試一次",
-        `辨識為 ${gotDisplay}，跟目標「${q.answer}」不太一樣喔！請點「聽一聽」重聽後再次挑戰。`,
+        `辨識為 ${gotDisplay}，跟目標「${targetTxt}」不太一樣喔！請點「聽一聽」重聽後再次挑戰。`,
         transcript || "（無清晰文字）"
       );
+      if (asrStatusText) asrStatusText.textContent = `未通過比對（辨識為：${transcript || "無"}）`;
+    }
+  }
 
-      // 畫面維持在原題，熱區點位不變
+  // 跳過當前題目功能
+  async function skipCurrentQuestion() {
+    const q = qForScreen(state.screen);
+    if (!q) {
+      if (state.screen === 0) {
+        state.screen = 1;
+        render();
+      } else {
+        state.screen = Math.min(11, state.screen + 1);
+        render();
+      }
+      return;
+    }
+
+    if (state.screen === q.before) {
+      // 在題目頁跳過：視同通過並進到該題結算圖
+      if (!state.completed[q.id - 1]) {
+        state.completed[q.id - 1] = true;
+        state.score = Math.min(100, state.score + 20);
+      }
+      showToast(`已跳過第 ${q.id} 題！`);
+      await playSfx("sparkle");
+      state.screen = q.after;
+      render();
+    } else if (state.screen === q.after) {
+      // 在結算頁跳過：直接前往下一題
+      await playSfx("next");
+      state.screen = Math.min(11, state.screen + 1);
+      render();
     }
   }
 
@@ -591,9 +753,47 @@
       badgePlayed: false
     };
     render();
+    showToast("遊戲已重新開始！");
+  }
+
+  // 開發者模式事件綁定
+  if (debugToggle) {
+    debugToggle.addEventListener("change", () => {
+      developerPanel.hidden = !debugToggle.checked;
+      updateDeveloperPanel();
+    });
+  }
+
+  if (asrProviderSelect) {
+    asrProviderSelect.addEventListener("change", () => {
+      const isMandarin = isMandarinMode();
+      currentApiBadge.textContent = isMandarin
+        ? "語音辨識（華語測試模式）"
+        : "即時語音辨識（客語）";
+      if (asrProviderNote) {
+        asrProviderNote.textContent = isMandarin
+          ? "已切換為華語測試：辨識標準答案自動採用華語同義詞比對。"
+          : "預設使用客委會客語即時串流辨識。";
+      }
+      render();
+    });
+  }
+
+  if (debugCompareBtn) {
+    debugCompareBtn.addEventListener("click", () => {
+      const q = qForScreen(state.screen);
+      if (!q) return;
+      const text = answerInput?.value.trim() || "";
+      if (!text) {
+        showToast("請先在文字框中輸入要測試的字串！");
+        return;
+      }
+      handleRecognitionResult(q, text);
+    });
   }
 
   // 綁定按鈕監聽
+  document.getElementById("skipBtn")?.addEventListener("click", skipCurrentQuestion);
   document.getElementById("helpClose")?.addEventListener("click", () => {
     helpPanel.hidden = true;
   });

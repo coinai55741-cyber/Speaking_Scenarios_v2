@@ -8,6 +8,8 @@
   --line-dark: #2b3743;
   --green-hit: #3a9b3f;
   --red-miss: #e07a72;
+  --ink: #1f2d3d;
+  --paper: #fffdfa;
 }
 
 * {
@@ -36,7 +38,9 @@ body {
 .game-topbar {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   margin-bottom: 8px;
+  gap: 12px;
 }
 
 .back-link {
@@ -60,6 +64,34 @@ body {
   color: #fff;
 }
 
+/* 開發者模式開關 */
+.mode-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  border: 2px solid rgba(255, 255, 255, 0.25);
+  border-radius: 999px;
+  color: #e5eef3;
+  background: rgba(25, 33, 43, 0.85);
+  font-size: 13.5px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.mode-toggle:hover {
+  border-color: var(--accent-gold);
+  color: #fff;
+}
+
+.mode-toggle input {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--accent-gold);
+  cursor: pointer;
+}
+
 .frame {
   width: 100%;
   display: grid;
@@ -68,7 +100,7 @@ body {
 
 .stage {
   position: relative;
-  width: min(100%, calc((100vh - 140px) * 1268 / 714));
+  width: min(100%, calc((100vh - 148px) * 1268 / 714));
   aspect-ratio: 1268 / 714;
   max-width: 1268px;
   overflow: hidden;
@@ -174,7 +206,7 @@ body {
 
 .card button,
 .below button {
-  min-height: 40px;
+  min-height: 38px;
   border: 0;
   border-radius: 12px;
   padding: 8px 16px;
@@ -352,10 +384,151 @@ body {
 }
 
 .below button {
-  min-height: 32px;
-  padding: 5px 14px;
+  min-height: 34px;
+  padding: 6px 14px;
   background: #e8eef2;
   color: #17222a;
+}
+
+.skip-btn {
+  background: #2a75be !important;
+  color: #fff !important;
+  border: 1.5px solid #4893db !important;
+}
+
+.skip-btn:hover {
+  background: #1b5f9e !important;
+}
+
+/* 內部檢視 / 開發者面板 (同 holiday.html) */
+.developer-panel {
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 999;
+  width: 280px;
+  height: 100vh;
+  overflow-y: auto;
+  padding: 22px 18px;
+  border-right: 2px solid #d4c19c;
+  background: rgba(255, 253, 250, 0.98);
+  box-shadow: 14px 0 32px rgba(0, 0, 0, 0.3);
+  color: #17222a;
+}
+
+.developer-panel[hidden] {
+  display: none;
+}
+
+.developer-panel h2 {
+  margin: 0 0 16px;
+  font-size: 20px;
+  color: #5a3317;
+}
+
+.developer-item {
+  margin-top: 14px;
+}
+
+.developer-label {
+  display: block;
+  margin-bottom: 5px;
+  color: #4a3828;
+  font-size: 13.5px;
+  font-weight: 700;
+}
+
+.developer-select {
+  width: 100%;
+  min-height: 38px;
+  border: 2px solid rgba(47, 148, 111, 0.35);
+  border-radius: 10px;
+  padding: 6px 10px;
+  background: #fff;
+  color: #17222a;
+  font: inherit;
+  font-size: 13.5px;
+  font-weight: 700;
+}
+
+.developer-note {
+  margin-top: 6px;
+  color: #786450;
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.developer-btn {
+  width: 100%;
+  margin-top: 8px;
+  min-height: 36px;
+  border: 0;
+  border-radius: 10px;
+  background: #2f946f;
+  color: #fff;
+  font-weight: 800;
+  font-size: 13.5px;
+  cursor: pointer;
+}
+
+.developer-btn:hover {
+  background: #237858;
+}
+
+.target-sentence {
+  padding: 12px;
+  border: 1.5px solid rgba(47, 148, 111, 0.35);
+  border-radius: 12px;
+  background: #f4faf6;
+}
+
+.sentence-label {
+  display: block;
+  font-size: 11.5px;
+  color: #2f946f;
+  font-weight: 900;
+  margin-bottom: 4px;
+}
+
+.target-sentence strong {
+  display: block;
+  font-size: 18px;
+  color: #17222a;
+  margin-bottom: 4px;
+}
+
+.target-sentence small {
+  display: block;
+  font-size: 13px;
+  color: #655442;
+}
+
+.answer-box {
+  margin-top: 14px;
+  display: grid;
+  gap: 6px;
+  padding: 12px;
+  border: 1.5px solid rgba(228, 210, 171, 0.9);
+  border-radius: 12px;
+  background: #fffdf7;
+}
+
+.answer-box label {
+  color: #5a3317;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.answer-box textarea {
+  width: 100%;
+  resize: vertical;
+  border: 1.5px solid rgba(30, 49, 91, 0.18);
+  border-radius: 10px;
+  padding: 8px 10px;
+  color: #17222a;
+  font: inherit;
+  font-size: 13.5px;
+  line-height: 1.45;
 }
 
 @media (max-width: 720px) {
