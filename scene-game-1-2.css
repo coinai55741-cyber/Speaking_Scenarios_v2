@@ -753,16 +753,103 @@ button.name-marker {
 }
 
 .complete-panel {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 16px;
-  padding: 14px;
+  display: grid;
+  justify-items: center;
+  align-content: center;
+  gap: 14px;
+  min-height: clamp(320px, 48vw, 430px);
+  padding: clamp(28px, 5vw, 54px) clamp(20px, 6vw, 72px);
+  border: 1px solid rgba(226, 184, 96, 0.54);
   border-radius: 8px;
-  color: white;
+  color: var(--ink);
+  background: rgba(255, 253, 250, 0.97);
+  box-shadow: 0 18px 38px rgba(38, 50, 56, 0.12);
+  text-align: center;
+  animation: completionStageIn 0.46s ease both;
+}
+
+.complete-panel > * {
+  opacity: 0;
+  animation: completionItemIn 0.48s ease both;
+}
+
+.completion-medal {
+  width: clamp(78px, 10vw, 112px);
+  height: auto;
+  margin-bottom: 6px;
+  animation-name: completionMedalIn;
+  animation-duration: 0.64s;
+  animation-delay: 0.1s;
+}
+
+.complete-panel h2 {
+  margin: 0;
+  color: var(--ink);
+  font-size: clamp(30px, 4.6vw, 52px);
+  line-height: 1.12;
+  letter-spacing: 0;
+  animation-delay: 0.28s;
+}
+
+.completion-stars {
+  display: inline-flex;
+  gap: 9px;
+  color: #e5aa32;
+  font-size: clamp(25px, 3.2vw, 36px);
+  line-height: 1;
+  text-shadow: 0 3px 8px rgba(181, 125, 23, 0.22);
+  animation-delay: 0.4s;
+}
+
+.completion-copy {
+  max-width: 640px;
+  margin: 2px 0 0;
+  color: var(--ink);
+  font-size: clamp(17px, 2vw, 23px);
+  font-weight: 900;
+  line-height: 1.6;
+  animation-delay: 0.5s;
+}
+
+.completion-kicker {
+  margin: 0;
+  color: var(--leaf);
+  font-size: clamp(13px, 1.45vw, 16px);
+  font-weight: 900;
+  line-height: 1.55;
+  animation-delay: 0.58s;
+}
+
+.completion-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 8px;
+  animation-delay: 0.68s;
+}
+
+.completion-button {
+  min-height: 44px;
+  padding: 0 22px;
+  border: 2px solid var(--leaf);
+  border-radius: 999px;
+  color: #fff;
   background: var(--leaf);
-  box-shadow: 0 8px 18px rgba(38, 50, 56, 0.14);
-  font-size: clamp(18px, 2vw, 24px);
+  font: inherit;
+  font-size: 16px;
+  font-weight: 900;
+  cursor: pointer;
+  box-shadow: 0 8px 16px rgba(47, 119, 93, 0.18);
+}
+
+.completion-button.secondary {
+  color: var(--leaf);
+  background: #fff;
+}
+
+.completion-button:hover {
+  transform: translateY(-1px);
 }
 
 .control-strip {
@@ -1087,11 +1174,11 @@ button.name-marker {
 }
 
 .mission-layout .complete-panel {
-  position: absolute;
-  left: 50%;
-  bottom: 13.5%;
-  transform: translateX(-50%);
-  width: min(82%, 640px);
+  position: relative;
+  z-index: 5;
+  grid-column: 1 / -1;
+  width: min(86%, 760px);
+  margin: clamp(20px, 4vw, 42px) auto 0;
 }
 
 .mission-layout .person-card {
@@ -1855,3 +1942,19 @@ body.debug-mode .page-shell {
 
 
 
+
+@keyframes completionStageIn {
+  from { opacity: 0; transform: translateY(18px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes completionItemIn {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes completionMedalIn {
+  0% { opacity: 0; transform: translateY(18px) scale(0.72) rotate(-8deg); }
+  68% { opacity: 1; transform: translateY(-4px) scale(1.08) rotate(3deg); }
+  100% { opacity: 1; transform: translateY(0) scale(1) rotate(0); }
+}

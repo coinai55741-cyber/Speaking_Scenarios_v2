@@ -18,15 +18,17 @@ const DIALECTS = [
 const SPEECH_BACKENDS = {
   mandarin: {
     label: "華語辨識",
-    endpoint: "http://localhost:5000/recognize",
+    endpoint: window.SPEECH_API?.endpoint() || "http://localhost:5000/api/speech/recognize",
     tokenMap: "mission1Mandarin"
   },
   "hakka-sixian": {
     label: "四縣腔辨識",
-    endpoint: "",
+    provider: "hakka_api",
+    providerId: "hakka_api_hak",
+    endpoint: window.SPEECH_API?.endpoint() || "http://localhost:5000/api/speech/recognize",
     tokenMap: "mission1Sixian"
   },
-  "hakka-hailu": { label: "海陸腔辨識", endpoint: "", tokenMap: "mission1Hakka" },
+  "hakka-hailu": { label: "海陸腔辨識", provider: "hakka_api", providerId: "hakka_api_hak", endpoint: "", tokenMap: "mission1Hakka" },
   "hakka-dapu": { label: "大埔腔辨識", endpoint: "", tokenMap: "mission1Hakka" },
   "hakka-raoping": { label: "饒平腔辨識", endpoint: "", tokenMap: "mission1Hakka" },
   "hakka-zhaoan": { label: "詔安腔辨識", endpoint: "", tokenMap: "mission1Hakka" },
@@ -62,7 +64,7 @@ const TOKEN_MAPS = {
 const STAGES = [
   { id: "intro", label: "情境介紹" },
   { id: "teaching", label: "情境教學" },
-  { id: "mission1", label: "任務遊戲1" }
+  { id: "mission1", label: "任務遊戲" }
 ];
 
 const PEOPLE = [
@@ -201,6 +203,7 @@ const state = {
   recognizedText: "",
   recognitionError: "",
   lastRecognitionPayload: null,
+  recognitionMode: localStorage.getItem("speakingDemoRecognitionMode") || "file",
   sentenceMissCount: 0,
   debugMode: false,
   sentenceResult: "",
@@ -295,7 +298,6 @@ function saveProgress() {
     selectedCommand: state.selectedCommand,
     selectedPerson: state.selectedPerson,
     answerTokens: state.answerTokens,
-    tokenOrder: state.tokenOrder,
     sentenceResult: state.sentenceResult,
     sentenceHinted: state.sentenceHinted,
     askedPerson: state.askedPerson,
@@ -316,6 +318,7 @@ function loadProgress() {
   try {
     const progress = JSON.parse(raw);
     Object.assign(state, progress);
+    state.tokenOrder = [];
     state.questionPlaying = false;
     resetRecordingState({ keepAnswer: true });
     if (state.askedPerson) state.responseReady = true;
@@ -447,7 +450,12 @@ function renderDeveloperPanel(stage) {
         <option value="mandarin" ${state.dialect === "mandarin" ? "selected" : ""}>Taiwan-Tongues-ASR-CE（華語 v2）</option>
         <option value="sixian" ${state.dialect === "sixian" ? "selected" : ""}>客委會 API（四縣腔預留）</option>
       </select>
-      <p class="developer-note">目前可用：${escapeHtml(backend.label)} / ${escapeHtml(backend.endpoint || "尚未設定 API")}</p>
+      <label class="developer-label" for="developerRecognitionMode">辨識模式</label>
+      <select id="developerRecognitionMode" class="developer-select">
+        <option value="file" ${state.recognitionMode === "file" ? "selected" : ""}>錄完判斷（檔案辨識）</option>
+        <option value="realtime" ${state.recognitionMode === "realtime" ? "selected" : ""}>即時辨識 WebSocket</option>
+      </select>
+      <p class="developer-note">目前可用：${escapeHtml(backend.label)} / ${escapeHtml(backend.endpoint || "尚未設定 API")} / ${state.recognitionMode === "realtime" ? "即時辨識" : "檔案辨識"}</p>
       <p class="developer-subnote">${escapeHtml(state.recognitionError || "可看辨識原文、字卡轉換與命中狀態。")}</p>
     </div>
     <div class="developer-item">
@@ -463,6 +471,13 @@ function renderDeveloperPanel(stage) {
     state.lastRecognitionPayload = state.recognizedText ? { text: state.recognizedText, source: "developer" } : null;
     state.answerTokens = mapRecognitionToCards(state.recognizedText, mission);
     renderMission(stage);
+  });
+
+  const modeSelect = els.developerContent.querySelector("#developerRecognitionMode");
+  modeSelect?.addEventListener("change", (event) => {
+    state.recognitionMode = event.target.value;
+    localStorage.setItem("speakingDemoRecognitionMode", state.recognitionMode);
+    renderDeveloperPanel(stage);
   });
 
   const providerSelect = els.developerContent.querySelector("#developerAsrProvider");
@@ -570,8 +585,15 @@ function renderTeaching() {
   });
 }
 
+function ensureMissionTokenOrder(stage, mission) {
+  if (stage === "mission1" && mission?.tokens?.length && !state.tokenOrder.length) {
+    state.tokenOrder = shuffleItems(mission.tokens);
+  }
+}
+
 function renderMission(stage) {
   const mission = LESSON.missions[stage];
+  ensureMissionTokenOrder(stage, mission);
   const complete = stage === "mission1" && state.completedMission1.length === 4;
   const sideContent = missionSideContent(stage, mission);
   els.view.innerHTML = `
@@ -756,11 +778,15 @@ function bindMissionEvents(stage, mission) {
     renderMission(stage);
   });
   bindOptional("#recordSentence", "click", () => handleRecordSentence(stage, mission));
+  bindOptional("#playAskVoice", "click", () => playAudio(audioUrl(mission.askAudio)));
   bindOptional("#playOwnVoice", "click", playRecordedAudio);
   bindOptional("#pauseVoice", "click", pauseAudio);
   bindOptional("#playResponseVoice", "click", () => playAudio(audioUrl(mission.responseAudio[state.askedPerson])));
-  bindOptional("#goMission2", "click", () => {
-    state.stageIndex = 2;
+  bindOptional("#replayMission1", "click", () => {
+    resetStageState();
+    render();
+  });
+  bindOptional("#backMissionMenu", "click", () => {
     resetStageState();
     render();
   });
@@ -827,6 +853,8 @@ function sentencePanel(mission) {
   const hintClass = state.sentenceHinted ? " is-hinted" : "";
   const hintLabel = state.sentenceHinted ? "已提示" : "提示";
   const activePerson = state.askedPerson || state.selectedPerson;
+  const questionAvatarClass = "person-avatar avatar-ruirong2";
+  const responseAvatarClass = activePerson ? avatarClassByName(activePerson) : "";
   const responseButton = state.askedPerson
     ? `<button class="voice-button response-voice" type="button" id="playResponseVoice" aria-label="播放回答" title="播放回答">${iconSvg("speaker")}</button>`
     : `<button class="voice-button response-voice" type="button" aria-label="播放回答" title="尚未有回答" disabled>${iconSvg("speaker")}</button>`;
@@ -838,7 +866,7 @@ function sentencePanel(mission) {
   return `
     <div class="sentence-panel flat-sentence-panel recognition-mode">
       <div class="flat-compose-row">
-        <span class="sentence-avatar ${avatarClassByName(activePerson, "sentence")}" aria-hidden="true">${activePerson ? "" : "問"}</span>
+        <span class="sentence-avatar ${questionAvatarClass}" aria-hidden="true"></span>
         <button class="voice-button record-button${recordClass}" type="button" id="recordSentence" aria-label="${recordLabel}" title="${recordLabel}" ${state.askedPerson || state.recognizing ? "disabled" : ""}>${iconSvg(recordIcon)}</button>
         <div class="answer-zone ${state.askedPerson ? "is-sentence-line" : ""}">${answer}</div>
         <div class="sentence-actions">
@@ -847,7 +875,7 @@ function sentencePanel(mission) {
         </div>
       </div>
       <div class="flat-tool-row">
-        <span class="sentence-avatar ${avatarClassByName(activePerson, "sentence")}" aria-hidden="true">${activePerson ? "" : "答"}</span>
+        <span class="sentence-avatar ${responseAvatarClass}" aria-hidden="true">${activePerson ? "" : "答"}</span>
         ${responseButton}
         <button class="hint-button${hintClass}" type="button" id="hintSentence" ${state.askedPerson ? "disabled" : ""}>${hintLabel}</button>
       </div>
@@ -914,8 +942,8 @@ async function finishSentenceRecording(stage, mission) {
   renderMission(stage);
   try {
     const payload = await recognizeSpeech(blob);
-    state.lastRecognitionPayload = payload;
-    state.recognizedText = normalizeRecognitionPayload(payload);
+    state.lastRecognitionPayload = payload.raw ?? payload;
+    state.recognizedText = payload.text;
     state.answerTokens = mapRecognitionToCards(payload, mission);
     renderDeveloperPanel(stage);
     state.recognitionError = state.recognizedText
@@ -938,14 +966,35 @@ async function recognizeSpeech(blob) {
   formData.append("audio", blob, "speech.webm");
   formData.append("dialect", state.dialect);
   formData.append("recognizer", currentDialect().recognizer);
+  formData.append("provider", backend.provider || "taiwan_tongues");
+  formData.append("provider_id", backend.providerId || "taiwan_tongues_zh");
+  formData.append("language", state.dialect === "mandarin" ? "zh" : "hak");
+  formData.append("scene_id", "scene-game-1-2");
+  formData.append("recognition_mode", state.recognitionMode || "file");
   const response = await fetch(backend.endpoint, {
     method: "POST",
     body: formData
   });
-  if (!response.ok) throw new Error(`辨識後端回應失敗：${response.status}`);
+  if (!response.ok) {
+    let message = `辨識後端回應失敗：${response.status}`;
+    try {
+      const errorPayload = await response.json();
+      message = errorPayload.detail || errorPayload.message || message;
+    } catch (error) {
+      const errorText = await response.text().catch(() => "");
+      if (errorText) message = errorText;
+    }
+    throw new Error(message);
+  }
   const contentType = response.headers.get("content-type") || "";
-  if (contentType.includes("application/json")) return response.json();
-  return { text: await response.text() };
+  const rawPayload = contentType.includes("application/json") ? await response.json() : { text: await response.text() };
+  return window.SPEECH_API?.normalizeResponse(rawPayload, {
+    provider: backend.provider || "taiwan_tongues",
+    provider_id: backend.providerId || "taiwan_tongues_zh",
+    dialect: state.dialect,
+    recognizer: currentDialect().recognizer,
+    scene_id: "scene-game-1-2"
+  }) || rawPayload;
 }
 
 function mapRecognitionToCards(payload, mission) {
@@ -958,6 +1007,7 @@ function mapRecognitionToCards(payload, mission) {
 }
 
 function extractRecognitionTokens(payload) {
+  if (window.SPEECH_API?.tokensFromPayload) return window.SPEECH_API.tokensFromPayload(payload);
   if (payload == null) return [];
   if (Array.isArray(payload)) return payload.map(String).filter(Boolean);
   if (typeof payload !== "object") return [];
@@ -986,6 +1036,7 @@ function matchMappedTokens(text, tokenMap, availableTokens) {
   return matched;
 }
 function normalizeRecognitionPayload(payload) {
+  if (window.SPEECH_API?.textFromPayload) return window.SPEECH_API.textFromPayload(payload);
   if (payload == null) return "";
   if (typeof payload === "string") return cleanRecognitionText(payload);
   if (Array.isArray(payload)) return cleanRecognitionText(payload.join(""));
@@ -996,6 +1047,7 @@ function normalizeRecognitionPayload(payload) {
 }
 
 function cleanRecognitionText(text) {
+  if (window.SPEECH_API?.cleanText) return window.SPEECH_API.cleanText(text);
   return text.replace(/[\s，,。！？!?、；;：「」『』（）()]/g, "").trim();
 }
 function playRecordedAudio() {
@@ -1085,10 +1137,19 @@ function transportPanel(mission) {
 
 function completePanel() {
   return `
-    <div class="complete-panel">
-      <strong>太好了，到時候大家都可以吃到熱熱的餅乾了！</strong>
-      <button class="primary-button" type="button" id="goMission2">下一階段</button>
-    </div>
+    <section class="complete-panel completion-card" aria-labelledby="missionCompleteTitle">
+      <img class="completion-medal" src="./assets/holiday-completion-medal.png" alt="任務完成獎章">
+      <h2 id="missionCompleteTitle">任務完成！</h2>
+      <div class="completion-stars" aria-hidden="true">
+        <span>★</span><span>★</span><span>★</span><span>★</span><span>★</span>
+      </div>
+      <p class="completion-copy">太好了，到時候大家都可以吃到熱熱的餅乾了！</p>
+      <p class="completion-kicker">#學會「你愛仰仔來吾屋下？」 #懂得口說客語</p>
+      <div class="completion-actions">
+        <button class="completion-button" type="button" id="replayMission1">再玩一次</button>
+        <button class="completion-button secondary" type="button" id="backMissionMenu">回任務選單</button>
+      </div>
+    </section>
   `;
 }
 
@@ -1217,6 +1278,21 @@ function flashHint(message) {
 }
 
 init();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

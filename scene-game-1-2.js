@@ -782,8 +782,11 @@ function bindMissionEvents(stage, mission) {
   bindOptional("#playOwnVoice", "click", playRecordedAudio);
   bindOptional("#pauseVoice", "click", pauseAudio);
   bindOptional("#playResponseVoice", "click", () => playAudio(audioUrl(mission.responseAudio[state.askedPerson])));
-  bindOptional("#goMission2", "click", () => {
-    state.stageIndex = 2;
+  bindOptional("#replayMission1", "click", () => {
+    resetStageState();
+    render();
+  });
+  bindOptional("#backMissionMenu", "click", () => {
     resetStageState();
     render();
   });
@@ -1134,10 +1137,19 @@ function transportPanel(mission) {
 
 function completePanel() {
   return `
-    <div class="complete-panel">
-      <strong>太好了，到時候大家都可以吃到熱熱的餅乾了！</strong>
-      <button class="primary-button" type="button" id="goMission2">下一階段</button>
-    </div>
+    <section class="complete-panel completion-card" aria-labelledby="missionCompleteTitle">
+      <img class="completion-medal" src="./assets/holiday-completion-medal.png" alt="任務完成獎章">
+      <h2 id="missionCompleteTitle">任務完成！</h2>
+      <div class="completion-stars" aria-hidden="true">
+        <span>★</span><span>★</span><span>★</span><span>★</span><span>★</span>
+      </div>
+      <p class="completion-copy">太好了，到時候大家都可以吃到熱熱的餅乾了！</p>
+      <p class="completion-kicker">#學會「你愛仰仔來吾屋下？」 #懂得口說客語</p>
+      <div class="completion-actions">
+        <button class="completion-button" type="button" id="replayMission1">再玩一次</button>
+        <button class="completion-button secondary" type="button" id="backMissionMenu">回任務選單</button>
+      </div>
+    </section>
   `;
 }
 
@@ -1266,6 +1278,9 @@ function flashHint(message) {
 }
 
 init();
+
+
+
 
 
 
