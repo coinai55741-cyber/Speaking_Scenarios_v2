@@ -145,7 +145,8 @@ function recognizedFoodCards(text) {
     .some(variant => source.includes(variant)));
 }
 function developerDialectLabel(provider = breakfastSpeechProvider()) {
-  return provider === "mandarin" ? "華語" : (selectedDialect || "四縣腔");
+  if (provider === "mandarin") return "華語";
+  return BREAKFAST_DIALECT_LABELS[selectedDialect] || "四縣腔";
 }
 
 function answerPairLabel(food, provider = breakfastSpeechProvider()) {
@@ -874,6 +875,7 @@ updateLessonCards();
 updateCarouselButtons();
 showScreen("intro");
 renderDeveloperPanel();
+
 
 
 
