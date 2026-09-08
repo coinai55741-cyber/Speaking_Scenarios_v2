@@ -13,7 +13,7 @@ const questions = [
   { type: "看圖選拼音", title: "這係麼个？", prompt: "請看拼音，選出正確的早餐圖卡。", answer: "卵包", field: "hakka", food: "卵包", hint: "再看看拼音 lonˋ bauˊ。", playMode: "scene" },
   { type: "看圖選拼音", title: "這係麼个？", prompt: "請看拼音，選出正確的早餐圖卡。", answer: "蘿蔔粄", field: "hakka", food: "蘿蔔粄", hint: "再看看拼音 loˇ ped banˋ。", playMode: "scene" },
   { type: "看圖選拼音", title: "這係麼个？", prompt: "請看拼音，選出正確的早餐圖卡。", answer: "豆乳", field: "hakka", food: "豆乳", hint: "再看看拼音 teu nen。", playMode: "scene" },
-  { type: "綜合挑戰", title: "今晡日阿公好食麼个？", prompt: "阿公：「𠊎好食mien bauˊ，也愛啉ngiuˇ nen。」", answer: ["麵包", "牛乳"], field: "hakka", choiceMode: "image", image: "./assets/lesson-1-question-grandpa-breakfast.png", alt: "阿公和小孩在早餐情境中思考吃什麼", hint: "再試試看！" }
+  { type: "綜合挑戰", title: "今晡日阿公好食麼个？", prompt: "阿公：「𠊎好食mien bauˊ，也愛啉ngiuˇ nen。」", answer: ["麵包", "牛乳"], field: "hakka", choiceMode: "image", image: "./assets/lesson-1-question-grandpa-breakfast.png", alt: "阿公和小孩在早餐情境中思考吃什麼", hint: "再試著念看看喔！" }
 ];
 
 const LESSON_QUESTIONS = {
@@ -128,10 +128,10 @@ function recognitionModeLabel(mode = breakfastRecognitionMode()) {
   return mode === "realtime" ? "即時辨識 WebSocket" : "錄完判斷（檔案辨識）";
 }
 
-function speechHitDetails(text, question) {
+function speechHitDetails(text, question, provider = breakfastSpeechProvider()) {
   const source = cleanSpeechText(text);
   return acceptedAnswers(question).map(answer => {
-    const variants = answerVariants(answer);
+    const variants = answerVariants(answer, provider);
     const hit = variants.some(variant => source.includes(variant));
     return { answer, hit, variants };
   });
@@ -186,9 +186,9 @@ function renderDeveloperPanel() {
 
   const question = activeQuestions[currentIndex] || activeQuestions[0] || questions[0];
   const answerList = acceptedAnswers(question);
-  const details = speechHitDetails(recognizedSpeechText, question);
-  const hitCount = details.filter(item => item.hit).length;
   const speechProvider = breakfastSpeechProvider();
+  const details = speechHitDetails(recognizedSpeechText, question, speechProvider);
+  const hitCount = details.filter(item => item.hit).length;
   const hitTags = details.map(item => `<span class="${item.hit ? "is-hit" : ""}">${escapeHtml(answerDisplayLabel(item.answer, speechProvider))}</span>`).join("");
   const convertedCards = recognizedFoodCards(recognizedSpeechText);
   const convertedTags = convertedCards.length
@@ -461,9 +461,11 @@ function acceptedAnswers(question) {
   return Array.isArray(question.answer) ? question.answer : [question.answer];
 }
 
-function answerVariants(answer) {
+function answerVariants(answer, provider = breakfastSpeechProvider()) {
   const food = findFood(answer);
-  return [answer, food?.hakka, food?.chinese, food?.pinyin]
+  if (!food) return [answer].map(cleanSpeechText).filter(Boolean);
+  const targetWords = provider === "mandarin" ? [food.chinese] : [food.hakka, food.pinyin];
+  return targetWords
     .filter(Boolean)
     .map(cleanSpeechText)
     .filter(Boolean);
@@ -471,8 +473,9 @@ function answerVariants(answer) {
 
 function speechMatchesQuestion(text, question) {
   const source = cleanSpeechText(text);
+  const provider = breakfastSpeechProvider();
   return acceptedAnswers(question).every(answer => (
-    answerVariants(answer).some(variant => source.includes(variant))
+    answerVariants(answer, provider).some(variant => source.includes(variant))
   ));
 }
 
@@ -640,6 +643,7 @@ function handleSpeechAnswer(text, question, options = {}) {
     els.feedback.textContent = question.hint;
     els.nextBtn.disabled = true;
     if (els.speechStatus) els.speechStatus.textContent = text ? `辨識：${text}` : "沒有辨識到文字。";
+    renderDeveloperPanel();
     return;
   }
   const selectedChoice = selectedChoiceForQuestion(question);
@@ -650,6 +654,7 @@ function handleSpeechAnswer(text, question, options = {}) {
   els.feedback.textContent = Array.isArray(question.answer) ? "答對了！這兩樣就是句子裡的食物。" : "答對了！得到一顆星星。";
   els.nextBtn.disabled = false;
   if (els.speechStatus) els.speechStatus.textContent = text ? `辨識：${text}` : "辨識正確。";
+  renderDeveloperPanel();
 }
 
 function playSpeechAudio() {
@@ -875,6 +880,9 @@ updateLessonCards();
 updateCarouselButtons();
 showScreen("intro");
 renderDeveloperPanel();
+
+
+
 
 
 
