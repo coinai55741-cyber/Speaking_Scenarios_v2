@@ -1121,6 +1121,25 @@ button.name-marker {
 .mission-layout > * {
   pointer-events: auto;
 }
+.mission-layout.is-complete-screen {
+  display: grid;
+  place-items: center;
+  padding: clamp(24px, 5vw, 64px);
+  background: rgba(255, 253, 250, 0.98);
+  pointer-events: auto;
+}
+
+.mission-layout.is-complete-screen .mission-top,
+.mission-layout.is-complete-screen .mission-people-panel,
+.mission-layout.is-complete-screen .mission-panel {
+  display: none;
+}
+
+.mission-layout.is-complete-screen .complete-panel {
+  width: min(92%, 860px);
+  min-height: min(72%, 440px);
+  margin: 0;
+}
 
 .mission-layout .mission-top {
   position: absolute;
@@ -1958,3 +1977,5 @@ body.debug-mode .page-shell {
   68% { opacity: 1; transform: translateY(-4px) scale(1.08) rotate(3deg); }
   100% { opacity: 1; transform: translateY(0) scale(1) rotate(0); }
 }
+
+

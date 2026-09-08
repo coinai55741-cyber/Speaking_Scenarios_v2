@@ -597,7 +597,7 @@ function renderMission(stage) {
   const complete = stage === "mission1" && state.completedMission1.length === 4;
   const sideContent = missionSideContent(stage, mission);
   els.view.innerHTML = `
-    <div class="mission-layout">
+    <div class="mission-layout ${complete ? "is-complete-screen" : ""}">
       <section class="mission-top" aria-label="任務說明">
         <h2 class="mission-title">${mission.title}</h2>
         <p class="mission-copy">${mission.copy.join("<br>")}</p>
@@ -1278,6 +1278,7 @@ function flashHint(message) {
 }
 
 init();
+
 
 
 
