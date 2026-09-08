@@ -195,7 +195,6 @@ function renderDeveloperPanel() {
     ? convertedCards.map(food => `<span class="is-hit">${escapeHtml(speechProvider === "mandarin" ? food.chinese : food.hakka)}</span>`).join("")
     : `<span>尚未填入</span>`;
   const answerLine = answerMainLine(answerList, speechProvider);
-  const answerSubline = answerSupportLine(answerList, speechProvider);
   const rawPayload = lastRecognitionPayload ? JSON.stringify(lastRecognitionPayload, null, 2) : "尚無回傳資料";
   const statusText = recognitionError || (isSpeechRecognizing ? "辨識中" : (recognizedSpeechText ? "已回傳辨識資料" : "尚未送出"));
   const recognitionMode = breakfastRecognitionMode();
@@ -204,7 +203,6 @@ function renderDeveloperPanel() {
       <span class="developer-label">正確答案</span>
       <span class="sentence-label">${escapeHtml(developerDialectLabel(speechProvider))}</span>
       <strong>${escapeHtml(answerLine || "尚無正確答案")}</strong>
-      <small>${escapeHtml(answerSubline || els.questionPrompt?.textContent || question.prompt || "")}</small>
     </div>
     <div class="developer-item">
       <span class="developer-label">標準 ASR</span>
@@ -880,6 +878,7 @@ updateLessonCards();
 updateCarouselButtons();
 showScreen("intro");
 renderDeveloperPanel();
+
 
 
 
