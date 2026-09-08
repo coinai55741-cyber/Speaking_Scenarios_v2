@@ -9,10 +9,10 @@ const foods = [
 ];
 
 const questions = [
-  { type: "看圖選拼音", title: "這係麼个？", prompt: "請看拼音，選出正確的早餐圖卡。", answer: "飯", field: "hakka", food: "飯", hint: "再看看拼音 fan。", playMode: "scene" },
-  { type: "看圖選拼音", title: "這係麼个？", prompt: "請看拼音，選出正確的早餐圖卡。", answer: "卵包", field: "hakka", food: "卵包", hint: "再看看拼音 lonˋ bauˊ。", playMode: "scene" },
-  { type: "看圖選拼音", title: "這係麼个？", prompt: "請看拼音，選出正確的早餐圖卡。", answer: "蘿蔔粄", field: "hakka", food: "蘿蔔粄", hint: "再看看拼音 loˇ ped banˋ。", playMode: "scene" },
-  { type: "看圖選拼音", title: "這係麼个？", prompt: "請看拼音，選出正確的早餐圖卡。", answer: "豆乳", field: "hakka", food: "豆乳", hint: "再看看拼音 teu nen。", playMode: "scene" },
+  { type: "看圖選拼音", title: "這係麼个？", prompt: "請看拼音，選出正確的早餐圖卡。", answer: "飯", field: "hakka", food: "飯", hint: "再試著念看看喔！", playMode: "scene" },
+  { type: "看圖選拼音", title: "這係麼个？", prompt: "請看拼音，選出正確的早餐圖卡。", answer: "卵包", field: "hakka", food: "卵包", hint: "再試著念看看喔！", playMode: "scene" },
+  { type: "看圖選拼音", title: "這係麼个？", prompt: "請看拼音，選出正確的早餐圖卡。", answer: "蘿蔔粄", field: "hakka", food: "蘿蔔粄", hint: "再試著念看看喔！", playMode: "scene" },
+  { type: "看圖選拼音", title: "這係麼个？", prompt: "請看拼音，選出正確的早餐圖卡。", answer: "豆乳", field: "hakka", food: "豆乳", hint: "再試著念看看喔！", playMode: "scene" },
   { type: "綜合挑戰", title: "今晡日阿公好食麼个？", prompt: "阿公：「𠊎好食mien bauˊ，也愛啉ngiuˇ nen。」", answer: ["麵包", "牛乳"], field: "hakka", choiceMode: "image", image: "./assets/lesson-1-question-grandpa-breakfast.png", alt: "阿公和小孩在早餐情境中思考吃什麼", hint: "再試著念看看喔！" }
 ];
 
@@ -880,6 +880,7 @@ updateLessonCards();
 updateCarouselButtons();
 showScreen("intro");
 renderDeveloperPanel();
+
 
 
 
