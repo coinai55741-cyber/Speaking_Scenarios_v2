@@ -24,6 +24,14 @@ let activeQuestions = questions;
 const BREAKFAST_ASR_ENDPOINT = window.SPEECH_API?.endpoint() || "http://localhost:5000/api/speech/recognize";
 const BREAKFAST_RECOGNITION_MODE_KEY = "speakingDemoRecognitionMode";
 const BREAKFAST_PROVIDER_KEY = "breakfastSpeechProvider";
+const BREAKFAST_DIALECT_LABELS = {
+  sixian: "四縣腔",
+  hailu: "海陸腔",
+  dapu: "大埔腔",
+  raoping: "饒平腔",
+  zhaoan: "詔安腔",
+  southSixian: "南四縣腔"
+};
 
 function breakfastRecognitionMode() {
   const value = localStorage.getItem(BREAKFAST_RECOGNITION_MODE_KEY) || "file";
@@ -866,6 +874,7 @@ updateLessonCards();
 updateCarouselButtons();
 showScreen("intro");
 renderDeveloperPanel();
+
 
 
 
