@@ -678,6 +678,9 @@ async function startSpeechRecording() {
     speechRecorder.addEventListener("stop", finishSpeechRecording, { once: true });
     speechRecorder.start();
     isSpeechRecording = true;
+    if (breakfastSpeechProvider() === "hakka" && breakfastRecognitionMode() === "realtime") {
+      startRealtimeBreakfastSpeech();
+    }
     els.recordSpeechBtn?.classList.add("is-recording");
     setIconButton(els.recordSpeechBtn, "stop", "停止錄音");
     if (els.speechStatus) els.speechStatus.textContent = "錄音中，再按一次停止。";
@@ -696,6 +699,7 @@ function stopSpeechRecording() {
     setIconButton(els.recordSpeechBtn, "stop", "辨識中");
   }
   if (els.speechStatus) els.speechStatus.textContent = "辨識中...";
+  if (realtimeSpeechActive) BreakfastRealtimeASR.stop();
   try { speechRecorder.stop(); } catch (error) { resetSpeechAnswer(); }
 }
 
@@ -710,10 +714,11 @@ async function startRealtimeBreakfastSpeech() {
   const finish = async (text, options = {}) => {
     if (realtimeResultHandled) return;
     realtimeResultHandled = true;
+    const shouldStopRealtime = realtimeSpeechActive;
     realtimeSpeechActive = false;
     isSpeechRecording = false;
     isSpeechRecognizing = false;
-    BreakfastRealtimeASR.stop();
+    if (shouldStopRealtime) BreakfastRealtimeASR.stop();
     if (speechStream) {
       speechStream.getTracks().forEach(track => track.stop());
       speechStream = null;
@@ -786,6 +791,24 @@ async function finishSpeechRecording() {
     speechStream = null;
   }
   if (els.playSpeechBtn) els.playSpeechBtn.disabled = false;
+  if (breakfastSpeechProvider() === "hakka" && breakfastRecognitionMode() === "realtime") {
+    setTimeout(() => {
+      if (!realtimeResultHandled) {
+        realtimeSpeechActive = false;
+        realtimeResultHandled = true;
+        isSpeechRecognizing = false;
+        recognizedSpeechText = recognizedSpeechText || "";
+        lastRecognitionPayload = { text: recognizedSpeechText, provider: "hakka_realtime_asr", mode: "realtime" };
+        handleSpeechAnswer(recognizedSpeechText, activeQuestions[currentIndex]);
+        if (els.recordSpeechBtn) {
+          els.recordSpeechBtn.disabled = false;
+          setIconButton(els.recordSpeechBtn, "mic", "重新錄音");
+        }
+        renderDeveloperPanel();
+      }
+    }, 900);
+    return;
+  }
   await recognizeBreakfastSpeech(blob);
 }
 
@@ -1065,6 +1088,8 @@ selectedDialect = "sixian";
 updateLessonCards();
 startLesson("1");
 renderDeveloperPanel();
+
+
 
 
 
