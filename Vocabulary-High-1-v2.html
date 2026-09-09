@@ -350,7 +350,7 @@ const ASR=(()=>{
       tk = await r.json();
       if (!tk.url || !tk.ticket) throw new Error(tk.error || "無票");
     } catch(e) {
-      if (ticketUrl !== "http://localhost:5000/ticket") {
+      if (location.hostname === "localhost" || location.hostname === "127.0.0.1") {
         try {
           let r2 = await fetch("http://localhost:5000/ticket", { method: "POST" });
           if (r2.ok) tk = await r2.json();
@@ -633,16 +633,20 @@ $("bRec").onclick=async()=>{
 
       // 若 WebSocket 即時串流未連上或無結果，直接連線本機 Port 5000 進行辨識
       if (!useAsr || $("asrOut").textContent.includes("連毋著") || $("asrOut").textContent.includes("收音") || $("asrOut").textContent.includes("連線中")) {
-        $("asrOut").textContent = "⏳ 正在透過本機後端 (Port 5000) 辨識中⋯⋯";
+        $("asrOut").textContent = "⏳ 正在送出檔案辨識中⋯⋯";
         try {
           const form = new FormData();
           form.append("audio", audioBlob, "recording.webm");
           form.append("provider_id", "taiwan_tongues_zh");
           form.append("language", "zh");
 
-          let r = await fetch("http://localhost:5000/transcribe", { method: "POST", body: form }).catch(() => null);
-          if (!r || !r.ok) {
-            r = await fetch("http://localhost:5000/api/speech/recognize", { method: "POST", body: form }).catch(() => null);
+          const localPage = location.hostname === "localhost" || location.hostname === "127.0.0.1";
+          let r = null;
+          if (localPage) {
+            r = await fetch("http://localhost:5000/transcribe", { method: "POST", body: form }).catch(() => null);
+            if (!r || !r.ok) {
+              r = await fetch("http://localhost:5000/api/speech/recognize", { method: "POST", body: form }).catch(() => null);
+            }
           }
           if (r && r.ok) {
             const data = await r.json();
@@ -656,7 +660,7 @@ $("bRec").onclick=async()=>{
           console.warn("Port 5000 辨識失敗:", err);
         }
         if (!useAsr) {
-          $("asrOut").textContent = "（本機辨識無回應，請確認 Port 5000 是否已啟動）";
+          $("asrOut").textContent = location.hostname === "localhost" || location.hostname === "127.0.0.1" ? "（本機辨識無回應，請確認 Port 5000 是否已啟動）" : "（線上版會使用客語即時辨識；華語檔案辨識仍需本機後端）";
         }
       }
     };
@@ -721,6 +725,7 @@ build();
 </script>
 </body>
 </html>
+
 
 
 

@@ -231,7 +231,7 @@
         if (r.ok) tk = await r.json();
         if (!tk?.url || !tk?.ticket) throw new Error(tk?.error || "無法取得辨識憑證");
       } catch (e) {
-        if (ticketUrl !== "http://localhost:5000/ticket") {
+        if (location.hostname === "localhost" || location.hostname === "127.0.0.1") {
           try {
             const r2 = await fetch("http://localhost:5000/ticket", { method: "POST" });
             if (r2.ok) tk = await r2.json();
@@ -642,8 +642,9 @@
       let endpoint = window.SPEECH_API?.endpoint() || "http://localhost:5000/api/speech/recognize";
       let response = await fetch(endpoint, { method: "POST", body: form }).catch(() => null);
       
-      // 若客委會 API 失敗或無回應，直接使用本機 5000 的 Taiwan-Tongues Whisper
-      if (!response || !response.ok) {
+      // 華語 Taiwan-Tongues 目前只在本機後端；客語線上版固定走 Vercel，不再退回使用者電腦。
+      const isLocalPage = location.hostname === "localhost" || location.hostname === "127.0.0.1";
+      if ((!response || !response.ok) && isMandarin && isLocalPage) {
         const localForm = new FormData();
         localForm.append("audio", blob, "speaking-field-trip.webm");
         localForm.append("provider_id", "taiwan_tongues_zh");
@@ -656,7 +657,7 @@
       }
 
       if (!response || !response.ok) {
-        throw new Error("無法連線至 Port 5000 辨識後端");
+        throw new Error(isMandarin ? "華語辨識需要開啟本機後端" : "客語 Vercel 檔案辨識暫時無法連線");
       }
 
       const payload = await response.json();
@@ -677,7 +678,7 @@
 
       handleRecognitionResult(q, text);
     } catch (e) {
-      setAsrState("retry", "⚠️ 辨識提示", "無法連線至辨識伺服器（請確認 Port 5000 後端是否已開啟）");
+      setAsrState("retry", "⚠️ 辨識提示", isMandarin ? "華語辨識需要開啟本機後端。" : "客語 Vercel 檔案辨識暫時無法連線，請稍後再試。");
     }
   }
 
@@ -884,6 +885,7 @@
   // 初始化畫面
   render();
 })();
+
 
 
 
