@@ -494,7 +494,8 @@
     }
 
     const isMandarin = isMandarinMode();
-    const mode = recognitionModeSelect?.value || "realtime";
+    const selectedMode = recognitionModeSelect?.value || "realtime";
+    const mode = isMandarin ? "file" : selectedMode;
     const targetLabel = isMandarin ? (q.mandarinAnswer || q.answer) : q.answer;
 
     try {
@@ -516,54 +517,83 @@
         if (isRecording) stopRecording();
       }, maxSec);
 
-      let useFileFallback = mode === "file" || (isMandarin && !window.SPEECH_API?.realtimeTicketUrl);
+      const useRealtimeStream = !isMandarin && mode === "realtime";
+      let resultHandled = false;
       audioChunks = [];
-      try {
-        mediaRecorder = new MediaRecorder(mediaStream);
-        mediaRecorder.ondataavailable = (e) => audioChunks.push(e.data);
-        mediaRecorder.onstop = async () => {
-          if (useFileFallback) {
+      mediaRecorder = null;
+
+      if (!useRealtimeStream) {
+        try {
+          mediaRecorder = new MediaRecorder(mediaStream);
+          mediaRecorder.ondataavailable = (e) => audioChunks.push(e.data);
+          mediaRecorder.onstop = async () => {
+            if (resultHandled) return;
+            resultHandled = true;
             const blob = new Blob(audioChunks, { type: "audio/webm" });
             await sendAudioFile(blob, q);
+          };
+          mediaRecorder.start();
+        } catch (recErr) {
+          console.warn("MediaRecorder start failed:", recErr);
+          throw recErr;
+        }
+        if (isMandarin && selectedMode === "realtime" && asrStatusText) {
+          asrStatusText.textContent = "華語目前使用本機錄完辨識，避免等待客語即時票券";
+        }
+      } else {
+        const finishRealtime = async (transcript) => {
+          if (resultHandled) return;
+          resultHandled = true;
+          isRecording = false;
+          clearTimeout(recTimeout);
+          ASR.stop();
+          if (mediaStream) {
+            mediaStream.getTracks().forEach((t) => t.stop());
+            mediaStream = null;
           }
+          await handleRecognitionResult(q, transcript);
         };
-        mediaRecorder.start();
-      } catch (recErr) {
-        console.warn("MediaRecorder start failed:", recErr);
-      }
 
-      if (!useFileFallback) {
-        // WebSocket 即時串流模式
         const ok = await ASR.start(
           mediaStream,
           (liveTranscript) => {
             setAsrState(
               "recording",
-              isMandarin ? "🎙️ 錄音中 (華語)" : "🎙️ 錄音中 (客語)",
+              "🎙️ 錄音中 (客語)",
               `正在收音⋯ 請說出「${targetLabel}」`,
-              liveTranscript
+              liveTranscript || "（聆聽中⋯）"
             );
-            if (answerInput) answerInput.value = liveTranscript;
-            if (asrStatusText) asrStatusText.textContent = `即時文字：${liveTranscript}`;
+            if (answerInput) answerInput.value = liveTranscript || "";
+            if (asrStatusText) asrStatusText.textContent = liveTranscript ? `即時文字：${liveTranscript}` : "即時辨識中⋯";
+            if (liveTranscript && checkAnswerMatch(q, liveTranscript)) {
+              finishRealtime(liveTranscript);
+            }
           },
           (finalTranscript) => {
-            handleRecognitionResult(q, finalTranscript);
+            finishRealtime(finalTranscript);
           },
           (errMsg) => {
-            useFileFallback = true;
-            if (asrStatusText) asrStatusText.textContent = "即時連線中斷，將使用本機後端辨識";
+            if (resultHandled) return;
+            resultHandled = true;
+            isRecording = false;
+            clearTimeout(recTimeout);
+            if (mediaStream) {
+              mediaStream.getTracks().forEach((t) => t.stop());
+              mediaStream = null;
+            }
+            setAsrState("retry", "⚠️ 即時辨識提示", errMsg || "即時連線中斷，請再試一次。", "（尚無辨識文字）");
+            if (asrStatusText) asrStatusText.textContent = errMsg || "即時連線中斷";
           }
         );
 
         if (!ok) {
-          useFileFallback = true;
-          setAsrState(
-            "recording",
-            isMandarin ? "🎙️ 錄音中 (華語)" : "🎙️ 錄音中 (客語)",
-            `正在收音⋯ 請說出「${targetLabel}」`,
-            "（錄音中⋯結束後送後端辨識）"
-          );
-          if (asrStatusText) asrStatusText.textContent = "已切換至本機後端辨識服務";
+          resultHandled = true;
+          isRecording = false;
+          clearTimeout(recTimeout);
+          if (mediaStream) {
+            mediaStream.getTracks().forEach((t) => t.stop());
+            mediaStream = null;
+          }
         }
       }
     } catch (err) {
@@ -583,9 +613,8 @@
 
     if (mediaRecorder && mediaRecorder.state === "recording") {
       mediaRecorder.stop();
-    } else {
-      ASR.stop();
     }
+    ASR.stop();
 
     setTimeout(() => {
       if (mediaStream) {
@@ -855,3 +884,5 @@
   // 初始化畫面
   render();
 })();
+
+

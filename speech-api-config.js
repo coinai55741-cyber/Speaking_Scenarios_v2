@@ -1,6 +1,6 @@
 (function () {
   const DEFAULT_BASE_URL = "http://localhost:5000";
-  const DEFAULT_REALTIME_TICKET_URL = "http://localhost:8788/ticket";
+  const DEFAULT_REALTIME_TICKET_URL = `${DEFAULT_BASE_URL}/ticket`;
   const ENDPOINTS = {
     recognize: "/api/speech/recognize",
     legacyRecognize: "/recognize",
@@ -126,3 +126,4 @@
     realtimeStorageKey: "speakingDemoRealtimeTicketEndpoint"
   };
 }());
+
