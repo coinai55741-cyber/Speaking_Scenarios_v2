@@ -52,6 +52,9 @@
     if (location.hostname.endsWith("github.io")) {
       return VERCEL_REALTIME_TICKET_URL;
     }
+    if (location.hostname.endsWith("vercel.app")) {
+      return `${location.origin}/ticket`;
+    }
     return DEFAULT_REALTIME_TICKET_URL;
   }
 
@@ -130,6 +133,7 @@
     realtimeStorageKey: "speakingDemoRealtimeTicketEndpoint"
   };
 }());
+
 
 
 
