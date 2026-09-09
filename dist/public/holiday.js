@@ -15,14 +15,15 @@ const ASR_PROVIDERS = {
     provider: "hakka_api",
     language: "hak",
     enabled: true,
-    note: "已接後端分流；需在 hf_space_asr/.env 填入客委會帳密後才會真正辨識。"
+    note: "線上版使用 Vercel 客語辨識。"
   }
 };
 
 function getSelectedAsrProvider() {
-  const providerId = els.asrProviderSelect?.value || localStorage.getItem("speakingDemoAsrProvider") || "taiwan_tongues_zh";
+  const savedProvider = localStorage.getItem("speakingDemoAsrProvider");
+  const providerId = els.asrProviderSelect?.value || savedProvider || "hakka_api_hak";
   const hasVisibleOption = !els.asrProviderSelect || [...els.asrProviderSelect.options].some(option => option.value === providerId);
-  return ASR_PROVIDERS[providerId] && hasVisibleOption ? providerId : "taiwan_tongues_zh";
+  return ASR_PROVIDERS[providerId] && hasVisibleOption ? providerId : "hakka_api_hak";
 }
 
 function getRecognitionMode() {
@@ -752,6 +753,7 @@ els.checkBtn.addEventListener("click", () => {
 
 els.missionLayout.hidden = true;
 renderTask();
+
 
 
 

@@ -185,7 +185,7 @@ const LESSON = {
 
 const state = {
   stageIndex: 0,
-  dialect: "mandarin",
+  dialect: "sixian",
   teachingIndex: 0,
   chineseVisible: true,
   textExpanded: true,
@@ -1312,6 +1312,7 @@ function flashHint(message) {
 }
 
 init();
+
 
 
 
