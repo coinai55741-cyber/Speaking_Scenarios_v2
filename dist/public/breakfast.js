@@ -134,7 +134,7 @@ function escapeHtml(value) {
 }
 
 function currentProviderLabel(provider = breakfastSpeechProvider()) {
-  if (provider === "mandarin") return "華語API";
+  if (provider === "mandarin") return "華語（瀏覽器原生）";
   return selectedDialect === "sixian" ? "客委會辨識API" : "客委會辨識API";
 }
 
@@ -246,7 +246,7 @@ function renderDeveloperPanel() {
       <span class="developer-label">辨識 API</span>
       <select id="developerProviderSelect">
         <option value="hakka" ${speechProvider === "hakka" ? "selected" : ""}>客委會辨識API</option>
-        <option value="mandarin" ${speechProvider === "mandarin" ? "selected" : ""}>華語API</option>
+        <option value="mandarin" ${speechProvider === "mandarin" ? "selected" : ""}>華語（瀏覽器原生）</option>
       </select>
       <p class="developer-subnote">目前可用：${escapeHtml(currentProviderLabel(speechProvider))} / ${escapeHtml(currentBreakfastAsrTarget())}</p>
     </div>
@@ -620,8 +620,17 @@ const BreakfastRealtimeASR = (() => {
 
   return { start, stop, abort };
 })();
+
+let mandarinSpeechSession = null;
+let mandarinSpeechActive = false;
+
 function resetSpeechAnswer(options = {}) {
   BreakfastRealtimeASR.abort();
+  if (mandarinSpeechSession) {
+    mandarinSpeechSession.abort();
+    mandarinSpeechSession = null;
+  }
+  mandarinSpeechActive = false;
   realtimeSpeechActive = false;
   realtimeResultHandled = false;
   if (speechRecorder && isSpeechRecording) {
@@ -680,6 +689,8 @@ async function startSpeechRecording() {
     isSpeechRecording = true;
     if (breakfastSpeechProvider() === "hakka" && breakfastRecognitionMode() === "realtime") {
       startRealtimeBreakfastSpeech();
+    } else if (breakfastSpeechProvider() === "mandarin") {
+      startMandarinBreakfastSpeech();
     }
     els.recordSpeechBtn?.classList.add("is-recording");
     setIconButton(els.recordSpeechBtn, "stop", "停止錄音");
@@ -700,9 +711,67 @@ function stopSpeechRecording() {
   }
   if (els.speechStatus) els.speechStatus.textContent = "辨識中...";
   if (realtimeSpeechActive) BreakfastRealtimeASR.stop();
+  if (mandarinSpeechActive && mandarinSpeechSession) mandarinSpeechSession.stop();
   try { speechRecorder.stop(); } catch (error) { resetSpeechAnswer(); }
 }
 
+function startMandarinBreakfastSpeech() {
+  const question = activeQuestions[currentIndex];
+  mandarinSpeechActive = true;
+  realtimeResultHandled = false;
+  isSpeechRecognizing = true;
+  recognitionError = "";
+  if (els.speechStatus) els.speechStatus.textContent = "華語語音辨識中...";
+
+  const finish = (text, options = {}) => {
+    if (realtimeResultHandled) return;
+    realtimeResultHandled = true;
+    mandarinSpeechActive = false;
+    isSpeechRecording = false;
+    isSpeechRecognizing = false;
+    if (speechStream) {
+      speechStream.getTracks().forEach(track => track.stop());
+      speechStream = null;
+    }
+    if (els.recordSpeechBtn) {
+      els.recordSpeechBtn.classList.remove("is-recording");
+      els.recordSpeechBtn.disabled = false;
+      setIconButton(els.recordSpeechBtn, "mic", "重新錄音");
+    }
+    recognizedSpeechText = text || "";
+    lastRecognitionPayload = { text: recognizedSpeechText, provider: "mandarin_web_speech", mode: "realtime" };
+    handleSpeechAnswer(recognizedSpeechText, question, options);
+  };
+
+  mandarinSpeechSession = window.MANDARIN_WEB_SPEECH?.createSession?.({
+    lang: "zh-TW",
+    interimResults: true,
+    continuous: false,
+    onTranscript(text) {
+      recognizedSpeechText = text || "";
+      lastRecognitionPayload = { text: recognizedSpeechText, provider: "mandarin_web_speech", mode: "realtime" };
+      if (els.speechStatus) els.speechStatus.textContent = recognizedSpeechText ? `即時辨識：${recognizedSpeechText}` : "華語語音辨識中...";
+      renderDeveloperPanel();
+      if (recognizedSpeechText && speechMatchesQuestion(recognizedSpeechText, question)) {
+        finish(recognizedSpeechText, { silent: true });
+      }
+    },
+    onFinal(text) {
+      finish(text || recognizedSpeechText);
+    },
+    onError(message) {
+      if (realtimeResultHandled) return;
+      recognitionError = message || "華語辨識發生錯誤。";
+      lastRecognitionPayload = { error: recognitionError };
+      if (els.speechStatus) els.speechStatus.textContent = recognitionError;
+      renderDeveloperPanel();
+    }
+  });
+
+  if (mandarinSpeechSession) {
+    mandarinSpeechSession.start();
+  }
+}
 
 async function startRealtimeBreakfastSpeech() {
   const question = activeQuestions[currentIndex];
@@ -807,6 +876,24 @@ async function finishSpeechRecording() {
         renderDeveloperPanel();
       }
     }, 900);
+    return;
+  }
+  if (breakfastSpeechProvider() === "mandarin") {
+    setTimeout(() => {
+      if (!realtimeResultHandled) {
+        mandarinSpeechActive = false;
+        realtimeResultHandled = true;
+        isSpeechRecognizing = false;
+        recognizedSpeechText = recognizedSpeechText || "";
+        lastRecognitionPayload = { text: recognizedSpeechText, provider: "mandarin_web_speech", mode: "realtime" };
+        handleSpeechAnswer(recognizedSpeechText, activeQuestions[currentIndex]);
+        if (els.recordSpeechBtn) {
+          els.recordSpeechBtn.disabled = false;
+          setIconButton(els.recordSpeechBtn, "mic", "重新錄音");
+        }
+        renderDeveloperPanel();
+      }
+    }, 400);
     return;
   }
   await recognizeBreakfastSpeech(blob);

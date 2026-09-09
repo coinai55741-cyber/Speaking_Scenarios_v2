@@ -52,6 +52,7 @@
   let recTimeout = null;
   let mediaRecorder = null;
   let audioChunks = [];
+  let activeMandarinSession = null;
 
   // 是否切換至華語辨識
   function isMandarinMode() {
@@ -517,12 +518,65 @@
         if (isRecording) stopRecording();
       }, maxSec);
 
-      const useRealtimeStream = !isMandarin && mode === "realtime";
       let resultHandled = false;
       audioChunks = [];
       mediaRecorder = null;
 
-      if (!useRealtimeStream) {
+      if (isMandarin) {
+        const finishMandarin = async (transcript) => {
+          if (resultHandled) return;
+          resultHandled = true;
+          isRecording = false;
+          clearTimeout(recTimeout);
+          if (activeMandarinSession) {
+            activeMandarinSession.stop();
+            activeMandarinSession = null;
+          }
+          if (mediaStream) {
+            mediaStream.getTracks().forEach((t) => t.stop());
+            mediaStream = null;
+          }
+          await handleRecognitionResult(q, transcript);
+        };
+
+        activeMandarinSession = window.MANDARIN_WEB_SPEECH?.createSession?.({
+          lang: "zh-TW",
+          interimResults: true,
+          continuous: false,
+          onTranscript(liveTranscript) {
+            setAsrState(
+              "recording",
+              "🎙️ 錄音中 (華語)",
+              `正在收音⋯ 請說出「${targetLabel}」`,
+              liveTranscript || "（聆聽中⋯）"
+            );
+            if (answerInput) answerInput.value = liveTranscript || "";
+            if (asrStatusText) asrStatusText.textContent = liveTranscript ? `即時文字：${liveTranscript}` : "華語辨識中⋯";
+            if (liveTranscript && checkAnswerMatch(q, liveTranscript)) {
+              finishMandarin(liveTranscript);
+            }
+          },
+          onFinal(finalTranscript) {
+            finishMandarin(finalTranscript);
+          },
+          onError(errMsg) {
+            if (resultHandled) return;
+            resultHandled = true;
+            isRecording = false;
+            clearTimeout(recTimeout);
+            if (mediaStream) {
+              mediaStream.getTracks().forEach((t) => t.stop());
+              mediaStream = null;
+            }
+            setAsrState("retry", "⚠️ 華語辨識提示", errMsg || "辨識中斷，請再試一次。", "（尚無辨識文字）");
+            if (asrStatusText) asrStatusText.textContent = errMsg || "辨識中斷";
+          }
+        });
+
+        if (activeMandarinSession) {
+          activeMandarinSession.start();
+        }
+      } else if (mode !== "realtime") {
         try {
           mediaRecorder = new MediaRecorder(mediaStream);
           mediaRecorder.ondataavailable = (e) => audioChunks.push(e.data);
@@ -536,9 +590,6 @@
         } catch (recErr) {
           console.warn("MediaRecorder start failed:", recErr);
           throw recErr;
-        }
-        if (isMandarin && selectedMode === "realtime" && asrStatusText) {
-          asrStatusText.textContent = "華語目前使用本機錄完辨識，避免等待客語即時票券";
         }
       } else {
         const finishRealtime = async (transcript) => {
@@ -611,6 +662,10 @@
     isRecording = false;
     clearTimeout(recTimeout);
 
+    if (activeMandarinSession) {
+      activeMandarinSession.stop();
+      activeMandarinSession = null;
+    }
     if (mediaRecorder && mediaRecorder.state === "recording") {
       mediaRecorder.stop();
     }

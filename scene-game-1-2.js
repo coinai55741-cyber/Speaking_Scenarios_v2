@@ -914,7 +914,28 @@ async function startSentenceRecording(stage, mission) {
       if (event.data && event.data.size) state.audioChunks.push(event.data);
     });
     state.mediaRecorder.addEventListener("stop", () => finishSentenceRecording(stage, mission), { once: true });
-    if (state.dialect !== "mandarin" && state.recognitionMode === "realtime" && window.HAKKA_REALTIME_ASR) {
+    if (state.dialect === "mandarin" && window.MANDARIN_WEB_SPEECH) {
+      state.realtimeSession = window.MANDARIN_WEB_SPEECH.createSession({
+        lang: "zh-TW",
+        interimResults: true,
+        continuous: false,
+        onTranscript(text) {
+          state.realtimeTranscript = text || "";
+          state.recognizedText = state.realtimeTranscript;
+          state.answerTokens = mapRecognitionToCards({ text: state.realtimeTranscript }, mission);
+          renderDeveloperPanel(stage);
+          renderMission(stage);
+        },
+        onFinal(text) {
+          state.realtimeTranscript = text || state.realtimeTranscript || "";
+          state.realtimeSession = null;
+        },
+        onError(message) {
+          state.recognitionError = message || "華語即時辨識錯誤";
+        }
+      });
+      state.realtimeSession.start();
+    } else if (state.dialect !== "mandarin" && state.recognitionMode === "realtime" && window.HAKKA_REALTIME_ASR) {
       state.realtimeSession = window.HAKKA_REALTIME_ASR.createSession({
         onTranscript(text) {
           state.realtimeTranscript = text || "";
@@ -954,7 +975,7 @@ async function startSentenceRecording(stage, mission) {
 
 function stopSentenceRecording() {
   if (!state.mediaRecorder || state.mediaRecorder.state === "inactive") return;
-  if (state.dialect !== "mandarin" && state.recognitionMode === "realtime") state.realtimeSession?.stop?.();
+  if (state.realtimeSession) state.realtimeSession?.stop?.();
   state.mediaRecorder.stop();
 }
 
@@ -972,7 +993,7 @@ async function finishSentenceRecording(stage, mission) {
   state.lastRecognitionPayload = null;
   renderMission(stage);
   try {
-    const useRealtimeResult = state.dialect !== "mandarin" && state.recognitionMode === "realtime";
+    const useRealtimeResult = (state.dialect !== "mandarin" && state.recognitionMode === "realtime") || (state.dialect === "mandarin" && Boolean(state.realtimeTranscript));
     const payload = useRealtimeResult
       ? { text: state.realtimeTranscript || state.recognizedText || "", raw: { text: state.realtimeTranscript || state.recognizedText || "", provider: "hakka_realtime_asr", mode: "realtime" } }
       : await recognizeSpeech(blob);

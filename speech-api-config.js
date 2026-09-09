@@ -21,7 +21,7 @@
       provider: "taiwan_tongues",
       language: "zh",
       recognizer: "mandarin",
-      label: "華語API"
+      label: "華語（瀏覽器原生）"
     },
     hakkaApi: {
       id: "hakka_api_hak",
@@ -130,6 +130,93 @@
     };
   }
 
+  window.MANDARIN_WEB_SPEECH = {
+    isSupported() {
+      return Boolean(window.SpeechRecognition || window.webkitSpeechRecognition);
+    },
+    createSession(options = {}) {
+      const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (!SR) {
+        if (typeof options.onError === "function") options.onError("瀏覽器不支援 Web Speech API 語音辨識");
+        return null;
+      }
+      const recognition = new SR();
+      recognition.lang = options.lang || "zh-TW";
+      recognition.continuous = options.continuous ?? false;
+      recognition.interimResults = options.interimResults ?? true;
+      recognition.maxAlternatives = 1;
+
+      let recognizedText = "";
+      let isStopped = false;
+      let hasEnded = false;
+
+      recognition.onresult = (event) => {
+        let interim = "";
+        let final = "";
+        for (let i = event.resultIndex; i < event.results.length; ++i) {
+          if (event.results[i].isFinal) {
+            final += event.results[i][0].transcript;
+          } else {
+            interim += event.results[i][0].transcript;
+          }
+        }
+        recognizedText = (final || interim || "").trim();
+        if (typeof options.onTranscript === "function") {
+          options.onTranscript(recognizedText, { final, interim });
+        }
+      };
+
+      recognition.onerror = (event) => {
+        if (isStopped) return;
+        if (event.error === "no-speech") {
+          // ignore silent pause
+          return;
+        }
+        if (typeof options.onError === "function") {
+          options.onError(event.error === "not-allowed" ? "請允許麥克風權限" : `辨識錯誤：${event.error}`);
+        }
+      };
+
+      recognition.onend = () => {
+        if (hasEnded) return;
+        hasEnded = true;
+        if (!isStopped && typeof options.onFinal === "function") {
+          options.onFinal(recognizedText);
+        }
+      };
+
+      return {
+        start() {
+          isStopped = false;
+          hasEnded = false;
+          recognizedText = "";
+          try {
+            recognition.start();
+            return true;
+          } catch (e) {
+            if (typeof options.onError === "function") options.onError(e.message);
+            return false;
+          }
+        },
+        stop() {
+          try {
+            recognition.stop();
+          } catch (e) {}
+        },
+        abort() {
+          isStopped = true;
+          hasEnded = true;
+          try {
+            recognition.abort();
+          } catch (e) {}
+        },
+        text() {
+          return recognizedText;
+        }
+      };
+    }
+  };
+
   window.SPEECH_API = {
     baseUrl,
     endpoint,
@@ -145,7 +232,8 @@
     providers: PROVIDERS,
     recognitionModes: RECOGNITION_MODES,
     storageKey: "speakingDemoSpeechEndpoint",
-    realtimeStorageKey: "speakingDemoRealtimeTicketEndpoint"
+    realtimeStorageKey: "speakingDemoRealtimeTicketEndpoint",
+    webSpeech: window.MANDARIN_WEB_SPEECH
   };
 }());
 

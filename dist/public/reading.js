@@ -40,7 +40,7 @@
     const mandarin = $('asrProviderSelect').value === 'taiwan_tongues_zh';
     if (mandarin) $('recognitionModeSelect').value = 'file';
     $('recognitionModeSelect').disabled = busy() || mandarin;
-    $('recognitionModeNote').textContent = mandarin ? '華語測試僅支援檔案辨識。' : recognitionMode() === 'realtime' ? '預設使用客委會即時串流（WebSocket）辨識。' : '按「送出朗讀」後上傳完整音檔，以檔案辨識取得結果。';
+    $('recognitionModeNote').textContent = mandarin ? '使用瀏覽器原生 Web Speech API 進行華語即時辨識。' : recognitionMode() === 'realtime' ? '預設使用客委會即時串流（WebSocket）辨識。' : '按「送出朗讀」後上傳完整音檔，以檔案辨識取得結果。';
     $('debugCompareBtn').disabled = busy() || !info.draft.trim();
     $('debugComparison').replaceChildren();
     $('debugMatch').textContent = '尚未比對';
@@ -54,6 +54,7 @@
   const busy = () => ['requesting', 'recording', 'stopping', 'submitting'].includes(phase);
   const stopTracks = () => { stream?.getTracks().forEach(track => track.stop()); stream = null; };
   const useRealtimeAsr = () => recognitionMode() === 'realtime' && document.getElementById('asrProviderSelect')?.value !== 'taiwan_tongues_zh' && window.HAKKA_REALTIME_ASR;
+  const useMandarinWebSpeech = () => document.getElementById('asrProviderSelect')?.value === 'taiwan_tongues_zh' && window.MANDARIN_WEB_SPEECH;
   const formatTime = seconds => `${String(Math.floor(seconds / 60)).padStart(2, '0')}:${String(seconds % 60).padStart(2, '0')}`;
   const status = text => { $('status').textContent = text; };
   const release = answer => { if (answer.url) URL.revokeObjectURL(answer.url); };
@@ -203,7 +204,40 @@
       stream = acquired;
       realtimeTranscript = '';
       realtimeError = '';
-      if (useRealtimeAsr()) {
+      if (useMandarinWebSpeech()) {
+        realtimeSession = window.MANDARIN_WEB_SPEECH.createSession({
+          lang: 'zh-TW',
+          interimResults: true,
+          continuous: true,
+          onTranscript(text) {
+            realtimeTranscript = text || '';
+            if (realtimeTranscript) {
+              diagnostic().draft = realtimeTranscript;
+              diagnostic().status = `華語即時辨識：${realtimeTranscript}`;
+              updateDeveloperMode();
+            }
+          },
+          onFinal(text) {
+            realtimeTranscript = text || realtimeTranscript || '';
+            if (realtimeTranscript) {
+              diagnostic().draft = realtimeTranscript;
+              diagnostic().status = '華語即時辨識完成';
+            } else if (realtimeError) {
+              diagnostic().status = realtimeError;
+            } else {
+              diagnostic().status = '即時辨識沒有文字';
+            }
+            realtimeSession = null;
+            updateDeveloperMode();
+          },
+          onError(message) {
+            realtimeError = message || '華語辨識中斷';
+            diagnostic().status = realtimeError;
+            updateDeveloperMode();
+          }
+        });
+        if (realtimeSession) realtimeSession.start();
+      } else if (useRealtimeAsr()) {
         realtimeSession = window.HAKKA_REALTIME_ASR.createSession({
           onTranscript(text) {
             realtimeTranscript = text || '';
@@ -272,7 +306,7 @@
   function stopRecording() {
     if (phase !== 'recording' || recorder?.state !== 'recording') return;
     setPhase('stopping', '正在整理你的錄音…');
-    if (useRealtimeAsr()) realtimeSession?.stop?.();
+    if (useRealtimeAsr() || useMandarinWebSpeech()) realtimeSession?.stop?.();
     recorder.stop();
     clearInterval(timer);
   }
@@ -300,7 +334,7 @@
     diagnostic().status = `${isHakka ? '客語' : '華語測試'}${modeLabel}中`;
     $('audioPreview').pause();
     setPhase('submitting', '正在整理你的朗讀結果，請稍等。');
-    if (isHakka && mode === 'realtime' && (answer.transcript || diagnostic().draft)) {
+    if ((isHakka || !isHakka) && (answer.transcript || diagnostic().draft)) {
       const text = answer.transcript || diagnostic().draft;
       Object.assign(diagnostic(), { draft: text, tested: true, status: '客語WebSocket 串流辨識完成' });
       answer.transcript = text;

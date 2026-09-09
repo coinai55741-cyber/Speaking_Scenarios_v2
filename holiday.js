@@ -477,8 +477,42 @@ async function startRecording() {
   try {
     resetRecording();
     stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    const useMandarinWeb = getSelectedAsrProvider() === "taiwan_tongues_zh" && window.MANDARIN_WEB_SPEECH;
     const useRealtime = getSelectedAsrProvider() === "hakka_api_hak" && getRecognitionMode() === "realtime" && window.HAKKA_REALTIME_ASR;
-    if (useRealtime) {
+    if (useMandarinWeb) {
+      realtimeSession = window.MANDARIN_WEB_SPEECH.createSession({
+        lang: "zh-TW",
+        interimResults: true,
+        continuous: false,
+        onTranscript(text) {
+          realtimeTranscript = text || "";
+          if (realtimeTranscript) {
+            els.answerInput.value = realtimeTranscript;
+            els.asrStatus.textContent = realtimeTranscript;
+            els.recordingStatus.textContent = `華語即時辨識：${realtimeTranscript}`;
+            updateHitStatus(realtimeTranscript);
+            setCheckEnabled(true, "等待辨識");
+          }
+        },
+        onFinal(text) {
+          realtimeTranscript = text || realtimeTranscript || "";
+          if (realtimeTranscript) {
+            els.answerInput.value = realtimeTranscript;
+            els.asrStatus.textContent = realtimeTranscript;
+            els.recordingStatus.textContent = `華語辨識完成：${realtimeTranscript}`;
+            updateHitStatus(realtimeTranscript);
+            setCheckEnabled(true, "等待辨識");
+            saveCurrentAnswer();
+          }
+          realtimeSession = null;
+        },
+        onError(message) {
+          realtimeError = message || "華語辨識發生錯誤";
+          els.asrStatus.textContent = realtimeError;
+        }
+      });
+      realtimeSession.start();
+    } else if (useRealtime) {
       realtimeSession = window.HAKKA_REALTIME_ASR.createSession({
         onTranscript(text) {
           realtimeTranscript = text || "";
@@ -531,7 +565,7 @@ async function startRecording() {
       els.audioPreview.src = audioUrl;
       els.audioPreview.hidden = false;
       els.recordingPanel.hidden = false;
-      const useRealtimeResult = getSelectedAsrProvider() === "hakka_api_hak" && getRecognitionMode() === "realtime";
+      const useRealtimeResult = (getSelectedAsrProvider() === "hakka_api_hak" && getRecognitionMode() === "realtime") || getSelectedAsrProvider() === "taiwan_tongues_zh";
       els.recordingStatus.textContent = useRealtimeResult ? `錄音完成：${formatBytes(blob.size)}。等待即時辨識文字...` : `錄音完成：${formatBytes(blob.size)}。正在辨識...`;
       if (useRealtimeResult) {
         realtimeSession?.stop?.();
