@@ -134,8 +134,8 @@ function escapeHtml(value) {
 }
 
 function currentProviderLabel(provider = breakfastSpeechProvider()) {
-  if (provider === "mandarin") return "華語本機辨識";
-  return selectedDialect === "sixian" ? "客委會 API（四縣腔）" : "客委會 API（客語）";
+  if (provider === "mandarin") return "華語API";
+  return selectedDialect === "sixian" ? "客委會辨識API" : "客委會辨識API";
 }
 
 function recognitionModeLabel(mode = breakfastRecognitionMode()) {
@@ -245,8 +245,8 @@ function renderDeveloperPanel() {
     <div class="developer-item">
       <span class="developer-label">辨識 API</span>
       <select id="developerProviderSelect">
-        <option value="hakka" ${speechProvider === "hakka" ? "selected" : ""}>客委會 API（四縣腔）</option>
-        <option value="mandarin" ${speechProvider === "mandarin" ? "selected" : ""}>華語本機辨識</option>
+        <option value="hakka" ${speechProvider === "hakka" ? "selected" : ""}>客委會辨識API</option>
+        <option value="mandarin" ${speechProvider === "mandarin" ? "selected" : ""}>華語API</option>
       </select>
       <p class="developer-subnote">目前可用：${escapeHtml(currentProviderLabel(speechProvider))} / ${escapeHtml(currentBreakfastAsrTarget())}</p>
     </div>
@@ -1065,6 +1065,7 @@ selectedDialect = "sixian";
 updateLessonCards();
 startLesson("1");
 renderDeveloperPanel();
+
 
 
 

@@ -21,14 +21,14 @@
       provider: "taiwan_tongues",
       language: "zh",
       recognizer: "mandarin",
-      label: "Taiwan-Tongues-ASR-CE（華語 v2）"
+      label: "華語API"
     },
     hakkaApi: {
       id: "hakka_api_hak",
       provider: "hakka_api",
       language: "hak",
       recognizerPrefix: "hakka",
-      label: "客委會 API（客語預留）"
+      label: "客委會辨識API"
     }
   };
 
@@ -148,6 +148,7 @@
     realtimeStorageKey: "speakingDemoRealtimeTicketEndpoint"
   };
 }());
+
 
 
 

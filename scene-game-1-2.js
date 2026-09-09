@@ -449,8 +449,8 @@ function renderDeveloperPanel(stage) {
     <div class="developer-item">
       <span class="developer-label">辨識 API</span>
       <select id="developerAsrProvider" class="developer-select">
-        <option value="mandarin" ${state.dialect === "mandarin" ? "selected" : ""}>Taiwan-Tongues-ASR-CE（華語 v2）</option>
-        <option value="sixian" ${state.dialect === "sixian" ? "selected" : ""}>客委會 API（四縣腔預留）</option>
+        <option value="sixian" ${state.dialect === "sixian" ? "selected" : ""}>客委會辨識API</option>
+        <option value="mandarin" ${state.dialect === "mandarin" ? "selected" : ""}>華語API</option>
       </select>
       <label class="developer-label" for="developerRecognitionMode">辨識模式</label>
       <select id="developerRecognitionMode" class="developer-select">
@@ -1312,6 +1312,7 @@ function flashHint(message) {
 }
 
 init();
+
 
 
 

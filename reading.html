@@ -76,7 +76,7 @@
     <aside id="developerPanel" class="developer-panel" hidden aria-label="開發者模式">
       <div class="developer-item"><span id="answerLabel" class="developer-label">標準答案（四縣腔）</span><p id="sentenceText" lang="hak"></p></div>
       <div class="developer-item"><span class="developer-label">辨識狀態</span><strong id="asrStatus" role="status"></strong><p id="debugRecording" class="small-note"></p><p id="debugEndpoint" class="small-note"></p></div>
-      <div class="developer-item"><label for="asrProviderSelect">辨識 API</label><select id="asrProviderSelect" class="developer-select"><option value="hakka_api_hak">客委會 API（客語）</option><option value="taiwan_tongues_zh">Taiwan-Tongues-ASR-CE（華語測試）</option></select><p class="small-note">朗讀預設使用客語。華語選項僅供開發測試。</p><label class="developer-label" for="recognitionModeSelect">辨識模式</label><select id="recognitionModeSelect" class="developer-select"><option value="realtime" selected>即時串流（WebSocket）</option><option value="file">錄完判斷（檔案辨識）</option></select><p id="recognitionModeNote" class="small-note"></p></div>
+      <div class="developer-item"><label for="asrProviderSelect">辨識 API</label><select id="asrProviderSelect" class="developer-select"><option value="hakka_api_hak">客委會辨識API</option><option value="taiwan_tongues_zh">華語API</option></select><p class="small-note">朗讀預設使用客語。華語選項僅供開發測試。</p><label class="developer-label" for="recognitionModeSelect">辨識模式</label><select id="recognitionModeSelect" class="developer-select"><option value="realtime" selected>即時串流（WebSocket）</option><option value="file">錄完判斷（檔案辨識）</option></select><p id="recognitionModeNote" class="small-note"></p></div>
       <div class="answer-box"><label for="answerInput">辨識文字／手動修正測試</label><textarea id="answerInput" rows="4" maxlength="4000" lang="hak" placeholder="辨識後顯示文字，也可輸入文字測試比對"></textarea><button id="debugCompareBtn" class="plain-button" type="button">測試文字比對</button><p class="small-note">手動測試不送出音檔，也不改變學生作答與解鎖進度。</p></div>
       <div class="developer-item"><span class="developer-label">文字比對</span><p id="debugMatch"></p><div id="debugComparison" lang="hak"></div></div>
     </aside>
@@ -101,6 +101,7 @@
   <script src="./reading.js?v=20260909-shared-realtime1"></script>
 </body>
 </html>
+
 
 
 
