@@ -660,20 +660,14 @@ function playSpeechAudio() {
   new Audio(speechAudioUrl).play().catch(() => {});
 }
 function renderSceneStage(question, selectedChoice = null) {
-  const targetFood = getQuestionFood(question);
-  const systemText = targetFood ? `這係 ${targetFood.pinyin}` : question.answer;
-  const selectedImage = selectedChoice?.image
-    ? `<img class="plate-choice-image" src="${selectedChoice.image}" alt="${selectedChoice.alt || "已選圖卡"}">`
-    : `<span class="plate-placeholder">?</span>`;
-
+  const targetFoods = acceptedAnswers(question).map(findFood).filter(Boolean);
+  const pictures = targetFoods.map(food => `<img src="${food.image}" alt="${food.alt}">`).join("");
   els.imageStage.innerHTML = `
     <div class="breakfast-scene">
-      <img class="scene-bg" src="./assets/lesson-1-breakfast-game-scene.png" alt="早餐廚房情境">
+      <img class="scene-bg" src="./assets/lesson-1-breakfast-game-scene.png?v=20260909-table" alt="早餐廚房與桌面">
       <div class="scene-question">${question.title}</div>
-      <div class="plate-answer" aria-label="盤子答題區">${selectedImage}</div>
-      <div class="plate-system-text"><span class="plate-speak-icon" aria-hidden="true"></span><span>${escapeHtml(systemText)}</span></div>
-    </div>
-  `;
+      <div class="table-foods" aria-label="看圖說出食物名稱">${pictures}</div>
+    </div>`;
 }
 
 function renderChoiceCard(choice) {
@@ -681,20 +675,7 @@ function renderChoiceCard(choice) {
 }
 
 function renderQuestionImage(question) {
-  if (question.playMode === "scene") {
-    renderSceneStage(question);
-    return;
-  }
-
-  if (question.image) {
-    els.imageStage.innerHTML = `<img src="${question.image}" alt="${question.alt || "題目圖片"}">`;
-    return;
-  }
-
-  const food = findFood(question.food || question.answer);
-  els.imageStage.innerHTML = food
-    ? `<img src="${food.image}" alt="${food.alt}">`
-    : `<img src="./assets/lesson-1-foods-cards.jpg" alt="早餐圖卡">`;
+  renderSceneStage(question);
 }
 
 function renderQuestion() {
@@ -703,11 +684,11 @@ function renderQuestion() {
   resetSpeechAnswer();
   if (els.questionNumber) els.questionNumber.textContent = String(currentIndex + 1);
   if (els.visibleQuestionNumber) els.visibleQuestionNumber.textContent = String(currentIndex + 1);
-  els.questionType.textContent = question.type;
+  els.questionType.textContent = "看圖說關鍵字";
   els.questionTitle.textContent = question.title;
   const targetFood = getQuestionFood(question);
-  els.questionPrompt.textContent = question.playMode === "scene" && targetFood ? `這係 ${targetFood.pinyin}` : question.prompt;
-  els.playScreen.classList.toggle("is-scene-question", question.playMode === "scene");
+  els.questionPrompt.textContent = Array.isArray(question.answer) ? "看圖片，說出這兩樣食物的名稱。" : "看圖片，說出食物名稱。";
+  els.playScreen.classList.add("is-scene-question");
   els.feedback.hidden = true;
   els.feedback.textContent = "";
   els.nextBtn.disabled = true;
@@ -718,24 +699,7 @@ function renderQuestion() {
   renderDeveloperPanel();
 
   els.choiceGrid.innerHTML = "";
-  els.choiceGrid.classList.toggle("is-image-grid", question.choiceMode === "image");
-  els.choiceGrid.classList.toggle("scene-choice-grid", question.playMode === "scene");
-  shuffleItems(getChoices(question)).forEach(choice => {
-    const button = document.createElement("button");
-    button.className = question.choiceMode === "image" || question.playMode === "scene" ? "choice-button image-choice" : "choice-button";
-    button.type = "button";
-    button.dataset.value = choice.value;
-    button.innerHTML = question.choiceMode === "image" || question.playMode === "scene"
-      ? renderChoiceCard(choice)
-      : `<strong>${choice.pinyin || choice.label}</strong>`;
-    button.disabled = true;
-    button.setAttribute("aria-disabled", "true");
-    button.addEventListener("click", () => {
-      els.feedback.hidden = false;
-      els.feedback.textContent = "請用口說回答。";
-    });
-    els.choiceGrid.appendChild(button);
-  });
+  els.choiceGrid.hidden = true;
 }
 
 function chooseAnswer(button) {
@@ -828,9 +792,9 @@ function restartGame() {
   earnedStars = 0;
   earnedQuestions = new Set();
   missedQuestions = new Set();
-  selectedDialect = "";
+  selectedDialect = "sixian";
   updateLessonCards();
-  showScreen("intro");
+  startLesson("1");
   renderDeveloperPanel();
 }
 
@@ -881,7 +845,9 @@ document.addEventListener("click", event => {
 
 updateLessonCards();
 updateCarouselButtons();
-showScreen("intro");
+selectedDialect = "sixian";
+updateLessonCards();
+startLesson("1");
 renderDeveloperPanel();
 
 

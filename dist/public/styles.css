@@ -627,19 +627,9 @@ h1 {
 
 .scenario-grid {
   display: grid;
-  grid-auto-flow: column;
-  grid-auto-columns: minmax(280px, 360px);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 18px;
-  overflow-x: auto;
-  overscroll-behavior-inline: contain;
-  scroll-snap-type: inline mandatory;
   padding: 2px 2px 18px;
-  scrollbar-color: var(--green) rgba(255, 255, 255, 0.7);
-}
-
-.scenario-grid::after {
-  content: "";
-  width: 1px;
 }
 
 .learning-card,
@@ -708,6 +698,7 @@ h1 {
   position: relative;
   background: rgba(255, 253, 250, 0.95);
   border-color: rgba(228, 210, 171, 0.7);
+  opacity: .78;
 }
 
 .card-coming-soon-badge {
@@ -1315,12 +1306,9 @@ h1 {
 
   .hero-section,
   .classroom-layout,
-  .learning-grid {
-    grid-template-columns: 1fr;
-  }
-
+  .learning-grid,
   .scenario-grid {
-    grid-auto-columns: minmax(260px, 84vw);
+    grid-template-columns: 1fr;
   }
 
 

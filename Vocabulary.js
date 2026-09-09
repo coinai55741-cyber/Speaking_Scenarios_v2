@@ -22,7 +22,7 @@ let earnedStars = 0;
 let earnedQuestions = new Set();
 let missedQuestions = new Set();
 let selectedAnswers = [];
-let selectedDialect = "";
+let selectedDialect = "sixian";
 let buttonSoundEnabled = false;
 const soundEffects = {
   click: new Audio("./assets/music/S2_m1_click.mp3"),
@@ -368,7 +368,7 @@ function restartGame() {
   earnedStars = 0;
   earnedQuestions = new Set();
   missedQuestions = new Set();
-  selectedDialect = "";
+  selectedDialect = "sixian";
   updateLessonCards();
   showScreen("intro");
 }

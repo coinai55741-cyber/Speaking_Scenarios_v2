@@ -516,19 +516,25 @@
         if (isRecording) stopRecording();
       }, maxSec);
 
-      if (mode === "file" || (isMandarin && !window.SPEECH_API?.realtimeTicketUrl)) {
-        // 檔案式辨識模式 (POST Blob)
-        audioChunks = [];
+      let useFileFallback = mode === "file" || (isMandarin && !window.SPEECH_API?.realtimeTicketUrl);
+      audioChunks = [];
+      try {
         mediaRecorder = new MediaRecorder(mediaStream);
         mediaRecorder.ondataavailable = (e) => audioChunks.push(e.data);
         mediaRecorder.onstop = async () => {
-          const blob = new Blob(audioChunks, { type: "audio/webm" });
-          await sendAudioFile(blob, q);
+          if (useFileFallback) {
+            const blob = new Blob(audioChunks, { type: "audio/webm" });
+            await sendAudioFile(blob, q);
+          }
         };
         mediaRecorder.start();
-      } else {
+      } catch (recErr) {
+        console.warn("MediaRecorder start failed:", recErr);
+      }
+
+      if (!useFileFallback) {
         // WebSocket 即時串流模式
-        await ASR.start(
+        const ok = await ASR.start(
           mediaStream,
           (liveTranscript) => {
             setAsrState(
@@ -544,11 +550,21 @@
             handleRecognitionResult(q, finalTranscript);
           },
           (errMsg) => {
-            isRecording = false;
-            setAsrState("retry", "⚠️ 連線提示", errMsg);
-            if (asrStatusText) asrStatusText.textContent = errMsg;
+            useFileFallback = true;
+            if (asrStatusText) asrStatusText.textContent = "即時連線中斷，將使用本機後端辨識";
           }
         );
+
+        if (!ok) {
+          useFileFallback = true;
+          setAsrState(
+            "recording",
+            isMandarin ? "🎙️ 錄音中 (華語)" : "🎙️ 錄音中 (客語)",
+            `正在收音⋯ 請說出「${targetLabel}」`,
+            "（錄音中⋯結束後送後端辨識）"
+          );
+          if (asrStatusText) asrStatusText.textContent = "已切換至本機後端辨識服務";
+        }
       }
     } catch (err) {
       isRecording = false;
@@ -594,8 +610,26 @@
       form.append("dialect", isMandarin ? "mandarin" : "sixian");
       form.append("recognizer", isMandarin ? "mandarin" : "hakka-sixian");
 
-      const endpoint = window.SPEECH_API?.endpoint() || "http://localhost:5000/api/speech/recognize";
-      const response = await fetch(endpoint, { method: "POST", body: form });
+      let endpoint = window.SPEECH_API?.endpoint() || "http://localhost:5000/api/speech/recognize";
+      let response = await fetch(endpoint, { method: "POST", body: form }).catch(() => null);
+      
+      // 若客委會 API 失敗或無回應，直接使用本機 5000 的 Taiwan-Tongues Whisper
+      if (!response || !response.ok) {
+        const localForm = new FormData();
+        localForm.append("audio", blob, "speaking-field-trip.webm");
+        localForm.append("provider_id", "taiwan_tongues_zh");
+        localForm.append("language", "zh");
+
+        response = await fetch("http://localhost:5000/transcribe", { method: "POST", body: localForm }).catch(() => null);
+        if (!response || !response.ok) {
+          response = await fetch("http://127.0.0.1:8000/transcribe", { method: "POST", body: localForm }).catch(() => null);
+        }
+      }
+
+      if (!response || !response.ok) {
+        throw new Error("無法連線至 Port 5000 辨識後端");
+      }
+
       const payload = await response.json();
 
       let text = "";
@@ -614,7 +648,7 @@
 
       handleRecognitionResult(q, text);
     } catch (e) {
-      setAsrState("retry", "⚠️ 辨識提示", "無法連線至檔案辨識伺服器（建議將辨識模式切換為即時串流 WebSocket）");
+      setAsrState("retry", "⚠️ 辨識提示", "無法連線至辨識伺服器（請確認 Port 5000 後端是否已開啟）");
     }
   }
 

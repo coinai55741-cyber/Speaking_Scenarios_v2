@@ -47,11 +47,11 @@ body {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-height: 40px;
-  padding: 0 18px;
-  border: 2px solid var(--teal);
+  min-height: 42px;
+  padding: 0 16px;
+  border: 2px solid #2f946f;
   border-radius: 999px;
-  color: var(--teal);
+  color: #2f946f;
   background: #fff;
   font-weight: 900;
   text-decoration: none;
@@ -60,8 +60,8 @@ body {
 }
 
 .back-link:hover {
-  background: var(--teal);
-  color: #fff;
+  background: #e9f7e8;
+  color: #2f946f;
 }
 
 /* 開發者模式開關 */

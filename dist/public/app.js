@@ -24,6 +24,28 @@ const scenarios = [
     demoStep: 1
   },
   {
+    id: "scene-game-1-2",
+    title: "你家在哪",
+    artClass: "art-home",
+    image: "./assets/scene-game-1-2/intro-school-friends.png",
+    description: "放學後大家討論要去誰家玩，聽一聽、問一問，完成任務吧！",
+    flow: [
+      "先聽同學討論要去哪裡。",
+      "再用客語問朋友怎麼來。",
+      "最後依照回答完成前往任務。"
+    ],
+    demoStep: 0
+  },
+  {
+    id: "reading-1",
+    title: "繪本朗讀",
+    href: "./reading.html",
+    artClass: "art-reading",
+    image: "./assets/scenario-picture-book-reading.png",
+    description: "陪故事中的主角找一位聽眾，把〈𠊎中意讀書〉讀出來，完成三段客語朗讀任務。"
+  }
+  /*,
+  {
     id: "shopping-food",
     title: "逛街吃飯記",
     artClass: "art-food",
@@ -51,6 +73,7 @@ const scenarios = [
     ],
     demoStep: 2
   }
+  */
 ];
 
 const grid = document.querySelector("#scenarioGrid");
@@ -62,7 +85,11 @@ function createScenarioCard(scenario) {
     card.setAttribute("aria-disabled", "true");
   }
 
-  const demoUrl = scenario.id === "holiday" ? "./holiday.html" : `../demo_v1/?step=${scenario.demoStep}`;
+  const demoUrl = scenario.href || (scenario.id === "holiday"
+    ? "./holiday.html"
+    : scenario.id === "scene-game-1-2"
+      ? "./scene-game-1-2.html"
+      : `../demo_v1/?step=${scenario.demoStep}`);
   const actionButton = scenario.disabled
     ? `<button class="card-link is-disabled" type="button" disabled aria-disabled="true">開始任務</button>` 
     : `<a class="card-link" href="${demoUrl}">開始任務</a>`;
@@ -93,5 +120,3 @@ if (sidebar && btnOut && btnIn) {
     sidebar.classList.add('collapsed');
   });
 }
-
-
