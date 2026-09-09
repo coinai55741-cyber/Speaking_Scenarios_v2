@@ -1,6 +1,7 @@
 (function () {
   const DEFAULT_BASE_URL = "http://localhost:5000";
   const DEFAULT_REALTIME_TICKET_URL = `${DEFAULT_BASE_URL}/ticket`;
+  const VERCEL_REALTIME_TICKET_URL = "https://speaking-scenarios-v2.vercel.app/ticket";
   const ENDPOINTS = {
     recognize: "/api/speech/recognize",
     legacyRecognize: "/recognize",
@@ -47,6 +48,9 @@
     } catch (e) {}
     if (window.SPEECH_API_BASE_URL && window.SPEECH_API_BASE_URL !== DEFAULT_BASE_URL) {
       return `${baseUrl().replace(/\/+$/, "")}/ticket`;
+    }
+    if (location.hostname.endsWith("github.io")) {
+      return VERCEL_REALTIME_TICKET_URL;
     }
     return DEFAULT_REALTIME_TICKET_URL;
   }
@@ -126,4 +130,6 @@
     realtimeStorageKey: "speakingDemoRealtimeTicketEndpoint"
   };
 }());
+
+
 
