@@ -350,7 +350,7 @@ const ASR=(()=>{
       tk = await r.json();
       if (!tk.url || !tk.ticket) throw new Error(tk.error || "無票");
     } catch(e) {
-      if (location.hostname === "localhost" || location.hostname === "127.0.0.1") {
+      if (window.SPEECH_API?.isLocalHost?.()) {
         try {
           let r2 = await fetch("http://localhost:5000/ticket", { method: "POST" });
           if (r2.ok) tk = await r2.json();
@@ -640,7 +640,7 @@ $("bRec").onclick=async()=>{
           form.append("provider_id", "taiwan_tongues_zh");
           form.append("language", "zh");
 
-          const localPage = location.hostname === "localhost" || location.hostname === "127.0.0.1";
+          const localPage = window.SPEECH_API?.isLocalHost?.();
           let r = null;
           if (localPage) {
             r = await fetch("http://localhost:5000/transcribe", { method: "POST", body: form }).catch(() => null);
@@ -660,7 +660,7 @@ $("bRec").onclick=async()=>{
           console.warn("Port 5000 辨識失敗:", err);
         }
         if (!useAsr) {
-          $("asrOut").textContent = location.hostname === "localhost" || location.hostname === "127.0.0.1" ? "（本機辨識無回應，請確認 Port 5000 是否已啟動）" : "（線上版會使用客語即時辨識；華語檔案辨識仍需本機後端）";
+          $("asrOut").textContent = window.SPEECH_API?.isLocalHost?.() ? "（本機辨識無回應，請確認 Port 5000 是否已啟動）" : "（線上版會使用客語即時辨識；華語檔案辨識仍需本機後端）";
         }
       }
     };
@@ -725,6 +725,7 @@ build();
 </script>
 </body>
 </html>
+
 
 
 

@@ -32,6 +32,14 @@
     }
   };
 
+
+  function isHostedPage() {
+    return location.hostname.endsWith("github.io") || location.hostname.endsWith("vercel.app");
+  }
+
+  function isLocalHost() {
+    return location.hostname === "localhost" || location.hostname === "127.0.0.1";
+  }
   function baseUrl() {
     return window.SPEECH_API_BASE_URL || DEFAULT_BASE_URL;
   }
@@ -127,6 +135,8 @@
     endpoint,
     realtimeTicketUrl,
     isAllowedEndpoint,
+    isHostedPage,
+    isLocalHost,
     normalizeResponse,
     textFromPayload,
     tokensFromPayload,
@@ -138,6 +148,8 @@
     realtimeStorageKey: "speakingDemoRealtimeTicketEndpoint"
   };
 }());
+
+
 
 
 

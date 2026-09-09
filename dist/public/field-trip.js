@@ -231,7 +231,7 @@
         if (r.ok) tk = await r.json();
         if (!tk?.url || !tk?.ticket) throw new Error(tk?.error || "無法取得辨識憑證");
       } catch (e) {
-        if (location.hostname === "localhost" || location.hostname === "127.0.0.1") {
+        if (window.SPEECH_API?.isLocalHost?.()) {
           try {
             const r2 = await fetch("http://localhost:5000/ticket", { method: "POST" });
             if (r2.ok) tk = await r2.json();
@@ -643,7 +643,7 @@
       let response = await fetch(endpoint, { method: "POST", body: form }).catch(() => null);
       
       // 華語 Taiwan-Tongues 目前只在本機後端；客語線上版固定走 Vercel，不再退回使用者電腦。
-      const isLocalPage = location.hostname === "localhost" || location.hostname === "127.0.0.1";
+      const isLocalPage = window.SPEECH_API?.isLocalHost?.();
       if ((!response || !response.ok) && isMandarin && isLocalPage) {
         const localForm = new FormData();
         localForm.append("audio", blob, "speaking-field-trip.webm");
@@ -885,6 +885,7 @@
   // 初始化畫面
   render();
 })();
+
 
 
 
