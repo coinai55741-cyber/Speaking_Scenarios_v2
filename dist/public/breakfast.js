@@ -22,6 +22,18 @@ const LESSON_QUESTIONS = {
 let activeQuestions = questions;
 
 const BREAKFAST_ASR_ENDPOINT = window.SPEECH_API?.endpoint() || "http://localhost:5000/api/speech/recognize";
+function breakfastAsrEndpoint(provider = breakfastSpeechProvider()) {
+  if (provider === "hakka" && (location.hostname.endsWith("vercel.app") || location.hostname.endsWith("github.io"))) {
+    return "https://speaking-scenarios-v2.vercel.app/api/speech/recognize";
+  }
+  return BREAKFAST_ASR_ENDPOINT;
+}
+function currentBreakfastAsrTarget() {
+  if (breakfastSpeechProvider() === "hakka" && breakfastRecognitionMode() === "realtime") {
+    return window.SPEECH_API?.realtimeTicketUrl?.() || "http://localhost:5000/ticket";
+  }
+  return breakfastAsrEndpoint();
+}
 const BREAKFAST_RECOGNITION_MODE_KEY = "speakingDemoRecognitionMode";
 const BREAKFAST_PROVIDER_KEY = "breakfastSpeechProvider";
 const BREAKFAST_DIALECT_LABELS = {
@@ -56,6 +68,8 @@ let speechAudioUrl = "";
 let speechAudioBlob = null;
 let isSpeechRecording = false;
 let isSpeechRecognizing = false;
+let realtimeSpeechActive = false;
+let realtimeResultHandled = false;
 let recognizedSpeechText = "";
 let debugMode = false;
 let lastRecognitionPayload = null;
@@ -234,7 +248,7 @@ function renderDeveloperPanel() {
         <option value="hakka" ${speechProvider === "hakka" ? "selected" : ""}>客委會 API（四縣腔）</option>
         <option value="mandarin" ${speechProvider === "mandarin" ? "selected" : ""}>華語本機辨識</option>
       </select>
-      <p class="developer-subnote">目前可用：${escapeHtml(currentProviderLabel(speechProvider))} / ${escapeHtml(BREAKFAST_ASR_ENDPOINT)}</p>
+      <p class="developer-subnote">目前可用：${escapeHtml(currentProviderLabel(speechProvider))} / ${escapeHtml(currentBreakfastAsrTarget())}</p>
     </div>
     <div class="developer-item">
       <span class="developer-label">辨識模式</span>
@@ -483,7 +497,133 @@ function selectedChoiceForQuestion(question) {
   return food ? { label: food.pinyin, pinyin: food.pinyin, sub: food.chinese, value: food.hakka, image: food.image, alt: food.alt } : null;
 }
 
+
+const BreakfastRealtimeASR = (() => {
+  let ws = null;
+  let ctx = null;
+  let srcNode = null;
+  let node = null;
+  let ready = false;
+  let closed = false;
+  let queued = [];
+  let segments = {};
+
+  function downsample(buffer, fromRate, toRate = 16000) {
+    const ratio = fromRate / toRate;
+    const outLen = Math.floor(buffer.length / ratio);
+    const out = new Int16Array(outLen);
+    for (let i = 0; i < outLen; i++) {
+      const s = Math.max(-1, Math.min(1, buffer[Math.floor(i * ratio)]));
+      out[i] = s < 0 ? s * 0x8000 : s * 0x7fff;
+    }
+    return out;
+  }
+
+  function currentText() {
+    return Object.keys(segments).sort((a, b) => Number(a) - Number(b)).map((key) => segments[key]).join("");
+  }
+
+  function stopAudio() {
+    if (node) { try { node.disconnect(); } catch (error) {} node = null; }
+    if (srcNode) { try { srcNode.disconnect(); } catch (error) {} srcNode = null; }
+  }
+
+  async function start(stream, onTranscript, onDone, onError) {
+    ready = false;
+    closed = false;
+    queued = [];
+    segments = {};
+    const ticketUrl = window.SPEECH_API?.realtimeTicketUrl?.() || "http://localhost:5000/ticket";
+    let ticketPayload = null;
+    try {
+      const response = await fetch(ticketUrl, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ language: "hak" })
+      });
+      if (!response.ok) throw new Error(`取票失敗：${response.status}`);
+      ticketPayload = await response.json();
+      if (!ticketPayload?.url || !ticketPayload?.ticket) throw new Error("取票回傳缺少 url 或 ticket");
+    } catch (error) {
+      onError(error.message || "無法取得即時辨識票券");
+      return false;
+    }
+
+    const query = `?ticket=${encodeURIComponent(ticketPayload.ticket)}&type=raw&rate=16000&channel=1&charactersToNumbers=0&noSpeechTimeout=20`;
+    try { ws = new WebSocket(ticketPayload.url + query); } catch (error) { onError("無法建立即時辨識連線"); return false; }
+    ws.binaryType = "arraybuffer";
+    ws.onmessage = (event) => {
+      let payload = null;
+      try { payload = JSON.parse(event.data); } catch (error) { return; }
+      const code = String(payload.code || "");
+      if (code === "180") {
+        ready = true;
+        queued.forEach((chunk) => { try { ws.send(chunk); } catch (error) {} });
+        queued = [];
+        return;
+      }
+      if (code === "200" && Array.isArray(payload.result)) {
+        payload.result.forEach((item) => {
+          const transcript = String(item.transcript || "").trim();
+          if (transcript) segments[String(item.segment || Object.keys(segments).length)] = transcript;
+        });
+        onTranscript(currentText(), payload);
+        if (payload.result.some((item) => item.end === 1 || item.end === "1")) finish(onDone);
+        return;
+      }
+      if (code === "202" || code === "204") finish(onDone);
+      if (code.startsWith("4") || code.startsWith("5")) {
+        onError(payload.message || payload.msg || `即時辨識錯誤：${code}`);
+        abort();
+      }
+    };
+    ws.onerror = () => { if (!closed) onError("即時辨識連線中斷"); };
+    ws.onclose = () => finish(onDone);
+    ctx = new (window.AudioContext || window.webkitAudioContext)();
+    srcNode = ctx.createMediaStreamSource(stream);
+    node = ctx.createScriptProcessor(4096, 1, 1);
+    node.onaudioprocess = (event) => {
+      if (!ws || ws.readyState > 1 || closed) return;
+      const pcm = downsample(event.inputBuffer.getChannelData(0), ctx.sampleRate);
+      if (ready) { try { ws.send(pcm.buffer); } catch (error) {} }
+      else if (queued.length < 60) queued.push(pcm.buffer);
+    };
+    srcNode.connect(node);
+    node.connect(ctx.destination);
+    return true;
+  }
+
+  function stop() {
+    stopAudio();
+    if (ws && ws.readyState === 1) { try { ws.send("EOS"); } catch (error) {} }
+  }
+
+  function finish(onDone) {
+    if (closed) return;
+    closed = true;
+    stopAudio();
+    try { if (ctx) ctx.close(); } catch (error) {}
+    ctx = null;
+    try { if (ws) ws.close(); } catch (error) {}
+    ws = null;
+    onDone(currentText());
+  }
+
+  function abort() {
+    closed = true;
+    stopAudio();
+    try { if (ctx) ctx.close(); } catch (error) {}
+    ctx = null;
+    try { if (ws) ws.close(); } catch (error) {}
+    ws = null;
+  }
+
+  return { start, stop, abort };
+})();
 function resetSpeechAnswer(options = {}) {
+  BreakfastRealtimeASR.abort();
+  realtimeSpeechActive = false;
+  realtimeResultHandled = false;
   if (speechRecorder && isSpeechRecording) {
     try { speechRecorder.stop(); } catch (error) { /* already stopped */ }
   }
@@ -559,6 +699,82 @@ function stopSpeechRecording() {
   try { speechRecorder.stop(); } catch (error) { resetSpeechAnswer(); }
 }
 
+
+async function startRealtimeBreakfastSpeech() {
+  const question = activeQuestions[currentIndex];
+  realtimeSpeechActive = true;
+  realtimeResultHandled = false;
+  isSpeechRecognizing = true;
+  recognitionError = "";
+  if (els.speechStatus) els.speechStatus.textContent = "客語即時辨識連線中...";
+  const finish = async (text, options = {}) => {
+    if (realtimeResultHandled) return;
+    realtimeResultHandled = true;
+    realtimeSpeechActive = false;
+    isSpeechRecording = false;
+    isSpeechRecognizing = false;
+    BreakfastRealtimeASR.stop();
+    if (speechStream) {
+      speechStream.getTracks().forEach(track => track.stop());
+      speechStream = null;
+    }
+    if (els.recordSpeechBtn) {
+      els.recordSpeechBtn.classList.remove("is-recording");
+      els.recordSpeechBtn.disabled = false;
+      setIconButton(els.recordSpeechBtn, "mic", "重新錄音");
+    }
+    recognizedSpeechText = text || "";
+    lastRecognitionPayload = { text: recognizedSpeechText, provider: "hakka_realtime_asr", mode: "realtime" };
+    handleSpeechAnswer(recognizedSpeechText, question, options);
+  };
+  const ok = await BreakfastRealtimeASR.start(
+    speechStream,
+    (text) => {
+      recognizedSpeechText = text || "";
+      lastRecognitionPayload = { text: recognizedSpeechText, provider: "hakka_realtime_asr", mode: "realtime" };
+      if (els.speechStatus) els.speechStatus.textContent = recognizedSpeechText ? `即時辨識：${recognizedSpeechText}` : "客語即時辨識中...";
+      renderDeveloperPanel();
+      if (recognizedSpeechText && speechMatchesQuestion(recognizedSpeechText, question)) finish(recognizedSpeechText, { silent: true });
+    },
+    (text) => finish(text),
+    (message) => {
+      realtimeSpeechActive = false;
+      isSpeechRecording = false;
+      isSpeechRecognizing = false;
+      recognitionError = message || "客語即時辨識連線失敗。";
+      lastRecognitionPayload = { error: recognitionError };
+      markCurrentQuestionMissed();
+      playSound("wrong");
+      els.feedback.hidden = false;
+      els.feedback.textContent = question.hint;
+      if (els.speechStatus) els.speechStatus.textContent = recognitionError;
+      if (speechStream) {
+        speechStream.getTracks().forEach(track => track.stop());
+        speechStream = null;
+      }
+      if (els.recordSpeechBtn) {
+        els.recordSpeechBtn.classList.remove("is-recording");
+        els.recordSpeechBtn.disabled = false;
+        setIconButton(els.recordSpeechBtn, "mic", "重新錄音");
+      }
+      renderDeveloperPanel();
+    }
+  );
+  if (!ok) {
+    realtimeSpeechActive = false;
+    isSpeechRecording = false;
+    isSpeechRecognizing = false;
+    if (speechStream) {
+      speechStream.getTracks().forEach(track => track.stop());
+      speechStream = null;
+    }
+    if (els.recordSpeechBtn) {
+      els.recordSpeechBtn.classList.remove("is-recording");
+      els.recordSpeechBtn.disabled = false;
+      setIconButton(els.recordSpeechBtn, "mic", "重新錄音");
+    }
+  }
+}
 async function finishSpeechRecording() {
   const type = speechRecorder?.mimeType || "audio/webm";
   const blob = new Blob(speechChunks, { type });
@@ -591,7 +807,7 @@ async function recognizeBreakfastSpeech(blob) {
     formData.append("language", providerConfig?.language || (speechProvider === "mandarin" ? "zh" : "hak"));
     formData.append("scene_id", "breakfast");
     formData.append("recognition_mode", breakfastRecognitionMode());
-    const response = await fetch(BREAKFAST_ASR_ENDPOINT, { method: "POST", body: formData });
+    const response = await fetch(breakfastAsrEndpoint(speechProvider), { method: "POST", body: formData });
     if (!response.ok) {
       let message = `辨識後端回應失敗：${response.status}`;
       try {
@@ -660,20 +876,14 @@ function playSpeechAudio() {
   new Audio(speechAudioUrl).play().catch(() => {});
 }
 function renderSceneStage(question, selectedChoice = null) {
-  const targetFood = getQuestionFood(question);
-  const systemText = targetFood ? `這係 ${targetFood.pinyin}` : question.answer;
-  const selectedImage = selectedChoice?.image
-    ? `<img class="plate-choice-image" src="${selectedChoice.image}" alt="${selectedChoice.alt || "已選圖卡"}">`
-    : `<span class="plate-placeholder">?</span>`;
-
+  const targetFoods = acceptedAnswers(question).map(findFood).filter(Boolean);
+  const pictures = targetFoods.map(food => `<img src="${food.image}" alt="${food.alt}">`).join("");
   els.imageStage.innerHTML = `
     <div class="breakfast-scene">
-      <img class="scene-bg" src="./assets/lesson-1-breakfast-game-scene.png" alt="早餐廚房情境">
+      <img class="scene-bg" src="./assets/lesson-1-breakfast-game-scene.png?v=20260909-table" alt="早餐廚房與桌面">
       <div class="scene-question">${question.title}</div>
-      <div class="plate-answer" aria-label="盤子答題區">${selectedImage}</div>
-      <div class="plate-system-text"><span class="plate-speak-icon" aria-hidden="true"></span><span>${escapeHtml(systemText)}</span></div>
-    </div>
-  `;
+      <div class="table-foods" aria-label="看圖說出食物名稱">${pictures}</div>
+    </div>`;
 }
 
 function renderChoiceCard(choice) {
@@ -681,20 +891,7 @@ function renderChoiceCard(choice) {
 }
 
 function renderQuestionImage(question) {
-  if (question.playMode === "scene") {
-    renderSceneStage(question);
-    return;
-  }
-
-  if (question.image) {
-    els.imageStage.innerHTML = `<img src="${question.image}" alt="${question.alt || "題目圖片"}">`;
-    return;
-  }
-
-  const food = findFood(question.food || question.answer);
-  els.imageStage.innerHTML = food
-    ? `<img src="${food.image}" alt="${food.alt}">`
-    : `<img src="./assets/lesson-1-foods-cards.jpg" alt="早餐圖卡">`;
+  renderSceneStage(question);
 }
 
 function renderQuestion() {
@@ -703,11 +900,11 @@ function renderQuestion() {
   resetSpeechAnswer();
   if (els.questionNumber) els.questionNumber.textContent = String(currentIndex + 1);
   if (els.visibleQuestionNumber) els.visibleQuestionNumber.textContent = String(currentIndex + 1);
-  els.questionType.textContent = question.type;
+  els.questionType.textContent = "看圖說關鍵字";
   els.questionTitle.textContent = question.title;
   const targetFood = getQuestionFood(question);
-  els.questionPrompt.textContent = question.playMode === "scene" && targetFood ? `這係 ${targetFood.pinyin}` : question.prompt;
-  els.playScreen.classList.toggle("is-scene-question", question.playMode === "scene");
+  els.questionPrompt.textContent = Array.isArray(question.answer) ? "看圖片，說出這兩樣食物的名稱。" : "看圖片，說出食物名稱。";
+  els.playScreen.classList.add("is-scene-question");
   els.feedback.hidden = true;
   els.feedback.textContent = "";
   els.nextBtn.disabled = true;
@@ -718,24 +915,7 @@ function renderQuestion() {
   renderDeveloperPanel();
 
   els.choiceGrid.innerHTML = "";
-  els.choiceGrid.classList.toggle("is-image-grid", question.choiceMode === "image");
-  els.choiceGrid.classList.toggle("scene-choice-grid", question.playMode === "scene");
-  shuffleItems(getChoices(question)).forEach(choice => {
-    const button = document.createElement("button");
-    button.className = question.choiceMode === "image" || question.playMode === "scene" ? "choice-button image-choice" : "choice-button";
-    button.type = "button";
-    button.dataset.value = choice.value;
-    button.innerHTML = question.choiceMode === "image" || question.playMode === "scene"
-      ? renderChoiceCard(choice)
-      : `<strong>${choice.pinyin || choice.label}</strong>`;
-    button.disabled = true;
-    button.setAttribute("aria-disabled", "true");
-    button.addEventListener("click", () => {
-      els.feedback.hidden = false;
-      els.feedback.textContent = "請用口說回答。";
-    });
-    els.choiceGrid.appendChild(button);
-  });
+  els.choiceGrid.hidden = true;
 }
 
 function chooseAnswer(button) {
@@ -828,9 +1008,9 @@ function restartGame() {
   earnedStars = 0;
   earnedQuestions = new Set();
   missedQuestions = new Set();
-  selectedDialect = "";
+  selectedDialect = "sixian";
   updateLessonCards();
-  showScreen("intro");
+  startLesson("1");
   renderDeveloperPanel();
 }
 
@@ -881,8 +1061,11 @@ document.addEventListener("click", event => {
 
 updateLessonCards();
 updateCarouselButtons();
-showScreen("intro");
+selectedDialect = "sixian";
+updateLessonCards();
+startLesson("1");
 renderDeveloperPanel();
+
 
 
 

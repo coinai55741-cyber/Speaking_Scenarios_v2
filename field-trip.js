@@ -223,7 +223,7 @@
       segs = {};
 
       const ticketUrl =
-        window.SPEECH_API?.realtimeTicketUrl() || "http://localhost:8788/ticket";
+        window.SPEECH_API?.realtimeTicketUrl() || "http://localhost:5000/ticket";
 
       let tk = null;
       try {
@@ -231,9 +231,9 @@
         if (r.ok) tk = await r.json();
         if (!tk?.url || !tk?.ticket) throw new Error(tk?.error || "無法取得辨識憑證");
       } catch (e) {
-        if (ticketUrl !== "http://localhost:8788/ticket") {
+        if (ticketUrl !== "http://localhost:5000/ticket") {
           try {
-            const r2 = await fetch("http://localhost:8788/ticket", { method: "POST" });
+            const r2 = await fetch("http://localhost:5000/ticket", { method: "POST" });
             if (r2.ok) tk = await r2.json();
           } catch (err2) {}
         }
@@ -884,5 +884,6 @@
   // 初始化畫面
   render();
 })();
+
 
 

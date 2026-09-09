@@ -5,13 +5,13 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>第1課 𠊎好食个東西｜客語生活任務</title>
-  <link rel="stylesheet" href="./breakfast.css?v=20260908-talkbubbles2">
+  <link rel="stylesheet" href="./breakfast.css?v=20260909-picture-naming">
 </head>
 <body>
   <main class="game-shell">
-    <header class="game-topbar"><a class="back-link" href="./index.html#classroom">返回</a>
+    <header class="game-topbar"><a class="back-link" href="./Vocabulary.html">返回</a>
       <div>
-        <h1>單元快問快答</h1>
+        <h1>我要吃早餐</h1>
       </div>
       <label class="mode-toggle" title="顯示辨識文字、正確答案與後端回傳">
         <input id="debugToggle" type="checkbox">
@@ -19,7 +19,7 @@
       </label>
     </header>
 
-    <section id="introScreen" class="screen intro-screen" aria-labelledby="introTitle">
+    <section id="introScreen" class="screen intro-screen" hidden aria-labelledby="introTitle">
       <div class="intro-copy">
 <section class="dialect-area" aria-labelledby="dialectTitle">
           <h3 id="dialectTitle">選擇腔別</h3>
@@ -82,7 +82,7 @@
           <p id="questionPrompt">請選出正確的四縣腔詞。</p>
         </div>
         <div id="imageStage" class="image-stage">
-          <img src="./assets/lesson-1-foods-cards.jpg" alt="早餐圖卡">
+          <img src="./assets/lesson-card-1-breakfast.png" alt="早餐圖卡">
         </div>
         <div id="choiceGrid" class="choice-grid"></div>
         <p id="feedback" class="feedback" hidden></p>
@@ -114,15 +114,17 @@
       </div>
       <div class="action-row center">
         <button id="againBtn" class="plain-button" type="button">再玩一次</button>
-        <a class="primary-link" href="./breakfast.html">回到課堂測驗</a>
+        <a class="primary-link" href="./Vocabulary.html">返回口說詞彙卡</a>
       </div>
     </section>
   </main>
 
-  <script src="./speech-api-config.js?v=20260909-global-ticket1"></script>
-  <script src="./breakfast.js?v=20260908-fieldtrip1"></script>
+  <script src="./speech-api-config.js?v=20260909-global-ticket2"></script>
+  <script src="./breakfast.js?v=20260909-realtime-ticket1"></script>
 </body>
 </html>
+
+
 
 
 

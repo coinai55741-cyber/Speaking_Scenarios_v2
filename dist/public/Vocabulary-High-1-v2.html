@@ -7,7 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;600;900&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
-<script src="./speech-api-config.js?v=20260909-global-ticket1"></script>
+<script src="./speech-api-config.js?v=20260909-global-ticket2"></script>
 <style>
   :root{--bg:#10161C;--panel:#19212B;--line:#2B3743;--soft:#212C38;
     --ink:#EDE6D8;--dim:#8B9BA8;--gold:#D9AE5F;--jade:#4E8C74;--rose:#B0605C;--cyan:#5FB0C4}
@@ -311,7 +311,7 @@ function quake(){
   setTimeout(()=>f.classList.remove("shake"),460);
 }
 /* ── 即時辨識取票服務：由 speech-api-config.js 統一管理 ── */
-const ASR_URL = (window.SPEECH_API?.realtimeTicketUrl ? window.SPEECH_API.realtimeTicketUrl() : "http://localhost:8788/ticket");
+const ASR_URL = (window.SPEECH_API?.realtimeTicketUrl ? window.SPEECH_API.realtimeTicketUrl() : "http://localhost:5000/ticket");
 
 /* ===== 即時辨識：跟等唸完，同已知答案逐字比對 ===== */
 /* ASR_URL 空白就完全毋會動著，遊戲同原本一模一樣 */
@@ -350,9 +350,9 @@ const ASR=(()=>{
       tk = await r.json();
       if (!tk.url || !tk.ticket) throw new Error(tk.error || "無票");
     } catch(e) {
-      if (ticketUrl !== "http://localhost:8788/ticket") {
+      if (ticketUrl !== "http://localhost:5000/ticket") {
         try {
-          let r2 = await fetch("http://localhost:8788/ticket", { method: "POST" });
+          let r2 = await fetch("http://localhost:5000/ticket", { method: "POST" });
           if (r2.ok) tk = await r2.json();
         } catch(err2) {}
       }
@@ -721,4 +721,6 @@ build();
 </script>
 </body>
 </html>
+
+
 

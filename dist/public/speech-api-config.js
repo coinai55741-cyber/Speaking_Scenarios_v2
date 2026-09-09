@@ -2,6 +2,7 @@
   const DEFAULT_BASE_URL = "http://localhost:5000";
   const DEFAULT_REALTIME_TICKET_URL = `${DEFAULT_BASE_URL}/ticket`;
   const VERCEL_REALTIME_TICKET_URL = "https://speaking-scenarios-v2.vercel.app/ticket";
+  const VERCEL_BASE_URL = "https://speaking-scenarios-v2.vercel.app";
   const ENDPOINTS = {
     recognize: "/api/speech/recognize",
     legacyRecognize: "/recognize",
@@ -36,6 +37,9 @@
   }
 
   function endpoint(path = ENDPOINTS.recognize) {
+    if (window.SPEECH_API_BASE_URL) return `${baseUrl()}${path}`;
+    if (location.hostname.endsWith("github.io")) return `${VERCEL_BASE_URL}${path}`;
+    if (location.hostname.endsWith("vercel.app")) return `${location.origin}${path}`;
     return `${baseUrl()}${path}`;
   }
 
@@ -63,7 +67,8 @@
       const url = new URL(value);
       const allowedLocal = url.hostname === "127.0.0.1" || url.hostname === "localhost";
       const allowedTunnel = url.hostname.endsWith(".trycloudflare.com") || url.hostname.endsWith(".ngrok-free.app") || url.hostname.endsWith(".ngrok-free.dev") || url.hostname.endsWith(".onrender.com");
-      return (Object.values(ENDPOINTS).includes(url.pathname) || url.pathname === "/ticket") && (allowedLocal || allowedTunnel);
+      const allowedVercel = url.hostname.endsWith(".vercel.app");
+      return (Object.values(ENDPOINTS).includes(url.pathname) || url.pathname === "/ticket") && (allowedLocal || allowedTunnel || allowedVercel);
     } catch (error) {
       return false;
     }
@@ -133,6 +138,7 @@
     realtimeStorageKey: "speakingDemoRealtimeTicketEndpoint"
   };
 }());
+
 
 
 
