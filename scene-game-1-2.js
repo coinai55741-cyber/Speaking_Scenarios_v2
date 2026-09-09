@@ -28,11 +28,11 @@ const SPEECH_BACKENDS = {
     endpoint: window.SPEECH_API?.endpoint() || "http://localhost:5000/api/speech/recognize",
     tokenMap: "mission1Sixian"
   },
-  "hakka-hailu": { label: "海陸腔辨識", provider: "hakka_api", providerId: "hakka_api_hak", endpoint: "", tokenMap: "mission1Hakka" },
-  "hakka-dapu": { label: "大埔腔辨識", endpoint: "", tokenMap: "mission1Hakka" },
-  "hakka-raoping": { label: "饒平腔辨識", endpoint: "", tokenMap: "mission1Hakka" },
-  "hakka-zhaoan": { label: "詔安腔辨識", endpoint: "", tokenMap: "mission1Hakka" },
-  "hakka-south-sixian": { label: "南四縣腔辨識", endpoint: "", tokenMap: "mission1Hakka" }
+  "hakka-hailu": { label: "海陸腔辨識", provider: "hakka_api", providerId: "hakka_api_hak", endpoint: window.SPEECH_API?.endpoint() || "http://localhost:5000/api/speech/recognize", tokenMap: "mission1Hakka" },
+  "hakka-dapu": { label: "大埔腔辨識", provider: "hakka_api", providerId: "hakka_api_hak", endpoint: window.SPEECH_API?.endpoint() || "http://localhost:5000/api/speech/recognize", tokenMap: "mission1Hakka" },
+  "hakka-raoping": { label: "饒平腔辨識", provider: "hakka_api", providerId: "hakka_api_hak", endpoint: window.SPEECH_API?.endpoint() || "http://localhost:5000/api/speech/recognize", tokenMap: "mission1Hakka" },
+  "hakka-zhaoan": { label: "詔安腔辨識", provider: "hakka_api", providerId: "hakka_api_hak", endpoint: window.SPEECH_API?.endpoint() || "http://localhost:5000/api/speech/recognize", tokenMap: "mission1Hakka" },
+  "hakka-south-sixian": { label: "南四縣腔辨識", provider: "hakka_api", providerId: "hakka_api_hak", endpoint: window.SPEECH_API?.endpoint() || "http://localhost:5000/api/speech/recognize", tokenMap: "mission1Hakka" }
 };
 
 const TOKEN_MAPS = {
@@ -1278,6 +1278,7 @@ function flashHint(message) {
 }
 
 init();
+
 
 
 

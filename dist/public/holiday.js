@@ -49,14 +49,19 @@ function updateProviderUi() {
 function getAsrEndpoint() {
   const urlParams = new URLSearchParams(window.location.search);
   const paramUrl = urlParams.get('asr');
+  const hosted = window.SPEECH_API?.isHostedPage?.();
+  const isVercelEndpoint = value => {
+    try { return new URL(value).hostname.endsWith('.vercel.app'); }
+    catch (error) { return false; }
+  };
   
-  if (paramUrl && isAllowedAsrEndpoint(paramUrl)) {
+  if (paramUrl && isAllowedAsrEndpoint(paramUrl) && (!hosted || isVercelEndpoint(paramUrl))) {
     localStorage.setItem(ASR_ENDPOINT_STORAGE_KEY, paramUrl);
     return paramUrl;
   }
   
   const savedUrl = localStorage.getItem(ASR_ENDPOINT_STORAGE_KEY);
-  if (savedUrl && isAllowedAsrEndpoint(savedUrl)) {
+  if (savedUrl && isAllowedAsrEndpoint(savedUrl) && (!hosted || isVercelEndpoint(savedUrl))) {
     return savedUrl;
   }
   
@@ -686,6 +691,7 @@ els.checkBtn.addEventListener("click", () => {
 
 els.missionLayout.hidden = true;
 renderTask();
+
 
 
 
