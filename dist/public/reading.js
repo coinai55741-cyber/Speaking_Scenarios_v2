@@ -244,10 +244,15 @@
 
   function endpoint() {
     const api = window.SPEECH_API;
+    const hosted = api?.isHostedPage?.();
+    const isVercelEndpoint = value => {
+      try { return new URL(value).hostname.endsWith('.vercel.app'); }
+      catch { return false; }
+    };
     let saved;
     try { saved = localStorage.getItem(api.storageKey); } catch { /* Browser storage may be disabled. */ }
     const supplied = new URLSearchParams(location.search).get('asr');
-    return [supplied, saved, api.endpoint()].find(value => value && api.isAllowedEndpoint(value));
+    return [supplied, saved, api.endpoint()].find(value => value && api.isAllowedEndpoint(value) && (!hosted || isVercelEndpoint(value)));
   }
 
   async function submit() {
