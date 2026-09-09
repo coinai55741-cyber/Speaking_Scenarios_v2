@@ -198,12 +198,14 @@ const state = {
   mediaRecorder: null,
   mediaStream: null,
   audioChunks: [],
+  realtimeSession: null,
+  realtimeTranscript: "",
   recordedAudioUrl: "",
   recordedAudioBlob: null,
   recognizedText: "",
   recognitionError: "",
   lastRecognitionPayload: null,
-  recognitionMode: localStorage.getItem("speakingDemoRecognitionMode") || "file",
+  recognitionMode: localStorage.getItem("speakingDemoRecognitionMode") || "realtime",
   sentenceMissCount: 0,
   debugMode: false,
   sentenceResult: "",
@@ -452,8 +454,8 @@ function renderDeveloperPanel(stage) {
       </select>
       <label class="developer-label" for="developerRecognitionMode">辨識模式</label>
       <select id="developerRecognitionMode" class="developer-select">
-        <option value="file" ${state.recognitionMode === "file" ? "selected" : ""}>錄完判斷（檔案辨識）</option>
         <option value="realtime" ${state.recognitionMode === "realtime" ? "selected" : ""}>即時辨識 WebSocket</option>
+        <option value="file" ${state.recognitionMode === "file" ? "selected" : ""}>錄完判斷（檔案辨識）</option>
       </select>
       <p class="developer-note">目前可用：${escapeHtml(backend.label)} / ${escapeHtml(backend.endpoint || "尚未設定 API")} / ${state.recognitionMode === "realtime" ? "即時辨識" : "檔案辨識"}</p>
       <p class="developer-subnote">${escapeHtml(state.recognitionError || "可看辨識原文、字卡轉換與命中狀態。")}</p>
@@ -912,6 +914,34 @@ async function startSentenceRecording(stage, mission) {
       if (event.data && event.data.size) state.audioChunks.push(event.data);
     });
     state.mediaRecorder.addEventListener("stop", () => finishSentenceRecording(stage, mission), { once: true });
+    if (state.dialect !== "mandarin" && state.recognitionMode === "realtime" && window.HAKKA_REALTIME_ASR) {
+      state.realtimeSession = window.HAKKA_REALTIME_ASR.createSession({
+        onTranscript(text) {
+          state.realtimeTranscript = text || "";
+          state.recognizedText = state.realtimeTranscript;
+          state.lastRecognitionPayload = { text: state.realtimeTranscript, provider: "hakka_realtime_asr", mode: "realtime" };
+          state.answerTokens = mapRecognitionToCards(state.lastRecognitionPayload, mission);
+          renderMission(stage);
+        },
+        onFinal(text) {
+          state.realtimeTranscript = text || state.realtimeTranscript || "";
+          state.recognizedText = state.realtimeTranscript;
+          state.lastRecognitionPayload = { text: state.realtimeTranscript, provider: "hakka_realtime_asr", mode: "realtime" };
+          state.answerTokens = mapRecognitionToCards(state.lastRecognitionPayload, mission);
+          state.recognitionError = state.recognizedText ? (state.answerTokens.length ? "" : "有辨識到文字，但沒有對應的字卡。") : "辨識完成，但沒有讀到文字。";
+          state.realtimeSession = null;
+          renderDeveloperPanel(stage);
+          renderMission(stage);
+        },
+        onError(message) {
+          state.recognitionError = message || "即時辨識連線失敗。";
+          renderMission(stage);
+        }
+      });
+      state.realtimeSession.start(stream).then((ok) => {
+        if (!ok) state.realtimeSession = null;
+      });
+    }
     state.recording = true;
     state.mediaRecorder.start();
     renderMission(stage);
@@ -924,6 +954,7 @@ async function startSentenceRecording(stage, mission) {
 
 function stopSentenceRecording() {
   if (!state.mediaRecorder || state.mediaRecorder.state === "inactive") return;
+  if (state.dialect !== "mandarin" && state.recognitionMode === "realtime") state.realtimeSession?.stop?.();
   state.mediaRecorder.stop();
 }
 
@@ -941,7 +972,10 @@ async function finishSentenceRecording(stage, mission) {
   state.lastRecognitionPayload = null;
   renderMission(stage);
   try {
-    const payload = await recognizeSpeech(blob);
+    const useRealtimeResult = state.dialect !== "mandarin" && state.recognitionMode === "realtime";
+    const payload = useRealtimeResult
+      ? { text: state.realtimeTranscript || state.recognizedText || "", raw: { text: state.realtimeTranscript || state.recognizedText || "", provider: "hakka_realtime_asr", mode: "realtime" } }
+      : await recognizeSpeech(blob);
     state.lastRecognitionPayload = payload.raw ?? payload;
     state.recognizedText = payload.text;
     state.answerTokens = mapRecognitionToCards(payload, mission);
@@ -970,7 +1004,7 @@ async function recognizeSpeech(blob) {
   formData.append("provider_id", backend.providerId || "taiwan_tongues_zh");
   formData.append("language", state.dialect === "mandarin" ? "zh" : "hak");
   formData.append("scene_id", "scene-game-1-2");
-  formData.append("recognition_mode", state.recognitionMode || "file");
+  formData.append("recognition_mode", state.recognitionMode || "realtime");
   const response = await fetch(backend.endpoint, {
     method: "POST",
     body: formData
@@ -1278,6 +1312,10 @@ function flashHint(message) {
 }
 
 init();
+
+
+
+
 
 
 

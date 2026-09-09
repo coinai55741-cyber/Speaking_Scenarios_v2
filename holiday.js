@@ -26,7 +26,7 @@ function getSelectedAsrProvider() {
 }
 
 function getRecognitionMode() {
-  const value = els.recognitionModeSelect?.value || localStorage.getItem(RECOGNITION_MODE_STORAGE_KEY) || "file";
+  const value = els.recognitionModeSelect?.value || localStorage.getItem(RECOGNITION_MODE_STORAGE_KEY) || "realtime";
   return value === "realtime" ? "realtime" : "file";
 }
 
@@ -166,6 +166,9 @@ let answerChecked = false;
 let recorder = null;
 let stream = null;
 let chunks = [];
+let realtimeSession = null;
+let realtimeTranscript = "";
+let realtimeError = "";
 let audioUrl = "";
 let isRecording = false;
 let isTranscribing = false;
@@ -432,6 +435,10 @@ function resetRecording(options = {}) {
   if (recorder && isRecording) {
     try { recorder.stop(); } catch (error) { /* already stopped */ }
   }
+  realtimeSession?.abort?.();
+  realtimeSession = null;
+  realtimeTranscript = "";
+  realtimeError = "";
   cleanupStream();
   recorder = null;
   chunks = [];
@@ -469,6 +476,45 @@ async function startRecording() {
   try {
     resetRecording();
     stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    const useRealtime = getSelectedAsrProvider() === "hakka_api_hak" && getRecognitionMode() === "realtime" && window.HAKKA_REALTIME_ASR;
+    if (useRealtime) {
+      realtimeSession = window.HAKKA_REALTIME_ASR.createSession({
+        onTranscript(text) {
+          realtimeTranscript = text || "";
+          if (realtimeTranscript) {
+            els.answerInput.value = realtimeTranscript;
+            els.asrStatus.textContent = realtimeTranscript;
+            els.recordingStatus.textContent = `即時辨識：${realtimeTranscript}`;
+            updateHitStatus(realtimeTranscript);
+            setCheckEnabled(true, "等待辨識");
+          }
+        },
+        onFinal(text) {
+          realtimeTranscript = text || realtimeTranscript || "";
+          if (realtimeTranscript) {
+            els.answerInput.value = realtimeTranscript;
+            els.asrStatus.textContent = realtimeTranscript;
+            els.recordingStatus.textContent = `即時辨識完成：${realtimeTranscript}`;
+            updateHitStatus(realtimeTranscript);
+            setCheckEnabled(true, "等待辨識");
+            saveCurrentAnswer();
+          } else if (realtimeError) {
+            els.asrStatus.textContent = "即時辨識失敗";
+            els.recordingStatus.textContent = realtimeError;
+          } else {
+            els.asrStatus.textContent = "未辨識出文字";
+            els.recordingStatus.textContent = "沒有辨識到文字。請重新錄音，或切換檔案辨識。";
+          }
+          realtimeSession = null;
+        },
+        onError(message) {
+          realtimeError = message || "即時辨識連線失敗";
+          els.asrStatus.textContent = realtimeError;
+        }
+      });
+      const realtimeOk = await realtimeSession.start(stream);
+      if (!realtimeOk) realtimeSession = null;
+    }
     const mimeType = MediaRecorder.isTypeSupported("audio/webm;codecs=opus") ? "audio/webm;codecs=opus" : "";
     recorder = new MediaRecorder(stream, mimeType ? { mimeType } : undefined);
     chunks = [];
@@ -484,9 +530,23 @@ async function startRecording() {
       els.audioPreview.src = audioUrl;
       els.audioPreview.hidden = false;
       els.recordingPanel.hidden = false;
-      els.recordingStatus.textContent = `錄音完成：${formatBytes(blob.size)}。正在辨識...`;
-      cleanupStream();
-      transcribeAudioBlob(blob);
+      const useRealtimeResult = getSelectedAsrProvider() === "hakka_api_hak" && getRecognitionMode() === "realtime";
+      els.recordingStatus.textContent = useRealtimeResult ? `錄音完成：${formatBytes(blob.size)}。等待即時辨識文字...` : `錄音完成：${formatBytes(blob.size)}。正在辨識...`;
+      if (useRealtimeResult) {
+        realtimeSession?.stop?.();
+        setTimeout(() => {
+          cleanupStream();
+          if (!realtimeTranscript && !realtimeError) {
+            els.asrStatus.textContent = "未辨識出文字";
+            els.recordingStatus.textContent = "沒有辨識到文字。請重新錄音，或切換檔案辨識。";
+          }
+          saveCurrentAnswer();
+          updateHitStatus(els.answerInput.value.trim());
+        }, 900);
+      } else {
+        cleanupStream();
+        transcribeAudioBlob(blob);
+      }
     });
 
     recorder.start();
@@ -515,6 +575,7 @@ function stopRecording() {
   setCheckEnabled(false, "辨識中...");
   els.recordingStatus.textContent = "正在整理錄音...";
   try {
+    if (getSelectedAsrProvider() === "hakka_api_hak" && getRecognitionMode() === "realtime") realtimeSession?.stop?.();
     recorder.stop();
   } catch (error) {
     cleanupStream();
@@ -691,6 +752,8 @@ els.checkBtn.addEventListener("click", () => {
 
 els.missionLayout.hidden = true;
 renderTask();
+
+
 
 
 

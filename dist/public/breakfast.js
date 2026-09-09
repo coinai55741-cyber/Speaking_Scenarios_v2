@@ -46,7 +46,7 @@ const BREAKFAST_DIALECT_LABELS = {
 };
 
 function breakfastRecognitionMode() {
-  const value = localStorage.getItem(BREAKFAST_RECOGNITION_MODE_KEY) || "file";
+  const value = localStorage.getItem(BREAKFAST_RECOGNITION_MODE_KEY) || "realtime";
   return value === "realtime" ? "realtime" : "file";
 }
 
@@ -1065,6 +1065,7 @@ selectedDialect = "sixian";
 updateLessonCards();
 startLesson("1");
 renderDeveloperPanel();
+
 
 
 

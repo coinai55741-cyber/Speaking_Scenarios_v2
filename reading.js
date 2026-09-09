@@ -4,6 +4,7 @@
   const $ = id => document.getElementById(id);
   const answers = lesson.passages.map(() => ({ blob: null, url: '', transcript: '', completed: false, seconds: 0 }));
   let current = 0, phase = 'ready', recorder = null, stream = null, timer = null, started = 0;
+  let realtimeSession = null, realtimeTranscript = '', realtimeError = '';
   let request = null, generation = 0, leaving = false;
   const diagnostics = new WeakMap();
   const diagnostic = () => {
@@ -52,6 +53,7 @@
   const phaseNames = { ready: '準備朗讀', requesting: '開啟麥克風', recording: '正在朗讀', stopping: '整理錄音', preview: '聽聽自己', submitting: '正在送出', feedback: '本段完成' };
   const busy = () => ['requesting', 'recording', 'stopping', 'submitting'].includes(phase);
   const stopTracks = () => { stream?.getTracks().forEach(track => track.stop()); stream = null; };
+  const useRealtimeAsr = () => recognitionMode() === 'realtime' && document.getElementById('asrProviderSelect')?.value !== 'taiwan_tongues_zh' && window.HAKKA_REALTIME_ASR;
   const formatTime = seconds => `${String(Math.floor(seconds / 60)).padStart(2, '0')}:${String(seconds % 60).padStart(2, '0')}`;
   const status = text => { $('status').textContent = text; };
   const release = answer => { if (answer.url) URL.revokeObjectURL(answer.url); };
@@ -199,7 +201,39 @@
       const acquired = await navigator.mediaDevices.getUserMedia({ audio: true });
       if (token !== generation || leaving) { acquired.getTracks().forEach(track => track.stop()); return; }
       stream = acquired;
-      const mime = ['audio/webm;codecs=opus', 'audio/mp4', 'audio/ogg;codecs=opus'].find(type => MediaRecorder.isTypeSupported(type));
+      realtimeTranscript = '';
+      realtimeError = '';
+      if (useRealtimeAsr()) {
+        realtimeSession = window.HAKKA_REALTIME_ASR.createSession({
+          onTranscript(text) {
+            realtimeTranscript = text || '';
+            if (realtimeTranscript) {
+              diagnostic().draft = realtimeTranscript;
+              diagnostic().status = `即時辨識：${realtimeTranscript}`;
+              updateDeveloperMode();
+            }
+          },
+          onFinal(text) {
+            realtimeTranscript = text || realtimeTranscript || '';
+            if (realtimeTranscript) {
+              diagnostic().draft = realtimeTranscript;
+              diagnostic().status = '客語即時辨識完成';
+            } else if (realtimeError) {
+              diagnostic().status = realtimeError;
+            } else {
+              diagnostic().status = '即時辨識沒有文字';
+            }
+            realtimeSession = null;
+            updateDeveloperMode();
+          },
+          onError(message) {
+            realtimeError = message || '即時辨識連線失敗';
+            diagnostic().status = realtimeError;
+            updateDeveloperMode();
+          }
+        });
+        realtimeSession.start(stream).then(ok => { if (!ok) realtimeSession = null; });
+      }      const mime = ['audio/webm;codecs=opus', 'audio/mp4', 'audio/ogg;codecs=opus'].find(type => MediaRecorder.isTypeSupported(type));
       const activeRecorder = new MediaRecorder(stream, mime ? { mimeType: mime } : undefined);
       recorder = activeRecorder;
       const chunks = [], index = current;
@@ -215,7 +249,7 @@
         const blob = new Blob(chunks, { type: activeRecorder.mimeType || mime || 'audio/webm' });
         if (!blob.size) { setPhase('ready', '沒有收到錄音，請確認麥克風後再試一次。'); return; }
         release(answers[index]);
-        answers[index] = { blob, url: URL.createObjectURL(blob), transcript: '', completed: false, seconds: Math.max(1, Math.round((Date.now() - started) / 1000)) };
+        answers[index] = { blob, url: URL.createObjectURL(blob), transcript: realtimeTranscript || '', completed: false, seconds: Math.max(1, Math.round((Date.now() - started) / 1000)) };
         render(false);
         $('submitBtn').focus();
       });
@@ -238,6 +272,7 @@
   function stopRecording() {
     if (phase !== 'recording' || recorder?.state !== 'recording') return;
     setPhase('stopping', '正在整理你的錄音…');
+    if (useRealtimeAsr()) realtimeSession?.stop?.();
     recorder.stop();
     clearInterval(timer);
   }
@@ -265,7 +300,16 @@
     diagnostic().status = `${isHakka ? '客語' : '華語測試'}${modeLabel}中`;
     $('audioPreview').pause();
     setPhase('submitting', '正在整理你的朗讀結果，請稍等。');
-    const controller = new AbortController();
+    if (isHakka && mode === 'realtime' && (answer.transcript || diagnostic().draft)) {
+      const text = answer.transcript || diagnostic().draft;
+      Object.assign(diagnostic(), { draft: text, tested: true, status: '客語WebSocket 串流辨識完成' });
+      answer.transcript = text;
+      answer.completed = true;
+      showFeedback();
+      setPhase('feedback', '本段朗讀已送出，可以聽聽自己的聲音。');
+      $('nextBtn').focus();
+      return;
+    }    const controller = new AbortController();
     request = controller;
     const timeout = setTimeout(() => controller.abort(), 120000);
     try {
@@ -423,4 +467,7 @@
   }, true);
   render(false);
 })();
+
+
+
 

@@ -125,8 +125,8 @@
         </select>
         <label class="developer-label" for="recognitionModeSelect">辨識模式</label>
         <select id="recognitionModeSelect" class="developer-select">
+          <option value="realtime" selected>即時辨識 WebSocket</option>
           <option value="file">錄完判斷（檔案辨識）</option>
-          <option value="realtime">即時辨識 WebSocket</option>
         </select>
         <p id="asrProviderNote" class="developer-note"></p>
         <p id="debugProvider" class="developer-subnote"></p>
@@ -135,9 +135,12 @@
   </main>
 
   <script src="./speech-api-config.js?v=20260909-global-ticket2"></script>
-  <script src="./holiday.js?v=20260907-realtime1"></script>
+  <script src="./speech-realtime-asr.js?v=20260909-shared-realtime1"></script>
+  <script src="./holiday.js?v=20260909-shared-realtime1"></script>
 </body>
 </html>
+
+
 
 
 
