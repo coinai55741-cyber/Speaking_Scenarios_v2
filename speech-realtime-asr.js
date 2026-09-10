@@ -57,6 +57,8 @@
       onFinal(currentText());
     }
 
+    const targetLanguage = options.language || window.CURRENT_ASR_LANGUAGE || (function(){ try { return localStorage.getItem("speakingDemoAsrLanguage"); }catch(e){ return null; } })() || "hak";
+
     async function start(stream) {
       closed = false;
       ready = false;
@@ -64,20 +66,35 @@
       segments = {};
 
       let ticketPayload = null;
-      const ticketUrl = window.SPEECH_API?.realtimeTicketUrl?.() || "http://localhost:5000/ticket";
-      try {
-        const response = await fetch(ticketUrl, {
+      const primaryUrl = window.SPEECH_API?.realtimeTicketUrl?.() || "http://localhost:5000/ticket";
+      const fallbackUrl = "https://speaking-scenarios-v2.vercel.app/ticket";
+
+      async function getTicket(url) {
+        const response = await fetch(url, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ language: "hak" })
+          body: JSON.stringify({ language: targetLanguage })
         });
-        ticketPayload = await response.json();
-        if (!response.ok || !ticketPayload?.url || !ticketPayload?.ticket) {
-          throw new Error(ticketPayload?.error || "無法取得即時辨識票券");
-        }
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        const data = await response.json();
+        if (!data?.url || !data?.ticket) throw new Error(data?.error || "無效辨識票券");
+        return data;
+      }
+
+      try {
+        ticketPayload = await getTicket(primaryUrl);
       } catch (error) {
-        onError(error.message || "無法取得即時辨識票券");
-        return false;
+        if (primaryUrl !== fallbackUrl) {
+          try {
+            ticketPayload = await getTicket(fallbackUrl);
+          } catch (fallbackError) {
+            onError(fallbackError.message || "無法取得即時辨識票券");
+            return false;
+          }
+        } else {
+          onError(error.message || "無法取得即時辨識票券");
+          return false;
+        }
       }
 
       const query = `?ticket=${encodeURIComponent(ticketPayload.ticket)}&type=raw&rate=16000&channel=1&charactersToNumbers=0&noSpeechTimeout=20`;
@@ -115,6 +132,9 @@
       ws.onclose = () => { if (!closed) finish(); };
 
       audioContext = new (window.AudioContext || window.webkitAudioContext)();
+      if (audioContext.state === "suspended") {
+        try { await audioContext.resume(); } catch (e) {}
+      }
       sourceNode = audioContext.createMediaStreamSource(stream);
       processorNode = audioContext.createScriptProcessor(4096, 1, 1);
       processorNode.onaudioprocess = (event) => {
@@ -135,6 +155,9 @@
       stopAudio();
       if (ws && ws.readyState === 1) {
         try { ws.send("EOS"); } catch (error) {}
+        setTimeout(() => {
+          if (!closed) finish();
+        }, 1200);
       } else {
         finish();
       }
@@ -152,5 +175,15 @@
     return { start, stop, abort, text: currentText };
   }
 
-  window.HAKKA_REALTIME_ASR = { createSession };
+  window.CURRENT_ASR_LANGUAGE = "hak";
+
+  function setLanguage(lang) {
+    window.CURRENT_ASR_LANGUAGE = lang === "zh" ? "zh" : "hak";
+  }
+
+  function getLanguage() {
+    return window.CURRENT_ASR_LANGUAGE === "zh" ? "zh" : "hak";
+  }
+
+  window.HAKKA_REALTIME_ASR = { createSession, setLanguage, getLanguage };
 }());

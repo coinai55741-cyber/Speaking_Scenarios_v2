@@ -39,8 +39,158 @@
   .mic span{opacity:.62;line-height:1.5;max-width:640px}
   main{flex:1 1 auto;min-height:0;padding:12px 10px 14px}
   iframe{width:100%;height:100%;border:0;display:block;background:transparent}
+  .asr-badge{background:rgba(232,200,122,.2);border:1px solid rgba(232,200,122,.5);padding:4px 14px;border-radius:999px;font-size:12.5px;color:var(--grain);display:inline-flex;align-items:center;gap:6px;transition:opacity .2s}
+  .asr-badge b{color:#fff;font-weight:700}
+
+  /* 開發者模式開關與面板 */
+  /* 開發者模式開關與左側面板 (同 你家在哪) */
+  body.debug-mode {
+    padding-left: 280px;
+    transition: padding-left 0.25s ease;
+  }
+  .mode-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 5px 12px;
+    border: 1.5px solid rgba(253,251,245,.25);
+    border-radius: 999px;
+    color: var(--paper);
+    background: rgba(31,58,95,.8);
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  .mode-toggle:hover { border-color: var(--grain); background: rgba(253,251,245,.15); }
+  .mode-toggle input { width: 15px; height: 15px; accent-color: var(--grain); cursor: pointer; }
+  .developer-panel {
+    position: fixed;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 280px;
+    height: 100vh;
+    overflow-y: auto;
+    background: rgba(255, 253, 250, 0.98);
+    border-right: 2px solid #d4c19c;
+    box-shadow: 14px 0 32px rgba(91, 67, 35, 0.16);
+    color: #17222a;
+    padding: 22px 18px;
+    font-size: 13.5px;
+    z-index: 99999;
+    box-sizing: border-box;
+  }
+  .developer-panel[hidden] { display: none; }
+  .developer-panel h2 {
+    font-family: "Noto Serif TC", serif;
+    font-size: 18px;
+    font-weight: 900;
+    color: #4a3828;
+    margin: 0 0 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .developer-panel h2 span { font-size: 12px; opacity: .7; font-family: sans-serif; }
+  .developer-panel .target-sentence {
+    margin: 0 0 14px;
+    padding: 12px;
+    border: 1.5px solid rgba(47, 148, 111, 0.35);
+    border-radius: 12px;
+    background: #fff;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+  }
+  .developer-panel .sentence-label {
+    display: inline-block;
+    color: #2e7d52;
+    font-size: 12px;
+    font-weight: 900;
+    margin-bottom: 4px;
+  }
+  .developer-panel .target-sentence strong {
+    display: block;
+    font-family: "Noto Serif TC", serif;
+    font-size: 20px;
+    font-weight: 900;
+    color: #17222a;
+    margin-bottom: 4px;
+  }
+  .developer-panel .target-sentence small {
+    display: block;
+    font-size: 13px;
+    color: #666;
+  }
+  .developer-panel .developer-item {
+    margin-top: 14px;
+  }
+  .developer-panel .developer-label {
+    display: block;
+    font-size: 13px;
+    font-weight: 700;
+    color: #4a3828;
+    margin-bottom: 4px;
+  }
+  .developer-panel .dev-btns {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 8px;
+  }
+  .developer-panel .dev-btn {
+    background: #fff;
+    border: 1.5px solid #d4c19c;
+    color: #4a3828;
+    border-radius: 8px;
+    padding: 5px 11px;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: .15s;
+  }
+  .developer-panel .dev-btn:hover {
+    background: #f0e6d2;
+    border-color: #ba9e6e;
+  }
+  .developer-panel .dev-input {
+    width: 100%;
+    border: 1.5px solid #d4c19c;
+    border-radius: 8px;
+    padding: 7px 10px;
+    background: #fff;
+    color: #17222a;
+    font-size: 13px;
+    margin-top: 6px;
+    outline: none;
+    box-sizing: border-box;
+  }
+  .developer-panel .dev-input:focus { border-color: #2e7d52; }
+  .developer-panel .dev-select {
+    width: 100%;
+    border: 1.5px solid #d4c19c;
+    border-radius: 8px;
+    padding: 6px 10px;
+    background: #fff;
+    color: #17222a;
+    font-size: 13px;
+    font-weight: 600;
+    margin-top: 4px;
+    outline: none;
+    box-sizing: border-box;
+    cursor: pointer;
+  }
+  .developer-panel .dev-select:focus { border-color: #2e7d52; }
+  .menu-back { transition: left 0.25s ease; }
+  body.debug-mode .menu-back { left: 296px !important; }
+  @media (max-width: 1100px) {
+    body.debug-mode { padding-left: 0; }
+    body.debug-mode .menu-back { left: 10px !important; }
+  }
 </style>
-<link rel="stylesheet" href="./unit-menu.css?v=20260909-fixed-back"></head>
+<link rel="stylesheet" href="./unit-menu.css?v=20260909-fixed-back2">
+<script src="./speech-api-config.js?v=20260909-global-ticket2"></script>
+<script src="./speech-realtime-asr.js"></script>
+</head>
 <body><a class="menu-back" href="./classroom.html" aria-label="返回單元快問快答">返回</a>
   <header>
     <h1>客語互動場景<em>學習階段一 ｜ 繪本風視覺版 ｜ 新詞愛覆誦</em></h1>
@@ -49,6 +199,11 @@
   <div class="mic">
     <button id="micBtn" type="button">開麥克風</button>
     <span id="micMsg">錄音愛先開麥克風。開毋起來就用單課檔，抑係放到 https 伺服器頂。</span>
+    <span id="asrLiveBadge" class="asr-badge" style="display:none">即時辨識：<b id="asrText"></b></span>
+    <label class="mode-toggle" title="顯示語音辨識與開發者面板">
+      <input id="debugToggle" type="checkbox">
+      <span>開發者模式</span>
+    </label>
   </div>
   <main><iframe id="frame" title="遊戲畫面" allow="microphone"></iframe></main>
 
@@ -63,15 +218,13 @@ function decode(b64){
   return new TextDecoder("utf-8").decode(bytes);
 }
 
-function load(i){
-  [...tabs.children].forEach((t,j) => t.classList.toggle("on", i === j));
-  frame.srcdoc = decode(GAMES[i].b64);
-}
-
-/* ---- 麥克風：頂層討權限。iframe 討毋著个時節（file://），由頂層代錄 ---- */
+/* ---- 麥克風與即時 ASR：頂層管理權限與即時語音辨識 ---- */
 const micBtn = document.getElementById("micBtn");
 const micMsg = document.getElementById("micMsg");
+const asrBadge = document.getElementById("asrLiveBadge");
+const asrTextEl = document.getElementById("asrText");
 let micStream = null, hostRec = null, hostChunks = [];
+let currentAsrSession = null, liveAsrText = "";
 
 function tell(msg){
   try{ if(frame.contentWindow) frame.contentWindow.postMessage(msg, "*"); }catch(e){}
@@ -88,21 +241,143 @@ window.addEventListener("message", e => {
 
   if(d.echo === "guest-ready"){ announce(); return; }
 
+  function evaluateAndAwardStars(txt) {
+    const doc = frame.contentDocument;
+    const targetWord = (doc?.querySelector(".echo-w")?.textContent?.trim()) || lastTargetWord || "";
+    const targetGloss = (doc?.querySelector(".cn")?.textContent?.trim()) || "";
+    const currentLang = window.HAKKA_REALTIME_ASR?.getLanguage?.() || "hak";
+    const isMandarin = (currentLang === "zh");
+
+    const expectedText = isMandarin ? targetGloss : targetWord;
+    const expectedLabel = isMandarin ? "華語意思" : "客語正字";
+    const cleanedExpected = (expectedText || "").replace(/[^\u4e00-\u9fa5a-zA-Z0-9]/g, "");
+    const cleanedGot = (txt || "").replace(/[^\u4e00-\u9fa5a-zA-Z0-9]/g, "");
+
+    let stars = 1;
+    let message = "";
+    if (!cleanedGot) {
+      stars = 0;
+      message = "無聽著聲音，請靠近麥克風再唸一擺。";
+    } else if (cleanedExpected && (cleanedGot.includes(cleanedExpected) || cleanedExpected.includes(cleanedGot))) {
+      stars = 3;
+      message = `當著！${expectedLabel}辨識正確：【${cleanedGot}】。`;
+    } else {
+      let hits = 0;
+      for (const c of cleanedExpected) {
+        if (cleanedGot.includes(c)) hits++;
+      }
+      if (hits > 0) {
+        stars = 2;
+        message = `當接近咧！辨識結果：【${cleanedGot}】，再唸一擺看會較像無。`;
+      } else {
+        stars = 1;
+        message = `辨識為【${cleanedGot}】，與${expectedLabel}【${expectedText}】不符，請再試一次。`;
+      }
+    }
+
+    if (doc) {
+      const starsEl = doc.querySelector(".echo-stars");
+      const note = doc.querySelector(".echo-note");
+      const bNext = doc.querySelector(".echo-next");
+      if (starsEl) {
+        if (stars > 0) {
+          starsEl.textContent = "★★★".slice(0, stars) + "☆☆☆".slice(0, 3 - stars);
+          starsEl.className = "echo-stars on s" + stars;
+        } else {
+          starsEl.textContent = "";
+          starsEl.className = "echo-stars";
+        }
+      }
+      if (note) note.textContent = message;
+      if (bNext) bNext.disabled = (stars === 0);
+    }
+    if (asrTextEl) {
+      asrTextEl.textContent = (cleanedGot ? `「${cleanedGot}」(${stars}星)` : "無辨識到聲音");
+    }
+    renderDeveloperPanel();
+  }
+
   if(d.echo === "rec-start"){
     if(!micStream){ tell({echo:"rec-error", name:"NoMic"}); return; }
     try{
       hostChunks = [];
+      liveAsrText = "";
+      const currentLang = window.HAKKA_REALTIME_ASR?.getLanguage?.() || "hak";
+      const isMandarin = (currentLang === "zh");
+      if(asrBadge) { asrBadge.style.display = "inline-flex"; asrTextEl.textContent = "聆聽中⋯⋯"; }
+
+      const doc = frame.contentDocument;
+      if (doc) {
+        const targetWord = (doc.querySelector(".echo-w")?.textContent?.trim()) || "";
+        const targetGloss = (doc.querySelector(".cn")?.textContent?.trim()) || "";
+        const starsEl = doc.querySelector(".echo-stars");
+        const note = doc.querySelector(".echo-note");
+        const bNext = doc.querySelector(".echo-next");
+        if (starsEl) { starsEl.textContent = ""; starsEl.className = "echo-stars"; }
+        if (note) {
+          note.textContent = isMandarin
+            ? `錄音中⋯⋯請唸出華語意思「${targetGloss}」，唸完撳「停」。`
+            : `錄音中⋯⋯請照客語拼音唸「${targetWord}」，唸完撳「停」。`;
+        }
+        if (bNext) { bNext.disabled = true; }
+      }
+
+      // 同步啟動 Realtime ASR 串流，傳入當前選定語種
+      if(window.HAKKA_REALTIME_ASR && window.HAKKA_REALTIME_ASR.createSession){
+        try {
+          if(currentAsrSession) { currentAsrSession.abort(); currentAsrSession = null; }
+          currentAsrSession = window.HAKKA_REALTIME_ASR.createSession({
+            language: currentLang,
+            onTranscript: (txt) => {
+              if(txt) {
+                liveAsrText = txt;
+                if(asrTextEl) asrTextEl.textContent = txt;
+                const note = frame.contentDocument?.querySelector(".echo-note");
+                if(note) note.textContent = "即時辨識中：【" + txt + "】";
+              }
+            },
+            onFinal: (txt) => {
+              if(txt) {
+                liveAsrText = txt;
+                if(asrTextEl) asrTextEl.textContent = txt;
+              }
+              evaluateAndAwardStars(liveAsrText);
+            },
+            onError: (err) => {
+              console.warn("Realtime ASR notice:", err);
+            }
+          });
+          currentAsrSession.start(micStream);
+        } catch(e) {
+          console.warn("ASR session init err:", e);
+        }
+      }
+
       hostRec = new MediaRecorder(micStream);
       hostRec.ondataavailable = ev => { if(ev.data && ev.data.size) hostChunks.push(ev.data); };
       hostRec.onerror = () => tell({echo:"rec-error", name:"RecError"});
       hostRec.onstop = () => {
-        if(!hostChunks.length){ tell({echo:"rec-done", data:null}); return; }
-        const blob = new Blob(hostChunks, {type: hostRec.mimeType || "audio/webm"});
-        const fr = new FileReader();
-        /* 轉 data URL 正傳得過去 —— blob: 网址跨來源讀毋著 */
-        fr.onload = () => tell({echo:"rec-done", data: fr.result});
-        fr.onerror = () => tell({echo:"rec-error", name:"ReadError"});
-        fr.readAsDataURL(blob);
+        if(currentAsrSession){
+          try { currentAsrSession.stop(); } catch(e){}
+        }
+
+        const finalize = (transcriptText) => {
+          evaluateAndAwardStars(transcriptText);
+          if(!hostChunks.length){ tell({echo:"rec-done", data:null, transcript:transcriptText}); return; }
+          const blob = new Blob(hostChunks, {type: hostRec.mimeType || "audio/webm"});
+          const fr = new FileReader();
+          fr.onload = () => {
+            tell({echo:"rec-done", data: fr.result, transcript: transcriptText});
+            setTimeout(() => evaluateAndAwardStars(transcriptText || liveAsrText), 60);
+          };
+          fr.onerror = () => tell({echo:"rec-error", name:"ReadError"});
+          fr.readAsDataURL(blob);
+        };
+
+        // 800ms 緩衝接收最終辨識文字
+        setTimeout(() => {
+          finalize(liveAsrText || "");
+        }, 800);
       };
       hostRec.start();
       tell({echo:"rec-started"});
@@ -111,6 +386,17 @@ window.addEventListener("message", e => {
   }
 
   if(d.echo === "rec-stop"){
+    if(asrBadge) { asrTextEl.textContent = "辨識評分中⋯⋯"; }
+    const doc = frame.contentDocument;
+    if (doc) {
+      const starsEl = doc.querySelector(".echo-stars");
+      const note = doc.querySelector(".echo-note");
+      const bNext = doc.querySelector(".echo-next");
+      if (starsEl) { starsEl.textContent = "⏳ 辨識中⋯⋯"; starsEl.className = "echo-stars on"; }
+      if (note) { note.textContent = "正在透過客委會即時語音辨識評分⋯⋯"; }
+      if (bNext) { bNext.disabled = true; }
+    }
+
     try{ if(hostRec && hostRec.state === "recording") hostRec.stop(); }
     catch(err){ tell({echo:"rec-error", name:"StopError"}); }
     return;
@@ -133,6 +419,213 @@ micBtn.onclick = async () => {
   }
 };
 
+function hookSubGame() {
+  try {
+    const w = frame.contentWindow;
+    if (w && w.ECHO) {
+      w.ECHO.grade = () => {};
+    }
+  } catch(e) {}
+}
+frame.addEventListener("load", hookSubGame);
+
+function load(i){
+  currentLessonIdx = i;
+  [...tabs.children].forEach((t,j) => t.classList.toggle("on", i === j));
+  frame.srcdoc = decode(GAMES[i].b64);
+  announce();
+  renderDeveloperPanel();
+}
+
+/* 開發者模式邏輯 */
+let debugMode = false;
+try {
+  debugMode = localStorage.getItem("speakingDemoDebugMode") === "true";
+} catch(e) {}
+
+let currentLessonIdx = 0;
+let lastTargetWord = "";
+
+const GAME_WORDS = [
+  [
+    {k:"喊", c:"叫"}, {k:"搞", c:"玩耍"}, {k:"囥人尋", c:"捉迷藏"},
+    {k:"這位", c:"這裡"}, {k:"恬恬", c:"安靜、不出聲"}, {k:"跈", c:"跟隨"}, {k:"仰會", c:"怎麼會"}
+  ],
+  [
+    {k:"果子", c:"水果"}, {k:"頭家", c:"老闆"}, {k:"弓蕉", c:"香蕉"},
+    {k:"葡萄", c:"葡萄"}, {k:"西瓜", c:"西瓜"}, {k:"黃梨", c:"鳳梨"},
+    {k:"味緒", c:"味道"}, {k:"有兜仔", c:"有些"}
+  ],
+  [
+    {k:"注射", c:"打針"}, {k:"叼著", c:"叮到"}, {k:"當", c:"很…"},
+    {k:"驚", c:"害怕"}, {k:"毋好", c:"不可以、不要"}, {k:"停動", c:"動"},
+    {k:"毋使", c:"不必、不用"}, {k:"毋驚", c:"不怕"}, {k:"天光日", c:"明天"}, {k:"共樣", c:"一樣"}
+  ]
+];
+
+function simulatePassWord(wordKey) {
+  try {
+    const w = frame.contentWindow;
+    const doc = frame.contentDocument || (w && w.document);
+
+    // 1. 如果子 iframe 的覆誦彈窗 (.echo) 目前開啟中
+    const echoBox = doc && doc.querySelector(".echo");
+    const isOpen = echoBox && (echoBox.classList.contains("on") || echoBox.offsetWidth > 0 || echoBox.offsetHeight > 0 || echoBox.style.display !== "none");
+    if (isOpen) {
+      const activeWord = echoBox.querySelector(".echo-w")?.textContent?.trim() || "";
+      const starsEl = echoBox.querySelector(".echo-stars");
+      const bNext = echoBox.querySelector(".echo-next");
+      const note = echoBox.querySelector(".echo-note");
+      const bRec = echoBox.querySelector(".echo-rec");
+
+      if (starsEl) {
+        starsEl.textContent = "★★★";
+        starsEl.className = "echo-stars on s3";
+      }
+      if (note) {
+        note.textContent = "當像！就係恁樣唸。（開發者模擬 3 星通過）";
+      }
+      if (bRec) {
+        bRec.classList.remove("recording");
+        bRec.textContent = "● 錄音";
+      }
+      if (bNext) {
+        bNext.disabled = false;
+        setTimeout(() => {
+          try { bNext.click(); } catch(e){}
+        }, 300);
+      }
+
+      liveAsrText = activeWord || wordKey || "★★★ 滿分";
+      if (asrTextEl) asrTextEl.textContent = liveAsrText + " (★★★)";
+      renderDeveloperPanel();
+      return;
+    }
+
+    // 2. 若彈窗未開，但有指定生詞，呼叫子畫面 play(wordKey) 觸發該詞覆誦
+    if (w && typeof w.play === "function") {
+      const words = GAME_WORDS[currentLessonIdx] || [];
+      const target = wordKey || (words[0] && words[0].k);
+      if (target) {
+        w.play(target);
+        setTimeout(() => {
+          simulatePassWord(target);
+        }, 600);
+        return;
+      }
+    }
+
+    // 3. 嘗試點擊開局按鈕（如 go 或 seeker 或 spot）
+    const goBtn = doc && doc.getElementById("go");
+    if (goBtn && !goBtn.disabled) {
+      goBtn.click();
+      return;
+    }
+    const seeker = doc && doc.getElementById("seeker");
+    if (seeker) {
+      seeker.click();
+      return;
+    }
+  } catch (err) {
+    console.warn("simulatePassWord error:", err);
+  }
+}
+
+function renderDeveloperPanel() {
+  const panel = document.getElementById("developerPanel");
+  const toggle = document.getElementById("debugToggle");
+  if (!panel || !toggle) return;
+  toggle.checked = debugMode;
+  panel.hidden = !debugMode;
+  document.body.classList.toggle("debug-mode", debugMode);
+  if (!debugMode) return;
+
+  const curGame = GAMES[currentLessonIdx];
+  const words = GAME_WORDS[currentLessonIdx] || [];
+
+  panel.innerHTML = `
+    <h2>內部檢視 <span>開發者模式</span></h2>
+    <div class="target-sentence">
+      <span class="sentence-label">當前單元 / 階段</span>
+      <strong>${curGame ? curGame.title : "—"}</strong>
+      <small>${curGame ? curGame.lesson : "—"}</small>
+    </div>
+    <div class="developer-item">
+      <span class="developer-label">本課目標生詞清單（點擊直接通關）</span>
+      <div class="dev-btns">
+        ${words.map(item => `<button type="button" class="dev-btn dev-word-tag" data-k="${item.k}">⚡ ${item.k} <small style="opacity:.7">(${item.c})</small></button>`).join("")}
+      </div>
+    </div>
+    <div class="developer-item">
+      <span class="developer-label">辨識語種選擇 (Realtime ASR)</span>
+      <select class="dev-select" id="devLangSelect">
+        <option value="hak" ${(window.HAKKA_REALTIME_ASR?.getLanguage?.() === "zh") ? "" : "selected"}>客委會API</option>
+        <option value="zh" ${(window.HAKKA_REALTIME_ASR?.getLanguage?.() === "zh") ? "selected" : ""}>華語</option>
+      </select>
+    </div>
+    <div class="developer-item">
+      <span class="developer-label">語音即時辨識 (Realtime ASR)</span>
+      <p style="margin:4px 0;line-height:1.5;">
+        語種：<b>${(window.HAKKA_REALTIME_ASR?.getLanguage?.() || "hak") === "zh" ? "華語 (zh)" : "客委會API (客語)"}</b><br>
+        狀態：<b>${currentAsrSession ? "連線中 / 錄音中" : "待命中"}</b><br>
+        即時出字：<b style="color:#2e7d52;">${liveAsrText ? '「' + liveAsrText + '」' : '尚無'}</b>
+      </p>
+      <div class="dev-btns">
+        <button type="button" class="dev-btn" id="devSimPass">⚡ 模擬發音 3 星滿分</button>
+        <button type="button" class="dev-btn" id="devSimWord">⚡ 模擬送出目標詞</button>
+      </div>
+      <input type="text" class="dev-input" id="devCustomAsr" placeholder="手動輸入文字送出測試" value="${lastTargetWord || ''}">
+      <div class="dev-btns" style="margin-top:6px">
+        <button type="button" class="dev-btn" id="devSendCustom">⚡ 送出手動文字</button>
+      </div>
+    </div>
+    <div class="developer-item">
+      <span class="developer-label">快捷單元切換</span>
+      <div class="dev-btns">
+        <button type="button" class="dev-btn" id="devNextLesson">切換下一課</button>
+        <button type="button" class="dev-btn" id="devReloadLesson">重新載入本課</button>
+      </div>
+    </div>
+  `;
+
+  panel.querySelector("#devLangSelect")?.addEventListener("change", (e) => {
+    const val = e.target.value;
+    if (window.HAKKA_REALTIME_ASR?.setLanguage) window.HAKKA_REALTIME_ASR.setLanguage(val);
+    renderDeveloperPanel();
+  });
+
+  panel.querySelectorAll(".dev-word-tag").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const k = btn.getAttribute("data-k");
+      if (k) simulatePassWord(k);
+    });
+  });
+
+  panel.querySelector("#devSimPass")?.addEventListener("click", () => {
+    simulatePassWord();
+  });
+  panel.querySelector("#devSimWord")?.addEventListener("click", () => {
+    simulatePassWord();
+  });
+  panel.querySelector("#devSendCustom")?.addEventListener("click", () => {
+    const val = panel.querySelector("#devCustomAsr")?.value.trim();
+    if (val) simulatePassWord(val);
+  });
+  panel.querySelector("#devNextLesson")?.addEventListener("click", () => {
+    const nextIdx = (currentLessonIdx + 1) % GAMES.length;
+    load(nextIdx);
+  });
+  panel.querySelector("#devReloadLesson")?.addEventListener("click", () => {
+    load(currentLessonIdx);
+  });
+}
+
+document.getElementById("debugToggle")?.addEventListener("change", (e) => {
+  debugMode = Boolean(e.target.checked);
+  try { localStorage.setItem("speakingDemoDebugMode", String(debugMode)); } catch(err) {}
+  renderDeveloperPanel();
+});
+
 GAMES.forEach((g,i) => {
   const b = document.createElement("button");
   b.className = "tab";
@@ -141,6 +634,9 @@ GAMES.forEach((g,i) => {
   tabs.appendChild(b);
 });
 load(0);
+renderDeveloperPanel();
 </script>
+
+<aside id="developerPanel" class="developer-panel" hidden></aside>
 </body>
 </html>

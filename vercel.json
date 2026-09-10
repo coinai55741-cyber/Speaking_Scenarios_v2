@@ -1,9 +1,13 @@
 {
   "rewrites": [
-    { "source": "/ticket", "destination": "/api/realtime-ticket" }
+    { "source": "/ticket", "destination": "/api/realtime-ticket" },
+    { "source": "/translate", "destination": "/api/translate" }
   ],
   "functions": {
     "api/realtime-ticket.js": {
+      "maxDuration": 30
+    },
+    "api/translate.js": {
       "maxDuration": 30
     },
     "api/speech/recognize.js": {
@@ -11,3 +15,4 @@
     }
   }
 }
+

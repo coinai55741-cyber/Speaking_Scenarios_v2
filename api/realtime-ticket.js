@@ -19,7 +19,7 @@ function isAllowedOrigin(req) {
   const origin = requestOrigin(req);
   if (!origin) return true;
   const allowed = allowedOrigins();
-  if (!allowed.length) return false;
+  if (!allowed.length) return true; // 未限制時預設允許
   return allowed.includes(origin);
 }
 
@@ -28,6 +28,8 @@ function json(req, res, statusCode, payload) {
   if (origin && isAllowedOrigin(req)) {
     res.setHeader("Access-Control-Allow-Origin", origin);
     res.setHeader("Vary", "Origin");
+  } else {
+    res.setHeader("Access-Control-Allow-Origin", "*");
   }
   res.setHeader("Access-Control-Allow-Methods", "GET,POST,OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type");

@@ -1,0 +1,836 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>聽音辨字｜客語生活任務</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&family=Noto+Serif+TC:wght@700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="./hakka-font.css?v=20260907-font4">
+
+<style>
+  :root{
+    --ink:#4f341d;
+    --ink2:#7d5f43;
+    --paper:#fff7ea;
+    --paper2:#ffe8bf;
+    --line:#efd6ab;
+    --gold:#efc66c;
+    --gold2:#d8924e;
+    --gold3:#8f5a2f;
+    --green:#94cd7b;
+    --green2:#5d9f55;
+    --sky:#cbe7fb;
+    --sky2:#93c8e8;
+    --soil:#d3a06a;
+    --soil2:#bc834f;
+    --shadow:rgba(79,52,29,.14);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    min-height:100vh;overflow-x:hidden;color:var(--ink);
+    font-family:"Noto Sans TC",sans-serif;-webkit-text-size-adjust:100%;
+    background:linear-gradient(180deg,#f4e5c8 0%, #ebd3a9 100%);
+    display:flex;flex-direction:column;
+  }
+  body:after{
+    content:"";position:fixed;left:0;right:0;bottom:0;height:88px;
+    pointer-events:none;opacity:.12;
+    background:linear-gradient(180deg,rgba(108,154,87,0),rgba(108,154,87,.18));
+  }
+
+  /* 頂部導覽列 */
+  .top-nav-bar{
+    flex:0 0 auto;display:flex;align-items:center;justify-content:space-between;
+    padding:12px 20px;background:rgba(255,247,234,.88);backdrop-filter:blur(6px);
+    border-bottom:1.5px solid var(--line);
+  }
+  .back-btn{
+    display:inline-flex;align-items:center;gap:6px;color:var(--gold3);
+    text-decoration:none;font-weight:700;font-size:14px;
+    padding:6px 14px;border-radius:999px;background:rgba(239,198,108,.25);
+    border:1px solid rgba(216,146,78,.35);transition:.2s;
+  }
+  .back-btn:hover{background:var(--gold);color:var(--ink)}
+  .nav-title{font-family:"Noto Serif TC",serif;font-weight:900;font-size:17px;color:var(--ink)}
+  .nav-tip{font-size:12.5px;color:var(--ink2);opacity:.85}
+
+  .wrap{max-width:860px;margin:0 auto;padding:16px 16px 42px;width:100%;flex:1}
+
+  /* 課別選單 */
+  .tabs-box{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-bottom:16px}
+  .tab{
+    background:var(--paper);border:2px solid var(--line);color:var(--ink);
+    border-radius:14px;padding:8px 16px;cursor:pointer;font-family:"Noto Sans TC";
+    font-size:14px;font-weight:700;transition:.2s;box-shadow:0 3px 0 var(--soil);
+  }
+  .tab:hover{transform:translateY(-2px);background:#fff}
+  .tab.on{
+    background:linear-gradient(180deg,var(--gold) 0%, var(--gold2) 100%);
+    border-color:#fff2d4;color:#fff;box-shadow:0 3px 0 var(--gold3);
+  }
+
+  /* 題目卡片主體 */
+  .main-stage{
+    background:var(--paper);border-radius:24px;border:3px solid var(--line);
+    box-shadow:0 12px 30px var(--shadow);padding:22px 20px;text-align:center;
+  }
+  .prog-bar-box{
+    display:flex;align-items:center;justify-content:space-between;
+    gap:12px;margin-bottom:16px;font-size:13px;font-weight:700;color:var(--ink2);
+  }
+  .pbar{flex:1;height:10px;background:rgba(79,52,29,.1);border-radius:99px;overflow:hidden}
+  .pbar-fill{height:100%;width:0;background:linear-gradient(90deg,var(--green),var(--green2));transition:width .4s}
+
+  /* 聽音大按鈕 */
+  .listen-box{margin:10px 0 18px}
+  .play-btn{
+    display:inline-flex;align-items:center;justify-content:center;gap:10px;
+    background:linear-gradient(180deg,#fff 0%, #ffeecb 100%);
+    border:2.5px solid var(--gold);color:var(--ink);border-radius:999px;
+    padding:14px 34px;font-family:"Noto Sans TC";font-size:18px;font-weight:900;
+    cursor:pointer;transition:.18s;box-shadow:0 6px 0 var(--soil);
+  }
+  .play-btn:hover{transform:translateY(-2px);box-shadow:0 8px 0 var(--soil)}
+  .play-btn:active,.play-btn.on{transform:translateY(3px);box-shadow:0 3px 0 var(--soil)}
+  .play-btn svg{width:24px;height:24px;fill:currentColor}
+
+  /* 客語字磚槽位 */
+  .cells-box{display:flex;gap:10px;justify-content:center;margin:16px 0 20px;min-height:72px;flex-wrap:wrap}
+  .cell{
+    width:62px;height:72px;border-radius:14px;border:2.5px solid var(--line);
+    background:#fff;display:flex;align-items:center;justify-content:center;
+    font-family:"Noto Serif TC",serif;font-size:32px;font-weight:900;
+    color:var(--ink);box-shadow:0 4px 10px rgba(79,52,29,.08);
+    transition:transform .2s, border-color .2s, background .2s;
+  }
+  .cell.blank{border-style:dashed;background:rgba(255,255,255,.5);color:transparent}
+  .cell.ok{border-color:var(--green2);background:#ebf7df;color:#2f6e24;animation:pop .4s ease-out}
+  .cell.no{border-color:#d9534f;background:#fde8e8;color:#a94442}
+  @keyframes pop{0%{transform:scale(.7)}60%{transform:scale(1.15)}100%{transform:scale(1)}}
+
+  /* 華語打字輸入區 */
+  .ask-row{display:flex;gap:10px;justify-content:center;max-width:520px;margin:0 auto 14px}
+  .ask-in{
+    flex:1;border:2px solid var(--line);border-radius:16px;padding:12px 18px;
+    font-family:"Noto Sans TC",sans-serif;font-size:17px;font-weight:700;
+    color:var(--ink);background:#fff;outline:none;transition:.18s;
+  }
+  .ask-in:focus{border-color:var(--gold2);box-shadow:0 0 0 3px rgba(239,198,108,.35)}
+  .btn-submit{
+    background:linear-gradient(180deg,var(--green) 0%, var(--green2) 100%);
+    color:#fff;border:0;border-radius:16px;padding:0 24px;font-family:"Noto Sans TC";
+    font-weight:900;font-size:16px;cursor:pointer;box-shadow:0 4px 0 #41733a;
+    transition:.18s;white-space:nowrap;
+  }
+  .btn-submit:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 6px 0 #41733a}
+  .btn-submit:active:not(:disabled){transform:translateY(2px);box-shadow:0 2px 0 #41733a}
+  .btn-submit:disabled{opacity:.4;cursor:default}
+
+  /* 輔助與換題按鈕 */
+  .act-row{display:flex;gap:12px;justify-content:center;margin-top:14px}
+  .btn-aux{
+    background:rgba(255,255,255,.8);border:1.5px solid var(--line);color:var(--ink2);
+    border-radius:999px;padding:8px 20px;font-family:"Noto Sans TC";font-size:14px;
+    font-weight:700;cursor:pointer;transition:.18s;box-shadow:0 2px 0 var(--line);
+  }
+  .btn-aux:hover:not(:disabled){background:#fff;border-color:var(--gold2)}
+  .btn-aux:disabled{opacity:.35;cursor:default}
+  .btn-next{
+    background:linear-gradient(180deg,var(--gold) 0%, var(--gold2) 100%);
+    color:#fff;border:0;border-radius:999px;padding:8px 24px;font-family:"Noto Sans TC";
+    font-size:14px;font-weight:900;cursor:pointer;box-shadow:0 3px 0 var(--gold3);
+    transition:.18s;
+  }
+  .btn-next:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 5px 0 var(--gold3)}
+  .btn-next:disabled{opacity:.35;cursor:default}
+
+  /* 答案與比對說明 */
+  .feedback-box{margin-top:14px;min-height:48px}
+  .verd{font-size:16px;font-weight:900;margin-bottom:4px}
+  .verd.v2{color:#2E7D52}
+  .verd.v1{color:#B8862B}
+  .verd.v0{color:#C0392B}
+  .ans-text{font-size:14px;color:var(--ink2);line-height:1.6}
+  .ans-text b{font-family:"Noto Serif TC",serif;font-size:18px;color:var(--ink);margin:0 4px}
+  .sub-tip{font-size:12px;color:var(--ink2);opacity:.75;margin-top:6px}
+
+  /* 結算畫面 */
+  .over-modal{
+    position:fixed;inset:0;background:rgba(40,25,12,.55);z-index:50;
+    display:flex;align-items:center;justify-content:center;padding:18px;
+    opacity:0;pointer-events:none;transition:opacity .3s;backdrop-filter:blur(4px);
+  }
+  .over-modal.on{opacity:1;pointer-events:auto}
+  .over-card{
+    background:linear-gradient(180deg,#fffdf6 0%, #ffefcd 100%);
+    border-radius:26px;padding:28px 24px 22px;max-width:440px;width:100%;
+    text-align:center;border:4px solid #fff;box-shadow:0 20px 40px rgba(0,0,0,.25);
+  }
+  .over-card h2{font-family:"Noto Serif TC",serif;font-size:24px;color:var(--ink);margin-bottom:8px}
+  .over-score{font-size:36px;font-weight:900;color:var(--gold2);margin:8px 0 12px}
+  .over-desc{font-size:14px;color:var(--ink2);line-height:1.7;margin-bottom:20px}
+  .over-btns{display:flex;gap:10px;justify-content:center}
+  .over-btns button{
+    border:0;border-radius:999px;padding:10px 24px;font-family:"Noto Sans TC";
+    font-size:14px;font-weight:900;cursor:pointer;transition:.18s;
+  }
+  .btn-replay{background:var(--paper);border:1.5px solid var(--soil);color:var(--ink)}
+  .btn-proceed{background:linear-gradient(180deg,var(--green) 0%, var(--green2) 100%);color:#fff;box-shadow:0 3px 0 #41733a}
+
+  /* 開發者模式開關與面板 */
+  .mode-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 5px 12px;
+    border: 1.5px solid rgba(79,52,29,.25);
+    border-radius: 999px;
+    color: var(--ink);
+    background: rgba(255,255,255,.7);
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  .mode-toggle:hover {
+    border-color: var(--gold2);
+    background: #fff;
+  }
+  .mode-toggle input {
+    width: 15px;
+    height: 15px;
+    accent-color: var(--gold2);
+    cursor: pointer;
+  }
+  /* 開發者模式開關與左側面板 (同 你家在哪) */
+  body.debug-mode {
+    padding-left: 280px;
+    transition: padding-left 0.25s ease;
+  }
+  .developer-panel {
+    position: fixed;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 280px;
+    height: 100vh;
+    overflow-y: auto;
+    background: rgba(255, 253, 250, 0.98);
+    border-right: 2px solid #d4c19c;
+    box-shadow: 14px 0 32px rgba(91, 67, 35, 0.16);
+    color: #17222a;
+    padding: 22px 18px;
+    font-size: 13.5px;
+    z-index: 99999;
+    box-sizing: border-box;
+  }
+  .developer-panel[hidden] { display: none; }
+  .developer-panel h2 {
+    font-family: "Noto Serif TC", serif;
+    font-size: 18px;
+    font-weight: 900;
+    color: #4a3828;
+    margin: 0 0 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .developer-panel h2 span { font-size: 12px; opacity: .7; font-family: sans-serif; }
+  .developer-panel .target-sentence {
+    margin: 0 0 14px;
+    padding: 12px;
+    border: 1.5px solid rgba(47, 148, 111, 0.35);
+    border-radius: 12px;
+    background: #fff;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+  }
+  .developer-panel .sentence-label {
+    display: inline-block;
+    color: #2e7d52;
+    font-size: 12px;
+    font-weight: 900;
+    margin-bottom: 4px;
+  }
+  .developer-panel .target-sentence strong {
+    display: block;
+    font-family: "Noto Serif TC", serif;
+    font-size: 20px;
+    font-weight: 900;
+    color: #17222a;
+    margin-bottom: 4px;
+  }
+  .developer-panel .target-sentence small {
+    display: block;
+    font-size: 13px;
+    color: #666;
+  }
+  .developer-panel .developer-item {
+    margin-top: 14px;
+  }
+  .developer-panel .developer-label {
+    display: block;
+    font-size: 13px;
+    font-weight: 700;
+    color: #4a3828;
+    margin-bottom: 4px;
+  }
+  .developer-panel .dev-btns {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 8px;
+  }
+  .developer-panel .dev-btn {
+    background: #fff;
+    border: 1.5px solid #d4c19c;
+    color: #4a3828;
+    border-radius: 8px;
+    padding: 5px 11px;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: .15s;
+  }
+  .developer-panel .dev-btn:hover {
+    background: #f0e6d2;
+    border-color: #ba9e6e;
+  }
+  .developer-panel .dev-select {
+    width: 100%;
+    border: 1.5px solid #d4c19c;
+    border-radius: 8px;
+    padding: 6px 10px;
+    background: #fff;
+    color: #17222a;
+    font-size: 13px;
+    font-weight: 600;
+    margin-top: 4px;
+    outline: none;
+    box-sizing: border-box;
+    cursor: pointer;
+  }
+  .developer-panel .dev-select:focus { border-color: #2e7d52; }
+  .developer-panel .dev-pre {
+    background: #f8f6f0;
+    border: 1px solid #d4c19c;
+    border-radius: 8px;
+    padding: 8px;
+    font-size: 11px;
+    font-family: monospace;
+    max-height: 120px;
+    overflow-y: auto;
+    white-space: pre-wrap;
+    word-break: break-all;
+    color: #333;
+    margin-top: 5px;
+  }
+
+  @media(max-width:1100px){
+    body.debug-mode { padding-left: 0; }
+  }
+  @media(max-width:600px){
+    .top-nav-bar{padding:10px 14px}
+    .nav-tip{display:none}
+    .wrap{padding:12px 10px 30px}
+    .main-stage{padding:16px 12px}
+    .cell{width:50px;height:60px;font-size:26px}
+    .ask-row{flex-direction:column}
+    .btn-submit{padding:12px}
+  }
+</style>
+</head>
+<body>
+
+  <header class="top-nav-bar">
+    <a class="back-btn" href="./index.html#basic">
+      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      返回首頁
+    </a>
+    <div style="text-align:center">
+      <div class="nav-title">聽音辨字</div>
+      <div class="nav-tip">客語生活任務 ｜ 基礎學習</div>
+    </div>
+    <label class="mode-toggle" title="顯示後端翻譯狀態與除錯面板">
+      <input id="debugToggle" type="checkbox">
+      <span>開發者模式</span>
+    </label>
+  </header>
+
+  <div class="wrap">
+    <nav class="tabs-box" id="tabs"></nav>
+
+    <main class="main-stage">
+      <div class="prog-bar-box">
+        <span id="pn">1 / 7</span>
+        <div class="pbar"><div class="pbar-fill" id="pi"></div></div>
+        <span id="ps">答對 0</span>
+      </div>
+
+      <div class="listen-box">
+        <button class="play-btn" id="play" type="button" aria-label="播放客語發音">
+          <svg viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>
+          <span>🔊 聽發音</span>
+        </button>
+      </div>
+
+      <div class="cells-box" id="cells"></div>
+
+      <div class="ask-row">
+        <input class="ask-in" id="inp" type="text" placeholder="請輸入聽到的華語意思（例如：捉迷藏）" autocomplete="off" />
+        <button class="btn-submit" id="send" type="button">送出辨字</button>
+      </div>
+
+      <div class="act-row">
+        <button class="btn-aux" id="skip" type="button">看解答</button>
+        <button class="btn-next" id="next" type="button" disabled>下一題 →</button>
+      </div>
+
+      <div class="feedback-box">
+        <p class="verd" id="verd"></p>
+        <p class="ans-text" id="ans"></p>
+        <p class="sub-tip" id="hint"></p>
+      </div>
+    </main>
+  </div>
+
+  <div class="over-modal" id="over">
+    <div class="over-card">
+      <h2 id="oT">單元練習完成！</h2>
+      <p class="over-score" id="oS">0 / 7</p>
+      <p class="over-desc" id="oP">表現得很好！多聽幾次客語發音，語感就會自然建立起來。</p>
+      <div class="over-btns">
+        <button class="btn-replay" id="oAgain" type="button">再練一次</button>
+        <button class="btn-proceed" id="oNext" type="button">下一課 →</button>
+      </div>
+    </div>
+  </div>
+
+<script>
+/* ── API 路徑自動配置 ── */
+function getMtUrl() {
+  if (window.SPEECH_API_TRANSLATE_URL) return window.SPEECH_API_TRANSLATE_URL;
+  if (location.hostname.endsWith("github.io") || location.hostname === "localhost" || location.hostname === "127.0.0.1" || location.protocol === "file:") {
+    return "https://speaking-scenarios-v2.vercel.app/api/translate";
+  }
+  return "/api/translate";
+}
+const MT_URL = getMtUrl();
+const BASE = "https://dn9mvjhbyvvpc.cloudfront.net/files/";
+
+/* ── 教材題庫資料 ── */
+const DATA = [
+  {
+    n: "1年上 第6課",
+    topic: "囥人尋",
+    w: [
+      { w: "喊", c: "叫", u: "16753_6a3c2afbd46f83316c5a93785933221b" },
+      { w: "搞", c: "玩耍", u: "16325_82f9b7120cc7233d31227f8eefa53f54" },
+      { w: "囥人尋", c: "捉迷藏", u: "16354_52c0476ab16f64e2db7fdd356768b50b" },
+      { w: "這位", c: "這裡", u: "16421_d5890f36e465b8aae7ffe774a5fe380b" },
+      { w: "恬恬", c: "安靜、不出聲", u: "16704_c2d2197a578f1ac1cda31adac10f9e88" },
+      { w: "跈", c: "跟隨", u: "16387_7c587d135442c89d128788d106ddf2e9" },
+      { w: "仰會", c: "怎麼會", u: "16730_6394d18d705f19864452eedc65e8d028" }
+    ]
+  },
+  {
+    n: "1年下 第1課",
+    topic: "果子攤",
+    w: [
+      { w: "果子", c: "水果", u: "19742_fc50bbe0c90b2dccc7b4dd72ca3ec50f" },
+      { w: "頭家", c: "老闆", u: "20114_bce4d992ca34cb57d5f585a6308f3b34" },
+      { w: "弓蕉", c: "香蕉", u: "19773_d95c2b6d4e94d9294dca3278c7a104be" },
+      { w: "葡萄", c: "葡萄", u: "19805_cb415ae104cdd56c9f2243be12728604" },
+      { w: "西瓜", c: "西瓜", u: "19834_e68dc03789a91a3f6e9c22e975677de2" },
+      { w: "黃梨", c: "鳳梨", u: "20177_755d3bd8df12a4cc50c52521051161eb" },
+      { w: "味緒", c: "味道", u: "19715_4ce8a5a551a496177a99ab8ac2e35368" },
+      { w: "有兜仔", c: "有些", u: "20147_6cda01362690b0ffd1f4cf530eb6b328" }
+    ]
+  },
+  {
+    n: "2年上 第6課",
+    topic: "注射",
+    w: [
+      { w: "注射", c: "打針", u: "16907_25866dc7041d5951e0ee4856460086ff" },
+      { w: "叼著", "c": "叮到", u: "16937_afc3fc000a768034b54fcbce36905f1b" },
+      { w: "當", c: "很…", u: "16843_439b635a6bc940232bdb6237b5d71cb6" },
+      { w: "驚", c: "害怕", u: "16875_6cf7bb17ac6841f67208b3e806d8aec9" },
+      { w: "毋好", "c": "不可以、不要", u: "17434_d835a6dbbbf6afd4f0292cc0589ddce1" },
+      { w: "停動", "c": "動", u: "17465_d71ad17de150491bf79c0af5823824bd" },
+      { w: "毋使", "c": "不必、不用", u: "17502_1a609cc11db9d8be575d771f8c2a0a9b" },
+      { w: "毋驚", "c": "不怕", u: "17405_340b6898677d409ab00b3bd2a9d7630a" },
+      { w: "天光日", "c": "明天", u: "17345_e9857263cb95bd3084aa736809d45110" },
+      { w: "共樣", "c": "一樣", u: "17377_6e5067dd2e7fc9396b56e768d8c3edb9" }
+    ]
+  }
+];
+
+const $ = id => document.getElementById(id);
+let li = 0, list = [], at = 0, right = 0, audio = null, busy = false, answered = false;
+
+/* ── 課別切換標籤 ── */
+function renderTabs(){
+  $("tabs").innerHTML = DATA.map((L,i) =>
+    `<button class="tab${i===li?' on':''}" data-i="${i}" title="${L.topic||''}">${L.n}・${L.topic}</button>`
+  ).join("");
+  [...$("tabs").children].forEach(b => b.onclick = () => { li = +b.dataset.i; start(); });
+}
+
+function shuffle(a){
+  a = a.slice();
+  for(let i=a.length-1; i>0; i--){
+    const j = (Math.random()*(i+1))|0;
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function start(){
+  list = shuffle(DATA[li].w);
+  at = 0; right = 0;
+  $("over").classList.remove("on");
+  renderTabs();
+  show();
+}
+
+function show(){
+  answered = false; busy = false;
+  const q = list[at];
+  if(!q) return;
+  const currentLang = (function(){ try { return localStorage.getItem("speakingDemoAsrLanguage"); }catch(e){ return null; } })() || "zh";
+  $("inp").placeholder = (currentLang === "hak") ? `請直接輸入聽到的客語正字（例如：${q.w}）` : `請輸入聽到的華語意思（例如：${q.c}）`;
+  $("pn").textContent = `${at+1} / ${list.length}`;
+  $("ps").textContent = `答對 ${right}`;
+  $("pi").style.width = `${(at/list.length)*100}%`;
+  $("inp").value = ""; $("inp").disabled = false;
+  $("send").disabled = false; $("next").disabled = true;
+  $("hint").textContent = "";
+  $("verd").textContent = ""; $("verd").className = "verd";
+  $("ans").textContent = "";
+  createBlanks(q.w.length);
+  setTimeout(playAudio, 250);
+  setTimeout(() => { try{ $("inp").focus(); }catch(e){} }, 320);
+  renderDeveloperPanel();
+}
+
+function createBlanks(n){
+  $("cells").innerHTML = "";
+  for(let i=0; i<n; i++){
+    const d = document.createElement("div");
+    d.className = "cell blank";
+    d.textContent = "";
+    $("cells").appendChild(d);
+  }
+}
+
+function fillHit(txt, hit){
+  $("cells").innerHTML = "";
+  [...String(txt)].forEach((ch, i) => {
+    const d = document.createElement("div");
+    d.className = `cell ${hit && hit[i] ? 'ok' : 'no'}`;
+    d.textContent = ch;
+    $("cells").appendChild(d);
+    setTimeout(() => d.classList.add("on"), 50 * i);
+  });
+}
+
+function fillStatic(txt, cls){
+  $("cells").innerHTML = "";
+  [...String(txt)].forEach((ch) => {
+    const d = document.createElement("div");
+    d.className = `cell ${cls || ''}`;
+    d.textContent = ch;
+    $("cells").appendChild(d);
+  });
+}
+
+function playAudio(){
+  const q = list[at];
+  if(!q) return;
+  if(audio) audio.pause();
+  audio = new Audio(BASE + q.u + ".mp3");
+  audio.play().catch(()=>{});
+  const b = $("play");
+  b.classList.remove("on");
+  void b.offsetWidth;
+  b.classList.add("on");
+}
+$("play").onclick = playAudio;
+
+/* ── 文字正規化與對齊演算法 ── */
+const clean = t => String(t||"").replace(/[\s，。、,.!！?？「」（）()]/g,"");
+
+function lineUp(got, want){
+  const A = [...got], B = [...want];
+  const n = A.length, m = B.length;
+  const D = [], P = [];
+  for(let i=0; i<=n; i++){ D.push(new Array(m+1).fill(0)); P.push(new Array(m+1).fill(null)); }
+  for(let i=0; i<=n; i++){ D[i][0] = i; P[i][0] = "d"; }
+  for(let j=0; j<=m; j++){ D[0][j] = j; P[0][j] = "i"; }
+  P[0][0] = null;
+  for(let i=1; i<=n; i++) for(let j=1; j<=m; j++){
+    const same = A[i-1] === B[j-1];
+    const s = D[i-1][j-1] + (same ? 0 : 1), d = D[i-1][j] + 1, ins = D[i][j-1] + 1;
+    if(s <= d && s <= ins){ D[i][j] = s; P[i][j] = same ? "m" : "s"; }
+    else if(d <= ins){ D[i][j] = d; P[i][j] = "d"; }
+    else { D[i][j] = ins; P[i][j] = "i"; }
+  }
+  const hit = new Array(n).fill(false);
+  let i = n, j = m, same = 0;
+  while(i > 0 || j > 0){
+    const p = P[i][j];
+    if(p === "m"){ hit[i-1] = true; same++; i--; j--; }
+    else if(p === "s"){ i--; j--; }
+    else if(p === "d"){ i--; }
+    else { j--; }
+  }
+  return { hit, sim: same / Math.max(n, m, 1) };
+}
+
+function localJudge(gloss, ans){
+  const a = clean(ans);
+  if(a.length < 1) return 0;
+  let best = 0;
+  String(gloss).split(/[、，,\/]/).forEach(g => {
+    g = clean(g); if(!g) return;
+    if(a.indexOf(g) >= 0 || g.indexOf(a) >= 0){ best = 1; return; }
+    let hit = 0; const seen = {};
+    for(const ch of g) if(!seen[ch]){ seen[ch] = 1; if(a.indexOf(ch) >= 0) hit++; }
+    best = Math.max(best, hit / (Object.keys(seen).length || 1));
+  });
+  return best >= 0.99 ? 2 : best >= 0.5 ? 1 : 0;
+}
+
+/* ── 提交送出辨字 ── */
+async function submitAnswer(){
+  if(busy || answered) return;
+  const ans = $("inp").value.trim();
+  const currentLang = (function(){ try { return localStorage.getItem("speakingDemoAsrLanguage"); }catch(e){ return null; } })() || "zh";
+  const isHakkaInput = (currentLang === "hak");
+
+  if(!ans){
+    $("hint").textContent = isHakkaInput ? "請先輸入客語正字，或點擊「看解答」。" : "請先輸入華語意思，或點擊「看解答」。";
+    return;
+  }
+  const q = list[at];
+  busy = true; $("send").disabled = true; $("inp").disabled = true;
+  $("hint").textContent = isHakkaInput ? "比對客語漢字中⋯⋯" : "AI 轉譯比對中⋯⋯";
+
+  let hak = null, why = "";
+  const tStart = performance.now();
+
+  let v = 0, al = null;
+  if(isHakkaInput) {
+    const t = clean(q.w);
+    const got = clean(ans);
+    al = lineUp(got, t);
+    if(got === t || al.sim >= 0.66) v = 2;
+    else if(al.sim >= 0.34) v = 1;
+    else v = 0;
+    fillHit(got, al.hit);
+    lastTranslationDebug = {
+      input: ans,
+      output: "(客語直打比對)",
+      timeMs: Math.round(performance.now() - tStart),
+      raw: null,
+      error: null
+    };
+  } else {
+    try {
+      const r = await fetch(MT_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text: ans })
+      });
+      if(!r.ok) throw new Error("HTTP " + r.status);
+      const j = await r.json();
+      hak = clean(j.hakka || "");
+      if(!hak) throw new Error("無回傳文字");
+      lastTranslationDebug = {
+        input: ans,
+        output: hak,
+        timeMs: Math.round(performance.now() - tStart),
+        raw: j,
+        error: null
+      };
+    } catch(e) {
+      hak = null;
+      why = "（目前離線或未連線翻譯服務，已自動切換為本地詞義比對）";
+      lastTranslationDebug = {
+        input: ans,
+        output: "(本地比對)",
+        timeMs: Math.round(performance.now() - tStart),
+        raw: null,
+        error: e.message
+      };
+    }
+
+    if(hak){
+      const t = clean(q.w);
+      al = lineUp(hak, t);
+      if(hak === t || al.sim >= 0.66) v = 2;
+      else if(al.sim >= 0.34) v = 1;
+      else v = localJudge(q.c, ans) >= 1 ? 1 : 0;
+      fillHit(hak, al.hit);
+    } else {
+      v = localJudge(q.c, ans);
+      fillStatic(q.w, v >= 1 ? "ok" : "no");
+    }
+  }
+
+  answered = true; busy = false; $("next").disabled = false;
+  if(v === 2) right++;
+  $("ps").textContent = `答對 ${right}`;
+  $("verd").textContent = v === 2 ? (al && al.sim < 1 ? "✓ 答對了！（客語用字有些微異體）" : "✓ 答對了！")
+    : v === 1 ? "～ 非常接近，再加油！" : "✗ 答錯了，請看正解";
+  $("verd").className = `verd v${v}`;
+  $("ans").innerHTML = `客語正字：<b>${q.w}</b>（華語釋義：${q.c}）`;
+  $("hint").textContent = why;
+  renderDeveloperPanel();
+}
+
+$("send").onclick = submitAnswer;
+$("inp").onkeydown = e => { if(e.key === "Enter") submitAnswer(); };
+
+$("skip").onclick = () => {
+  if(answered) return;
+  const q = list[at];
+  answered = true; $("send").disabled = true; $("inp").disabled = true; $("next").disabled = false;
+  fillStatic(q.w, "");
+  $("verd").textContent = "查看解答"; $("verd").className = "verd";
+  $("ans").innerHTML = `客語正字：<b>${q.w}</b>（華語釋義：${q.c}）`;
+  renderDeveloperPanel();
+};
+
+$("next").onclick = () => {
+  at++;
+  if(at >= list.length) return showOver();
+  show();
+  renderDeveloperPanel();
+};
+
+function showOver(){
+  $("pi").style.width = "100%";
+  $("oT").textContent = `${DATA[li].n}・${DATA[li].topic} 練習完成！`;
+  $("oS").textContent = `${right} / ${list.length}`;
+  $("oP").textContent = right === list.length ? "太厲害了！全部答對！🎉"
+    : right >= list.length * 0.6 ? "表現非常優秀！多聽幾次發音就會更加熟悉。"
+    : "別擔心！多聽幾次真人發音，慢慢就能記起來囉！";
+  const nx = li + 1 < DATA.length;
+  $("oNext").style.display = nx ? "" : "none";
+  $("oNext").onclick = () => { li++; start(); };
+  $("oAgain").onclick = start;
+  $("over").classList.add("on");
+  renderDeveloperPanel();
+}
+
+/* 開發者模式邏輯 */
+let debugMode = false;
+try {
+  debugMode = localStorage.getItem("speakingDemoDebugMode") === "true";
+} catch(e) {}
+
+let lastTranslationDebug = {
+  input: "",
+  output: "",
+  timeMs: 0,
+  raw: null,
+  error: null
+};
+
+function renderDeveloperPanel() {
+  const panel = $("developerPanel");
+  const toggle = $("debugToggle");
+  if (!panel || !toggle) return;
+  toggle.checked = debugMode;
+  panel.hidden = !debugMode;
+  document.body.classList.toggle("debug-mode", debugMode);
+  if (!debugMode) return;
+
+  const currentLesson = DATA[li];
+  const q = list[at] || {};
+  const currentLang = (function(){ try { return localStorage.getItem("speakingDemoAsrLanguage"); }catch(e){ return null; } })() || "zh";
+
+  panel.innerHTML = `
+    <h2>內部檢視 <span>開發者模式</span></h2>
+    <div class="target-sentence">
+      <span class="sentence-label">正確客語正字（答案）</span>
+      <strong>${q.w || "—"}</strong>
+      <small>拼音：${q.p || "—"}｜華語：${q.c || "—"}</small>
+    </div>
+    <div class="developer-item">
+      <span class="developer-label">當前單元 / 題號</span>
+      <p><b>${currentLesson ? currentLesson.n + " " + currentLesson.topic : "—"}</b><br><small style="color:#666">（第 ${at + 1} / ${list.length} 題）</small></p>
+    </div>
+    <div class="developer-item">
+      <span class="developer-label">作答語種選擇</span>
+      <select class="dev-select" id="devLangSelect">
+        <option value="zh" ${currentLang === "zh" ? "selected" : ""}>華語（翻譯比對客語）</option>
+        <option value="hak" ${currentLang === "hak" ? "selected" : ""}>客委會API / 客語（直接比對客語）</option>
+      </select>
+    </div>
+    <div class="developer-item">
+      <span class="developer-label">快捷作答操作</span>
+      <div class="dev-btns">
+        <button type="button" class="dev-btn" id="devFillZh">⚡ 填入華語並送出</button>
+        <button type="button" class="dev-btn" id="devFillHk">⚡ 填入客語</button>
+        <button type="button" class="dev-btn" id="devPlayAudio">🔊 聽示範音</button>
+      </div>
+    </div>
+    <div class="developer-item">
+      <span class="developer-label">客華雙向翻譯 API 狀態</span>
+      <p style="margin:4px 0;line-height:1.45;font-size:12.5px;">
+        端點：<code>/api/translate</code><br>
+        輸入：${lastTranslationDebug.input ? '「' + lastTranslationDebug.input + '」' : '尚無'}<br>
+        譯出：<b>${lastTranslationDebug.output ? '「' + lastTranslationDebug.output + '」' : '—'}</b><br>
+        耗時：${lastTranslationDebug.timeMs ? lastTranslationDebug.timeMs + ' ms' : '—'}
+      </p>
+      <div class="dev-pre">${lastTranslationDebug.raw ? JSON.stringify(lastTranslationDebug.raw, null, 2) : (lastTranslationDebug.error || '尚無請求紀錄')}</div>
+    </div>
+  `;
+
+  panel.querySelector("#devLangSelect")?.addEventListener("change", (e) => {
+    const val = e.target.value;
+    try { localStorage.setItem("speakingDemoAsrLanguage", val); } catch(err) {}
+    if (window.HAKKA_REALTIME_ASR?.setLanguage) window.HAKKA_REALTIME_ASR.setLanguage(val);
+    show();
+    renderDeveloperPanel();
+  });
+
+  panel.querySelector("#devFillZh")?.addEventListener("click", () => {
+    const curQ = list[at] || {};
+    if(!curQ.c) return;
+    $("inp").value = curQ.c.split(/[、，,]/)[0].trim();
+    submitAnswer();
+  });
+  panel.querySelector("#devFillHk")?.addEventListener("click", () => {
+    const curQ = list[at] || {};
+    if(!curQ.w) return;
+    $("inp").value = curQ.w.trim();
+    submitAnswer();
+  });
+  panel.querySelector("#devPlayAudio")?.addEventListener("click", () => {
+    const curQ = list[at] || {};
+    if(curQ.u) {
+      if(audio) audio.pause();
+      audio = new Audio(BASE + curQ.u + ".mp3");
+      audio.play().catch(()=>{});
+    }
+  });
+}
+
+$("debugToggle")?.addEventListener("change", (e) => {
+  debugMode = Boolean(e.target.checked);
+  try { localStorage.setItem("speakingDemoDebugMode", String(debugMode)); } catch(err) {}
+  renderDeveloperPanel();
+});
+
+renderTabs();
+start();
+renderDeveloperPanel();
+</script>
+
+<aside id="developerPanel" class="developer-panel" hidden></aside>
+</body>
+</html>
