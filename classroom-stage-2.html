@@ -1248,7 +1248,7 @@ function stopTileMic(){
   }
 }
 
-function toggleTileMic(){
+async function toggleTileMic(){
   if(!cur) return;
   if(tileAsrSession){
     stopTileMic();
@@ -1263,6 +1263,15 @@ function toggleTileMic(){
   const isMandarin = (currentLang === "zh");
   const targetText = isMandarin ? cur.c : cur.w;
   const targetLabel = isMandarin ? `華語意思「${cur.c}」` : `客語正字「${cur.w}」`;
+
+  let stream = null;
+  try {
+    stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+  } catch (err) {
+    console.warn("getUserMedia error:", err);
+    line("無法取得麥克風權限，請確認瀏覽器已允許麥克風", 2500);
+    return;
+  }
 
   const btn = $("btnMic");
   btn.classList.add("recording");
@@ -1317,11 +1326,13 @@ function toggleTileMic(){
     }
   });
 
-  tileAsrSession.start().catch(err => {
+  try {
+    await tileAsrSession.start(stream);
+  } catch (err) {
     console.warn("Start tile ASR error:", err);
     stopTileMic();
-    line("麥克風無法啟用", 2000);
-  });
+    line("語音連線中斷，請再試一次", 2000);
+  }
 }
 
 $("btnPlay").onclick=()=>{ if(cur) play(cur.u); };

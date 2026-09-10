@@ -39,11 +39,16 @@
         .trim();
     }
 
+    let ownedStream = null;
     function stopAudio() {
       try { if (processorNode) processorNode.disconnect(); } catch (error) {}
       try { if (sourceNode) sourceNode.disconnect(); } catch (error) {}
       processorNode = null;
       sourceNode = null;
+      if (ownedStream) {
+        try { ownedStream.getTracks().forEach(t => t.stop()); } catch (e) {}
+        ownedStream = null;
+      }
     }
 
     function finish() {
@@ -64,6 +69,23 @@
       ready = false;
       pending = [];
       segments = {};
+
+      if (!stream) {
+        try {
+          stream = await navigator.mediaDevices.getUserMedia({
+            audio: {
+              channelCount: 1,
+              sampleRate: { ideal: 16000 },
+              echoCancellation: true,
+              noiseSuppression: true
+            }
+          });
+          ownedStream = stream;
+        } catch (err) {
+          onError("麥克風無法啟用（未取得權限）");
+          return false;
+        }
+      }
 
       let ticketPayload = null;
       const primaryUrl = window.SPEECH_API?.realtimeTicketUrl?.() || "http://localhost:5000/ticket";
