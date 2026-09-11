@@ -151,8 +151,8 @@ const tasks = [
   {
     type: "題型三：情境圖片",
     title: "看圖說一說",
-    prompt: "觀察圖片，用客語完整回答。",
-    question: "阿明喜歡在哪裡做什麼？",
+    prompt: "  ",
+    question: "觀察圖片，用客語完整回答-阿明在哪裡做什麼？",
     mandarin: "阿明喜歡在公園裡打籃球",
     audio: "",
     image: "./assets/scenario-holiday-basketball-hoodie.png",
@@ -216,7 +216,9 @@ const els = {
   recognitionModeSelect: document.querySelector("#recognitionModeSelect"),
   hitTags: document.querySelector("#hitTags"),
   storyIntro: document.querySelector("#storyIntro"),
-  storyStartBtn: document.querySelector("#storyStartBtn")
+  storyStartBtn: document.querySelector("#storyStartBtn"),
+  debugNextBtn: document.querySelector("#debugNextBtn"),
+  debugAutoFillBtn: document.querySelector("#debugAutoFillBtn")
 };
 
 function getFirstLockedStep() {
@@ -768,6 +770,65 @@ els.retryBtn.addEventListener("click", () => {
 
 els.finishBtn.addEventListener("click", () => {
   showReview();
+});
+
+els.debugNextBtn?.addEventListener("click", () => {
+  cleanupStream();
+  if (isRecording && recorder) {
+    try { recorder.stop(); } catch (e) { }
+    isRecording = false;
+  }
+  if (realtimeSession) {
+    try { realtimeSession.stop?.(); } catch (e) { }
+    realtimeSession = null;
+  }
+
+  // If still on intro screen, enter task
+  if (els.storyIntro && !els.storyIntro.hidden) {
+    els.storyIntro.hidden = true;
+    els.missionLayout.hidden = false;
+    els.missionLayout.classList.add("is-entering");
+    currentStep = 0;
+    renderTask();
+    return;
+  }
+
+  // Auto mark current task completed with standard answer
+  const stdAnswer = dialectSentences[currentDialect][currentStep] || "";
+  answers[currentStep].transcript = stdAnswer;
+  answers[currentStep].completed = true;
+  answers[currentStep].needsPractice = false;
+  if (els.answerInput) els.answerInput.value = stdAnswer;
+  els.asrStatus.textContent = stdAnswer;
+
+  if (currentStep < tasks.length - 1) {
+    currentStep++;
+    renderTask();
+  } else {
+    updateDeveloperMode();
+    updateStepLocks();
+    updateFinishPanel();
+    showReview();
+  }
+});
+
+els.debugAutoFillBtn?.addEventListener("click", () => {
+  cleanupStream();
+  const stdAnswer = dialectSentences[currentDialect][currentStep] || "";
+  if (els.answerInput) els.answerInput.value = stdAnswer;
+  answers[currentStep].transcript = stdAnswer;
+  answers[currentStep].completed = true;
+  answers[currentStep].needsPractice = false;
+  els.asrStatus.textContent = stdAnswer;
+  els.checkBtn.textContent = "已送出";
+  saveCurrentAnswer({
+    completed: true,
+    needsPractice: false
+  });
+  updateHitStatus(stdAnswer);
+  updateDeveloperMode();
+  updateStepLocks();
+  updateFinishPanel();
 });
 
 els.checkBtn.addEventListener("click", () => {

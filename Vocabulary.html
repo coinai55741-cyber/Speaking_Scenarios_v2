@@ -1,5 +1,6 @@
 <!doctype html>
 <html lang="zh-Hant">
+
 <head>
   <link rel="stylesheet" href="./hakka-font.css?v=20260907-font4">
   <meta charset="utf-8">
@@ -7,6 +8,7 @@
   <title>口說詞彙卡｜客語生活任務</title>
   <link rel="stylesheet" href="./Vocabulary.css?v=20260907-font1">
 </head>
+
 <body>
   <main class="game-shell">
     <header class="game-topbar"><a class="back-link" href="./index.html#basic">返回</a>
@@ -17,7 +19,7 @@
 
     <section id="introScreen" class="screen intro-screen" aria-labelledby="introTitle">
       <div class="intro-copy">
-<section class="dialect-area" aria-labelledby="dialectTitle">
+        <section class="dialect-area" aria-labelledby="dialectTitle">
           <h3 id="dialectTitle">選擇腔別</h3>
           <div class="dialect-switcher">
             <button class="dialect" type="button" data-dialect="sixian">四縣腔</button>
@@ -34,26 +36,30 @@
             <h3 id="lessonTitle">選擇主題</h3>
             <p id="lessonHint">請先選擇腔別，再選課別開始。</p>
           </div>
-          <div class="lesson-carousel-wrap"><div class="lesson-carousel " id="lessonCarousel" aria-label="課別卡片">
+          <div class="lesson-carousel-wrap">
+            <div class="lesson-carousel " id="lessonCarousel" aria-label="課別卡片">
               <button class="lesson-card" type="button" data-lesson="field-trip" data-url="./field-trip.html" disabled>
                 <img src="./assets/lesson-card-2-outdoor-learning.png" alt="戶外教學趣">
-                <span>LV1</span>
+                <span>學習階段1</span>
                 <strong>戶外教學趣</strong>
                 <small>聽音跟讀：聽示範，跟著說出客庄詞語。</small>
               </button>
-              <button class="lesson-card" type="button" data-lesson="classroom-stage-1" data-url="./classroom-stage-1.html" disabled>
+              <button class="lesson-card" type="button" data-lesson="classroom-stage-1"
+                data-url="./classroom-stage-1.html" disabled>
                 <img src="./assets/vocabulary-card-primary-scene.png" alt="客語互動場景">
-                <span>LV2</span>
+                <span>學習階段2</span>
                 <strong>客語互動場景</strong>
                 <small>觀察場景，點選物件進行詞語互動。</small>
               </button>
-            </div></div>
+            </div>
+          </div>
         </section>
       </div>
     </section>
 
     <section id="playScreen" class="screen play-screen" hidden aria-live="polite">
-      <button id="wordMenuBtn" class="word-menu-button" type="button" aria-controls="statusPanel" aria-expanded="false">單字</button>
+      <button id="wordMenuBtn" class="word-menu-button" type="button" aria-controls="statusPanel"
+        aria-expanded="false">單字</button>
       <div id="wordMenuBackdrop" class="word-menu-backdrop" hidden></div>
       <aside id="statusPanel" class="status-panel" aria-label="單字選單">
         <button id="wordMenuCloseBtn" class="word-menu-close" type="button">關閉</button>
@@ -101,67 +107,5 @@
 
   <script src="./Vocabulary.js?v=20260909-default-sixian"></script>
 </body>
+
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

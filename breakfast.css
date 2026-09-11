@@ -555,6 +555,7 @@ h1 {
   place-items: center;
   padding: clamp(8px, 1.5vw, 18px);
   color: var(--ink);
+  font-family: "GenSekiGothic2TW", "Noto Sans TC", "Microsoft JhengHei", sans-serif;
   font-size: clamp(18px, 3.05vw, 38px);
   font-weight: 900;
   line-height: 1.12;
@@ -1130,6 +1131,35 @@ h1 {
   border-color: var(--green);
   background: #dff8ea;
   color: #17623f;
+}
+
+.dev-quick-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+.dev-action-btn {
+  width: 100%;
+  background: #2e6634;
+  color: #ffffff;
+  border: 1px solid #205026;
+  border-radius: 8px;
+  padding: 8px 10px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  text-align: center;
+  transition: background 0.15s ease, transform 0.1s ease;
+}
+
+.dev-action-btn:hover {
+  background: #245229;
+}
+
+.dev-action-btn:active {
+  transform: scale(0.98);
 }
 
 .developer-panel .answer-box label {

@@ -13,7 +13,7 @@ const questions = [
   { type: "看圖選拼音", title: "這係麼个？", prompt: "請看拼音，選出正確的早餐圖卡。", answer: "卵包", field: "hakka", food: "卵包", hint: "再試著念看看喔！", playMode: "scene" },
   { type: "看圖選拼音", title: "這係麼个？", prompt: "請看拼音，選出正確的早餐圖卡。", answer: "蘿蔔粄", field: "hakka", food: "蘿蔔粄", hint: "再試著念看看喔！", playMode: "scene" },
   { type: "看圖選拼音", title: "這係麼个？", prompt: "請看拼音，選出正確的早餐圖卡。", answer: "豆乳", field: "hakka", food: "豆乳", hint: "再試著念看看喔！", playMode: "scene" },
-  { type: "綜合挑戰", title: "今晡日阿公好食麼个？", prompt: "阿公：「𠊎好食mien bauˊ，也愛啉ngiuˇ nen。」", answer: ["麵包", "牛乳"], field: "hakka", choiceMode: "image", image: "./assets/lesson-1-question-grandpa-breakfast.png", alt: "阿公和小孩在早餐情境中思考吃什麼", hint: "再試著念看看喔！" }
+  { type: "綜合挑戰", title: "𠊎好食麼个？", prompt: "阿公：「𠊎好食mien bauˊ，也愛啉ngiuˇ nen。」", answer: ["麵包", "牛乳"], field: "hakka", choiceMode: "image", image: "./assets/lesson-1-question-grandpa-breakfast.png", alt: "阿公和小孩在早餐情境中思考吃什麼", hint: "再試著念看看喔！" }
 ];
 
 const LESSON_QUESTIONS = {
@@ -90,10 +90,10 @@ const els = {
   completeScreen: document.querySelector("#completeScreen"),
   dialects: [...document.querySelectorAll(".dialect")],
   lessonCards: [...document.querySelectorAll(".lesson-card")],
-  lessonCarousel: document.querySelector("#lessonCarousel"),  lessonHint: document.querySelector("#lessonHint"),
-  
+  lessonCarousel: document.querySelector("#lessonCarousel"), lessonHint: document.querySelector("#lessonHint"),
+
   completeBadges: [...document.querySelectorAll("[data-complete-badge]")],
-questionNumber: document.querySelector("#questionNumber"),
+  questionNumber: document.querySelector("#questionNumber"),
   visibleQuestionNumber: document.querySelector("#visibleQuestionNumber"),
   starRow: document.querySelector("#starRow"),
   visibleStarRow: document.querySelector("#visibleStarRow"),
@@ -213,6 +213,13 @@ function renderDeveloperPanel() {
   const statusText = recognitionError || (isSpeechRecognizing ? "辨識中" : (recognizedSpeechText ? "已回傳辨識資料" : "尚未送出"));
   const recognitionMode = breakfastRecognitionMode();
   els.developerContent.innerHTML = `
+    <div class="developer-item">
+      <span class="developer-label">快速跳題／測試</span>
+      <div class="dev-quick-actions">
+        <button id="debugNextBtn" class="dev-action-btn" type="button">直接跳下一題／下一段 ⏩</button>
+        <button id="debugAutoFillBtn" class="dev-action-btn" type="button">自動填入並完成 ✨</button>
+      </div>
+    </div>
     <div class="developer-item target-sentence">
       <span class="developer-label">正確答案</span>
       <span class="sentence-label">${escapeHtml(developerDialectLabel(speechProvider))}</span>
@@ -264,6 +271,33 @@ function renderDeveloperPanel() {
     </div>
   `;
 
+  els.developerContent.querySelector("#debugNextBtn")?.addEventListener("click", () => {
+    if (speechStream) {
+      speechStream.getTracks().forEach(track => track.stop());
+      speechStream = null;
+    }
+    if (speechRecorder && isSpeechRecording) {
+      try { speechRecorder.stop(); } catch (e) { }
+      isSpeechRecording = false;
+    }
+    realtimeSpeechActive = false;
+    mandarinSpeechActive = false;
+    isSpeechRecognizing = false;
+
+    awardCurrentQuestionStar();
+    renderStars();
+    nextQuestion();
+  });
+
+  els.developerContent.querySelector("#debugAutoFillBtn")?.addEventListener("click", () => {
+    const question = activeQuestions[currentIndex];
+    const stdAnswer = answerLine || (acceptedAnswers(question)[0] || "");
+    recognizedSpeechText = stdAnswer;
+    lastRecognitionPayload = { text: stdAnswer, source: "developer_autofill" };
+    handleSpeechAnswer(stdAnswer, question, { silent: false });
+    renderDeveloperPanel();
+  });
+
   els.developerContent.querySelector("#developerAnswerInput")?.addEventListener("input", event => {
     recognizedSpeechText = event.target.value.trim();
     recognitionError = "";
@@ -304,7 +338,7 @@ function findFood(value) {
 
 let lessonDrag = { active: false, moved: false, startX: 0, scrollLeft: 0 };
 
-function updateCarouselButtons() {}
+function updateCarouselButtons() { }
 
 function beginLessonDrag(event) {
   if (!els.lessonCarousel) return;
@@ -354,7 +388,7 @@ function playSound(name = "click") {
   if (!buttonSoundEnabled) return;
   const audio = soundEffects[name] || soundEffects.click;
   audio.currentTime = 0;
-  audio.play().catch(() => {});
+  audio.play().catch(() => { });
 }
 
 function playButtonSound() {
@@ -524,8 +558,8 @@ const BreakfastRealtimeASR = (() => {
   }
 
   function stopAudio() {
-    if (node) { try { node.disconnect(); } catch (error) {} node = null; }
-    if (srcNode) { try { srcNode.disconnect(); } catch (error) {} srcNode = null; }
+    if (node) { try { node.disconnect(); } catch (error) { } node = null; }
+    if (srcNode) { try { srcNode.disconnect(); } catch (error) { } srcNode = null; }
   }
 
   async function start(stream, onTranscript, onDone, onError) {
@@ -558,7 +592,7 @@ const BreakfastRealtimeASR = (() => {
       const code = String(payload.code || "");
       if (code === "180") {
         ready = true;
-        queued.forEach((chunk) => { try { ws.send(chunk); } catch (error) {} });
+        queued.forEach((chunk) => { try { ws.send(chunk); } catch (error) { } });
         queued = [];
         return;
       }
@@ -585,7 +619,7 @@ const BreakfastRealtimeASR = (() => {
     node.onaudioprocess = (event) => {
       if (!ws || ws.readyState > 1 || closed) return;
       const pcm = downsample(event.inputBuffer.getChannelData(0), ctx.sampleRate);
-      if (ready) { try { ws.send(pcm.buffer); } catch (error) {} }
+      if (ready) { try { ws.send(pcm.buffer); } catch (error) { } }
       else if (queued.length < 60) queued.push(pcm.buffer);
     };
     srcNode.connect(node);
@@ -595,16 +629,16 @@ const BreakfastRealtimeASR = (() => {
 
   function stop() {
     stopAudio();
-    if (ws && ws.readyState === 1) { try { ws.send("EOS"); } catch (error) {} }
+    if (ws && ws.readyState === 1) { try { ws.send("EOS"); } catch (error) { } }
   }
 
   function finish(onDone) {
     if (closed) return;
     closed = true;
     stopAudio();
-    try { if (ctx) ctx.close(); } catch (error) {}
+    try { if (ctx) ctx.close(); } catch (error) { }
     ctx = null;
-    try { if (ws) ws.close(); } catch (error) {}
+    try { if (ws) ws.close(); } catch (error) { }
     ws = null;
     onDone(currentText());
   }
@@ -612,9 +646,9 @@ const BreakfastRealtimeASR = (() => {
   function abort() {
     closed = true;
     stopAudio();
-    try { if (ctx) ctx.close(); } catch (error) {}
+    try { if (ctx) ctx.close(); } catch (error) { }
     ctx = null;
-    try { if (ws) ws.close(); } catch (error) {}
+    try { if (ws) ws.close(); } catch (error) { }
     ws = null;
   }
 
@@ -983,7 +1017,7 @@ function handleSpeechAnswer(text, question, options = {}) {
 
 function playSpeechAudio() {
   if (!speechAudioUrl) return;
-  new Audio(speechAudioUrl).play().catch(() => {});
+  new Audio(speechAudioUrl).play().catch(() => { });
 }
 function renderSceneStage(question, selectedChoice = null) {
   const targetFoods = acceptedAnswers(question).map(findFood).filter(Boolean);
@@ -991,7 +1025,7 @@ function renderSceneStage(question, selectedChoice = null) {
   els.imageStage.innerHTML = `
     <div class="breakfast-scene">
       <img class="scene-bg" src="./assets/lesson-1-breakfast-game-scene.png?v=20260909-table" alt="早餐廚房與桌面">
-      <div class="scene-question">${question.title}</div>
+      <div class="scene-question hakka-font" lang="hak">${question.title}</div>
       <div class="table-foods" aria-label="看圖說出食物名稱">${pictures}</div>
     </div>`;
 }
@@ -1100,7 +1134,7 @@ function skipQuestion() {
 
 function nextQuestion() {
   if (currentIndex >= activeQuestions.length - 1) {
-    
+
     playSound("complete");
     completedLessons.add("1");
     localStorage.setItem("breakfastCompletedLessons", JSON.stringify([...completedLessons]));

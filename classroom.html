@@ -1,1 +1,67 @@
-<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>單元快問快答｜客語生活任務</title><link rel="stylesheet" href="./holiday.css"><link rel="stylesheet" href="./unit-menu.css?v=20260909"></head><body><main class="task-shell"><header class="task-topbar"><a class="back-link" href="./index.html#classroom">返回</a><h1 class="menu-heading">單元快問快答</h1></header><section class="dialect-switcher" aria-label="腔別"><button class="dialect is-active" aria-pressed="true" type="button">四縣腔</button><button class="dialect" disabled type="button" title="教材準備中">海陸腔</button><button class="dialect" disabled type="button" title="教材準備中">大埔腔</button><button class="dialect" disabled type="button" title="教材準備中">饒平腔</button><button class="dialect" disabled type="button" title="教材準備中">詔安腔</button><button class="dialect" disabled type="button" title="教材準備中">南四縣腔</button></section><p>選擇單元開始。</p><section class="unit-menu" aria-label="單元選單"><article class="unit-card"><img src="./assets/lesson-card-1-breakfast.png" alt=""><p class="level">學習階段1</p><h2>我要吃早餐</h2><p>看圖說詞：看早餐圖片，用客語說出食物名稱。</p><a class="back-link" href="./breakfast.html">進入學習 →</a></article><article class="unit-card"><img src="./assets/vocabulary-card-middle-tiles.png" alt=""><p class="level">學習階段2</p><h2>字磚拼拼樂</h2><p>聽一聽，使用字磚完成詞語挑戰。</p><a class="back-link" href="./classroom-stage-2.html">進入學習 →</a></article><article class="unit-card"><img src="./assets/vocabulary-card-high-radio.png" alt=""><p class="level">學習階段3</p><h2>客庄廣播電台</h2><p>聽廣播、找線索，使用字磚完成句子，再開口讀讀看。</p><a class="back-link" href="./Vocabulary-High-1-v2.html">進入學習 →</a></article></section></main></body></html>
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <link rel="stylesheet" href="./hakka-font.css?v=20260907-font4">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>單元快問快答｜客語生活任務</title>
+  <link rel="stylesheet" href="./Vocabulary.css?v=20260907-font1">
+</head>
+<body>
+  <main class="game-shell">
+    <header class="game-topbar">
+      <a class="back-link" href="./index.html#classroom">返回</a>
+      <div>
+        <h1>單元快問快答</h1>
+      </div>
+    </header>
+
+    <section id="introScreen" class="screen intro-screen" aria-labelledby="introTitle">
+      <div class="intro-copy">
+        <section class="dialect-area" aria-labelledby="dialectTitle">
+          <h3 id="dialectTitle">選擇腔別</h3>
+          <div class="dialect-switcher">
+            <button class="dialect is-active" type="button" data-dialect="sixian">四縣腔</button>
+            <button class="dialect" type="button" disabled aria-disabled="true">海陸腔</button>
+            <button class="dialect" type="button" disabled aria-disabled="true">大埔腔</button>
+            <button class="dialect" type="button" disabled aria-disabled="true">饒平腔</button>
+            <button class="dialect" type="button" disabled aria-disabled="true">詔安腔</button>
+            <button class="dialect" type="button" disabled aria-disabled="true">南四縣腔</button>
+          </div>
+        </section>
+
+        <section class="lesson-area" aria-labelledby="lessonTitle">
+          <div class="lesson-heading">
+            <h3 id="lessonTitle">選擇單元</h3>
+            <p id="lessonHint">請選擇單元開始。</p>
+          </div>
+          <div class="lesson-carousel-wrap">
+            <div class="lesson-carousel" id="lessonCarousel" aria-label="單元卡片">
+              <button class="lesson-card" type="button" data-url="./breakfast.html">
+                <img src="./assets/lesson-card-1-breakfast.png" alt="我要吃早餐">
+                <span>學習階段1</span>
+                <strong>我要吃早餐</strong>
+                <small>看圖說詞：看早餐圖片，用客語說出食物名稱。</small>
+              </button>
+              <button class="lesson-card" type="button" data-url="./classroom-stage-2.html">
+                <img src="./assets/vocabulary-card-middle-tiles.png" alt="字磚拼拼樂">
+                <span>學習階段2</span>
+                <strong>字磚拼拼樂</strong>
+                <small>聽一聽，使用字磚完成詞語挑戰。</small>
+              </button>
+              <button class="lesson-card" type="button" data-url="./Vocabulary-High-1-v2.html">
+                <img src="./assets/vocabulary-card-high-radio.png" alt="客庄廣播電台">
+                <span>學習階段3</span>
+                <strong>客庄廣播電台</strong>
+                <small>聽廣播、找線索，使用字磚完成句子，再開口讀讀看。</small>
+              </button>
+            </div>
+          </div>
+        </section>
+      </div>
+    </section>
+  </main>
+
+  <script src="./classroom.js?v=20260909-classroom1"></script>
+</body>
+</html>

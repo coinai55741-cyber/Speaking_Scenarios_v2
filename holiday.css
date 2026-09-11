@@ -454,6 +454,35 @@ textarea {
   font-size: 20px;
 }
 
+.dev-quick-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+.dev-action-btn {
+  width: 100%;
+  background: #2e6634;
+  color: #ffffff;
+  border: 1px solid #205026;
+  border-radius: 8px;
+  padding: 8px 10px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  text-align: center;
+  transition: background 0.15s ease, transform 0.1s ease;
+}
+
+.dev-action-btn:hover {
+  background: #245229;
+}
+
+.dev-action-btn:active {
+  transform: scale(0.98);
+}
+
 .developer-item {
   margin-top: 14px;
 }
