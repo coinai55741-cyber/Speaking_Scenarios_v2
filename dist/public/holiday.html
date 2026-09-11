@@ -1,5 +1,6 @@
 <!doctype html>
 <html lang="zh-Hant">
+
 <head>
   <link rel="stylesheet" href="./hakka-font.css?v=20260907-font4">
   <meta charset="utf-8">
@@ -9,6 +10,7 @@
   <script src="./speech-api-config.js?v=20260909-global-ticket2"></script>
   <script src="./speech-realtime-asr.js?v=20260909-shared-realtime1"></script>
 </head>
+
 <body>
   <main class="task-shell">
     <header class="task-topbar"><a class="back-link" href="./index.html#situations">返回</a>
@@ -21,15 +23,19 @@
       </label>
       <section class="dialect-switcher" aria-label="選擇腔別">
         <button class="dialect is-active" type="button" data-dialect="sixian">四縣腔</button>
-        <button class="dialect is-disabled" type="button" data-dialect="hailu" disabled aria-disabled="true">海陸腔</button>
+        <button class="dialect is-disabled" type="button" data-dialect="hailu" disabled
+          aria-disabled="true">海陸腔</button>
         <button class="dialect is-disabled" type="button" data-dialect="dabu" disabled aria-disabled="true">大埔腔</button>
-        <button class="dialect is-disabled" type="button" data-dialect="raoping" disabled aria-disabled="true">饒平腔</button>
-        <button class="dialect is-disabled" type="button" data-dialect="zhaoan" disabled aria-disabled="true">詔安腔</button>
-        <button class="dialect is-disabled" type="button" data-dialect="southSixian" disabled aria-disabled="true">南四縣腔</button>
+        <button class="dialect is-disabled" type="button" data-dialect="raoping" disabled
+          aria-disabled="true">饒平腔</button>
+        <button class="dialect is-disabled" type="button" data-dialect="zhaoan" disabled
+          aria-disabled="true">詔安腔</button>
+        <button class="dialect is-disabled" type="button" data-dialect="southSixian" disabled
+          aria-disabled="true">南四縣腔</button>
       </section>
     </header>
 
-        <section id="storyIntro" class="story-intro" aria-labelledby="storyTitle">
+    <section id="storyIntro" class="story-intro" aria-labelledby="storyTitle">
       <div class="story-visual">
         <img src="./assets/holiday-task-1-invite.png" alt="阿明在休假日邀請小達一起打籃球">
       </div>
@@ -46,7 +52,7 @@
         <img id="sceneImage" src="./assets/holiday-task-1-invite.png" alt="小達抱著籃球，阿明邀請他一起打籃球">
         <button id="scenePlayBtn" class="scene-play-button" type="button" aria-label="播放音檔">
           <svg viewBox="0 0 10 14" aria-hidden="true">
-            <path d="M0 0v14l11-7z"/>
+            <path d="M0 0v14l11-7z" />
           </svg>
         </button>
         <audio id="taskAudio" preload="auto"></audio>
@@ -60,11 +66,11 @@
         </div>
 
         <div class="task-heading">
-          <p id="taskType" class="task-type">題型一：聽音複誦</p>
+          <p id="taskType" class="task-type">題型一：情境表達</p>
           <h2 id="taskTitle">邀請小達一起打球</h2>
         </div>
 
-        <p id="taskPrompt" class="prompt">先聽一句，再按錄音跟著說。</p>
+        <p id="taskPrompt" class="prompt">聽聽看別人怎麼說，試著用自己的話邀請小達。</p>
         <div id="questionBox" class="question-box" hidden></div>
 
         <div class="answer-actions">
@@ -91,7 +97,7 @@
         <small id="sentenceMandarin">下午要不要一起去打籃球？</small>
         <button id="developerPlayBtn" class="developer-play-button" type="button" hidden aria-label="播放音檔">
           <svg viewBox="0 0 11 14" aria-hidden="true">
-            <path d="M0 0v14l11-7z"/>
+            <path d="M0 0v14l11-7z" />
           </svg>
           <span>播放音檔</span>
         </button>
@@ -133,25 +139,5 @@
 
   <script src="./holiday.js?v=20260909-shared-realtime1"></script>
 </body>
+
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

@@ -35,14 +35,6 @@ const scenarios = [
       "最後依照回答完成前往任務。"
     ],
     demoStep: 0
-  },
-  {
-    id: "reading-1",
-    title: "繪本朗讀",
-    href: "./reading.html",
-    artClass: "art-reading",
-    image: "./assets/scenario-picture-book-reading.png",
-    description: "陪故事中的主角找一位聽眾，把〈𠊎中意讀書〉讀出來，完成三段客語朗讀任務。"
   }
   /*,
   {

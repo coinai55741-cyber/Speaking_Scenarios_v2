@@ -160,9 +160,124 @@
     updateDeveloperMode();
   }
 
+  function calculateMetrics(matchCount, totalSpoken, hasAudio = true, seconds = 0) {
+    const ratio = totalSpoken > 0 ? (matchCount / totalSpoken) : 0;
+    
+    // 1. 完整度 (Completeness): e.g. "8 / 10"
+    const completeness = `${matchCount} / ${totalSpoken}`;
+    
+    // 2. 發音 (Pronunciation rating)
+    let pronunciation = '不錯';
+    if (ratio >= 0.9) pronunciation = '極佳';
+    else if (ratio >= 0.75) pronunciation = '不錯';
+    else if (ratio >= 0.5) pronunciation = '尚可';
+    else pronunciation = '再加油';
+    
+    // 3. 流暢度 (Fluency rating) - 基準：每個字念 0.8 秒（基準總秒數 = totalSpoken * 0.8 秒）
+    const expectedDuration = totalSpoken * 0.8;
+    let fluency = '再順一點會更好';
+    if (seconds > 0 && totalSpoken > 0) {
+      const secPerChar = seconds / totalSpoken; // 實際平均每字耗時（秒）
+      // 標準自然區間：平均每字約 0.35s ~ 1.25s（相當於基準 0.8s 的合理上下限），且命中率達 80% 以上
+      if (ratio >= 0.80 && secPerChar >= 0.35 && secPerChar <= 1.25) {
+        fluency = '流暢自然';
+      } else if (ratio >= 0.60 && secPerChar <= 2.0) {
+        // 命中率達 60% 以上，或每字耗時在 2.0 秒內（稍微有停頓猶豫）
+        fluency = '再順一點會更好';
+      } else {
+        // 命中率低於 60% 或 耗時過長（> 2.0s/字，停頓過久）
+        fluency = '多加練習';
+      }
+    } else {
+      // 無秒數數據時（如手動測試／開發者跳題）
+      if (ratio >= 0.80) fluency = '流暢自然';
+      else if (ratio >= 0.60) fluency = '再順一點會更好';
+      else fluency = '多加練習';
+    }
+    
+    // 4. 音量 (Volume rating)
+    let volume = '很清楚';
+    if (!hasAudio) volume = '未檢測到';
+    else if (ratio >= 0.5 || seconds > 0) volume = '很清楚';
+    else volume = '適中';
+    
+    // Subtitle phrase
+    let subtitle = '繼續加油，你讀得不錯喔！';
+    if (ratio >= 0.85 && fluency === '流暢自然') subtitle = '太棒了，你讀得非常標準流暢！';
+    else if (ratio >= 0.65) subtitle = '繼續加油，你讀得不錯喔！';
+    else if (ratio >= 0.45) subtitle = '讀得很努力，再多練習幾次會更好！';
+    else subtitle = '多聽幾次客語發音，再挑戰一次喔！';
+    
+    return { completeness, pronunciation, fluency, volume, subtitle, ratio, expectedDuration, seconds };
+  }
+
+  function renderMetrics(container, metrics) {
+    if (!container) return;
+    container.innerHTML = `
+      <div class="metric-card">
+        <div class="metric-icon" aria-hidden="true">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#009688" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+            <polyline points="14 2 14 8 20 8"></polyline>
+            <line x1="16" y1="13" x2="8" y2="13"></line>
+            <line x1="16" y1="17" x2="8" y2="17"></line>
+            <line x1="10" y1="9" x2="8" y2="9"></line>
+          </svg>
+        </div>
+        <span class="metric-label">完整度</span>
+        <strong class="metric-value">${metrics.completeness}</strong>
+      </div>
+      <div class="metric-card">
+        <div class="metric-icon" aria-hidden="true">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#009688" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path>
+            <circle cx="9" cy="12" r="1" fill="#009688"></circle>
+            <circle cx="12" cy="12" r="1" fill="#009688"></circle>
+            <circle cx="15" cy="12" r="1" fill="#009688"></circle>
+          </svg>
+        </div>
+        <span class="metric-label">發音</span>
+        <strong class="metric-value">${metrics.pronunciation}</strong>
+      </div>
+      <div class="metric-card">
+        <div class="metric-icon" aria-hidden="true">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#009688" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 3v18"></path>
+            <path d="M8 8v8"></path>
+            <path d="M16 8v8"></path>
+            <path d="M4 11v2"></path>
+            <path d="M20 11v2"></path>
+          </svg>
+        </div>
+        <span class="metric-label">流暢度</span>
+        <strong class="metric-value">${metrics.fluency}</strong>
+      </div>
+      <div class="metric-card">
+        <div class="metric-icon" aria-hidden="true">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#009688" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+            <path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+            <path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path>
+          </svg>
+        </div>
+        <span class="metric-label">音量</span>
+        <strong class="metric-value">${metrics.volume}</strong>
+      </div>
+    `;
+  }
+
   function showFeedback() {
     const answer = answers[current];
     const result = alignText(lesson.passages[current].lines, answer.transcript);
+    const metrics = calculateMetrics(result.matchCount, result.totalSpoken, Boolean(answer.blob || answer.transcript), answer.seconds || 0);
+    
+    if ($('feedbackSubtitle')) {
+      $('feedbackSubtitle').textContent = metrics.subtitle;
+    }
+    if ($('feedbackMetrics')) {
+      renderMetrics($('feedbackMetrics'), metrics);
+    }
+    
     $('feedbackText').textContent = result.identical ? '辨識文字與本段課文一致。聽聽自己的朗讀，再繼續下一段。' : '看看標示的地方（綠色為吻合，紅色為未辨識出），按播放重聽自己的朗讀，重新讀一次試試吧！';
     renderComparison($('passageText'), result);
     $('transcript').textContent = answer.transcript || '（無辨識文字）';
@@ -289,13 +404,11 @@
       });
       activeRecorder.start();
       started = Date.now();
-      $('recordTime').textContent = '00:00';
       setPhase('recording', '照自己的速度朗讀，讀完按「完成朗讀」。');
       timer = setInterval(() => {
         const seconds = Math.floor((Date.now() - started) / 1000);
-        $('recordTime').textContent = formatTime(seconds);
         if (seconds >= 180) stopRecording();
-      }, 250);
+      }, 500);
     } catch (error) {
       if (token !== generation || leaving) return;
       clearInterval(timer); stopTracks(); recorder = null;
@@ -392,9 +505,11 @@
       title.textContent = `✓ 第 ${index + 1} 段：${lesson.passages[index].title}`;
 
       const alignResult = alignText(lesson.passages[index].lines, answer.transcript);
-      const stats = document.createElement('p');
-      stats.className = 'summary-match-stats';
-      stats.textContent = `文字命中 ${alignResult.matchCount}／${alignResult.totalSpoken} 字`;
+      const metrics = calculateMetrics(alignResult.matchCount, alignResult.totalSpoken, Boolean(answer.blob || answer.transcript), answer.seconds || 0);
+      
+      const metricsContainer = document.createElement('div');
+      metricsContainer.className = 'feedback-metrics-grid';
+      renderMetrics(metricsContainer, metrics);
 
       const audio = document.createElement('audio');
       audio.controls = true;
@@ -404,7 +519,7 @@
       const details = document.createElement('details');
       details.className = 'summary-comparison-details';
       const summary = document.createElement('summary');
-      summary.textContent = '查看本段文字比對';
+      summary.textContent = '查看本段文字比對與辨識結果';
 
       const compDiv = document.createElement('div');
       compDiv.className = 'comparison-display';
@@ -421,7 +536,7 @@
       transcriptText.textContent = answer.transcript || '（無辨識文字）';
 
       details.append(summary, compDiv, transcriptNote, transcriptText);
-      article.append(title, stats, audio, details);
+      article.append(title, metricsContainer, audio, details);
       return article;
     }));
     $('summaryTitle').focus();
@@ -437,6 +552,52 @@
   $('debugToggle').addEventListener('change', updateDeveloperMode);
   $('asrProviderSelect').addEventListener('change', updateDeveloperMode);
   $('recognitionModeSelect').addEventListener('change', updateDeveloperMode);
+  $('debugNextBtn')?.addEventListener('click', () => {
+    pauseAll();
+    stopTracks();
+    if (recorder?.state === 'recording') recorder.stop();
+    if (useRealtimeAsr() || useMandarinWebSpeech()) realtimeSession?.stop?.();
+    clearInterval(timer);
+
+    if (!$('readingIntro').hidden) {
+      $('readingIntro').hidden = true;
+      $('readingMission').hidden = false;
+      $('readingMission').classList.add('is-entering');
+      render();
+      return;
+    }
+
+    if (!answers[current].completed) {
+      const targetText = developerAnswerLines().join('');
+      answers[current].transcript = targetText;
+      answers[current].completed = true;
+      diagnostic().draft = targetText;
+      diagnostic().tested = true;
+      diagnostic().status = '開發者跳題（已自動完成本段）';
+    }
+
+    if (current < lesson.passages.length - 1) {
+      current++;
+      render();
+    } else {
+      showSummary();
+    }
+    updateDeveloperMode();
+  });
+  $('debugAutoFillBtn')?.addEventListener('click', () => {
+    pauseAll();
+    const targetText = developerAnswerLines().join('\n');
+    $('answerInput').value = targetText;
+    diagnostic().draft = targetText;
+    diagnostic().tested = true;
+    diagnostic().status = '已自動填入標準答案並完成本段';
+    answers[current].transcript = developerAnswerLines().join('');
+    answers[current].completed = true;
+    showFeedback();
+    setPhase('feedback', '已自動填入標準答案並完成本段。');
+    $('nextBtn').focus();
+    updateDeveloperMode();
+  });
   $('answerInput').addEventListener('input', () => {
     diagnostic().draft = $('answerInput').value.slice(0, 4000);
     diagnostic().tested = false;
@@ -473,10 +634,6 @@
   });
   $('reviewStoryBtn')?.addEventListener('click', () => {
     pauseAll();
-    current = 0;
-    $('readingSummary').hidden = true;
-    $('readingMission').hidden = false;
-    render();
   });
   $('restartBtn').addEventListener('click', () => {
     if (!window.confirm('要清除這次錄音，重新開始嗎？')) return;

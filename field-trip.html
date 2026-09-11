@@ -1,5 +1,6 @@
 <!doctype html>
 <html lang="zh-Hant">
+
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -8,11 +9,12 @@
   <script src="./speech-api-config.js?v=20260909-global-ticket2"></script>
   <script src="./speech-realtime-asr.js?v=20260909-shared-realtime1"></script>
 </head>
+
 <body>
   <main class="shell">
     <header class="game-topbar">
       <a class="back-link" href="./Vocabulary.html">返回</a>
-      
+
       <!-- 開發者模式切換開關 (同 holiday.html) -->
       <label class="mode-toggle" title="顯示內部檢視、手動輸入與 API 切換">
         <input id="debugToggle" type="checkbox">
@@ -89,7 +91,7 @@
           <option value="hakka_api_hak" selected>客委會辨識API</option>
           <option value="taiwan_tongues_zh">華語API</option>
         </select>
-        
+
         <label class="developer-label" for="recognitionModeSelect" style="margin-top: 10px;">辨識模式</label>
         <select id="recognitionModeSelect" class="developer-select">
           <option value="realtime" selected>即時串流（WebSocket）</option>
@@ -105,11 +107,5 @@
   <!-- 載入遊戲主邏輯 -->
   <script src="./field-trip.js?v=20260909-shared-realtime1"></script>
 </body>
+
 </html>
-
-
-
-
-
-
-

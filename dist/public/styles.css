@@ -642,8 +642,11 @@ h1 {
 }
 
 .learning-card {
+  position: relative;
   min-height: 260px;
-  padding: 18px;
+  padding: 18px 18px 62px 18px;
+  display: flex;
+  flex-direction: column;
 }
 
 .learning-card h3,
@@ -663,9 +666,11 @@ h1 {
 
 .start-learning-btn {
   display: inline-flex;
+  align-items: center;
+  justify-content: center;
   margin-top: 8px;
-  padding: 7px 14px;
-  border: 0;
+  padding: 7px 16px;
+  border: 1px solid #f0d250;
   border-radius: 999px;
   color: #8a5c14;
   background: #fff3cf;
@@ -674,6 +679,13 @@ h1 {
   cursor: pointer;
   text-decoration: none;
   transition: opacity 0.2s, background 0.2s;
+}
+
+.learning-card .start-learning-btn {
+  position: absolute;
+  right: 18px;
+  bottom: 18px;
+  margin-top: 0;
 }
 
 .start-learning-btn:hover {
@@ -793,12 +805,29 @@ h1 {
 }
 
 .wide-card {
+  position: relative;
   display: grid;
   grid-template-columns: 180px minmax(0, 1fr);
   gap: 22px;
   align-items: center;
   min-height: 210px;
   padding: 20px;
+}
+
+.wide-card > div {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: 100%;
+  padding-bottom: 44px;
+}
+
+.wide-card .start-learning-btn {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  margin-top: 0;
 }
 
 .lesson-art,

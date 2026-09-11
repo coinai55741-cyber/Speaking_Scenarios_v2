@@ -1233,3 +1233,9 @@ body.screen-complete .mode-toggle {
 
 
 
+
+/* Picture naming: food is visible on the table before recording. */
+.table-foods {position:absolute;left:50%;top:65%;width:48%;height:29%;transform:translateX(-50%);display:flex;align-items:center;justify-content:center;gap:5%;}
+.breakfast-scene .table-foods img {width:45%;height:100%;max-height:none;object-fit:contain;mix-blend-mode:multiply;filter:drop-shadow(0 8px 8px rgba(91,67,35,.12));}
+.breakfast-scene .table-foods img:only-child {width:65%;}
+#choiceGrid[hidden] {display:none !important;}

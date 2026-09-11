@@ -1,6 +1,4 @@
-const DEFAULT_ASR_ENDPOINT = window.SPEECH_API?.endpoint() || "http://localhost:5000/api/speech/recognize";
-const ASR_ENDPOINT_STORAGE_KEY = window.SPEECH_API?.storageKey || "speakingDemoSpeechEndpoint";
-const RECOGNITION_MODE_STORAGE_KEY = "speakingDemoRecognitionMode";
+const DEFAULT_ASR_ENDPOINT = "https://reversal-batboy-bust.ngrok-free.dev/transcribe";
 const ASR_ENDPOINT = getAsrEndpoint();
 const ASR_PROVIDERS = {
   taiwan_tongues_zh: {
@@ -14,21 +12,15 @@ const ASR_PROVIDERS = {
     label: "客委會 API（客語預留）",
     provider: "hakka_api",
     language: "hak",
-    enabled: true,
-    note: "線上版使用 Vercel 客語辨識。"
+    enabled: false,
+    note: "接口已預留；需申請 API key 後由後端串接，key 不會放在前端。"
   }
 };
 
 function getSelectedAsrProvider() {
-  const savedProvider = localStorage.getItem("speakingDemoAsrProvider");
-  const providerId = els.asrProviderSelect?.value || savedProvider || "hakka_api_hak";
+  const providerId = els.asrProviderSelect?.value || localStorage.getItem("speakingDemoAsrProvider") || "taiwan_tongues_zh";
   const hasVisibleOption = !els.asrProviderSelect || [...els.asrProviderSelect.options].some(option => option.value === providerId);
-  return ASR_PROVIDERS[providerId] && hasVisibleOption ? providerId : "hakka_api_hak";
-}
-
-function getRecognitionMode() {
-  const value = els.recognitionModeSelect?.value || localStorage.getItem(RECOGNITION_MODE_STORAGE_KEY) || "realtime";
-  return value === "realtime" ? "realtime" : "file";
+  return ASR_PROVIDERS[providerId] && hasVisibleOption ? providerId : "taiwan_tongues_zh";
 }
 
 function updateProviderUi() {
@@ -36,36 +28,30 @@ function updateProviderUi() {
   const providerId = getSelectedAsrProvider();
   const config = ASR_PROVIDERS[providerId];
   els.asrProviderSelect.value = providerId;
-  if (els.recognitionModeSelect) els.recognitionModeSelect.value = getRecognitionMode();
-  if (els.asrProviderNote) els.asrProviderNote.textContent = `${config.note} / ${getRecognitionMode() === "realtime" ? "即時辨識" : "檔案辨識"}`;
+  if (els.asrProviderNote) els.asrProviderNote.textContent = config.note;
   if (els.debugProvider) {
     els.debugProvider.textContent = `${config.label} / ${config.enabled ? "可用" : "預留"}`;
   }
-
+  
   if (typeof updateHitStatus === 'function' && els.answerInput) {
-    updateHitStatus(els.answerInput.value.trim());
+    updateHitStatus(els.answerInput.value.trim() || saved.transcript);
   }
 }
 
 function getAsrEndpoint() {
   const urlParams = new URLSearchParams(window.location.search);
   const paramUrl = urlParams.get('asr');
-  const hosted = window.SPEECH_API?.isHostedPage?.();
-  const isVercelEndpoint = value => {
-    try { return new URL(value).hostname.endsWith('.vercel.app'); }
-    catch (error) { return false; }
-  };
-
-  if (paramUrl && isAllowedAsrEndpoint(paramUrl) && (!hosted || isVercelEndpoint(paramUrl))) {
-    localStorage.setItem(ASR_ENDPOINT_STORAGE_KEY, paramUrl);
+  
+  if (paramUrl && isAllowedAsrEndpoint(paramUrl)) {
+    localStorage.setItem('asrEndpoint', paramUrl);
     return paramUrl;
   }
-
-  const savedUrl = localStorage.getItem(ASR_ENDPOINT_STORAGE_KEY);
-  if (savedUrl && isAllowedAsrEndpoint(savedUrl) && (!hosted || isVercelEndpoint(savedUrl))) {
+  
+  const savedUrl = localStorage.getItem('asrEndpoint');
+  if (savedUrl && isAllowedAsrEndpoint(savedUrl)) {
     return savedUrl;
   }
-
+  
   return DEFAULT_ASR_ENDPOINT;
 }
 
@@ -74,7 +60,7 @@ function isAllowedAsrEndpoint(value) {
     const url = new URL(value);
     const allowedLocal = url.hostname === "127.0.0.1" || url.hostname === "localhost";
     const allowedTunnel = url.hostname.endsWith(".trycloudflare.com") || url.hostname.endsWith(".ngrok-free.app") || url.hostname.endsWith(".ngrok-free.dev") || url.hostname.endsWith(".onrender.com");
-    return (window.SPEECH_API?.isAllowedEndpoint(value) || (["/api/speech/recognize", "/recognize", "/transcribe"].includes(url.pathname) && (allowedLocal || allowedTunnel)));
+    return url.pathname === "/transcribe" && (allowedLocal || allowedTunnel);
   } catch (error) {
     return false;
   }
@@ -98,40 +84,40 @@ const dialectSentences = {
   sixian: [
     "下晝愛共下去打籃球無？",
     "𠊎逐擺打籃球都擲毋準。",
-    "阿明當愛在公園肚打籃球"
+    ""
   ],
   hailu: [
     "下晝愛共下去打籃球無？",
     "𠊎逐擺打籃球都擲毋準。",
-    "阿明當愛在公園肚打籃球"
+    ""
   ],
   dabu: [
     "下晝愛共下去打籃球無？",
     "𠊎逐擺打籃球都擲毋準。",
-    "阿明當愛在公園肚打籃球"
+    ""
   ],
   raoping: [
     "下晝愛共下去打籃球無？",
     "𠊎逐擺打籃球都擲毋準。",
-    "阿明當愛在公園肚打籃球"
+    ""
   ],
   zhaoan: [
     "下晝愛共下去打籃球無？",
     "𠊎逐擺打籃球都擲毋準。",
-    "阿明當愛在公園肚打籃球"
+    ""
   ],
   southSixian: [
     "下晝愛共下去打籃球無？",
     "𠊎逐擺打籃球都擲毋準。",
-    "阿明當愛在公園肚打籃球"
+    ""
   ]
 };
 
 const tasks = [
   {
-    type: "題型一：情境表達",
+    type: "題型一：聽音複誦",
     title: "邀請小達一起打球",
-    prompt: "聽聽看別人怎麼說，試著用自己的客話邀請小達。",
+    prompt: "先聽一句，再按錄音跟著說。",
     question: "",
     mandarin: "下午要不要一起去打籃球？",
     audio: "https://dn9mvjhbyvvpc.cloudfront.net/files/66079_4d91b320010330a8105c5893e5fc96a1.mp3",
@@ -153,7 +139,7 @@ const tasks = [
     title: "看圖說一說",
     prompt: "觀察圖片，用客語完整回答。",
     question: "阿明喜歡在哪裡做什麼？",
-    mandarin: "阿明喜歡在公園裡打籃球",
+    mandarin: "",
     audio: "",
     image: "./assets/scenario-holiday-basketball-hoodie.png",
     alt: "阿明穿著帽T在公園打籃球"
@@ -167,9 +153,6 @@ let answerChecked = false;
 let recorder = null;
 let stream = null;
 let chunks = [];
-let realtimeSession = null;
-let realtimeTranscript = "";
-let realtimeError = "";
 let audioUrl = "";
 let isRecording = false;
 let isTranscribing = false;
@@ -206,33 +189,14 @@ const els = {
   finishPanel: document.querySelector("#finishPanel"),
   finishBtn: document.querySelector("#finishBtn"),
   reviewResult: document.querySelector("#reviewResult"),
-  missionLayout: document.querySelector(".mission-layout"),
   recordingPanel: document.querySelector("#recordingPanel"),
   recordingStatus: document.querySelector("#recordingStatus"),
   audioPreview: document.querySelector("#audioPreview"),
   asrProviderSelect: document.querySelector("#asrProviderSelect"),
   asrProviderNote: document.querySelector("#asrProviderNote"),
   debugProvider: document.querySelector("#debugProvider"),
-  recognitionModeSelect: document.querySelector("#recognitionModeSelect"),
-  hitTags: document.querySelector("#hitTags"),
-  storyIntro: document.querySelector("#storyIntro"),
-  storyStartBtn: document.querySelector("#storyStartBtn")
+  hitTags: document.querySelector("#hitTags")
 };
-
-function getFirstLockedStep() {
-  const firstIncomplete = answers.findIndex(answer => !answer.completed);
-  return firstIncomplete === -1 ? tasks.length : firstIncomplete + 1;
-}
-
-function updateStepLocks() {
-  const firstLockedStep = getFirstLockedStep();
-  els.steps.forEach((step, index) => {
-    const isLocked = index > 0 && index >= firstLockedStep;
-    step.disabled = isLocked;
-    step.setAttribute("aria-disabled", String(isLocked));
-    step.classList.toggle("is-locked", isLocked);
-  });
-}
 
 function renderTask() {
   const task = tasks[currentStep];
@@ -252,7 +216,6 @@ function renderTask() {
   resetRecording({ keepSaved: true });
   restoreRecordingPreview(saved);
   els.steps.forEach((step, index) => step.classList.toggle("is-active", index === currentStep));
-  updateStepLocks();
   els.dialects.forEach(button => button.classList.toggle("is-active", button.dataset.dialect === currentDialect));
 
   if (sentence) {
@@ -270,7 +233,6 @@ function renderTask() {
     setAudioButtonState(false);
   }
   updateDeveloperMode();
-  updateStepLocks();
   updateFinishPanel();
   updateProviderUi();
   updateHitStatus(saved.transcript);
@@ -279,11 +241,11 @@ function renderTask() {
 function updateHitStatus(transcript) {
   if (!els.hitTags) return;
   const cleanTranscript = (transcript || "").replace(/[。，！？、？\s]/g, "").replace(/准/g, "準");
-
+  
   const renderBilingualTags = (hakkaWords, mandarinWords) => {
     const providerId = getSelectedAsrProvider();
     const isHakkaApi = ASR_PROVIDERS[providerId]?.language === "hak";
-
+    
     let html = '';
     if (isHakkaApi) {
       html += '<div style="width: 100%; font-size: 12px; color: #666; margin-bottom: 2px;">客語：</div>';
@@ -312,10 +274,10 @@ function updateHitStatus(transcript) {
   } else if (currentStep === 2) {
     const placeWord = "公園";
     const activityWords = ["打", "籃球"];
-
+    
     let html = '<div style="width: 100%; font-size: 12px; color: #666; margin-bottom: 2px;">地點：</div>';
     html += `<span class="${cleanTranscript.includes(placeWord) ? 'is-hit' : ''}">${placeWord}</span>`;
-
+    
     html += '<div style="width: 100%; font-size: 12px; color: #666; margin-top: 6px; margin-bottom: 2px;">活動：</div>';
     activityWords.forEach(word => {
       const isHit = cleanTranscript.includes(word);
@@ -394,23 +356,13 @@ function updateFinishPanel() {
 }
 
 function showReview() {
-  els.missionLayout.classList.add("is-completing");
-  window.setTimeout(() => {
-    els.missionLayout.classList.remove("is-completing");
-    els.missionLayout.classList.add("is-complete");
-    els.missionLayout.innerHTML = `
-      <section class="completion-card" aria-labelledby="completionTitle">
-        <img class="completion-medal" src="./assets/holiday-completion-medal.png" alt="休假日任務完成獎牌">
-        <p class="completion-kicker">休假日任務完成</p>
-        <h2 id="completionTitle">通過測驗～</h2>
-        <p class="completion-copy">恭喜你完成「休假日」任務！</p>
-        <button id="playAgainBtn" class="completion-button" type="button">再玩一次</button>
-      </section>
-    `;
-    document.querySelector("#playAgainBtn")?.addEventListener("click", () => {
-      window.location.reload();
-    });
-  }, 460);
+  const practiceItems = answers
+    .map((answer, index) => answer.needsPractice ? `第 ${index + 1} 題可以再多練習喔！` : "")
+    .filter(Boolean);
+  els.reviewResult.innerHTML = practiceItems.length
+    ? practiceItems.map(text => `<p>${text}</p>`).join("")
+    : "<p>三題都完成了，表現很穩喔！</p>";
+  els.reviewResult.hidden = false;
 }
 
 function isAnswerReady(answer) {
@@ -436,10 +388,6 @@ function resetRecording(options = {}) {
   if (recorder && isRecording) {
     try { recorder.stop(); } catch (error) { /* already stopped */ }
   }
-  realtimeSession?.abort?.();
-  realtimeSession = null;
-  realtimeTranscript = "";
-  realtimeError = "";
   cleanupStream();
   recorder = null;
   chunks = [];
@@ -477,79 +425,6 @@ async function startRecording() {
   try {
     resetRecording();
     stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-    const useMandarinWeb = getSelectedAsrProvider() === "taiwan_tongues_zh" && window.MANDARIN_WEB_SPEECH;
-    const useRealtime = getSelectedAsrProvider() === "hakka_api_hak" && getRecognitionMode() === "realtime" && window.HAKKA_REALTIME_ASR;
-    if (useMandarinWeb) {
-      realtimeSession = window.MANDARIN_WEB_SPEECH.createSession({
-        lang: "zh-TW",
-        interimResults: true,
-        continuous: false,
-        onTranscript(text) {
-          realtimeTranscript = text || "";
-          if (realtimeTranscript) {
-            els.answerInput.value = realtimeTranscript;
-            els.asrStatus.textContent = realtimeTranscript;
-            els.recordingStatus.textContent = `華語即時辨識：${realtimeTranscript}`;
-            updateHitStatus(realtimeTranscript);
-            setCheckEnabled(true, "等待辨識");
-          }
-        },
-        onFinal(text) {
-          realtimeTranscript = text || realtimeTranscript || "";
-          if (realtimeTranscript) {
-            els.answerInput.value = realtimeTranscript;
-            els.asrStatus.textContent = realtimeTranscript;
-            els.recordingStatus.textContent = `華語辨識完成：${realtimeTranscript}`;
-            updateHitStatus(realtimeTranscript);
-            setCheckEnabled(true, "等待辨識");
-            saveCurrentAnswer();
-          }
-          realtimeSession = null;
-        },
-        onError(message) {
-          realtimeError = message || "華語辨識發生錯誤";
-          els.asrStatus.textContent = realtimeError;
-        }
-      });
-      realtimeSession.start();
-    } else if (useRealtime) {
-      realtimeSession = window.HAKKA_REALTIME_ASR.createSession({
-        onTranscript(text) {
-          realtimeTranscript = text || "";
-          if (realtimeTranscript) {
-            els.answerInput.value = realtimeTranscript;
-            els.asrStatus.textContent = realtimeTranscript;
-            els.recordingStatus.textContent = `即時辨識：${realtimeTranscript}`;
-            updateHitStatus(realtimeTranscript);
-            setCheckEnabled(true, "等待辨識");
-          }
-        },
-        onFinal(text) {
-          realtimeTranscript = text || realtimeTranscript || "";
-          if (realtimeTranscript) {
-            els.answerInput.value = realtimeTranscript;
-            els.asrStatus.textContent = realtimeTranscript;
-            els.recordingStatus.textContent = `即時辨識完成：${realtimeTranscript}`;
-            updateHitStatus(realtimeTranscript);
-            setCheckEnabled(true, "等待辨識");
-            saveCurrentAnswer();
-          } else if (realtimeError) {
-            els.asrStatus.textContent = "即時辨識失敗";
-            els.recordingStatus.textContent = realtimeError;
-          } else {
-            els.asrStatus.textContent = "未辨識出文字";
-            els.recordingStatus.textContent = "沒有辨識到文字。請重新錄音，或切換檔案辨識。";
-          }
-          realtimeSession = null;
-        },
-        onError(message) {
-          realtimeError = message || "即時辨識連線失敗";
-          els.asrStatus.textContent = realtimeError;
-        }
-      });
-      const realtimeOk = await realtimeSession.start(stream);
-      if (!realtimeOk) realtimeSession = null;
-    }
     const mimeType = MediaRecorder.isTypeSupported("audio/webm;codecs=opus") ? "audio/webm;codecs=opus" : "";
     recorder = new MediaRecorder(stream, mimeType ? { mimeType } : undefined);
     chunks = [];
@@ -565,23 +440,9 @@ async function startRecording() {
       els.audioPreview.src = audioUrl;
       els.audioPreview.hidden = false;
       els.recordingPanel.hidden = false;
-      const useRealtimeResult = (getSelectedAsrProvider() === "hakka_api_hak" && getRecognitionMode() === "realtime") || getSelectedAsrProvider() === "taiwan_tongues_zh";
-      els.recordingStatus.textContent = useRealtimeResult ? `錄音完成：${formatBytes(blob.size)}。等待即時辨識文字...` : `錄音完成：${formatBytes(blob.size)}。正在辨識...`;
-      if (useRealtimeResult) {
-        realtimeSession?.stop?.();
-        setTimeout(() => {
-          cleanupStream();
-          if (!realtimeTranscript && !realtimeError) {
-            els.asrStatus.textContent = "未辨識出文字";
-            els.recordingStatus.textContent = "沒有辨識到文字。請重新錄音，或切換檔案辨識。";
-          }
-          saveCurrentAnswer();
-          updateHitStatus(els.answerInput.value.trim());
-        }, 900);
-      } else {
-        cleanupStream();
-        transcribeAudioBlob(blob);
-      }
+      els.recordingStatus.textContent = `錄音完成：${formatBytes(blob.size)}。正在辨識...`;
+      cleanupStream();
+      transcribeAudioBlob(blob);
     });
 
     recorder.start();
@@ -610,7 +471,6 @@ function stopRecording() {
   setCheckEnabled(false, "辨識中...");
   els.recordingStatus.textContent = "正在整理錄音...";
   try {
-    if (getSelectedAsrProvider() === "hakka_api_hak" && getRecognitionMode() === "realtime") realtimeSession?.stop?.();
     recorder.stop();
   } catch (error) {
     cleanupStream();
@@ -635,10 +495,6 @@ async function transcribeAudioBlob(blob) {
   formData.append("provider_id", providerId);
   formData.append("provider", providerConfig.provider);
   formData.append("language", providerConfig.language);
-  formData.append("dialect", currentDialect);
-  formData.append("recognizer", providerConfig.language === "hak" ? `hakka-${currentDialect}` : "mandarin");
-  formData.append("scene_id", "holiday");
-  formData.append("recognition_mode", getRecognitionMode());
 
   try {
     const response = await fetch(ASR_ENDPOINT, {
@@ -649,21 +505,15 @@ async function transcribeAudioBlob(blob) {
       const message = await response.text();
       throw new Error(message || `HTTP ${response.status}`);
     }
-    const result = window.SPEECH_API?.normalizeResponse(await response.json(), {
-      provider: providerConfig.provider,
-      provider_id: providerId,
-      dialect: currentDialect,
-      recognizer: providerConfig.language === "hak" ? `hakka-${currentDialect}` : "mandarin",
-      scene_id: "holiday"
-    }) || { text: "", ok: false };
+    const result = await response.json();
     if (result.status === "not_enabled") {
       throw new Error(result.message || "此辨識 API 尚未啟用");
     }
-    const text = result.text;
+    const text = (result.text || "").trim();
     if (text) {
       els.answerInput.value = text;
       els.asrStatus.textContent = text;
-      els.recordingStatus.textContent = `辨識完成：${text}`;
+      els.recordingStatus.textContent = "辨識完成，可以送出辨識。";
     } else {
       els.asrStatus.textContent = "未辨識出文字";
       els.recordingStatus.textContent = "沒有辨識到文字。開發者模式可手動修正，或重新錄音。";
@@ -689,20 +539,9 @@ els.dialects.forEach(button => {
 
 els.steps.forEach((button, index) => {
   button.addEventListener("click", () => {
-    if (button.disabled || button.classList.contains("is-locked")) return;
     currentStep = index;
     renderTask();
   });
-});
-
-els.storyStartBtn?.addEventListener("click", () => {
-  els.storyIntro.classList.add("is-leaving");
-  window.setTimeout(() => {
-    els.storyIntro.hidden = true;
-    els.missionLayout.hidden = false;
-    els.missionLayout.classList.add("is-entering");
-    renderTask();
-  }, 520);
 });
 
 els.debugToggle.addEventListener("change", event => {
@@ -762,7 +601,6 @@ els.retryBtn.addEventListener("click", () => {
   if (els.answerInput) els.answerInput.value = "";
   els.asrStatus.textContent = "尚未送出";
   els.missCount.textContent = "0";
-  updateStepLocks();
   updateFinishPanel();
 });
 
@@ -781,24 +619,7 @@ els.checkBtn.addEventListener("click", () => {
     needsPractice: needsMorePractice(answer || "")
   });
   updateDeveloperMode();
-  updateStepLocks();
   updateFinishPanel();
 });
 
-els.missionLayout.hidden = true;
 renderTask();
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

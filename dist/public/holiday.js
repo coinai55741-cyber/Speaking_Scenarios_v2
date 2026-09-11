@@ -41,7 +41,7 @@ function updateProviderUi() {
   if (els.debugProvider) {
     els.debugProvider.textContent = `${config.label} / ${config.enabled ? "可用" : "預留"}`;
   }
-  
+
   if (typeof updateHitStatus === 'function' && els.answerInput) {
     updateHitStatus(els.answerInput.value.trim());
   }
@@ -55,17 +55,17 @@ function getAsrEndpoint() {
     try { return new URL(value).hostname.endsWith('.vercel.app'); }
     catch (error) { return false; }
   };
-  
+
   if (paramUrl && isAllowedAsrEndpoint(paramUrl) && (!hosted || isVercelEndpoint(paramUrl))) {
     localStorage.setItem(ASR_ENDPOINT_STORAGE_KEY, paramUrl);
     return paramUrl;
   }
-  
+
   const savedUrl = localStorage.getItem(ASR_ENDPOINT_STORAGE_KEY);
   if (savedUrl && isAllowedAsrEndpoint(savedUrl) && (!hosted || isVercelEndpoint(savedUrl))) {
     return savedUrl;
   }
-  
+
   return DEFAULT_ASR_ENDPOINT;
 }
 
@@ -74,7 +74,7 @@ function isAllowedAsrEndpoint(value) {
     const url = new URL(value);
     const allowedLocal = url.hostname === "127.0.0.1" || url.hostname === "localhost";
     const allowedTunnel = url.hostname.endsWith(".trycloudflare.com") || url.hostname.endsWith(".ngrok-free.app") || url.hostname.endsWith(".ngrok-free.dev") || url.hostname.endsWith(".onrender.com");
-    return (window.SPEECH_API?.isAllowedEndpoint(value) || ( ["/api/speech/recognize", "/recognize", "/transcribe"].includes(url.pathname) && (allowedLocal || allowedTunnel) ));
+    return (window.SPEECH_API?.isAllowedEndpoint(value) || (["/api/speech/recognize", "/recognize", "/transcribe"].includes(url.pathname) && (allowedLocal || allowedTunnel)));
   } catch (error) {
     return false;
   }
@@ -129,9 +129,9 @@ const dialectSentences = {
 
 const tasks = [
   {
-    type: "題型一：聽音複誦",
+    type: "題型一：情境表達",
     title: "邀請小達一起打球",
-    prompt: "先聽一句，再按錄音跟著說。",
+    prompt: "聽聽看別人怎麼說，試著用自己的客話邀請小達。",
     question: "",
     mandarin: "下午要不要一起去打籃球？",
     audio: "https://dn9mvjhbyvvpc.cloudfront.net/files/66079_4d91b320010330a8105c5893e5fc96a1.mp3",
@@ -279,11 +279,11 @@ function renderTask() {
 function updateHitStatus(transcript) {
   if (!els.hitTags) return;
   const cleanTranscript = (transcript || "").replace(/[。，！？、？\s]/g, "").replace(/准/g, "準");
-  
+
   const renderBilingualTags = (hakkaWords, mandarinWords) => {
     const providerId = getSelectedAsrProvider();
     const isHakkaApi = ASR_PROVIDERS[providerId]?.language === "hak";
-    
+
     let html = '';
     if (isHakkaApi) {
       html += '<div style="width: 100%; font-size: 12px; color: #666; margin-bottom: 2px;">客語：</div>';
@@ -312,10 +312,10 @@ function updateHitStatus(transcript) {
   } else if (currentStep === 2) {
     const placeWord = "公園";
     const activityWords = ["打", "籃球"];
-    
+
     let html = '<div style="width: 100%; font-size: 12px; color: #666; margin-bottom: 2px;">地點：</div>';
     html += `<span class="${cleanTranscript.includes(placeWord) ? 'is-hit' : ''}">${placeWord}</span>`;
-    
+
     html += '<div style="width: 100%; font-size: 12px; color: #666; margin-top: 6px; margin-bottom: 2px;">活動：</div>';
     activityWords.forEach(word => {
       const isHit = cleanTranscript.includes(word);

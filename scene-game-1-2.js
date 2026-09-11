@@ -122,7 +122,7 @@ const LESSON = {
   missions: {
     mission1: {
       title: "怎麼來",
-      copy: ["瑞容想先打電話問問大家的交通方式，在筆記本寫下大家的交通方式。", "請依照順序排出問句詞卡，打電話給大家。"],
+      copy: ["瑞容想先打電話問問大家的交通方式，在筆記本寫下大家的交通方式。", "請打電話給大家，按錄音鈕唸出問句。"],
       commands: [{ id: "call", label: "打電話" }],
       sentence: "你愛仰仔來吾屋下？",
       correctTokens: ["你", "愛", "仰仔", "來", "吾屋下"],
@@ -343,7 +343,7 @@ function resetStageState() {
   state.answerTokens = [];
   state.tokenOrder = [];
   state.sentenceResult = "";
-      state.sentenceHinted = false;
+  state.sentenceHinted = false;
   state.askedPerson = "";
   state.travelPerson = "";
   state.responseReady = false;
@@ -659,19 +659,9 @@ function missionSideContent(stage, mission) {
 }
 
 function questionAudioPanel(mission) {
-  const completedTitle = state.completedMission1.length ? "已完成同學" : "已完成";
+  const completedTitle = "已完成同學";
   return `
     <div class="mission-notes question-audio-panel">
-      <div class="question-audio-head">
-        <div>
-          <strong>句型</strong>
-          <small>${mission.sentence}</small>
-        </div>
-        <div class="audio-actions">
-          <button class="round-audio-button" type="button" id="playAskVoice" aria-label="播放問句" title="播放問句">${iconSvg("play")}</button>
-          <button class="round-audio-button is-pause" type="button" id="pauseVoice" aria-label="暫停問句" title="暫停問句">${iconSvg("pause")}</button>
-        </div>
-      </div>
       <div class="completed-students">
         <strong>${completedTitle}</strong>
         <div class="completed-list">${completedList()}</div>
@@ -688,7 +678,7 @@ function personButton(name) {
 }
 
 function completedList() {
-  if (!state.completedMission1.length) return `<span class="completed-empty">尚未完成</span>`;
+  if (!state.completedMission1.length) return `<span class="completed-empty">尚未紀錄</span>`;
   return state.completedMission1.map((name) => `<span class="completed-chip">${name}</span>`).join("");
 }
 
@@ -742,13 +732,15 @@ function bindMissionEvents(stage, mission) {
     resetRecordingState();
     state.answerTokens = [];
     state.sentenceResult = "";
-      state.sentenceHinted = false;
+    state.sentenceHinted = false;
     renderMission(stage);
   });
   bindOptional("#submitSentence", "click", () => {
-    const answer = normalizeSentence(state.answerTokens.join(""));
+    const rawAnswer = state.recognizedText || state.answerTokens.join("");
+    const answer = normalizeSentence(rawAnswer);
     const target = normalizeSentence(mission.sentence);
-    if (answer === target) {
+    const matchedByCards = normalizeSentence(state.answerTokens.join("")) === target;
+    if (answer === target || matchedByCards) {
       playSe(8);
       state.askedPerson = state.selectedPerson;
       state.responseReady = false;
@@ -770,7 +762,7 @@ function bindMissionEvents(stage, mission) {
       playWrongAudio();
       state.sentenceResult = "";
       state.sentenceHinted = false;
-      flashHint("還差一點，請調整詞卡順序。");
+      flashHint("還差一點，請重新錄音唸出問句。");
     }
     renderMission(stage);
   });
@@ -812,11 +804,11 @@ function bindMissionEvents(stage, mission) {
         state.travelPerson = "";
         state.responseReady = false;
         state.questionPlaying = false;
-    resetRecordingState({ keepAnswer: true });
+        resetRecordingState({ keepAnswer: true });
         state.answerTokens = [];
         state.tokenOrder = [];
         state.sentenceResult = "";
-      state.sentenceHinted = false;
+        state.sentenceHinted = false;
       } else {
         playWrongAudio();
         state.transportResult = "";
@@ -832,28 +824,29 @@ function missionHint(stage) {
   if (state.questionPlaying) return "正在播放朋友回答，請先聽完。";
   if (state.askedPerson && !state.responseReady) return "請稍等回答播放完成。";
   if (state.selectedCommand === "call" && !state.selectedPerson) return "請選一位朋友。";
-  if (state.selectedCommand === "call" && state.selectedPerson) return "請依照順序排出問句詞卡。";
+  if (state.selectedCommand === "call" && state.selectedPerson) return "請按錄音鈕唸出問句，打電話給朋友。";
   if (state.askedPerson && state.responseReady) return `請幫${state.askedPerson}選交通方式。`;
   if (state.askedPerson && !state.selectedCommand) return `請聽${state.askedPerson}的回答。`;
   return "請先選「打電話」。";
 }
 
 function sentencePanel(mission) {
-  const correctTokens = mission.correctTokens || mission.sentence.replace(/[？?。！!，,]/g, "").split(/\s+/).filter(Boolean);
-  const tokenSource = state.tokenOrder.length ? state.tokenOrder : mission.tokens;
-  const tokens = tokenSource.map((token) => {
-    const disabled = "disabled";
-    const hinted = state.sentenceHinted && correctTokens.includes(token) ? " is-answer-hint" : "";
-    const recognized = state.answerTokens.includes(token) ? " is-recognized" : "";
-    return `<button class="token-chip${hinted}${recognized}" type="button" data-token="${token}" ${disabled}>${token}</button>`;
-  }).join("");
-  const answer = state.askedPerson
-    ? `<span class="sentence-line-text">${mission.sentence}</span>`
-    : state.answerTokens.length
-      ? state.answerTokens.map((token) => `<span class="answer-token is-recognition-token">${token}</span>`).join("")
-      : `<span class="recognition-status">${recognitionStatusText()}</span>`;
-  const hintClass = state.sentenceHinted ? " is-hinted" : "";
-  const hintLabel = state.sentenceHinted ? "已提示" : "提示";
+  let answerHtml = "";
+  if (state.askedPerson) {
+    answerHtml = `<span class="sentence-line-text">${mission.sentence}</span>`;
+  } else if (state.recording) {
+    const text = state.realtimeTranscript || "錄音中，再按一次停止。";
+    answerHtml = `<span class="recognition-status">${text}</span>`;
+  } else if (state.recognizing) {
+    answerHtml = `<span class="recognition-status">辨識中....</span>`;
+  } else if (state.recognizedText) {
+    answerHtml = `<span class="sentence-line-text">${state.recognizedText}</span>`;
+  } else if (state.recognitionError) {
+    answerHtml = `<span class="recognition-status is-error">${state.recognitionError}</span>`;
+  } else {
+    answerHtml = `<span class="recognition-status">點擊錄音鈕。</span>`;
+  }
+
   const activePerson = state.askedPerson || state.selectedPerson;
   const questionAvatarClass = "person-avatar avatar-ruirong2";
   const responseAvatarClass = activePerson ? avatarClassByName(activePerson) : "";
@@ -864,13 +857,16 @@ function sentencePanel(mission) {
   const recordLabel = state.recording ? "停止錄音" : state.recognizing ? "辨識中" : state.recordedAudioUrl ? "重新錄音" : "錄音";
   const recordIcon = state.recording ? "stop" : "mic";
   const recordClass = state.recording ? " is-recording" : state.recognizing ? " is-recognizing" : "";
-  const canSubmit = state.answerTokens.length && !state.recording && !state.recognizing;
+  const hasRecognizedText = Boolean(state.recognizedText && state.recognizedText.trim());
+  const canSubmit = (hasRecognizedText || state.answerTokens.length > 0) && !state.recording && !state.recognizing;
+  const isLineText = Boolean(state.askedPerson || (state.recognizedText && !state.recording && !state.recognizing));
+
   return `
     <div class="sentence-panel flat-sentence-panel recognition-mode">
       <div class="flat-compose-row">
         <span class="sentence-avatar ${questionAvatarClass}" aria-hidden="true"></span>
         <button class="voice-button record-button${recordClass}" type="button" id="recordSentence" aria-label="${recordLabel}" title="${recordLabel}" ${state.askedPerson || state.recognizing ? "disabled" : ""}>${iconSvg(recordIcon)}</button>
-        <div class="answer-zone ${state.askedPerson ? "is-sentence-line" : ""}">${answer}</div>
+        <div class="answer-zone ${isLineText ? "is-sentence-line" : ""}">${answerHtml}</div>
         <div class="sentence-actions">
           <button class="voice-button own-voice" type="button" id="playOwnVoice" aria-label="聽自己念" title="聽自己念" ${state.recordedAudioUrl ? "" : "disabled"}>${iconSvg("speaker")}</button>
           <button class="icon-button submit-button" type="button" id="submitSentence" ${state.askedPerson || !canSubmit ? "disabled" : ""}>送出</button>
@@ -879,9 +875,7 @@ function sentencePanel(mission) {
       <div class="flat-tool-row">
         <span class="sentence-avatar ${responseAvatarClass}" aria-hidden="true">${activePerson ? "" : "答"}</span>
         ${responseButton}
-        <button class="hint-button${hintClass}" type="button" id="hintSentence" ${state.askedPerson ? "disabled" : ""}>${hintLabel}</button>
       </div>
-      <div class="token-bank is-recognition-bank">${tokens}</div>
       ${transportChoices}
     </div>
   `;
@@ -890,7 +884,7 @@ function recognitionStatusText() {
   if (state.recording) return "錄音中，再按一次停止。";
   if (state.recognizing) return "辨識中....";
   if (state.recognitionError) return state.recognitionError;
-  if (state.recognizedText) return `辨識：${state.recognizedText}`;
+  if (state.recognizedText) return state.recognizedText;
   if (state.recordedAudioUrl) return "可聽自己念，或重新錄音。";
   return "點擊錄音鈕。";
 }
@@ -949,7 +943,7 @@ async function startSentenceRecording(stage, mission) {
           state.recognizedText = state.realtimeTranscript;
           state.lastRecognitionPayload = { text: state.realtimeTranscript, provider: "hakka_realtime_asr", mode: "realtime" };
           state.answerTokens = mapRecognitionToCards(state.lastRecognitionPayload, mission);
-          state.recognitionError = state.recognizedText ? (state.answerTokens.length ? "" : "有辨識到文字，但沒有對應的字卡。") : "辨識完成，但沒有讀到文字。";
+          state.recognitionError = state.recognizedText ? "" : "辨識完成，但沒有讀到文字。";
           state.realtimeSession = null;
           renderDeveloperPanel(stage);
           renderMission(stage);
@@ -1002,7 +996,7 @@ async function finishSentenceRecording(stage, mission) {
     state.answerTokens = mapRecognitionToCards(payload, mission);
     renderDeveloperPanel(stage);
     state.recognitionError = state.recognizedText
-      ? (state.answerTokens.length ? "" : "有辨識到文字，但沒有對應的字卡。")
+      ? ""
       : "辨識完成，但沒有讀到文字。";
   } catch (error) {
     state.lastRecognitionPayload = null;
@@ -1265,7 +1259,7 @@ function syncBgm(stage) {
   state.bgm = new Audio(target);
   state.bgm.loop = true;
   state.bgm.volume = Number(document.querySelector("#bgmVolume").value) / 100;
-  state.bgm.play().catch(() => {});
+  state.bgm.play().catch(() => { });
 }
 
 function playCallAudio() {
@@ -1273,7 +1267,7 @@ function playCallAudio() {
   state.callLoop = new Audio(`${LOCAL_MUSIC_ROOT}/S2_m1_call.mp3`);
   state.callLoop.loop = true;
   state.callLoop.volume = Number(document.querySelector("#seVolume").value) / 100;
-  state.callLoop.play().catch(() => {});
+  state.callLoop.play().catch(() => { });
 }
 
 function stopCallAudio() {
@@ -1299,7 +1293,7 @@ function playLocalAudio(src, onEnded) {
   state.se = new Audio(src);
   state.se.volume = Number(document.querySelector("#seVolume").value) / 100;
   if (onEnded) state.se.addEventListener("ended", onEnded, { once: true });
-  state.se.play().catch(() => {});
+  state.se.play().catch(() => { });
 }
 
 function shuffleItems(items) {
@@ -1315,7 +1309,7 @@ function playSe(index) {
   if (state.se) state.se.pause();
   state.se = new Audio(`${BGM_ROOT}/${value}.mp3`);
   state.se.volume = Number(document.querySelector("#seVolume").value) / 100;
-  state.se.play().catch(() => {});
+  state.se.play().catch(() => { });
 }
 
 function normalizeSentence(text) {

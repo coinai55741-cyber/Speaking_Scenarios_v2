@@ -4,14 +4,14 @@
   <link rel="stylesheet" href="./hakka-font.css?v=20260907-font4">
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>第1課 𠊎好食个東西｜客語生活任務</title>
+  <title>口說詞彙卡｜客語生活任務</title>
   <link rel="stylesheet" href="./Vocabulary.css?v=20260907-font1">
 </head>
 <body>
   <main class="game-shell">
     <header class="game-topbar"><a class="back-link" href="./index.html#basic">返回</a>
       <div>
-        <h1>詞彙卡</h1>
+        <h1>口說詞彙卡</h1>
       </div>
     </header>
 
@@ -35,36 +35,17 @@
             <p id="lessonHint">請先選擇腔別，再選課別開始。</p>
           </div>
           <div class="lesson-carousel-wrap"><div class="lesson-carousel " id="lessonCarousel" aria-label="課別卡片">
-              <button class="lesson-card is-locked" type="button" data-lesson="primary" data-url="./Vocabulary-Primary.html" disabled>
-                <span class="complete-badge" data-complete-badge hidden>已完成</span>
-                <img src="./assets/vocabulary-card-primary-scene.png" alt="客語互動場景學習圖">
-                <span>第一階段</span>
+              <button class="lesson-card" type="button" data-lesson="field-trip" data-url="./field-trip.html" disabled>
+                <img src="./assets/lesson-card-2-outdoor-learning.png" alt="戶外教學趣">
+                <span>LV1</span>
+                <strong>戶外教學趣</strong>
+                <small>聽音跟讀：聽示範，跟著說出客庄詞語。</small>
+              </button>
+              <button class="lesson-card" type="button" data-lesson="classroom-stage-1" data-url="./classroom-stage-1.html" disabled>
+                <img src="./assets/vocabulary-card-primary-scene.png" alt="客語互動場景">
+                <span>LV2</span>
                 <strong>客語互動場景</strong>
-                <small>觀察場景圖片，點選物件學習常見客語詞彙。</small>
-              </button>
-              <button class="lesson-card is-locked" type="button" data-lesson="middle" data-url="./Vocabulary-Middle.html" disabled>
-                <img src="./assets/vocabulary-card-middle-tiles.png" alt="字磚拼拼樂學習圖">
-                <span>第二階段</span>
-                <strong>字磚拼拼樂</strong>
-                <small>從字磚中找出正確字詞，依序排出客語詞彙。</small>
-              </button>
-              <button class="lesson-card " type="button" data-lesson="high1" data-url="./Vocabulary-High-1-v2.html" disabled>
-                <img src="./assets/vocabulary-card-high-radio.png" alt="庄頭廣播電台學習圖">
-                <span>第三階段</span>
-                <strong>庄頭廣播電台</strong>
-                <small>聽廣播情境與線索，辨認進階生活詞彙</small>
-              </button>
-              <button class="lesson-card is-locked" type="button" data-lesson="high2" data-url="./Vocabulary-High-2.html" disabled>
-                <img src="./assets/vocabulary-card-high-boardgame.png" alt="字句大富翁學習圖">
-                <span>第四階段</span>
-                <strong>字句大富翁</strong>
-                <small>辨認進階生活詞彙與讀懂課文內容</small>
-              </button>
-                            <button class="lesson-card is-locked" type="button" data-lesson="high3" data-url="./Vocabulary-High-3.html" disabled>
-                <img src="./assets/vocabulary-card-high-newspaper.png" alt="庄頭報社學習圖">
-                <span>第五階段</span>
-                <strong>庄頭報社</strong>
-                <small>依據文章內容查證題目，扮演記者將報導推送到正確的版面，贏取讀者支持與信用。</small>
+                <small>觀察場景，點選物件進行詞語互動。</small>
               </button>
             </div></div>
         </section>
@@ -113,12 +94,12 @@
       </div>
       <div class="action-row center">
         <button id="againBtn" class="plain-button" type="button">再玩一次</button>
-        <a class="primary-link" href="./breakfast.html">回到課堂測驗</a>
+        <a class="primary-link" href="./Vocabulary.html">返回口說詞彙卡</a>
       </div>
     </section>
   </main>
 
-  <script src="./Vocabulary.js?v=20260901-01"></script>
+  <script src="./Vocabulary.js?v=20260909-default-sixian"></script>
 </body>
 </html>
 

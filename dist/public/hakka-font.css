@@ -17,6 +17,7 @@
 .hakka-font,
 [lang="hak"],
 .hakka-line,
+#questionPrompt,
 .hakka-text,
 .hakka-word,
 .vocab-hakka,
@@ -33,6 +34,7 @@
 .hakka-font,
 [lang="hak"],
 .hakka-line,
+#questionPrompt,
 .hakka-text,
 .hakka-word,
 .vocab-hakka,
@@ -47,3 +49,4 @@
 .target-sentence strong {
   font-weight: 600;
 }
+

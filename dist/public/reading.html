@@ -1,5 +1,6 @@
 <!doctype html>
 <html lang="zh-Hant">
+
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -8,10 +9,11 @@
   <link rel="stylesheet" href="./holiday.css">
   <link rel="stylesheet" href="./reading.css">
 </head>
+
 <body class="reading-page">
   <main class="task-shell">
     <header class="task-topbar">
-      <a class="back-link" href="./index.html#situations">返回</a>
+      <a class="back-link" href="./index.html#classroom">返回</a>
       <h1>繪本朗讀任務</h1>
       <label class="mode-toggle" title="顯示課文、辨識文字與測試設定">
         <input id="debugToggle" type="checkbox" aria-controls="developerPanel" aria-expanded="false">
@@ -33,7 +35,11 @@
         <h2 id="storyTitle" lang="hak">𠊎中意讀書</h2>
         <p>主角喜歡讀書，想找一個人聽故事。家人都在做什麼呢？</p>
         <p>陪主角找找看，將故事分成三段讀出來。</p>
-        <ol class="intro-steps"><li>看看故事</li><li>大聲朗讀</li><li>聆聽自己的聲音</li></ol>
+        <ol class="intro-steps">
+          <li>看看故事</li>
+          <li>大聲朗讀</li>
+          <li>聆聽自己的聲音</li>
+        </ol>
         <button id="storyStartBtn" class="story-start-button" type="button">開始朗讀 →</button>
         <p class="small-note">按「開始朗讀」才會開啟麥克風。</p>
       </div>
@@ -46,7 +52,9 @@
       </article>
       <article class="task-panel">
         <nav id="passageSteps" class="progress-strip" aria-label="朗讀段落"></nav>
-        <div class="reading-heading"><p id="passageCount" class="task-type"></p><span id="phaseLabel" class="phase-label">準備朗讀</span></div>
+        <div class="reading-heading">
+          <p id="passageCount" class="task-type"></p><span id="phaseLabel" class="phase-label">準備朗讀</span>
+        </div>
         <h2 id="passageTitle" tabindex="-1"></h2>
         <p class="prompt">請用客語，把下面這段故事讀出來。</p>
         <div id="passageText" class="passage-text" lang="hak"></div>
@@ -55,7 +63,8 @@
           <p id="transcript" class="transcript-text" lang="hak"></p>
         </div>
         <div class="reading-controls">
-          <div id="liveRecording" class="live-recording" hidden><span class="record-dot" aria-hidden="true"></span><span>錄音中</span><time id="recordTime">00:00</time></div>
+          <div id="liveRecording" class="live-recording" hidden><span class="record-dot"
+              aria-hidden="true"></span><span>錄音中…</span></div>
           <p id="status" class="reading-status" role="status" aria-live="polite">準備好再開始，不用急。</p>
           <audio id="audioPreview" controls hidden aria-label="聽我的朗讀"></audio>
           <div class="reading-actions">
@@ -66,7 +75,20 @@
           </div>
         </div>
         <section id="feedbackPanel" class="reading-feedback" hidden aria-labelledby="feedbackTitle">
-          <h3 id="feedbackTitle">本段朗讀已送出</h3>
+          <div class="feedback-banner">
+            <div class="feedback-banner-icon" aria-hidden="true">
+              <svg width="34" height="34" viewBox="0 0 32 32" fill="none">
+                <circle cx="16" cy="16" r="16" fill="#1ea44f" />
+                <path d="M9 16.5L14 21.5L23 11.5" stroke="white" stroke-width="3" stroke-linecap="round"
+                  stroke-linejoin="round" />
+              </svg>
+            </div>
+            <div class="feedback-banner-titles">
+              <h3 id="feedbackTitle">你已經讀完整段短文！</h3>
+              <p id="feedbackSubtitle" class="feedback-subtitle">繼續加油，你讀得不錯喔！</p>
+            </div>
+          </div>
+          <div id="feedbackMetrics" class="feedback-metrics-grid"></div>
           <p id="feedbackText"></p>
           <button id="nextBtn" class="primary-button" type="button">下一段 →</button>
         </section>
@@ -74,11 +96,42 @@
     </section>
 
     <aside id="developerPanel" class="developer-panel" hidden aria-label="開發者模式">
-      <div class="developer-item"><span id="answerLabel" class="developer-label">標準答案（四縣腔）</span><p id="sentenceText" lang="hak"></p></div>
-      <div class="developer-item"><span class="developer-label">辨識狀態</span><strong id="asrStatus" role="status"></strong><p id="debugRecording" class="small-note"></p><p id="debugEndpoint" class="small-note"></p></div>
-      <div class="developer-item"><label for="asrProviderSelect">辨識 API</label><select id="asrProviderSelect" class="developer-select"><option value="hakka_api_hak">客委會辨識API</option><option value="taiwan_tongues_zh">華語API</option></select><p class="small-note">朗讀預設使用客語。華語選項僅供開發測試。</p><label class="developer-label" for="recognitionModeSelect">辨識模式</label><select id="recognitionModeSelect" class="developer-select"><option value="realtime" selected>即時串流（WebSocket）</option><option value="file">錄完判斷（檔案辨識）</option></select><p id="recognitionModeNote" class="small-note"></p></div>
-      <div class="answer-box"><label for="answerInput">辨識文字／手動修正測試</label><textarea id="answerInput" rows="4" maxlength="4000" lang="hak" placeholder="辨識後顯示文字，也可輸入文字測試比對"></textarea><button id="debugCompareBtn" class="plain-button" type="button">測試文字比對</button><p class="small-note">手動測試不送出音檔，也不改變學生作答與解鎖進度。</p></div>
-      <div class="developer-item"><span class="developer-label">文字比對</span><p id="debugMatch"></p><div id="debugComparison" lang="hak"></div></div>
+      <div class="developer-item">
+        <span class="developer-label">快速跳題／測試</span>
+        <div class="dev-quick-actions">
+          <button id="debugNextBtn" class="plain-button dev-action-btn" type="button">直接跳下一題／下一段 ⏩</button>
+          <button id="debugAutoFillBtn" class="plain-button dev-action-btn" type="button">自動填入並完成 ✨</button>
+        </div>
+      </div>
+      <div class="developer-item"><span id="answerLabel" class="developer-label">標準答案（四縣腔）</span>
+        <p id="sentenceText" lang="hak"></p>
+      </div>
+      <div class="developer-item"><span class="developer-label">辨識狀態</span><strong id="asrStatus"
+          role="status"></strong>
+        <p id="debugRecording" class="small-note"></p>
+        <p id="debugEndpoint" class="small-note"></p>
+      </div>
+      <div class="developer-item"><label for="asrProviderSelect">辨識 API</label><select id="asrProviderSelect"
+          class="developer-select">
+          <option value="hakka_api_hak">客委會辨識API</option>
+          <option value="taiwan_tongues_zh">華語API</option>
+        </select>
+        <p class="small-note">朗讀預設使用客語。華語選項僅供開發測試。</p><label class="developer-label"
+          for="recognitionModeSelect">辨識模式</label><select id="recognitionModeSelect" class="developer-select">
+          <option value="realtime" selected>即時串流（WebSocket）</option>
+          <option value="file">錄完判斷（檔案辨識）</option>
+        </select>
+        <p id="recognitionModeNote" class="small-note"></p>
+      </div>
+      <div class="answer-box"><label for="answerInput">辨識文字／手動修正測試</label><textarea id="answerInput" rows="4"
+          maxlength="4000" lang="hak" placeholder="辨識後顯示文字，也可輸入文字測試比對"></textarea><button id="debugCompareBtn"
+          class="plain-button" type="button">測試文字比對</button>
+        <p class="small-note">手動測試不送出音檔，也不改變學生作答與解鎖進度。</p>
+      </div>
+      <div class="developer-item"><span class="developer-label">文字比對</span>
+        <p id="debugMatch"></p>
+        <div id="debugComparison" lang="hak"></div>
+      </div>
     </aside>
 
     <section id="readingSummary" class="reading-summary" hidden aria-labelledby="summaryTitle">
@@ -88,21 +141,26 @@
       <p class="small-note">錄音只保留在這次開啟的頁面，離開或重新整理後就會清除。</p>
       <div id="summaryList"></div>
       <div class="reading-actions">
-        <button id="reviewStoryBtn" class="plain-button" type="button">回故事檢視各段</button>
+        <a id="reviewStoryBtn" class="plain-button"
+          href="https://12basic.hakka.gov.tw/self_study/reading/1?dialect_id=1" target="_blank" rel="noopener">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
+            <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
+          </svg>
+          <span>檢視繪本</span>
+        </a>
         <button id="restartBtn" class="plain-button primary-button" type="button">再讀一次</button>
         <a class="primary-button" href="./index.html#situations">返回情境應用</a>
       </div>
     </section>
-    <p class="reading-source">教材與插圖：<a href="https://12basic.hakka.gov.tw/self_study/reading/1?dialect_id=1" target="_blank" rel="noopener">來上客〈𠊎中意讀書〉</a> · Letta Machoga / StoryWeaver</p>
+    <p class="reading-source">教材與插圖：<a href="https://12basic.hakka.gov.tw/self_study/reading/1?dialect_id=1"
+        target="_blank" rel="noopener">來上客〈𠊎中意讀書〉</a> · Letta Machoga / StoryWeaver</p>
   </main>
   <script src="./speech-api-config.js?v=20260909-global-ticket2"></script>
   <script src="./speech-realtime-asr.js?v=20260909-shared-realtime1"></script>
   <script src="./reading-data.js?v=20260908-answers"></script>
   <script src="./reading.js?v=20260909-shared-realtime1"></script>
 </body>
+
 </html>
-
-
-
-
-

@@ -40,9 +40,16 @@
   .combo{font-family:"Noto Serif TC",serif;font-size:13px;color:var(--dim);letter-spacing:.06em;white-space:nowrap}
   .combo b{color:var(--gold);font-size:17px}
 
-  /* 波形 */
-  .wave{height:46px;display:flex;align-items:center;gap:2px;justify-content:center;
-    background:#0E141A;border:1px solid var(--line);border-radius:12px;padding:0 12px;margin-bottom:12px;overflow:hidden}
+  /* 波形與播放按鈕 */
+  .wave-wrap{display:flex;align-items:center;gap:12px;background:#0E141A;border:1px solid var(--line);border-radius:12px;padding:0 12px 0 10px;margin-bottom:12px;height:46px;overflow:hidden}
+  .wave-play{width:32px;height:32px;border-radius:50%;background:var(--gold);color:#12191F;border:0;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;transition:transform .16s,background .2s}
+  .wave-play:hover{transform:scale(1.1);filter:brightness(1.1)}
+  .wave-play svg{width:16px;height:16px;fill:currentColor}
+  .wave-play .icon-pause{display:none}
+  .wave-play.playing{background:var(--rose);color:#fff}
+  .wave-play.playing .icon-play{display:none}
+  .wave-play.playing .icon-pause{display:block}
+  .wave{height:100%;flex:1;display:flex;align-items:center;gap:2px;justify-content:center;overflow:hidden}
   .wv{width:3px;border-radius:2px;background:var(--line);transition:background .4s,height .3s}
   .wv.on{background:var(--cyan)}
   .wv.gap{background:var(--rose);opacity:.55}
@@ -141,21 +148,225 @@
   #asrOut{margin-top:6px;font-size:12.5px;line-height:1.6;opacity:.78}
   #asrOut b{color:var(--gold,#E8C87A)}
   #asrOut .raw{display:block;opacity:.5;font-size:11.5px;margin-top:2px}
- .back-link{position:fixed;left:18px;top:18px;z-index:50;display:inline-flex;align-items:center;justify-content:center;min-height:38px;padding:0 16px;border:2px solid #2f946f;border-radius:999px;color:#2f946f;background:rgba(255,255,255,.92);font-weight:900;text-decoration:none;box-shadow:0 8px 18px rgba(0,0,0,.12)}
+ .back-link{position:fixed;left:18px;top:18px;z-index:50;display:inline-flex;align-items:center;justify-content:center;min-height:38px;padding:0 16px;border:2px solid #2f946f;border-radius:999px;color:#2f946f;background:rgba(255,255,255,.92);font-weight:900;text-decoration:none;box-shadow:0 8px 18px rgba(0,0,0,.12);transition:left .25s ease}
   .back-link:hover{background:#2f946f;color:#fff}
+  body.debug-mode .back-link{left:296px !important}
+  @media(max-width:1100px){body.debug-mode .back-link{left:12px !important}}
   @media(max-width:560px){.back-link{left:12px;top:12px;min-height:34px;padding:0 13px;font-size:13px}}
+
+  /* 開發者模式開關與左側面板 */
+  body.debug-mode {
+    padding-left: 295px;
+    transition: padding-left 0.25s ease;
+  }
+  @media (max-width: 1100px) {
+    body.debug-mode { padding-left: 0; }
+  }
+  .mode-toggle {
+    margin-left: auto;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    color: var(--dim, #8B9BA8);
+    cursor: pointer;
+    user-select: none;
+  }
+  .mode-toggle input {
+    cursor: pointer;
+    accent-color: var(--gold, #D9AE5F);
+  }
+  .developer-panel {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 280px;
+    height: 100vh;
+    box-sizing: border-box;
+    background: #141b22;
+    border-right: 1px solid var(--line, #2B3743);
+    padding: 16px 14px;
+    overflow-y: auto;
+    z-index: 99999;
+    font-family: "Noto Sans TC", system-ui, sans-serif;
+    color: var(--ink, #EDE6D8);
+    display: none;
+    box-shadow: 4px 0 16px rgba(0,0,0,0.45);
+  }
+  body.debug-mode .developer-panel {
+    display: block;
+  }
+  .developer-panel .panel-title {
+    font-size: 15px;
+    font-weight: 900;
+    color: var(--ink, #EDE6D8);
+    margin-bottom: 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--line, #2B3743);
+    padding-bottom: 8px;
+  }
+  .developer-panel .panel-title span.badge {
+    font-size: 11px;
+    color: var(--gold, #D9AE5F);
+    background: rgba(217,174,95,0.14);
+    border: 1px solid rgba(217,174,95,0.3);
+    padding: 2px 6px;
+    border-radius: 4px;
+  }
+  .developer-panel .target-sentence {
+    margin-bottom: 14px;
+    padding: 10px;
+    border: 1px solid var(--line, #2B3743);
+    border-radius: 10px;
+    background: #19212b;
+  }
+  .developer-panel .sentence-label {
+    display: inline-block;
+    color: var(--gold, #D9AE5F);
+    font-size: 12px;
+    font-weight: 700;
+    margin-bottom: 4px;
+  }
+  .developer-panel .target-sentence strong {
+    display: block;
+    font-family: "Noto Serif TC", serif;
+    font-size: 18px;
+    font-weight: 900;
+    color: var(--ink, #EDE6D8);
+    margin-bottom: 2px;
+  }
+  .developer-panel .target-sentence small {
+    display: block;
+    font-size: 12px;
+    color: var(--dim, #8B9BA8);
+  }
+  .developer-panel .developer-item {
+    margin-top: 14px;
+  }
+  .developer-panel .developer-label {
+    display: block;
+    font-size: 12.5px;
+    font-weight: 700;
+    color: var(--dim, #8B9BA8);
+    margin-bottom: 6px;
+  }
+  .developer-panel .dev-btns {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .developer-panel .dev-btn {
+    background: #212c38;
+    border: 1px solid var(--line, #2B3743);
+    color: var(--ink, #EDE6D8);
+    border-radius: 8px;
+    padding: 5px 9px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: .15s;
+  }
+  .developer-panel .dev-btn:hover {
+    background: #2b3743;
+    border-color: var(--gold, #D9AE5F);
+    color: var(--gold, #D9AE5F);
+  }
+  .developer-panel .dev-btn.active {
+    background: rgba(217,174,95,0.22);
+    border-color: var(--gold, #D9AE5F);
+    color: var(--gold, #D9AE5F);
+    font-weight: 700;
+  }
+  .developer-panel .dev-input {
+    width: 100%;
+    border: 1px solid var(--line, #2B3743);
+    border-radius: 8px;
+    padding: 7px 10px;
+    background: #0e141a;
+    color: var(--ink, #EDE6D8);
+    font-size: 13px;
+    margin-top: 6px;
+    outline: none;
+    box-sizing: border-box;
+  }
+  .developer-panel .dev-input:focus {
+    border-color: var(--gold, #D9AE5F);
+  }
+  .developer-panel .dev-select {
+    width: 100%;
+    border: 1px solid var(--line, #2B3743);
+    border-radius: 8px;
+    padding: 7px 10px;
+    background: #0e141a;
+    color: var(--ink, #EDE6D8);
+    font-size: 13px;
+    font-weight: 600;
+    margin-top: 4px;
+    outline: none;
+    box-sizing: border-box;
+    cursor: pointer;
+  }
+  .developer-panel .dev-select:focus {
+    border-color: var(--gold, #D9AE5F);
+  }
 </style>
 </head>
 <body>
-    <a class="back-link" href="./Vocabulary.html">返回</a>
+    <a class="back-link" href="./classroom.html">返回</a>
+<aside id="developerPanel" class="developer-panel" aria-label="內部檢視面板">
+  <div class="panel-title">
+    <span>內部檢視</span>
+    <span class="badge">開發者模式</span>
+  </div>
+  <div id="devTargetInfo" class="target-sentence"></div>
+  <div class="developer-item">
+    <span class="developer-label">廣播段落切換 (共 10 段)</span>
+    <div id="devQuestionList" class="dev-btns"></div>
+  </div>
+  <div class="developer-item">
+    <span class="developer-label">快捷操作</span>
+    <div class="dev-btns">
+      <button type="button" class="dev-btn" id="devBtnAns">⚡ 一鍵拼好字磚</button>
+      <button type="button" class="dev-btn" id="devBtn100">⚡ 模擬 100% 辨識滿分</button>
+      <button type="button" class="dev-btn" id="devBtnNext">⚡ 下一段</button>
+      <button type="button" class="dev-btn" id="devBtnWin">⚡ 直接全通關 (訊號滿分)</button>
+    </div>
+  </div>
+  <div class="developer-item">
+    <span class="developer-label">辨識語種選擇 (Realtime ASR)</span>
+    <select id="devLangSelect" class="dev-select">
+      <option value="hak">客委會API</option>
+      <option value="zh">華語</option>
+    </select>
+  </div>
+  <div class="developer-item">
+    <span class="developer-label">語音即時辨識 (Realtime ASR) 模擬</span>
+    <input type="text" id="devManualInput" class="dev-input" placeholder="手動輸入客話送出測試">
+    <div class="dev-btns" style="margin-top:6px;">
+      <button type="button" class="dev-btn" id="devBtnSendManual">⚡ 送出手動文字</button>
+    </div>
+  </div>
+</aside>
 <div class="frame">
   <div class="top">
-    <div class="logo">庄頭<b>廣播電台</b></div>
+    <div class="logo">客庄<b>廣播電台</b></div>
     <div class="sig"><span>訊 號</span><div class="sbar"><i id="sig"></i></div></div>
     <div class="combo">連紲 <b id="combo">0</b>　修好 <b id="fix">0</b>/10</div>
+    <label class="mode-toggle" title="顯示內部檢視與開發者面板">
+      <input id="debugToggle" type="checkbox">
+      <span>開發者模式</span>
+    </label>
   </div>
 
-  <div class="wave" id="wave"></div>
+  <div class="wave-wrap">
+    <button class="wave-play" id="btnWavePlay" type="button" aria-label="播放或暫停廣播" title="播放 / 暫停">
+      <svg class="icon-play" viewBox="0 0 24 24"><path d="M8 5.14v13.72a1 1 0 0 0 1.5.86l11-6.86a1 1 0 0 0 0-1.72l-11-6.86a1 1 0 0 0-1.5.86z"/></svg>
+      <svg class="icon-pause" viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+    </button>
+    <div class="wave" id="wave"></div>
+  </div>
 
   <div class="card">
     <div class="meta">
@@ -339,27 +550,37 @@ const ASR=(()=>{
   /* 開始串流。stream = getUserMedia 拿著个；onState 回報狀態 */
   async function start(stream,onState){
     closed=false; ready=false; buf=[]; segs={};
-    let tk;
-    const ticketUrl = (window.SPEECH_API?.realtimeTicketUrl ? window.SPEECH_API.realtimeTicketUrl() : ASR_URL);
-    try{
-      let r = await fetch(ticketUrl, { method: "POST" });
-      if (!r.ok && r.status === 405) {
-        r = await fetch(ticketUrl, { method: "GET" });
-      }
-      if (!r.ok) throw new Error("http " + r.status);
-      tk = await r.json();
-      if (!tk.url || !tk.ticket) throw new Error(tk.error || "無票");
-    } catch(e) {
-      if (window.SPEECH_API?.isLocalHost?.()) {
-        try {
-          let r2 = await fetch("http://localhost:5000/ticket", { method: "POST" });
-          if (r2.ok) tk = await r2.json();
-        } catch(err2) {}
-      }
-      if (!tk || !tk.url || !tk.ticket) {
-        onState("err", "連毋著取票服務");
-        return false;
-      }
+    let tk = null;
+    const lang = (window.HAKKA_REALTIME_ASR?.getLanguage?.() || "hak");
+    const candidateUrls = [
+      (window.SPEECH_API?.realtimeTicketUrl ? window.SPEECH_API.realtimeTicketUrl() : null),
+      "https://speaking-scenarios-v2.vercel.app/ticket",
+      "http://localhost:5000/ticket"
+    ].filter(Boolean);
+
+    for (const url of candidateUrls) {
+      try {
+        let r = await fetch(url, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ language: lang })
+        });
+        if (!r.ok && r.status === 405) {
+          r = await fetch(url, { method: "GET" });
+        }
+        if (r.ok) {
+          const data = await r.json();
+          if (data?.url && data?.ticket) {
+            tk = data;
+            break;
+          }
+        }
+      } catch (err) {}
+    }
+
+    if (!tk || !tk.url || !tk.ticket) {
+      onState("err", "連毋著取票服務");
+      return false;
     }
 
     const q="?ticket="+encodeURIComponent(tk.ticket)
@@ -506,17 +727,37 @@ function build(){
   $("asrOut").textContent="";
   $("note").textContent="訊號分雜音蓋忒咧 —— 聽錄音，將無去个音節補轉來。";
   setTimeout(()=>play(S[q.si].u),400);
+  renderDeveloperPanel();
 }
 const mv=(x,y)=>{gt.style.left=x+"px";gt.style.top=y+"px";};
-function stopKara(){ waveEl.classList.remove("play"); }
+function stopKara(){
+  waveEl.classList.remove("play");
+  const pBtn=$("btnWavePlay");
+  if(pBtn) pBtn.classList.remove("playing");
+}
 function play(u){
   stopKara();
   if(audio){ audio.pause(); audio.onended=null; }
-  audio=new Audio(u);
+  audio=new Audio(u || S[Q[i].si].u);
   audio.onended=stopKara;
-  audio.onpause=()=>{ if(audio && audio.ended) stopKara(); };
+  audio.onpause=()=>{ if(audio && (audio.ended || audio.paused)) stopKara(); };
+  audio.onplay=()=>{
+    waveEl.classList.add("play");
+    const pBtn=$("btnWavePlay");
+    if(pBtn) pBtn.classList.add("playing");
+  };
   audio.play().catch(()=>{});
   waveEl.classList.add("play");
+  const pBtn=$("btnWavePlay");
+  if(pBtn) pBtn.classList.add("playing");
+}
+function togglePlay(){
+  if(audio && !audio.paused && !audio.ended){
+    audio.pause();
+    stopKara();
+  }else{
+    play(S[Q[i].si].u);
+  }
 }
 
 const slots=()=>[...document.querySelectorAll("#line .slot:not(.done)")];
@@ -572,11 +813,11 @@ function finish(){
               : clean ? "一擺就著 —— 這段修好咧，播出去！"
               : "修好咧，播出去！";
   $("note").innerHTML=`<b>${cheer}</b> 照拼音自家唸一擺看啊。`;
-  setTimeout(()=>play(S[q.si].u),320);
   if(fixed===Q.length) setTimeout(showOver,2400);
 }
 
-$("spk").onclick=()=>play(S[Q[i].si].u);
+$("btnWavePlay").onclick=togglePlay;
+$("spk").onclick=togglePlay;
 $("bAns").onclick=()=>{
   const q=Q[i], s=S[q.si];
   clean=false;
@@ -598,7 +839,21 @@ function asrState(kind,msg){
   /* kind === "done" */
   const q=Q[i], sen=S[q.si];
   if(!msg){ asrClear(); out.textContent="（無辨識著內容，再唸一擺看啊。）"; return; }
-  const r=ASR.align(sen.ch,msg);
+  const currentLang = (window.HAKKA_REALTIME_ASR?.getLanguage?.() || (function(){ try { return localStorage.getItem("speakingDemoAsrLanguage"); }catch(e){ return null; } })() || "hak");
+  const isMandarin = (currentLang === "zh");
+
+  let r = ASR.align(sen.ch, msg);
+  if (isMandarin) {
+    const cleanMsg = String(msg || "").replace(/[^\u4e00-\u9fa5a-zA-Z0-9]/g, "");
+    const cleanGloss = String(q.c || "").replace(/[^\u4e00-\u9fa5a-zA-Z0-9]/g, "");
+    if (cleanGloss && (cleanMsg.includes(cleanGloss) || cleanGloss.includes(cleanMsg))) {
+      q.span.forEach(idx => {
+        if (idx >= 0 && idx < r.hit.length) r.hit[idx] = true;
+      });
+      r.ok = Math.max(r.ok, q.span.length);
+    }
+  }
+
   [...lineEl.children].forEach((el,k)=>{
     el.classList.remove("hit","miss");
     el.classList.add(r.hit[k]?"hit":"miss");
@@ -607,7 +862,7 @@ function asrState(kind,msg){
   r.hit.forEach((h,k)=>{ if(!h) miss.push(sen.ch[k]+" "+sen.sy[k]); });
   out.innerHTML="<b>"+r.ok+" / "+r.n+"</b> 隻音節對著咧。"
     +(miss.length?"　無對著个："+miss.slice(0,6).join("、")+(miss.length>6?"⋯":""):"　規句攏著！")
-    +'<span class="raw">辨識結果：'+r.got+"（用字同課本無共樣乜會算無對著，毋一定係唸毋著）</span>";
+    +'<span class="raw">辨識結果：'+r.got+"（" + (isMandarin ? "華語模式" : "客語模式") + "）</span>";
 }
 
 $("bRec").onclick=async()=>{
@@ -721,6 +976,122 @@ $("oPlay").onclick=async()=>{
   btn.disabled=false; btn.textContent="▶ 再播一擺";
 };
 
+/* ── 開發者模式邏輯 ── */
+let debugMode = false;
+try {
+  debugMode = localStorage.getItem("speakingDemoDebugMode") === "true";
+} catch(e) {}
+
+function setDebugMode(on) {
+  debugMode = !!on;
+  document.body.classList.toggle("debug-mode", debugMode);
+  const toggle = document.getElementById("debugToggle");
+  if (toggle) toggle.checked = debugMode;
+  try {
+    localStorage.setItem("speakingDemoDebugMode", debugMode ? "true" : "false");
+  } catch(e) {}
+  renderDeveloperPanel();
+}
+
+function renderDeveloperPanel() {
+  if (!Q || !Q[i]) return;
+  const q = Q[i], sen = S[q.si];
+  const targetInfo = document.getElementById("devTargetInfo");
+  if (targetInfo) {
+    targetInfo.innerHTML = `
+      <span class="sentence-label">當前段落：第 ${i + 1} / ${Q.length} 段（${sen.role}）</span>
+      <strong>${q.w} <small style="display:inline;color:var(--dim)">（${q.c}）</small></strong>
+      <small style="margin-top:4px;">整句：${sen.ch.join("")}</small>
+    `;
+  }
+  const qList = document.getElementById("devQuestionList");
+  if (qList) {
+    qList.innerHTML = "";
+    Q.forEach((item, idx) => {
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "dev-btn" + (idx === i ? " active" : "");
+      btn.textContent = `${idx + 1}. ${item.w}`;
+      btn.onclick = () => {
+        i = idx;
+        build();
+      };
+      qList.appendChild(btn);
+    });
+  }
+}
+
+// 綁定開發者模式事件
+const devLangSelect = document.getElementById("devLangSelect");
+if (devLangSelect) {
+  const currentLang = (window.HAKKA_REALTIME_ASR?.getLanguage?.() || (function(){ try { return localStorage.getItem("speakingDemoAsrLanguage"); }catch(e){ return null; } })() || "hak");
+  devLangSelect.value = currentLang;
+  devLangSelect.onchange = (e) => {
+    const val = e.target.value;
+    try { localStorage.setItem("speakingDemoAsrLanguage", val); } catch(err) {}
+    if (window.HAKKA_REALTIME_ASR?.setLanguage) {
+      window.HAKKA_REALTIME_ASR.setLanguage(val);
+    }
+  };
+}
+
+const debugToggle = document.getElementById("debugToggle");
+if (debugToggle) {
+  debugToggle.onchange = (e) => setDebugMode(e.target.checked);
+}
+
+const devBtnAns = document.getElementById("devBtnAns");
+if (devBtnAns) {
+  devBtnAns.onclick = () => {
+    const btn = document.getElementById("bAns");
+    if (btn) btn.click();
+  };
+}
+
+const devBtn100 = document.getElementById("devBtn100");
+if (devBtn100) {
+  devBtn100.onclick = () => {
+    const q = Q[i], sen = S[q.si];
+    asrState("done", sen.ch.join(""));
+  };
+}
+
+const devBtnNext = document.getElementById("devBtnNext");
+if (devBtnNext) {
+  devBtnNext.onclick = () => {
+    if (i < Q.length - 1) {
+      i++;
+      build();
+    }
+  };
+}
+
+const devBtnWin = document.getElementById("devBtnWin");
+if (devBtnWin) {
+  devBtnWin.onclick = () => {
+    fixed = Q.length;
+    cleanN = Q.length;
+    sig = 100;
+    best = Q.length;
+    $("fix").textContent = fixed;
+    $("sig").style.width = "100%";
+    showOver();
+  };
+}
+
+const devBtnSendManual = document.getElementById("devBtnSendManual");
+if (devBtnSendManual) {
+  devBtnSendManual.onclick = () => {
+    const input = document.getElementById("devManualInput");
+    const txt = input ? input.value.trim() : "";
+    if (txt) {
+      asrState("done", txt);
+    }
+  };
+}
+
+// 初始化
+setDebugMode(debugMode);
 build();
 </script>
 </body>
