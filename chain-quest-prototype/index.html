@@ -1,0 +1,440 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>客語情境互動學習原型｜6大生活任務與連鎖分支</title>
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+  <div class="layout-shell" id="layoutShell">
+    <!-- 左側固定抽屜／側邊欄：開發者內部檢視面板 -->
+    <aside class="dev-dock-sidebar" id="devDockSidebar">
+      <div class="dev-panel-inner">
+        <div class="dev-panel-header">
+          <div class="dev-title-wrap">
+            <span class="dev-panel-badge">DEV MODE</span>
+            <h3>內部顯示與即時比對</h3>
+          </div>
+          <button id="closeDevDockBtn" class="dev-close-btn" type="button" title="關閉開發者模式">✕</button>
+        </div>
+
+        <!-- 快速跳題與測試控制 -->
+        <div class="dev-item">
+          <span class="dev-label">⚡ 快速測試工具</span>
+          <div class="dev-actions-grid">
+            <button id="devSkipNextBtn" class="dev-btn btn-skip" type="button">⏩ 直接跳下一關</button>
+            <button id="devAutoFillSuccessBtn" class="dev-btn btn-auto-success" type="button">✨ 模擬辨識成功</button>
+            <button id="devAutoFillFailBtn" class="dev-btn btn-auto-fail" type="button">⚠️ 模擬辨識失敗</button>
+            <button id="devCustomInputBtn" class="dev-btn btn-custom" type="button">✍️ 自訂文字測試</button>
+          </div>
+        </div>
+
+        <!-- 分支手動切換（當前為分支或選擇節點時顯示） -->
+        <div class="dev-item" id="devBranchSection" hidden>
+          <span class="dev-label">🔀 分支路線切換（免口說直通）</span>
+          <div class="dev-branch-grid" id="devBranchGrid">
+            <!-- 動態生成分支按鈕 -->
+          </div>
+        </div>
+
+        <!-- 當前節點與模式資訊 -->
+        <div class="dev-item">
+          <span class="dev-label">📌 當前節點狀態</span>
+          <div class="dev-status-info">
+            <p>節點 ID：<strong id="devNodeIdText">zoo_start</strong></p>
+            <p>節點類型：<span class="kw-tag" id="devNodeTypeTag">主線</span></p>
+            <p>指定移動點：<span id="devTargetLocText">售票亭</span></p>
+          </div>
+        </div>
+
+        <!-- 換你開口說客語（標準答案） -->
+        <div class="dev-item target-answer-box">
+          <span class="dev-label">🎯 換你開口說客語（標準答案）</span>
+          <strong class="dev-target-hakka" id="devTargetHakka">𠊎愛買三張學生票。</strong>
+          <span class="dev-target-mandarin" id="devTargetMandarin">（華語：我要買三張學生票。）</span>
+        </div>
+
+        <!-- 辨識命中目標詞 -->
+        <div class="dev-item">
+          <span class="dev-label">🔍 辨識命中目標詞（關鍵字比對）</span>
+          <div class="dev-keywords-list" id="devKeywordsList">
+            <span class="kw-tag">愛買</span>
+            <span class="kw-tag">三張</span>
+            <span class="kw-tag">學生票</span>
+          </div>
+        </div>
+
+        <!-- 🔌 第二階段：三層流水線即時監控 (Pipeline Inspector) -->
+        <div class="dev-item">
+          <span class="dev-label">🔌 流水線即時監控（Pipeline Inspector）</span>
+          <div class="pipeline-steps-box">
+            <!-- 步驟 1: 客語 ASR 語音辨識 -->
+            <div class="pipeline-step-card" id="pipeStep1Card">
+              <div class="pipeline-step-header">
+                <span class="pipeline-step-title">1️⃣ 客語 ASR 語音轉文字</span>
+                <span class="pipeline-badge" id="pipeAsrBadge">待錄音</span>
+              </div>
+              <div class="pipeline-step-body">
+                客語輸出：<strong id="pipeAsrText">（等待發音...）</strong>
+              </div>
+            </div>
+
+            <!-- 步驟 2: 客語轉華語翻譯 -->
+            <div class="pipeline-step-card" id="pipeStep2Card">
+              <div class="pipeline-step-header">
+                <span class="pipeline-step-title">2️⃣ 客轉華語意正規化 (MT)</span>
+                <span class="pipeline-badge" id="pipeMtBadge">待處理</span>
+              </div>
+              <div class="pipeline-step-body">
+                華語意圖：<strong id="pipeMtText">（等待翻譯...）</strong>
+              </div>
+            </div>
+
+            <!-- 步驟 3: LLM 邊界判定與動態 NPC 生成 -->
+            <div class="pipeline-step-card" id="pipeStep3Card">
+              <div class="pipeline-step-header">
+                <span class="pipeline-step-title">3️⃣ LLM-as-a-Judge 邊界評審</span>
+                <span class="pipeline-badge" id="pipeLlmBadge">待評估</span>
+              </div>
+              <div class="pipeline-step-body">
+                <p>判定結果：<span id="pipeLlmResult">尚未判定</span></p>
+                <p>意圖識別：<strong id="pipeLlmIntent">無</strong>（精確度: <span id="pipeLlmScore">--</span>）</p>
+                <p>動態 NPC：<span class="npc-preview" id="pipeLlmNpc">（待生成...）</span></p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ⚙️ API 模式與串接設定 -->
+        <div class="dev-item">
+          <button id="toggleApiConfigBtn" class="dev-toggle-json-btn" type="button">⚙️ 展開 API 串接與降級設定</button>
+          <div id="apiConfigPanel" class="api-config-grid" hidden>
+            <div class="api-config-row">
+              <label class="api-config-label">ASR 客語辨識引擎：</label>
+              <select id="apiAsrSelect" class="api-select">
+                <option value="webspeech" selected>Web Speech API (本機原生，免金鑰)</option>
+                <option value="external_asr">外部客語 ASR API (POST 接口)</option>
+                <option value="mock">模擬模式 (測試用)</option>
+              </select>
+            </div>
+            <div class="api-config-row">
+              <label class="api-config-label">客轉華翻譯引擎：</label>
+              <select id="apiMtSelect" class="api-select">
+                <option value="builtin" selected>本機客華對照字典 (內建 50+ 組詞彙)</option>
+                <option value="external_mt">外部客轉華 API (POST 接口)</option>
+              </select>
+            </div>
+            <div class="api-config-row">
+              <label class="api-config-label">LLM 邊界判定引擎：</label>
+              <select id="apiLlmSelect" class="api-select">
+                <option value="local_judge" selected>本機智慧安全網 (離線零延遲)</option>
+                <option value="openai_gemini">線上 LLM (OpenAI / Gemini / 自訂)</option>
+              </select>
+            </div>
+            <div class="api-config-row" id="llmApiSecretRows">
+              <label class="api-config-label">線上 LLM Endpoint：</label>
+              <input type="text" id="apiLlmEndpointInput" class="api-input" value="https://api.openai.com/v1/chat/completions" placeholder="https://api.openai.com/v1/chat/completions">
+              <label class="api-config-label" style="margin-top: 3px;">模型名稱 (Model)：</label>
+              <input type="text" id="apiLlmModelInput" class="api-input" value="gpt-4o-mini" placeholder="gpt-4o-mini 或 gemini-1.5-flash">
+              <label class="api-config-label" style="margin-top: 3px;">API Key（僅儲存於本機瀏覽器，不外流）：</label>
+              <input type="password" id="apiLlmKeyInput" class="api-input" placeholder="sk-..." autocomplete="off">
+            </div>
+            <div class="api-config-row">
+              <label class="api-config-label">API 降級安全超時 (毫秒)：</label>
+              <input type="number" id="apiTimeoutInput" class="api-input" value="3000" min="500" max="10000" step="500">
+            </div>
+          </div>
+        </div>
+
+        <!-- LLM 語意判定與 Prompt 預備模組 -->
+        <div class="dev-item">
+          <button id="toggleLlmBtn" class="dev-toggle-json-btn" type="button">🤖 展開本題 LLM Prompt 與語意結構</button>
+          <pre id="llmViewer" class="dev-llm-viewer" hidden></pre>
+        </div>
+
+        <!-- 即時 JSON 結構切換 -->
+        <div class="dev-item">
+          <button id="toggleJsonBtn" class="dev-toggle-json-btn" type="button">📋 展開本題 Live JSON 結構</button>
+          <pre id="jsonViewer" hidden></pre>
+        </div>
+      </div>
+      <!-- 左右拖移把手 (Draggable Resizer) -->
+      <div class="dev-resizer" id="devResizer" title="左右拖移調整面板寬度"></div>
+    </aside>
+
+    <!-- 右側主內容容器（100vh 零捲動展示架構） -->
+    <div class="app-container" id="appContainer">
+      <!-- 頂部精簡導覽列：6 個情境切換 + 開發者模式切換開關 -->
+      <header class="app-header">
+        <div class="brand">
+          <span class="brand-badge">客語生活任務</span>
+          <h1>情境式口說任務原型</h1>
+        </div>
+
+        <nav class="scenario-nav" aria-label="情境選單">
+          <button class="nav-tab is-active" data-scenario="zoo_chain" type="button">
+            <span class="tab-icon">🦁</span>
+            <span class="tab-label">動物園連鎖</span>
+          </button>
+          <button class="nav-tab" data-scenario="hakka_food" type="button">
+            <span class="tab-icon">🍜</span>
+            <span class="tab-label">客家美食</span>
+          </button>
+          <button class="nav-tab" data-scenario="field_trip_pack" type="button">
+            <span class="tab-icon">🎒</span>
+            <span class="tab-label">教學打包</span>
+          </button>
+          <button class="nav-tab" data-scenario="bus_directions" type="button">
+            <span class="tab-icon">🚌</span>
+            <span class="tab-label">搭車問路</span>
+          </button>
+          <button class="nav-tab" data-scenario="health_center" type="button">
+            <span class="tab-icon">🏥</span>
+            <span class="tab-label">健康中心</span>
+          </button>
+          <button class="nav-tab" data-scenario="weather_outfit" type="button">
+            <span class="tab-icon">🌦️</span>
+            <span class="tab-label">天氣穿搭</span>
+          </button>
+        </nav>
+
+        <!-- 開發者模式切換開關 -->
+        <label class="dev-mode-toggle" title="切換顯示左側內部顯示與即時比對面板">
+          <input id="debugToggle" type="checkbox">
+          <span class="toggle-slider"></span>
+          <span class="toggle-label">開發者模式</span>
+        </label>
+      </header>
+
+      <!-- 主情境舞台（滿版高度零滾動） -->
+      <main class="main-stage">
+        <!-- 左側：情境概覽與關卡進度條 -->
+        <aside class="scenario-sidebar">
+          <!-- 情境基本資訊 -->
+          <div class="scenario-card-header">
+            <div class="scenario-theme-icon" id="themeIcon">🦁</div>
+            <div class="scenario-header-text">
+              <h2 id="scenarioTitle">動物園連鎖任務</h2>
+              <p class="scenario-objective" id="scenarioObjective">學習購票、驗票問候與地圖走位問路的連貫情境對話。</p>
+            </div>
+          </div>
+
+          <!-- 關卡進度條 / 節點路徑 -->
+          <div class="progress-section">
+            <div class="progress-label-row">
+              <span class="progress-title">任務關卡進度</span>
+              <span class="progress-counter" id="progressCounter">第 1 / 4 關</span>
+            </div>
+            <div class="step-tracker" id="stepTracker">
+              <!-- 動態生成步驟 -->
+            </div>
+          </div>
+
+          <!-- 校外教學打包專屬：4 格背包收集盤 (僅在 field_trip_pack 顯示) -->
+          <div class="backpack-panel" id="backpackPanel" hidden>
+            <div class="backpack-header">
+              <span>🎒 背包整理清單</span>
+              <span class="backpack-count" id="backpackCount">0 / 4</span>
+            </div>
+            <div class="backpack-grid" id="backpackGrid">
+              <!-- 動態生成 4 個物品格 -->
+            </div>
+          </div>
+        </aside>
+
+        <!-- 右側雙欄互動主區：左側插畫容器 + 右側情境故事/地圖/對話 -->
+        <section class="interactive-stage" id="interactiveStage">
+          <!-- 左欄：情境插畫容器（精美嵌入，不佔垂直空間） -->
+          <div class="stage-visual-col">
+            <div class="scenario-visual-showcase" id="scenarioVisualShowcase">
+              <div class="showcase-header">
+                <span class="showcase-badge" id="showcaseBadge">生活情境探索</span>
+                <h3 class="showcase-title" id="showcaseTitle">動物園連鎖任務</h3>
+              </div>
+              <div class="showcase-img-container">
+                <img id="scenarioBannerImg" class="showcase-img" src="./assets/zoo_chain.jpg" alt="情境主視覺插畫">
+              </div>
+              <div class="showcase-footer">
+                <span class="showcase-loc-tag" id="showcaseLocTag">📍 動物園大門售票處</span>
+                <span class="showcase-step-tag" id="showcaseStepTag">關卡 1</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- 右欄：情境故事引導 + 口說/選擇/地圖互動區 + NPC 回應 -->
+          <div class="stage-dialogue-col">
+            <article class="narrative-card" id="narrativeCard">
+              <!-- 生動情境故事引導句 -->
+              <div class="story-narrative-box">
+                <div class="story-icon">📖</div>
+                <div class="story-text-body">
+                  <div class="story-tag-row">
+                    <span class="step-tag" id="currentStepTag">第 1 關</span>
+                    <span class="scene-location-tag" id="sceneLocationTag">動物園大門售票處</span>
+                  </div>
+                  <p class="story-prompt" id="storyPrompt">
+                    你和兩位同學來到動物園門口，輪到你向售票員買票。你說：
+                  </p>
+                </div>
+              </div>
+
+              <!-- 靜態提詞卡片區塊（僅提示選項供口說參考，不可點擊） -->
+              <div class="speech-hint-section" id="speechHintSection" hidden>
+                <div class="speech-hint-header">
+                  <span class="speech-hint-badge">💡 地點／項目提示（請開口說）</span>
+                  <span class="speech-hint-tip" id="speechHintTip">提示有以下地點／選項，請開口說出你想去或想說的內容：</span>
+                </div>
+                <div class="speech-hint-cards" id="speechHintCards">
+                  <!-- 動態生成展示卡片 -->
+                </div>
+              </div>
+
+                <!-- 口說辨識模式切換：客語專用 ASR vs 瀏覽器內建華語對照 -->
+                <div class="speech-mode-toggle-bar">
+                  <span class="mode-bar-label">口說模式：</span>
+                  <div class="mode-pill-group">
+                    <button id="modeHakkaBtn" class="mode-pill-btn is-active" type="button" data-mode="hakka" title="使用客委會專用語音辨識 (聽客語)">
+                      <span class="pill-dot"></span>
+                      <span>🎙️ 客語專用模式 (客委會 ASR)</span>
+                    </button>
+                    <button id="modeMandarinBtn" class="mode-pill-btn" type="button" data-mode="mandarin" title="使用 Chrome 瀏覽器內建華語辨識 (直接說國語)">
+                      <span class="pill-dot"></span>
+                      <span>🗣️ 華語對照模式 (瀏覽器內建)</span>
+                    </button>
+                  </div>
+                </div>
+
+                <div class="recording-status-line">
+                  <span class="status-dot" id="statusDot"></span>
+                  <span class="status-tip" id="statusTip">請點擊下方按鈕，開始用客語說出你想講的話。</span>
+                </div>
+
+                <div class="speech-interactive-row">
+                  <!-- 錄音按鈕 -->
+                  <button id="recordBtn" class="btn btn-record" type="button">
+                    <span class="btn-icon" id="recordBtnIcon">🎙️</span>
+                    <span id="recordBtnText">按住／點擊錄音</span>
+                  </button>
+
+                  <!-- 學生說出的話顯示框 -->
+                  <div class="student-speech-bubble" id="studentSpeechBubble" hidden>
+                    <div class="student-avatar" id="studentAvatar">🧒</div>
+                    <div class="student-bubble-body">
+                      <span class="speaker-name" id="speakerNameTag">你說：</span>
+                      <p class="student-text" id="studentTranscriptText">「𠊎愛買三張學生票。」</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 模式 B：分支選擇卡片容器 (節點類型 = 選擇) -->
+              <div class="choice-action-section" id="choiceActionSection" hidden>
+                <div class="choice-prompt-bar">
+                  <span class="choice-badge">💡 請點選分支選項</span>
+                  <span class="choice-guide-text">點選你想前往或體驗的項目：</span>
+                </div>
+                <div class="choice-card-grid" id="choiceCardGrid">
+                  <!-- 動態生成分支卡片 -->
+                </div>
+              </div>
+
+              <!-- 模式 C：動物園 Canvas 小人走地圖容器 (節點類型 = 地圖探索 / 集合點) -->
+              <div class="map-action-section" id="mapActionSection" hidden>
+                <div class="map-guide-banner">
+                  <div class="map-guide-icon">🗺️</div>
+                  <div class="map-guide-info">
+                    <div class="map-guide-title">
+                      <strong>園區步道導覽移動</strong>
+                      <span class="map-tip-pill">依照導覽員指示走向對應的 ⭐ 星標！</span>
+                    </div>
+                    <p class="map-guide-sub" id="mapGuideSub">請使用方向鍵 ↑↓←→ 或點擊步道移動小人，到達目的地後按右下角【確定抵達】。</p>
+                  </div>
+                </div>
+
+                <!-- Canvas 地圖與控制盤外框 -->
+                <div class="map-canvas-wrapper">
+                  <canvas id="zooMapCanvas" width="620" height="280"></canvas>
+
+                  <!-- 地圖狀態提示浮層 -->
+                  <div class="map-overlay-toast" id="mapOverlayToast" hidden>
+                    <span class="toast-icon">⚠️</span>
+                    <span class="toast-text" id="mapToastText">哎呀，走錯了喔！</span>
+                  </div>
+
+                  <!-- 虛擬方向鍵輔助盤 (D-pad) -->
+                  <div class="map-dpad">
+                    <button class="dpad-btn dpad-up" id="dpadUp" type="button" title="向上走">▲</button>
+                    <div class="dpad-mid-row">
+                      <button class="dpad-btn dpad-left" id="dpadLeft" type="button" title="向左走">◀</button>
+                      <button class="dpad-btn dpad-down" id="dpadDown" type="button" title="向下走">▼</button>
+                      <button class="dpad-btn dpad-right" id="dpadRight" type="button" title="向右走">▶</button>
+                    </div>
+                  </div>
+
+                  <!-- 右下角確認與重置按鈕組 -->
+                  <div class="map-controls-dock">
+                    <button class="btn btn-map-reset" id="mapResetBtn" type="button" title="回到起點重新走">
+                      <span>🔄 重新走</span>
+                    </button>
+                    <button class="btn btn-map-ok" id="mapOkBtn" type="button" title="確認小人已抵達目的地">
+                      <span>✅ 確定抵達 (OK)</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- NPC 角色回應對話卡（講完話或選完後展開） -->
+              <div class="npc-response-section" id="npcResponseSection" hidden>
+                <div class="npc-response-card">
+                  <div class="npc-avatar-box">
+                    <span class="npc-avatar-emoji" id="npcAvatar">🧑‍💼</span>
+                  </div>
+                  <div class="npc-response-body">
+                    <div class="npc-header-row">
+                      <span class="npc-role-name" id="npcRoleName">售票員</span>
+                      <span class="response-status-tag" id="responseStatusTag">回應</span>
+                    </div>
+                    <p class="npc-dialog-text" id="npcDialogText">
+                      「好，三張學生票。這是你的門票，請收好。」
+                    </p>
+                  </div>
+                  <!-- 下一階段前進按鈕 -->
+                  <div class="continue-action-wrap">
+                    <button id="nextStepBtn" class="btn btn-continue" type="button">
+                      <span id="nextStepBtnText">繼續前進 ➔</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </article>
+
+            <!-- 情境全階段通關圓滿完成卡片 -->
+            <article class="scenario-completed-card" id="scenarioCompletedCard" hidden>
+              <div class="completed-visual">✨ 🗺️ ✨</div>
+              <h2 id="completedTitle">【動物園連鎖任務】情境探索完成！</h2>
+              <p id="completedSubtitle">你已順利完成本主題所有生活對話，成功運用客語融入日常情境！</p>
+              <div class="completed-summary-box">
+                <div class="summary-item">
+                  <span class="summary-num" id="completedStepCount">4 / 4</span>
+                  <span class="summary-label">完成階段</span>
+                </div>
+                <div class="summary-item">
+                  <span class="summary-num">100%</span>
+                  <span class="summary-label">情境對話達成</span>
+                </div>
+              </div>
+              <div class="completed-actions">
+                <button id="replayScenarioBtn" class="btn btn-replay" type="button">重新體驗本情境 🔄</button>
+                <button id="nextScenarioBtn" class="btn btn-next-scenario" type="button">前往下一個生活任務 ➔</button>
+              </div>
+            </article>
+          </div>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <script src="./app.js"></script>
+</body>
+</html>

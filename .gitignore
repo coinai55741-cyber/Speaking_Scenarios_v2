@@ -1,4 +1,7 @@
 
+.env
+.env.*.local
+*.env
 hf_space_asr/.env
 hf_space_asr/__pycache__/
 *.pyc
