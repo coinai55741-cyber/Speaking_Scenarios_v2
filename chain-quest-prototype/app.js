@@ -1850,71 +1850,8 @@ class UIController {
       pipeLlmResult: byId("pipeLlmResult"),
       pipeLlmIntent: byId("pipeLlmIntent"),
       pipeLlmScore: byId("pipeLlmScore"),
-      pipeLlmNpc: byId("pipeLlmNpc"),
-      toggleApiConfigBtn: byId("toggleApiConfigBtn"),
-      apiConfigPanel: byId("apiConfigPanel"),
-      apiAsrSelect: byId("apiAsrSelect"),
-      apiMtSelect: byId("apiMtSelect"),
-      apiLlmSelect: byId("apiLlmSelect"),
-      apiLlmEndpointInput: byId("apiLlmEndpointInput"),
-      apiLlmModelInput: byId("apiLlmModelInput"),
-      apiLlmKeyInput: byId("apiLlmKeyInput"),
-      apiTimeoutInput: byId("apiTimeoutInput")
+      pipeLlmNpc: byId("pipeLlmNpc")
     };
-
-    // 載入本地儲存之 API 偏好與安全憑證
-    this.loadSavedApiSettings();
-  }
-
-  loadSavedApiSettings() {
-    try {
-      const savedAsr = localStorage.getItem("hakka_asr_engine");
-      if (savedAsr && this.els.apiAsrSelect) {
-        this.els.apiAsrSelect.value = savedAsr;
-        HakkaASRAdapter.config.engine = savedAsr;
-      }
-
-      const savedMt = localStorage.getItem("hakka_mt_engine");
-      if (savedMt && this.els.apiMtSelect) {
-        this.els.apiMtSelect.value = savedMt;
-        HakkaToMandarinAdapter.config.engine = savedMt;
-      }
-
-      const savedLlm = localStorage.getItem("hakka_llm_engine");
-      if (savedLlm && this.els.apiLlmSelect) {
-        this.els.apiLlmSelect.value = savedLlm;
-        LLMServiceAdapter.config.provider = savedLlm;
-      }
-
-      const savedEndpoint = localStorage.getItem("hakka_llm_endpoint");
-      if (savedEndpoint && this.els.apiLlmEndpointInput) {
-        this.els.apiLlmEndpointInput.value = savedEndpoint;
-        LLMServiceAdapter.config.apiEndpoint = savedEndpoint;
-      }
-
-      const savedModel = localStorage.getItem("hakka_llm_model");
-      if (savedModel && this.els.apiLlmModelInput) {
-        this.els.apiLlmModelInput.value = savedModel;
-        LLMServiceAdapter.config.model = savedModel;
-      }
-
-      const savedKey = localStorage.getItem("hakka_llm_key");
-      if (savedKey && this.els.apiLlmKeyInput) {
-        this.els.apiLlmKeyInput.value = savedKey;
-        LLMServiceAdapter.config.apiKey = savedKey;
-      }
-
-      const savedTimeout = localStorage.getItem("hakka_api_timeout");
-      if (savedTimeout && this.els.apiTimeoutInput) {
-        const timeoutNum = parseInt(savedTimeout, 10) || 3000;
-        this.els.apiTimeoutInput.value = timeoutNum;
-        HakkaASRAdapter.config.timeout = timeoutNum;
-        HakkaToMandarinAdapter.config.timeout = timeoutNum;
-        LLMServiceAdapter.config.timeout = timeoutNum;
-      }
-    } catch (e) {
-      console.warn("無法存取 localStorage API 設定：", e);
-    }
   }
 
   initMapEngine() {
@@ -2040,63 +1977,7 @@ class UIController {
       this.els.nextStepBtn.addEventListener("click", () => this.advanceToNextNode());
     }
 
-    // 7. 切換 API 設定面板
-    if (this.els.toggleApiConfigBtn && this.els.apiConfigPanel) {
-      this.els.toggleApiConfigBtn.addEventListener("click", () => {
-        const isHidden = this.els.apiConfigPanel.hidden;
-        this.els.apiConfigPanel.hidden = !isHidden;
-        this.els.toggleApiConfigBtn.textContent = isHidden ? "⚙️ 收合 API 串接與降級設定" : "⚙️ 展開 API 串接與降級設定";
-      });
-    }
-
-    // 8. 綁定 API 設定變更與安全持久化 (localStorage)
-    if (this.els.apiAsrSelect) {
-      this.els.apiAsrSelect.addEventListener("change", (e) => {
-        HakkaASRAdapter.config.engine = e.target.value;
-        try { localStorage.setItem("hakka_asr_engine", e.target.value); } catch (_) {}
-      });
-    }
-    if (this.els.apiMtSelect) {
-      this.els.apiMtSelect.addEventListener("change", (e) => {
-        HakkaToMandarinAdapter.config.engine = e.target.value;
-        try { localStorage.setItem("hakka_mt_engine", e.target.value); } catch (_) {}
-      });
-    }
-    if (this.els.apiLlmSelect) {
-      this.els.apiLlmSelect.addEventListener("change", (e) => {
-        LLMServiceAdapter.config.provider = e.target.value;
-        try { localStorage.setItem("hakka_llm_engine", e.target.value); } catch (_) {}
-      });
-    }
-    if (this.els.apiLlmEndpointInput) {
-      this.els.apiLlmEndpointInput.addEventListener("input", (e) => {
-        LLMServiceAdapter.config.apiEndpoint = e.target.value.trim();
-        try { localStorage.setItem("hakka_llm_endpoint", e.target.value.trim()); } catch (_) {}
-      });
-    }
-    if (this.els.apiLlmModelInput) {
-      this.els.apiLlmModelInput.addEventListener("input", (e) => {
-        LLMServiceAdapter.config.model = e.target.value.trim();
-        try { localStorage.setItem("hakka_llm_model", e.target.value.trim()); } catch (_) {}
-      });
-    }
-    if (this.els.apiLlmKeyInput) {
-      this.els.apiLlmKeyInput.addEventListener("input", (e) => {
-        LLMServiceAdapter.config.apiKey = e.target.value.trim();
-        try { localStorage.setItem("hakka_llm_key", e.target.value.trim()); } catch (_) {}
-      });
-    }
-    if (this.els.apiTimeoutInput) {
-      this.els.apiTimeoutInput.addEventListener("change", (e) => {
-        const val = parseInt(e.target.value, 10) || 3000;
-        HakkaASRAdapter.config.timeout = val;
-        HakkaToMandarinAdapter.config.timeout = val;
-        LLMServiceAdapter.config.timeout = val;
-        try { localStorage.setItem("hakka_api_timeout", val.toString()); } catch (_) {}
-      });
-    }
-
-    // 9. 切換 LLM Prompt 結構檢視
+    // 7. 切換 LLM Prompt 結構檢視
     if (this.els.toggleLlmBtn && this.els.llmViewer) {
       this.els.toggleLlmBtn.addEventListener("click", () => {
         const isHidden = this.els.llmViewer.hidden;
