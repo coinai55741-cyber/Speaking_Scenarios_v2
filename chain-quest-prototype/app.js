@@ -1322,6 +1322,30 @@ class LLMServiceAdapter {
   }
 
   /**
+   * 當 LLM 遇到請求頻率限制 (429 Rate Limit) 時，生成完全融入角色情境的沉浸式緩衝台詞
+   */
+  static getRateLimitNpcResponse(npcRole) {
+    const roleBuffers = {
+      "售票員": "「售票系統剛好在重新整理票務連線中，請同學深呼吸、稍等五秒再說一次喔！」",
+      "驗票志工": "「哎呀閘門感應器連線稍微慢了一下，請同學稍候五秒，再給奶奶看一次門票喔！」",
+      "園區導覽員": "「前面展區參觀人潮比較多、廣播連線稍候片刻，請稍等五秒再問一次路線喔！」",
+      "小吃店老闆": "「老闆手邊正忙著翻鍋大火快炒，剛才沒聽清楚，請客官稍等五秒再點一次喔！」",
+      "廚房阿姨": "「阿姨剛才正在掌杓煮湯，請稍等五秒再交代一次客製要求喔！」",
+      "服務生": "「店內點餐機正在出單整理中，請客人稍等五秒再加點飲品喔！」",
+      "媽媽": "「媽媽剛才在忙著收衣服整理東西，請稍等五秒再跟媽媽說一次喔！」",
+      "爸爸": "「爸爸剛才在看行程地圖，請稍等五秒再說一次要帶什麼裝備喔！」",
+      "站務人員": "「公車動態看板正在更新班次連線，請同學稍候五秒再詢問一次路線喔！」",
+      "公車司機": "「司機先生正在專注看後照鏡進站，請稍等五秒上車再確認一次目的地喔！」",
+      "熱心阿婆": "「阿婆剛才在看路邊紅綠燈，請稍等五秒再問一次方向喔！」",
+      "護理師": "「阿姨剛才正在幫其他同學量體溫，請先坐下來喘口氣、稍等五秒再說一次喔！」",
+      "家人": "「外頭風聲有點大剛才沒聽清楚，請喝口水稍等五秒再提醒一次穿搭喔！」",
+      "同學阿明": "「阿明剛才在看旁邊的展區分心了，請稍等五秒再跟我分享一次你的發現喔！」",
+      "帶隊老師": "「老師剛才在點名冊上登記名字，請稍等五秒再向老師報告集合喔！」"
+    };
+    return roleBuffers[npcRole] || "「現場連線稍微整理中，請深呼吸稍等五秒再說一次喔！」";
+  }
+
+  /**
    * 執行 LLM 評估 (整合 Vercel /api/judge、線上 API 與本地安全網雙軌備援)
    */
   static async evaluate({ hakkaTranscript, mandarinTranscript, nodeConfig, scenario }) {
@@ -1354,6 +1378,21 @@ class LLMServiceAdapter {
               provider: "gemini_api"
             };
           }
+        } else if (res.status === 429) {
+          // 遇到 429 頻率限制，回傳自然情境緩衝台詞
+          const rateLimitReply = this.getRateLimitNpcResponse(nodeConfig.npcRole);
+          return {
+            isMatch: false,
+            isRateLimited: true,
+            intent: "請求頻率超額 (Rate Limit)",
+            matchedChoice: null,
+            matchedChoiceId: null,
+            semanticAccuracy: 0,
+            hitKeywords: [],
+            missingKeywords: [],
+            feedback: "連線整理中（429 頻率冷卻），請稍候 5 秒再試一次。",
+            dynamicNpcResponse: rateLimitReply
+          };
         }
       } catch (err) {
         console.warn("[LLMServiceAdapter] Vercel 後端 /api/judge 調用異常，自動降級至本地安全網：", err);
@@ -2490,20 +2529,37 @@ class UIController {
       }
     } else if (stepNum === 3) {
       if (this.els.pipeLlmBadge) {
-        this.els.pipeLlmBadge.className = `pipeline-badge badge-${status}`;
-        this.els.pipeLlmBadge.textContent = status === "running" ? "評審中..." : (status === "success" ? "判定通過" : "未命中重試");
+        if (status === "running") {
+          this.els.pipeLlmBadge.className = "pipeline-badge badge-running";
+          this.els.pipeLlmBadge.textContent = "評審中...";
+        } else if (data?.isRateLimited) {
+          this.els.pipeLlmBadge.className = "pipeline-badge badge-pending";
+          this.els.pipeLlmBadge.textContent = "⏳ 頻率冷卻 (429)";
+        } else {
+          this.els.pipeLlmBadge.className = `pipeline-badge badge-${status}`;
+          this.els.pipeLlmBadge.textContent = status === "success" ? "判定通過" : "未命中重試";
+        }
       }
       if (this.els.pipeStep3Card) {
         this.els.pipeStep3Card.className = `pipeline-step-card is-${status}`;
       }
       if (status !== "running" && data) {
         if (this.els.pipeLlmResult) {
-          const sourceTag = data.isFromAPI ? " [☁️ Gemini 雲端運算]" : " [🛡️ 本地安全網]";
-          this.els.pipeLlmResult.textContent = (data.isMatch ? "✓ 通過 (Match)" : "⚠️ 未命中重試 (Retry)") + sourceTag;
-          this.els.pipeLlmResult.style.color = data.isMatch ? "#34d399" : "#f87171";
+          if (data.isRateLimited) {
+            this.els.pipeLlmResult.textContent = "⏳ 請求頻率飽和 (Rate Limit 429) [已觸發 NPC 情境緩衝]";
+            this.els.pipeLlmResult.style.color = "#f59e0b";
+          } else {
+            const sourceTag = data.isFromAPI ? " [☁️ Gemini 雲端運算]" : " [🛡️ 本地安全網]";
+            this.els.pipeLlmResult.textContent = (data.isMatch ? "✓ 通過 (Match)" : "⚠️ 未命中重試 (Retry)") + sourceTag;
+            this.els.pipeLlmResult.style.color = data.isMatch ? "#34d399" : "#f87171";
+          }
         }
-        if (this.els.pipeLlmIntent) this.els.pipeLlmIntent.textContent = data.intent || "無";
-        if (this.els.pipeLlmScore) this.els.pipeLlmScore.textContent = `${data.semanticAccuracy}%`;
+        if (this.els.pipeLlmIntent) {
+          this.els.pipeLlmIntent.textContent = data.isRateLimited ? "⚠️ 429 頻率冷卻 (請等 5 秒)" : (data.intent || "無");
+        }
+        if (this.els.pipeLlmScore) {
+          this.els.pipeLlmScore.textContent = data.isRateLimited ? "冷卻 5s" : `${data.semanticAccuracy}%`;
+        }
         if (this.els.pipeLlmNpc) this.els.pipeLlmNpc.textContent = data.dynamicNpcResponse || "（無回應）";
       }
     }

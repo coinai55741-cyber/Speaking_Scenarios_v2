@@ -159,8 +159,10 @@ module.exports = async function handler(req, res) {
       ...parsed
     });
   } catch (error) {
-    json(res, 500, {
+    const isRateLimited = error.message?.includes("429") || error.message?.includes("ResourceExhausted") || error.message?.includes("quota") || error.message?.includes("high demand") || error.message?.includes("503");
+    json(res, isRateLimited ? 429 : 500, {
       ok: false,
+      isRateLimited: !!isRateLimited,
       error: error.message || "LLM 評估伺服器處理異常"
     });
   }
