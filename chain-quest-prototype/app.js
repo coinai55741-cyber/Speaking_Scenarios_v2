@@ -89,6 +89,7 @@ const SCENARIOS_GRAPH = {
         targetHakka: "𠊎愛買三張學生票。",
         targetMandarin: "我要買三張學生票。",
         keywords: ["三張", "愛買", "學生票"],
+        mandarinKeywords: ["我要買","三張","學生票"],
         altKeywords: ["三張", "學生", "學生票", "買票"],
         npcRole: "售票員",
         npcAvatar: "🧑‍💼",
@@ -105,6 +106,7 @@ const SCENARIOS_GRAPH = {
         targetHakka: "這係𠊎个門票，恁仔細。",
         targetMandarin: "這是我的門票，謝謝。",
         keywords: ["門票", "恁仔細"],
+        mandarinKeywords: ["這是","門票","謝謝"],
         altKeywords: ["這係", "謝謝", "門票"],
         npcRole: "驗票志工",
         npcAvatar: "👵",
@@ -121,6 +123,7 @@ const SCENARIOS_GRAPH = {
         targetHakka: "請問大象區愛仰般行？",
         targetMandarin: "請問大象展區要怎麼走？",
         keywords: ["請問", "愛仰般行"],
+        mandarinKeywords: ["請問","怎麼走"],
         altKeywords: ["大象", "獅子", "蛇", "仰般行"],
         npcRole: "園區導覽員",
         npcAvatar: "👨‍🌾",
@@ -134,6 +137,7 @@ const SCENARIOS_GRAPH = {
             targetBranchId: "zoo_elephant",
             zoneCode: "A",
             keywords: ["大象", "象", "水池", "鼻仔"],
+            mandarinKeywords: ["大象","大象區","大象展區","水池","鼻子"],
             guideResponse: "「想看大象的話，從這裡沿著步道直走經過十字路口，再往左手邊走到底，就會看到大象水池囉！」"
           },
           {
@@ -143,6 +147,7 @@ const SCENARIOS_GRAPH = {
             targetBranchId: "zoo_lion",
             zoneCode: "B",
             keywords: ["獅子", "獅仔", "獅", "岩石", "威風"],
+            mandarinKeywords: ["獅子","獅子區","獅子展區","岩石","威風"],
             guideResponse: "「想看獅子的話，從這裡沿著步道直走經過十字路口，正前方岩石區就是獅子展區囉！」"
           },
           {
@@ -152,6 +157,7 @@ const SCENARIOS_GRAPH = {
             targetBranchId: "zoo_snake",
             zoneCode: "C",
             keywords: ["蛇", "蛇仔", "溫室", "玻璃", "安靜"],
+            mandarinKeywords: ["蛇","蛇區","蛇展區","溫室","安靜"],
             guideResponse: "「想看蛇的話，從這裡沿著步道直走經過十字路口，再往右手邊走到底，玻璃溫室就是蛇展區囉！」"
           }
         ],
@@ -177,6 +183,7 @@ const SCENARIOS_GRAPH = {
         targetHakka: "大象个鼻仔當長，當得人惜！",
         targetMandarin: "大象的鼻子好長，好可愛！",
         keywords: ["大象", "鼻仔", "當長", "得人惜"],
+        mandarinKeywords: ["大象","鼻子","好長","可愛"],
         altKeywords: ["鼻仔", "得人惜", "長", "大象"],
         npcRole: "同學阿明",
         npcAvatar: "👦",
@@ -193,6 +200,7 @@ const SCENARIOS_GRAPH = {
         targetHakka: "獅仔看起來當威風。",
         targetMandarin: "獅子看起來很威風。",
         keywords: ["獅仔", "當威風"],
+        mandarinKeywords: ["獅子","威風","很威風"],
         altKeywords: ["獅子", "威風", "獅仔"],
         npcRole: "同學阿明",
         npcAvatar: "👦",
@@ -209,6 +217,7 @@ const SCENARIOS_GRAPH = {
         targetHakka: "蛇仔行路當靜。",
         targetMandarin: "蛇移動得很安靜。",
         keywords: ["蛇仔", "當靜"],
+        mandarinKeywords: ["蛇","移動","安靜","很安靜"],
         altKeywords: ["蛇", "安靜", "靜", "蛇仔"],
         npcRole: "同學阿明",
         npcAvatar: "👦",
@@ -225,6 +234,7 @@ const SCENARIOS_GRAPH = {
         targetHakka: "老師，𠊎兜都參觀好了！",
         targetMandarin: "老師，我們都參觀好了！",
         keywords: ["老師", "參觀", "好了"],
+        mandarinKeywords: ["老師","我們","參觀好了"],
         altKeywords: ["老師", "好了", "參觀好了"],
         npcRole: "帶隊老師",
         npcAvatar: "👩‍🏫",
@@ -256,6 +266,7 @@ const SCENARIOS_GRAPH = {
         targetHakka: "老闆，𠊎愛一碗湯粄條。",
         targetMandarin: "老闆，我要一碗湯粄條。",
         keywords: ["老闆", "愛一碗", "湯粄條"],
+        mandarinKeywords: ["老闆","我要","一碗","湯粄條"],
         altKeywords: ["愛", "湯粄條", "一碗", "粄條"],
         npcRole: "小吃店老闆",
         npcAvatar: "👨‍🍳",
@@ -272,6 +283,7 @@ const SCENARIOS_GRAPH = {
         targetHakka: "毋好放香菜，甜一點。",
         targetMandarin: "不要放香菜，甜一點。",
         keywords: ["毋好放", "香菜"],
+        mandarinKeywords: ["不要放","香菜","甜一點"],
         altKeywords: ["毋好", "香菜", "甜一點"],
         npcRole: "廚房阿姨",
         npcAvatar: "👩‍🍳",
@@ -288,6 +300,7 @@ const SCENARIOS_GRAPH = {
         targetHakka: "再加一杯擂茶，這道客家小炒當好食！",
         targetMandarin: "再加一杯擂茶，這道客家小炒真好吃！",
         keywords: ["擂茶", "客家小炒", "當好食"],
+        mandarinKeywords: ["擂茶","客家小炒","好吃","真好吃"],
         altKeywords: ["擂茶", "好食", "客家小炒"],
         npcRole: "服務生",
         npcAvatar: "🧑‍💼",
@@ -331,6 +344,7 @@ const SCENARIOS_GRAPH = {
             targetHakka: "𠊎愛帶遮仔，落雨做得用。",
             targetMandarin: "我要帶雨傘，下雨可以用。",
             keywords: ["遮仔", "落雨", "用"],
+        mandarinKeywords: ["我要帶","雨傘","下雨","可以用"],
             altKeywords: ["雨傘", "下雨", "遮仔"],
             npcRole: "媽媽",
             npcAvatar: "👩",
@@ -347,6 +361,7 @@ const SCENARIOS_GRAPH = {
             targetHakka: "𠊎愛帶水壺，嘴渴做得啉水。",
             targetMandarin: "我要帶水壺，口渴可以喝水。",
             keywords: ["水壺", "嘴渴", "啉水"],
+        mandarinKeywords: ["我要帶","水壺","口渴","喝水"],
             altKeywords: ["水壺", "喝水", "口渴"],
             npcRole: "媽媽",
             npcAvatar: "👩",
@@ -363,6 +378,7 @@ const SCENARIOS_GRAPH = {
             targetHakka: "𠊎愛帶毛巾，流汗做得拭汗。",
             targetMandarin: "我要帶毛巾，流汗可以擦汗。",
             keywords: ["毛巾", "流汗", "拭汗"],
+        mandarinKeywords: ["我要帶","毛巾","流汗","擦汗"],
             altKeywords: ["毛巾", "擦汗", "拭汗"],
             npcRole: "爸爸",
             npcAvatar: "👨",
@@ -379,6 +395,7 @@ const SCENARIOS_GRAPH = {
             targetHakka: "𠊎愛帶點心，肚屎枵做得食。",
             targetMandarin: "我要帶點心，肚子餓可以吃。",
             keywords: ["點心", "肚屎枵", "食"],
+        mandarinKeywords: ["我要帶","點心","肚子餓","吃"],
             altKeywords: ["點心", "肚子餓", "肚屎枵"],
             npcRole: "爸爸",
             npcAvatar: "👨",
@@ -397,6 +414,7 @@ const SCENARIOS_GRAPH = {
         targetHakka: "𠊎東西都收好，準備好出發了！",
         targetMandarin: "我東西都收好了，準備好出發了！",
         keywords: ["收好", "出發"],
+        mandarinKeywords: ["東西","收好了","準備好","出發"],
         altKeywords: ["準備", "出發", "收好"],
         npcRole: "媽媽",
         npcAvatar: "👩",
@@ -428,6 +446,7 @@ const SCENARIOS_GRAPH = {
         targetHakka: "請問去文化園區愛坐哪一路公車？",
         targetMandarin: "請問去文化園區要搭哪一路公車？",
         keywords: ["請問", "哪一路", "公車"],
+        mandarinKeywords: ["請問","公車","搭哪一路"],
         altKeywords: ["文化園區", "學校", "圖書館", "公車"],
         npcRole: "站務人員",
         npcAvatar: "👮",
@@ -440,6 +459,7 @@ const SCENARIOS_GRAPH = {
             sub: "搭乘 802 路公車",
             targetBranchId: "bus_ask_culture",
             keywords: ["文化園區", "文化", "園區"],
+            mandarinKeywords: ["文化園區","文化","園區"],
             guideResponse: "「去文化園區要搭 802 路公車喔！大約再過三分鐘就會進站了，準備好悠遊卡喔！」"
           },
           {
@@ -448,6 +468,7 @@ const SCENARIOS_GRAPH = {
             sub: "搭乘 615 路公車",
             targetBranchId: "bus_ask_school",
             keywords: ["學校", "正門", "學校正門"],
+            mandarinKeywords: ["學校","學校正門","正門"],
             guideResponse: "「去學校可以搭 615 路公車，請在右側站牌等候喔！」"
           },
           {
@@ -456,6 +477,7 @@ const SCENARIOS_GRAPH = {
             sub: "搭乘 306 路公車",
             targetBranchId: "bus_ask_library",
             keywords: ["圖書館", "市立圖書館"],
+            mandarinKeywords: ["圖書館","市立圖書館"],
             guideResponse: "「去圖書館請搭 306 路公車，很快就到了喔！」"
           }
         ],
@@ -470,6 +492,7 @@ const SCENARIOS_GRAPH = {
         targetHakka: "請問去文化園區愛坐哪一路公車？",
         targetMandarin: "請問去文化園區要搭哪一路公車？",
         keywords: ["文化園區", "哪一路", "公車"],
+        mandarinKeywords: ["文化園區","公車","搭哪一路"],
         altKeywords: ["坐", "公車", "文化園區"],
         npcRole: "站務人員",
         npcAvatar: "👮",
@@ -486,6 +509,7 @@ const SCENARIOS_GRAPH = {
         targetHakka: "請問去學校愛坐哪一路公車？",
         targetMandarin: "請問去學校要搭哪一路公車？",
         keywords: ["學校", "哪一路", "公車"],
+        mandarinKeywords: ["學校","公車","搭哪一路"],
         altKeywords: ["坐", "公車", "學校"],
         npcRole: "站務人員",
         npcAvatar: "👮",
@@ -502,6 +526,7 @@ const SCENARIOS_GRAPH = {
         targetHakka: "請問去圖書館愛坐哪一路公車？",
         targetMandarin: "請問去圖書館要搭哪一路公車？",
         keywords: ["圖書館", "哪一路", "公車"],
+        mandarinKeywords: ["圖書館","公車","搭哪一路"],
         altKeywords: ["坐", "公車", "圖書館"],
         npcRole: "站務人員",
         npcAvatar: "👮",
@@ -518,6 +543,7 @@ const SCENARIOS_GRAPH = {
         targetHakka: "請問這台車有到目的地無？",
         targetMandarin: "請問這台車有到目的地嗎？",
         keywords: ["這台車", "有到", "無"],
+        mandarinKeywords: ["這台車","有到","目的地","嗎"],
         altKeywords: ["目的地", "這台車", "有到無"],
         npcRole: "公車司機",
         npcAvatar: "👨‍✈️",
@@ -534,6 +560,7 @@ const SCENARIOS_GRAPH = {
         targetHakka: "向前行，過紅綠燈越倒手就到了。",
         targetMandarin: "往前走，過紅綠燈左轉就到了。",
         keywords: ["向前行", "紅綠燈", "越倒手"],
+        mandarinKeywords: ["往前走","紅綠燈","左轉"],
         altKeywords: ["向前", "過紅綠燈", "左轉", "越倒手"],
         npcRole: "熱心阿婆",
         npcAvatar: "👵",
@@ -566,6 +593,7 @@ const SCENARIOS_GRAPH = {
         targetHakka: "護理師，𠊎頭那痛、肚痛。",
         targetMandarin: "護理師，我頭痛、肚子痛。",
         keywords: ["護理師", "痛"],
+        mandarinKeywords: ["護理師","痛","不舒服"],
         altKeywords: ["頭痛", "肚痛", "擦傷", "發熱"],
         npcRole: "護理師",
         npcAvatar: "👩‍⚕️",
@@ -578,6 +606,7 @@ const SCENARIOS_GRAPH = {
             sub: "頭暈腦脹、肚子陣陣疼痛",
             targetBranchId: "health_symptom_head",
             keywords: ["頭痛", "肚痛", "頭那痛", "肚子痛", "頭暈"],
+            mandarinKeywords: ["頭痛","肚子痛","頭暈","肚痛"],
             guideResponse: "「小朋友辛苦了，先坐下來量體溫，阿姨倒一杯溫開水給你喝喔。」"
           },
           {
@@ -586,6 +615,7 @@ const SCENARIOS_GRAPH = {
             sub: "操場跑步跌倒擦破皮",
             targetBranchId: "health_symptom_scratch",
             keywords: ["擦傷", "跌倒", "膝蓋", "跑太快", "腳痛", "流血"],
+            mandarinKeywords: ["擦傷","跌倒","膝蓋","流血","破皮"],
             guideResponse: "「不要緊喔！阿姨幫你用生理食鹽水清洗傷口、擦藥膏喔！」"
           },
           {
@@ -594,6 +624,7 @@ const SCENARIOS_GRAPH = {
             sub: "全身熱熱的、沒有力氣",
             targetBranchId: "health_symptom_fever",
             keywords: ["發熱", "發燒", "身體熱", "當燒", "無力", "燒"],
+            mandarinKeywords: ["發熱","發燒","身體熱","沒有力氣","無力"],
             guideResponse: "「我先幫你量耳溫，稍微有一點發燒，等一下幫你聯絡家長與導師。」"
           }
         ],
@@ -608,6 +639,7 @@ const SCENARIOS_GRAPH = {
         targetHakka: "護理師，𠊎頭那痛、肚痛。",
         targetMandarin: "護理師，我頭痛、肚子痛。",
         keywords: ["護理師", "頭那痛", "肚痛"],
+        mandarinKeywords: ["護理師","頭痛","肚子痛"],
         altKeywords: ["頭痛", "肚痛", "痛"],
         npcRole: "護理師",
         npcAvatar: "👩‍⚕️",
@@ -624,6 +656,7 @@ const SCENARIOS_GRAPH = {
         targetHakka: "體育課跑太遽，𠊎腳跌倒痛痛。",
         targetMandarin: "體育課跑太快，我腳跌倒痛痛。",
         keywords: ["體育課", "跑太遽", "跌倒"],
+        mandarinKeywords: ["體育課","跑太快","跌倒","痛痛"],
         altKeywords: ["跑太快", "腳痛", "跌倒", "跑太遽"],
         npcRole: "護理師",
         npcAvatar: "👩‍⚕️",
@@ -640,6 +673,7 @@ const SCENARIOS_GRAPH = {
         targetHakka: "𠊎身體當燒，無麼个力。",
         targetMandarin: "我身體很熱，沒有什麼力氣。",
         keywords: ["身體", "當燒", "無力"],
+        mandarinKeywords: ["身體","很熱","沒有力氣","發燒"],
         altKeywords: ["發熱", "沒力", "當燒", "身體"],
         npcRole: "護理師",
         npcAvatar: "👩‍⚕️",
@@ -656,6 +690,7 @@ const SCENARIOS_GRAPH = {
         targetHakka: "𠊎會多啉水、好好歇睏，恁仔細！",
         targetMandarin: "我會多喝水、好好休息，謝謝您！",
         keywords: ["多啉水", "歇睏", "恁仔細"],
+        mandarinKeywords: ["多喝水","好好休息","謝謝"],
         altKeywords: ["喝水", "休息", "謝謝", "多啉水"],
         npcRole: "護理師",
         npcAvatar: "👩‍⚕️",
@@ -687,6 +722,7 @@ const SCENARIOS_GRAPH = {
         targetHakka: "今晡日落雨，愛帶遮仔著雨衣。",
         targetMandarin: "今天下雨，要帶雨傘穿雨衣。",
         keywords: ["今晡日", "愛"],
+        mandarinKeywords: ["今天","要"],
         altKeywords: ["落雨", "當熱", "當冷", "雨傘", "帽子", "大衣"],
         npcRole: "家人",
         npcAvatar: "👨‍👩‍👧",
@@ -699,6 +735,7 @@ const SCENARIOS_GRAPH = {
             sub: "天空飄雨、地面潮濕",
             targetBranchId: "weather_outfit_rain",
             keywords: ["落雨", "下雨", "雨天", "雨傘", "雨衣", "遮仔"],
+            mandarinKeywords: ["下雨","雨天","雨傘","雨衣","陰雨"],
             guideResponse: "「無錯！落雨天路滑，著好雨衣、帶好遮仔，出門小心行喔！」"
           },
           {
@@ -707,6 +744,7 @@ const SCENARIOS_GRAPH = {
             sub: "豔陽高照、氣溫偏高",
             targetBranchId: "weather_outfit_hot",
             keywords: ["當熱", "很熱", "大熱天", "晴天", "太陽", "遮陽帽"],
+            mandarinKeywords: ["很熱","大熱天","晴天","太陽","遮陽帽"],
             guideResponse: "「大熱天陽光真烈，戴上帽仔、多喝水才不會中暑喔！」"
           },
           {
@@ -715,6 +753,7 @@ const SCENARIOS_GRAPH = {
             sub: "冷氣團來襲、北風呼呼",
             targetBranchId: "weather_outfit_cold",
             keywords: ["當冷", "很冷", "寒冷", "天冷", "冬天", "大衫", "圍巾"],
+            mandarinKeywords: ["很冷","寒冷","天冷","冬天","大衣","圍巾"],
             guideResponse: "「乖孫真靈俐！著暖暖、圍巾圍好，出門就毋驚吹風冷著囉！」"
           }
         ],
@@ -729,6 +768,7 @@ const SCENARIOS_GRAPH = {
         targetHakka: "今晡日落雨，愛帶遮仔著雨衣。",
         targetMandarin: "今天下雨，要帶雨傘穿雨衣。",
         keywords: ["今晡日", "落雨", "遮仔", "雨衣"],
+        mandarinKeywords: ["今天","下雨","雨傘","雨衣"],
         altKeywords: ["下雨", "雨傘", "雨衣", "遮仔"],
         npcRole: "媽媽",
         npcAvatar: "👩",
@@ -745,6 +785,7 @@ const SCENARIOS_GRAPH = {
         targetHakka: "今晡日當熱，愛戴等遮陽帽仔。",
         targetMandarin: "今天很熱，要戴著遮陽帽。",
         keywords: ["今晡日", "當熱", "遮陽帽仔"],
+        mandarinKeywords: ["今天","很熱","戴著","遮陽帽"],
         altKeywords: ["很熱", "帽子", "遮陽帽", "當熱"],
         npcRole: "爸爸",
         npcAvatar: "👨",
@@ -761,6 +802,7 @@ const SCENARIOS_GRAPH = {
         targetHakka: "天時當冷，愛著大衫圍等圍巾。",
         targetMandarin: "天氣很冷，要穿大衣圍著圍巾。",
         keywords: ["天時", "當冷", "大衫", "圍巾"],
+        mandarinKeywords: ["天氣","很冷","穿大衣","圍巾"],
         altKeywords: ["很冷", "大衣", "圍巾", "當冷"],
         npcRole: "阿公",
         npcAvatar: "👴",
@@ -777,6 +819,7 @@ const SCENARIOS_GRAPH = {
         targetHakka: "大家都準備好了，出門行囉！",
         targetMandarin: "大家都準備好了，出門走囉！",
         keywords: ["準備好", "出門"],
+        mandarinKeywords: ["大家都","準備好了","出門走囉"],
         altKeywords: ["準備", "出門", "準備好了"],
         npcRole: "家人",
         npcAvatar: "👨‍👩‍👧",
@@ -1375,8 +1418,9 @@ class LLMServiceAdapter {
     }
 
     // 本地雙軌安全網：結合客語與華語意圖進行智能匹配
-    const combinedText = `${hakkaTranscript || ""} ${mandarinTranscript || ""}`;
-    const fallbackEval = SpeechService.evaluateAnswer(combinedText, nodeConfig);
+    const isMandarin = !hakkaTranscript && !!mandarinTranscript;
+    const combinedText = `${hakkaTranscript || ""} ${mandarinTranscript || ""}`.trim();
+    const fallbackEval = SpeechService.evaluateAnswer(combinedText, nodeConfig, isMandarin);
     const matchedChoice = fallbackEval.matchedChoice;
 
     let dynamicNpcResponse = "";
@@ -1410,14 +1454,14 @@ class LLMServiceAdapter {
 
 class SpeechService {
   /**
-   * 比對學生發音文字與節點要求
+   * 比對學生發音文字與節點要求 (支援客語模式與華語模式關鍵字動態切換)
    */
-  static evaluateAnswer(userTranscript, nodeConfig) {
+  static evaluateAnswer(userTranscript, nodeConfig, isMandarinMode = false) {
     if (!userTranscript || !userTranscript.trim()) {
       return {
         isMatch: false,
         hitKeywords: [],
-        missingKeywords: nodeConfig.keywords || [],
+        missingKeywords: isMandarinMode ? (nodeConfig.mandarinKeywords || nodeConfig.keywords || []) : (nodeConfig.keywords || []),
         similarity: 0,
         feedback: "未偵測到清晰語音，請靠近麥克風再試一次。"
       };
@@ -1428,7 +1472,9 @@ class SpeechService {
     // 1. 若為「選擇」節點，進行分支關鍵字匹配 (若皆未命中則判定 false)
     if (nodeConfig.nodeType === "選擇" && nodeConfig.choices) {
       for (const choice of nodeConfig.choices) {
-        const choiceKeywords = choice.keywords || [choice.title];
+        const choiceKeywords = isMandarinMode
+          ? (choice.mandarinKeywords || choice.keywords || [choice.title])
+          : (choice.keywords || [choice.title]);
         const isChoiceHit = choiceKeywords.some(kw => cleanText.includes(kw));
         if (isChoiceHit) {
           return {
@@ -1454,7 +1500,9 @@ class SpeechService {
     }
 
     // 2. 一般口說比對 (嚴格要求核心關鍵字與數量匹配)
-    const primaryKeywords = nodeConfig.keywords || [];
+    const primaryKeywords = isMandarinMode
+      ? (nodeConfig.mandarinKeywords || nodeConfig.keywords || [])
+      : (nodeConfig.keywords || []);
     const hitPrimary = primaryKeywords.filter(kw => cleanText.includes(kw));
     const missingPrimary = primaryKeywords.filter(kw => !cleanText.includes(kw));
 
@@ -1462,9 +1510,10 @@ class SpeechService {
     const targetRequiresThree = (nodeConfig.targetHakka || "").includes("三") || (nodeConfig.targetMandarin || "").includes("三") || primaryKeywords.some(k => k.includes("三") || k.includes("3"));
     const studentHasWrongQuantity = targetRequiresThree && (cleanText.includes("兩") || cleanText.includes("二") || cleanText.includes("一") || cleanText.includes("2") || cleanText.includes("1")) && !cleanText.includes("三") && !cleanText.includes("3");
 
-    const targetClean = (nodeConfig.targetHakka || "").replace(/[。，！？、？\s\.,!?]/g, "");
+    const targetTarget = isMandarinMode ? (nodeConfig.targetMandarin || "") : (nodeConfig.targetHakka || "");
+    const targetClean = targetTarget.replace(/[。，！？、？\s\.,!?]/g, "");
     const isFullPrimaryHit = primaryKeywords.length > 0 && hitPrimary.length === primaryKeywords.length;
-    const isStrictHit = primaryKeywords.length >= 2 ? (hitPrimary.length >= primaryKeywords.length) : (hitPrimary.length >= 1);
+    const isStrictHit = primaryKeywords.length >= 2 ? (hitPrimary.length >= Math.ceil(primaryKeywords.length * 0.65)) : (hitPrimary.length >= 1);
     const isMatch = !studentHasWrongQuantity && (isFullPrimaryHit || isStrictHit || (targetClean && cleanText.includes(targetClean)));
 
     return {
@@ -1473,7 +1522,7 @@ class SpeechService {
       hitKeywords: hitPrimary,
       missingKeywords: missingPrimary,
       similarity: isFullPrimaryHit ? 100 : Math.round((hitPrimary.length / Math.max(1, primaryKeywords.length)) * 100),
-      feedback: isMatch ? "辨識成功！語意明確且關鍵字命中。" : (studentHasWrongQuantity ? "數量不符（題目要求三張，非兩張或一張），請修正數量後再試一次。" : "關鍵字詞未完整命中（如數量或指定項目不符），請參考提示再說一次。")
+      feedback: isMatch ? (isMandarinMode ? "華語辨識成功！語意明確且關鍵詞命中。" : "辨識成功！語意明確且關鍵字命中。") : (studentHasWrongQuantity ? "數量不符（題目要求三張，非兩張或一張），請修正數量後再試一次。" : "關鍵字詞未完整命中，請參考提示再說一次。")
     };
   }
 
@@ -2191,8 +2240,8 @@ class UIController {
 
     if (mode === "mandarin") {
       if (this.els.recordBtnIcon) this.els.recordBtnIcon.textContent = "🗣️";
-      if (this.els.recordBtnText) this.els.recordBtnText.textContent = "點擊說華語 (Web Speech)";
-      if (this.els.statusTip) this.els.statusTip.textContent = "🗣️ 華語對照模式：請直接開口說華語（例如「我要買三張學生票」），系統將由瀏覽器直接辨識並由 AI 評審！";
+      if (this.els.recordBtnText) this.els.recordBtnText.textContent = "點擊錄音 (華語)";
+      if (this.els.statusTip) this.els.statusTip.textContent = "🗣️ 華語對照模式：請點擊下方按鈕開始說華語，說完再點一次送出！";
       if (pipeStep1Title) pipeStep1Title.textContent = "1️⃣ 華語 ASR 語音轉文字 (瀏覽器內建)";
       if (this.els.pipeMtBadge) {
         this.els.pipeMtBadge.textContent = "華語直通";
@@ -2201,8 +2250,8 @@ class UIController {
       if (this.els.pipeMtText) this.els.pipeMtText.textContent = "（華語模式：已略過客轉華轉譯直通）";
     } else {
       if (this.els.recordBtnIcon) this.els.recordBtnIcon.textContent = "🎙️";
-      if (this.els.recordBtnText) this.els.recordBtnText.textContent = "按住／點擊錄音";
-      if (this.els.statusTip) this.els.statusTip.textContent = "請點擊下方按鈕，開始用客語說出你想講的話。";
+      if (this.els.recordBtnText) this.els.recordBtnText.textContent = "點擊錄音";
+      if (this.els.statusTip) this.els.statusTip.textContent = "請點擊下方按鈕開始用客語說話，說完再點一次送出！";
       if (pipeStep1Title) pipeStep1Title.textContent = "1️⃣ 客語 ASR 語音轉文字 (客委會)";
       if (this.els.pipeMtBadge) {
         this.els.pipeMtBadge.textContent = "待處理";
@@ -2816,12 +2865,22 @@ class UIController {
     this.renderSpeechNodeControls(node);
   }
 
+  updateRecordButtonDefaultState() {
+    const isMandarin = this.state.speechMode === "mandarin";
+    if (this.els.recordBtnIcon) {
+      this.els.recordBtnIcon.textContent = isMandarin ? "🗣️" : "🎙️";
+    }
+    if (this.els.recordBtnText) {
+      this.els.recordBtnText.textContent = isMandarin ? "點擊錄音 (華語)" : "點擊錄音";
+    }
+  }
+
   renderSpeechNodeControls(targetNodeConfig) {
     if (this.els.recordBtn) {
       this.els.recordBtn.disabled = false;
       this.els.recordBtn.classList.remove("is-recording");
     }
-    if (this.els.recordBtnText) this.els.recordBtnText.textContent = "按住／點擊錄音";
+    this.updateRecordButtonDefaultState();
     if (this.els.devAutoFillSuccessBtn) this.els.devAutoFillSuccessBtn.disabled = false;
     if (this.els.devAutoFillFailBtn) this.els.devAutoFillFailBtn.disabled = false;
   }
@@ -2832,14 +2891,17 @@ class UIController {
         this.els.recordBtn.disabled = false;
         this.els.recordBtn.classList.add("is-recording");
       }
-      if (this.els.recordBtnText) this.els.recordBtnText.textContent = "🔴 正在錄音辨識中...（可再點擊停止）";
+      if (this.els.recordBtnIcon) this.els.recordBtnIcon.textContent = "⏹️";
+      if (this.els.recordBtnText) this.els.recordBtnText.textContent = "⏹️ 錄音中...（再按一次結束送出）";
       if (this.els.statusDot) this.els.statusDot.className = "status-dot is-recording";
-      if (this.els.statusTip) this.els.statusTip.textContent = "正在聆聽麥克風客語發音並即時與語料比對中...";
+      if (this.els.statusTip) {
+        this.els.statusTip.textContent = this.state.speechMode === "mandarin" ? "🔴 正在聆聽華語發音中...說完請再點擊一次按鈕送出！" : "🔴 正在聆聽客語發音中...說完請再點擊一次按鈕送出！";
+      }
     } else {
       if (this.els.recordBtn) {
         this.els.recordBtn.classList.remove("is-recording");
       }
-      if (this.els.recordBtnText) this.els.recordBtnText.textContent = "按住／點擊錄音";
+      this.updateRecordButtonDefaultState();
     }
   }
 
