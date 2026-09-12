@@ -3,7 +3,8 @@
  * Vercel Serverless Function: /api/judge
  * ============================================================================
  * LLM-as-a-Judge 後端轉發評估介面
- * 支援 Google Gemini API 與 OpenAI 格式 API，金鑰安全隔離於後端 .env。
+ * 支援 Google Gemini 3.6 Flash / 3.5 Flash 及 OpenAI 格式 API。
+ * 金鑰安全隔離於後端 .env。
  */
 
 function json(res, statusCode, payload) {
@@ -27,6 +28,45 @@ async function readBody(req) {
   } catch (error) {
     return {};
   }
+}
+
+async function callGemini(apiKey, models, systemPrompt, userPrompt) {
+  let lastError = null;
+  for (const model of models) {
+    try {
+      const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+      const geminiRes = await fetch(geminiUrl, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          contents: [
+            {
+              role: "user",
+              parts: [{ text: `${systemPrompt}\n\n${userPrompt}` }]
+            }
+          ],
+          generationConfig: {
+            responseMimeType: "application/json",
+            temperature: 0.2
+          }
+        })
+      });
+
+      if (geminiRes.ok) {
+        const geminiData = await geminiRes.json();
+        const text = geminiData.candidates?.[0]?.content?.parts?.[0]?.text || "";
+        if (text) {
+          return { text, modelUsed: model };
+        }
+      } else {
+        const errBody = await geminiRes.text();
+        lastError = new Error(`Gemini [${model}] HTTP ${geminiRes.status}: ${errBody.slice(0, 150)}`);
+      }
+    } catch (err) {
+      lastError = err;
+    }
+  }
+  throw lastError || new Error("All Gemini candidate models failed.");
 }
 
 module.exports = async function handler(req, res) {
@@ -54,7 +94,7 @@ module.exports = async function handler(req, res) {
     const { systemPrompt, userPrompt } = body;
 
     const apiKey = process.env.LLM_API_KEY || "";
-    const model = process.env.LLM_MODEL || "gemini-1.5-flash";
+    const primaryModel = process.env.LLM_MODEL || "gemini-3.6-flash";
     const endpoint = process.env.LLM_ENDPOINT || "";
 
     if (!apiKey) {
@@ -63,36 +103,23 @@ module.exports = async function handler(req, res) {
     }
 
     let llmResponseContent = "";
+    let modelUsed = primaryModel;
 
     // 判斷是否為 Gemini API (以 AQ. 或 AIza 開頭，或 endpoint 包含 googleapis)
     const isGemini = apiKey.startsWith("AQ.") || apiKey.startsWith("AIza") || endpoint.includes("googleapis.com");
 
     if (isGemini) {
-      const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
-      const geminiRes = await fetch(geminiUrl, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          contents: [
-            {
-              role: "user",
-              parts: [{ text: `${systemPrompt}\n\n${userPrompt}` }]
-            }
-          ],
-          generationConfig: {
-            responseMimeType: "application/json",
-            temperature: 0.2
-          }
-        })
-      });
+      const candidateModels = [
+        primaryModel,
+        "gemini-3.6-flash",
+        "gemini-3.5-flash",
+        "gemini-3.1-flash-lite",
+        "gemini-2.5-pro"
+      ].filter((v, i, a) => a.indexOf(v) === i && !v.includes("1.5")); // 排除已廢棄的 1.5 系列
 
-      if (!geminiRes.ok) {
-        const errBody = await geminiRes.text();
-        throw new Error(`Gemini API 請求失敗（HTTP ${geminiRes.status}）：${errBody.slice(0, 180)}`);
-      }
-
-      const geminiData = await geminiRes.json();
-      llmResponseContent = geminiData.candidates?.[0]?.content?.parts?.[0]?.text || "";
+      const result = await callGemini(apiKey, candidateModels, systemPrompt, userPrompt);
+      llmResponseContent = result.text;
+      modelUsed = result.modelUsed;
     } else {
       // 標準 OpenAI 格式
       const openaiEndpoint = endpoint || "https://api.openai.com/v1/chat/completions";
@@ -103,7 +130,7 @@ module.exports = async function handler(req, res) {
           Authorization: `Bearer ${apiKey}`
         },
         body: JSON.stringify({
-          model,
+          model: primaryModel,
           messages: [
             { role: "system", content: systemPrompt },
             { role: "user", content: userPrompt }
@@ -127,6 +154,8 @@ module.exports = async function handler(req, res) {
 
     json(res, 200, {
       ok: true,
+      isFromAPI: true,
+      modelUsed,
       ...parsed
     });
   } catch (error) {
