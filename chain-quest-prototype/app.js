@@ -78,6 +78,7 @@ const SCENARIOS_GRAPH = {
     bannerImage: "./assets/zoo_chain.jpg",
     objectPosition: "calc(32% + 100px) 42%",
     objective: "體驗購票、驗票、口說問路並依照指引在 Canvas 地圖操縱小人走入展區，完成對話並於出口集合。",
+    mandarinObjective: "體驗購票、驗票、口說問路並依照指引在 Canvas 地圖操縱角色走入展區，完成對話並於出口集合。",
     startNodeId: "zoo_start",
     nodes: {
       zoo_start: {
@@ -86,15 +87,18 @@ const SCENARIOS_GRAPH = {
         nodeType: "主線",
         locationTag: "動物園大門售票處",
         storyPrompt: "今天天氣晴朗，你跟同學一起來到動物園門口。輪到你上前時，你準備跟售票員買學生票。你說：",
+        mandarinStoryPrompt: "今天天氣晴朗，你跟同學一起來到動物園門口。輪到你上前時，你準備跟售票員買學生票。你說：",
         targetHakka: "𠊎愛買三張學生票。",
         targetMandarin: "我要買三張學生票。",
         keywords: ["三張", "愛買", "學生票"],
-        mandarinKeywords: ["我要買","三張","學生票"],
+        mandarinKeywords: ["我要買", "三張", "學生票"],
         altKeywords: ["三張", "學生", "學生票", "買票"],
         npcRole: "售票員",
         npcAvatar: "🧑‍💼",
         npcSuccessResponse: "「好，三張學生票。這是你的門票，請收好，祝你們玩得開心！」",
+        mandarinNpcSuccessResponse: "「好，三張學生票。這是你的門票，請收好，祝你們玩得開心！」",
         npcRetryResponse: "「不好意思我沒聽清楚，請問是要買幾張呢？例如說：『𠊎愛買三張學生票』。」",
+        mandarinNpcRetryResponse: "「不好意思我沒聽清楚，請問是要買幾張呢？例如說：『我要買三張學生票』。」",
         nextNodeId: "zoo_gate"
       },
       zoo_gate: {
@@ -103,15 +107,18 @@ const SCENARIOS_GRAPH = {
         nodeType: "主線",
         locationTag: "入園驗票閘門",
         storyPrompt: "你拿著門票走到閘門前，志工奶奶準備幫你驗票，你也想向她道謝。你說：",
+        mandarinStoryPrompt: "你拿著門票走到閘門前，志工奶奶準備幫你驗票，你也想向她道謝。你說：",
         targetHakka: "這係𠊎个門票，恁仔細。",
         targetMandarin: "這是我的門票，謝謝。",
         keywords: ["門票", "恁仔細"],
-        mandarinKeywords: ["這是","門票","謝謝"],
+        mandarinKeywords: ["這是", "門票", "謝謝"],
         altKeywords: ["這係", "謝謝", "門票"],
         npcRole: "驗票志工",
         npcAvatar: "👵",
         npcSuccessResponse: "「歡迎光臨！閘門打開了，進去請小心腳步，慢慢參觀喔！」",
+        mandarinNpcSuccessResponse: "「歡迎光臨！閘門打開了，進去請小心腳步，慢慢參觀喔！」",
         npcRetryResponse: "「志工奶奶正在等你出示門票，可以說：『這係𠊎个門票，恁仔細』喔！」",
+        mandarinNpcRetryResponse: "「志工奶奶正在等你出示門票，可以說：『這是我的門票，謝謝』喔！」",
         nextNodeId: "zoo_choose_animal"
       },
       zoo_choose_animal: {
@@ -120,15 +127,18 @@ const SCENARIOS_GRAPH = {
         nodeType: "選擇",
         locationTag: "園區路口導覽站",
         storyPrompt: "進到園區後，你們想先看一種動物。請看上方提示，開口向導覽員詢問你想去的展區（例如大象、獅子或蛇）：",
+        mandarinStoryPrompt: "進到園區後，你們想先看一種動物。請看上方提示，開口向導覽員詢問你想去的展區（例如大象、獅子或蛇）：",
         targetHakka: "請問大象區愛仰般行？",
         targetMandarin: "請問大象展區要怎麼走？",
         keywords: ["請問", "愛仰般行"],
-        mandarinKeywords: ["請問","怎麼走"],
+        mandarinKeywords: ["請問", "怎麼走"],
         altKeywords: ["大象", "獅子", "蛇", "仰般行"],
         npcRole: "園區導覽員",
         npcAvatar: "👨‍🌾",
         npcSuccessResponse: "「想好要看哪一種動物後，就看清楚路線提示，操縱小人出發吧！」",
+        mandarinNpcSuccessResponse: "「想好要看哪一種動物後，就看清楚路線提示，操縱角色出發吧！」",
         npcRetryResponse: "「請問你想去哪裡呢？請開口說出大象、獅子或蛇其中一個展區喔！」",
+        mandarinNpcRetryResponse: "「請問你想去哪裡呢？請開口說出大象、獅子或蛇其中一個展區喔！」",
         choices: [
           {
             id: "elephant",
@@ -137,8 +147,9 @@ const SCENARIOS_GRAPH = {
             targetBranchId: "zoo_elephant",
             zoneCode: "A",
             keywords: ["大象", "象", "水池", "鼻仔"],
-            mandarinKeywords: ["大象","大象區","大象展區","水池","鼻子"],
-            guideResponse: "「想看大象的話，從這裡沿著步道直走經過十字路口，再往左手邊走到底，就會看到大象水池囉！」"
+            mandarinKeywords: ["大象", "大象區", "大象展區", "水池", "鼻子"],
+            guideResponse: "「想看大象的話，從這裡沿著步道直走經過十字路口，再往左手邊走到底，就會看到大象水池囉！」",
+            mandarinGuideResponse: "「想看大象的話，從這裡沿著步道直走經過十字路口，再往左手邊走到底，就會看到大象水池囉！」"
           },
           {
             id: "lion",
@@ -147,8 +158,9 @@ const SCENARIOS_GRAPH = {
             targetBranchId: "zoo_lion",
             zoneCode: "B",
             keywords: ["獅子", "獅仔", "獅", "岩石", "威風"],
-            mandarinKeywords: ["獅子","獅子區","獅子展區","岩石","威風"],
-            guideResponse: "「想看獅子的話，從這裡沿著步道直走經過十字路口，正前方岩石區就是獅子展區囉！」"
+            mandarinKeywords: ["獅子", "獅子區", "獅子展區", "岩石", "威風"],
+            guideResponse: "「想看獅子的話，從這裡沿著步道直走經過十字路口，正前方岩石區就是獅子展區囉！」",
+            mandarinGuideResponse: "「想看獅子的話，從這裡沿著步道直走經過十字路口，正前方岩石區就是獅子展區囉！」"
           },
           {
             id: "snake",
@@ -157,8 +169,9 @@ const SCENARIOS_GRAPH = {
             targetBranchId: "zoo_snake",
             zoneCode: "C",
             keywords: ["蛇", "蛇仔", "溫室", "玻璃", "安靜"],
-            mandarinKeywords: ["蛇","蛇區","蛇展區","溫室","安靜"],
-            guideResponse: "「想看蛇的話，從這裡沿著步道直走經過十字路口，再往右手邊走到底，玻璃溫室就是蛇展區囉！」"
+            mandarinKeywords: ["蛇", "蛇區", "蛇展區", "溫室", "安靜"],
+            guideResponse: "「想看蛇的話，從這裡沿著步道直走經過十字路口，再往右手邊走到底，玻璃溫室就是蛇展區囉！」",
+            mandarinGuideResponse: "「想看蛇的話，從這裡沿著步道直走經過十字路口，再往右手邊走到底，玻璃溫室就是蛇展區囉！」"
           }
         ],
         nextNodeId: "zoo_map_nav"
@@ -169,10 +182,13 @@ const SCENARIOS_GRAPH = {
         nodeType: "地圖移動",
         locationTag: "園區步道十字路口",
         storyPrompt: "請依照導覽員的指示，操縱小人沿著石板步道走向你選擇的【⭐ 星標展區】，抵達後按右下角【確定抵達】！",
+        mandarinStoryPrompt: "請依照導覽員的指示，操縱角色沿著石板步道走向你選擇的【⭐ 星標展區】，抵達後按右下角【確定抵達】！",
         npcRole: "園區導覽員",
         npcAvatar: "👨‍🌾",
         npcSuccessResponse: "「很好！你順利走到展區了，快跟同學分享你的發現吧！」",
-        npcRetryResponse: "「哎呀走錯展區囉！目前位置不是你選擇的展區，請按【🔄 重新走】或看清楚星標再試一次！」"
+        mandarinNpcSuccessResponse: "「很好！你順利走到展區了，快跟同學分享你的發現吧！」",
+        npcRetryResponse: "「哎呀走錯展區囉！目前位置不是你選擇的展區，請按【🔄 重新走】或看清楚星標再試一次！」",
+        mandarinNpcRetryResponse: "「哎呀走錯展區囉！目前位置不是你選擇的展區，請按【🔄 重新走】或看清楚星標再試一次！」"
       },
       zoo_elephant: {
         id: "zoo_elephant",
@@ -180,15 +196,18 @@ const SCENARIOS_GRAPH = {
         nodeType: "分支",
         locationTag: "大象展區水池旁",
         storyPrompt: "你看到大象用長鼻子吸水沖在背上洗澡，覺得很可愛，想跟身邊的同學分享。你說：",
+        mandarinStoryPrompt: "你看到大象用長鼻子吸水沖在背上洗澡，覺得很可愛，想跟身邊的同學分享。你說：",
         targetHakka: "大象个鼻仔當長，當得人惜！",
         targetMandarin: "大象的鼻子好長，好可愛！",
         keywords: ["大象", "鼻仔", "當長", "得人惜"],
-        mandarinKeywords: ["大象","鼻子","好長","可愛"],
+        mandarinKeywords: ["大象", "鼻子", "好長", "可愛"],
         altKeywords: ["鼻仔", "得人惜", "長", "大象"],
         npcRole: "同學阿明",
         npcAvatar: "👦",
         npcSuccessResponse: "「真的耶！你看牠還會用長鼻子捲草吃，大象真的好得意喔！」",
+        mandarinNpcSuccessResponse: "「真的耶！你看牠還會用長鼻子吸水噴在背上，大象真的好可愛喔！」",
         npcRetryResponse: "「蛤，你剛剛說什麼？試著說說大象的鼻子：『大象个鼻仔當長，當得人惜！』」",
+        mandarinNpcRetryResponse: "「蛤，你剛剛說什麼？試著說說大象的長鼻子：『大象的鼻子好長，好可愛！』」",
         nextNodeId: "zoo_meet_point"
       },
       zoo_lion: {
@@ -197,15 +216,18 @@ const SCENARIOS_GRAPH = {
         nodeType: "分支",
         locationTag: "獅子展區岩石旁",
         storyPrompt: "你看到獅子趴在石頭上休息，鬃毛看起來很威風，想跟身邊的同學分享。你說：",
+        mandarinStoryPrompt: "你看到獅子趴在石頭上休息，鬃毛看起來很威風，想跟身邊的同學分享。你說：",
         targetHakka: "獅仔看起來當威風。",
         targetMandarin: "獅子看起來很威風。",
         keywords: ["獅仔", "當威風"],
-        mandarinKeywords: ["獅子","威風","很威風"],
+        mandarinKeywords: ["獅子", "威風", "很威風"],
         altKeywords: ["獅子", "威風", "獅仔"],
         npcRole: "同學阿明",
         npcAvatar: "👦",
         npcSuccessResponse: "「對啊，牠趴在岩石上，看起來就像草原之王一樣威風！」",
+        mandarinNpcSuccessResponse: "「對啊，牠趴在岩石上，看起來就像草原之王一樣威風！」",
         npcRetryResponse: "「試著用客語說：『獅仔看起來當威風』喔！」",
+        mandarinNpcRetryResponse: "「試著說說看：『獅子看起來很威風』喔！」",
         nextNodeId: "zoo_meet_point"
       },
       zoo_snake: {
@@ -214,15 +236,18 @@ const SCENARIOS_GRAPH = {
         nodeType: "分支",
         locationTag: "蛇展區玻璃窗前",
         storyPrompt: "你看到蛇慢慢爬過樹枝，動作很安靜，想跟身邊的同學分享。你說：",
+        mandarinStoryPrompt: "你看到蛇慢慢爬過樹枝，動作很安靜，想跟身邊的同學分享。你說：",
         targetHakka: "蛇仔行路當靜。",
         targetMandarin: "蛇移動得很安靜。",
         keywords: ["蛇仔", "當靜"],
-        mandarinKeywords: ["蛇","移動","安靜","很安靜"],
+        mandarinKeywords: ["蛇", "移動", "安靜", "很安靜"],
         altKeywords: ["蛇", "安靜", "靜", "蛇仔"],
         npcRole: "同學阿明",
         npcAvatar: "👦",
         npcSuccessResponse: "「真的，牠在樹枝上滑行得好慢，幾乎一點聲音都沒有！」",
+        mandarinNpcSuccessResponse: "「真的，牠在樹枝上滑行得好慢，幾乎一點聲音都沒有！」",
         npcRetryResponse: "「試著用客語說：『蛇仔行路當靜』喔！」",
+        mandarinNpcRetryResponse: "「試著說說看：『蛇移動得很安靜』喔！」",
         nextNodeId: "zoo_meet_point"
       },
       zoo_meet_point: {
@@ -231,22 +256,25 @@ const SCENARIOS_GRAPH = {
         nodeType: "集合點",
         locationTag: "園區出口集合點",
         storyPrompt: "參觀完動物展區後，大家走到【⭐ 出口集合點】集合，老師正在清點人數。你向老師報告：",
+        mandarinStoryPrompt: "參觀完動物展區後，大家走到【⭐ 出口集合點】集合，老師正在清點人數。你向老師報告：",
         targetHakka: "老師，𠊎兜都參觀好了！",
         targetMandarin: "老師，我們都參觀好了！",
         keywords: ["老師", "參觀", "好了"],
-        mandarinKeywords: ["老師","我們","參觀好了"],
+        mandarinKeywords: ["老師", "我們", "參觀好了"],
         altKeywords: ["老師", "好了", "參觀好了"],
         npcRole: "帶隊老師",
         npcAvatar: "👩‍🏫",
         npcSuccessResponse: "「太棒了！大家都準時集合而且學到很多動物知識，動物園探索大成功！」",
+        mandarinNpcSuccessResponse: "「太棒了！大家都準時集合而且學到很多動物知識，動物園探索大成功！」",
         npcRetryResponse: "「跟老師報告大家參觀好了：『老師，𠊎兜都參觀好了！』」",
+        mandarinNpcRetryResponse: "「跟老師報告大家參觀好了：『老師，我們都參觀好了！』」",
         nextNodeId: null // 結束
       }
     }
   },
 
   // ----------------------------------------------------
-  // 情境 2：客家美食點餐 (還原上一版經典 3 步驟)
+  // 情境 2：客家美食點餐 (經典 3 步驟)
   // ----------------------------------------------------
   hakka_food: {
     id: "hakka_food",
@@ -255,6 +283,7 @@ const SCENARIOS_GRAPH = {
     bannerImage: "./assets/hakka_food.jpg",
     objectPosition: "50% 50%",
     objective: "走入客家傳統餐館，學習點粄條主食、客製化飲食需求與加點飲品評價。",
+    mandarinObjective: "走入傳統餐館，體驗點粄條主食、客製化飲食需求與加點飲品評價。",
     startNodeId: "food_step1",
     nodes: {
       food_step1: {
@@ -263,15 +292,18 @@ const SCENARIOS_GRAPH = {
         nodeType: "主線",
         locationTag: "客家小吃店櫃檯",
         storyPrompt: "我走過街上聞一聞好香喔，我的嘴巴都流口水了，跟著香味走去原來是一個客家小吃攤。你舔了一舔嘴巴，進到餐廳門口看了一下，決定跟老闆點菜。你說：",
+        mandarinStoryPrompt: "走過街上聞一聞好香喔，嘴巴都流口水了，跟著香味走去原來是一個傳統小吃攤。你舔了一舔嘴巴，進到餐廳門口看了一下，決定跟老闆點菜。你說：",
         targetHakka: "老闆，𠊎愛一碗湯粄條。",
         targetMandarin: "老闆，我要一碗湯粄條。",
         keywords: ["老闆", "愛一碗", "湯粄條"],
-        mandarinKeywords: ["老闆","我要","一碗","湯粄條"],
+        mandarinKeywords: ["老闆", "我要", "一碗", "湯粄條"],
         altKeywords: ["愛", "湯粄條", "一碗", "粄條"],
         npcRole: "小吃店老闆",
         npcAvatar: "👨‍🍳",
         npcSuccessResponse: "「好，我收你五十箍，你去那邊稍坐一下喔，等一下就上菜了！」",
+        mandarinNpcSuccessResponse: "「好，我收你五十元，你去那邊稍坐一下喔，等一下就上菜了！」",
         npcRetryResponse: "「想吃粄條嗎？可以跟老闆說：『老闆，𠊎愛一碗湯粄條』喔！」",
+        mandarinNpcRetryResponse: "「想吃粄條嗎？可以跟老闆說：『老闆，我要一碗湯粄條』喔！」",
         nextNodeId: "food_step2"
       },
       food_step2: {
@@ -280,15 +312,18 @@ const SCENARIOS_GRAPH = {
         nodeType: "主線",
         locationTag: "出餐備料區",
         storyPrompt: "你想起自己平常不喜歡吃香菜，而且喜歡湯頭稍微甘甜一點。你走到廚房窗口前，親切地交代掌廚的阿姨。你說：",
+        mandarinStoryPrompt: "你想起自己平常不喜歡吃香菜，而且喜歡湯頭稍微甘甜一點。你走到廚房窗口前，親切地交代掌廚的阿姨。你說：",
         targetHakka: "毋好放香菜，甜一點。",
         targetMandarin: "不要放香菜，甜一點。",
         keywords: ["毋好放", "香菜"],
-        mandarinKeywords: ["不要放","香菜","甜一點"],
+        mandarinKeywords: ["不要放", "香菜", "甜一點"],
         altKeywords: ["毋好", "香菜", "甜一點"],
         npcRole: "廚房阿姨",
         npcAvatar: "👩‍🍳",
         npcSuccessResponse: "「沒問題！阿姨記下來了，不放香菜，幫你煮得甘甜甘甜！」",
+        mandarinNpcSuccessResponse: "「沒問題！阿姨記下來了，不放香菜，幫你煮得甘甜甘甜！」",
         npcRetryResponse: "「如果不加香菜，可以說：『毋好放香菜，甜一點』喔！」",
+        mandarinNpcRetryResponse: "「如果不加香菜，可以說：『不要放香菜，甜一點』喔！」",
         nextNodeId: "food_step3"
       },
       food_step3: {
@@ -297,15 +332,18 @@ const SCENARIOS_GRAPH = {
         nodeType: "集合點",
         locationTag: "小吃店用餐餐桌",
         storyPrompt: "熱騰騰的粄條和客家小炒端上桌了，每一口都香氣四溢。你吃得津津有味，想順便加點一杯傳統客家擂茶解渴，順便稱讚老闆手藝。你說：",
+        mandarinStoryPrompt: "熱騰騰的粄條和客家小炒端上桌了，每一口都香氣四溢。你吃得津津有味，想順便加點一杯傳統擂茶解渴，順便稱讚老闆手藝。你說：",
         targetHakka: "再加一杯擂茶，這道客家小炒當好食！",
         targetMandarin: "再加一杯擂茶，這道客家小炒真好吃！",
         keywords: ["擂茶", "客家小炒", "當好食"],
-        mandarinKeywords: ["擂茶","客家小炒","好吃","真好吃"],
+        mandarinKeywords: ["擂茶", "客家小炒", "好吃", "真好吃"],
         altKeywords: ["擂茶", "好食", "客家小炒"],
         npcRole: "服務生",
         npcAvatar: "🧑‍💼",
         npcSuccessResponse: "「多謝你喜歡！冰涼濃郁的現磨擂茶馬上送上來，請慢用喔！」",
+        mandarinNpcSuccessResponse: "「多謝你喜歡！冰涼濃郁的現磨擂茶馬上送上來，請慢用喔！」",
         npcRetryResponse: "「可以試著說：『再加一杯擂茶，這道客家小炒當好食！』」",
+        mandarinNpcRetryResponse: "「可以試著說：『再加一杯擂茶，這道客家小炒真好吃！』」",
         nextNodeId: null
       }
     }
@@ -322,6 +360,7 @@ const SCENARIOS_GRAPH = {
     objectFit: "cover",
     objectPosition: "46% 50%",
     objective: "在出發前對照清單，以自由順序將雨傘、水壺、毛巾、點心 4 樣物品用客語裝入背包，並於玄關集合。",
+    mandarinObjective: "在出發前對照清單，以自由順序將雨傘、水壺、毛巾、點心 4 樣物品裝入背包，並於玄關集合。",
     startNodeId: "pack_hub",
     nodes: {
       pack_hub: {
@@ -330,9 +369,11 @@ const SCENARIOS_GRAPH = {
         nodeType: "收集任務",
         locationTag: "客廳背包整理區",
         storyPrompt: "明天要校外教學，媽媽提醒你把需要的東西放進背包。請在下方【背包清單】點選物品，說出它的客語名稱與原因！",
+        mandarinStoryPrompt: "明天要校外教學，媽媽提醒你把需要的東西放進背包。請在下方【背包清單】點選物品，說出它的名稱與攜帶原因！",
         npcRole: "媽媽",
         npcAvatar: "👩",
         npcSuccessResponse: "「雨傘、水壺、毛巾、點心都裝齊了，太棒了！我們到玄關集合準備出發！」",
+        mandarinNpcSuccessResponse: "「雨傘、水壺、毛巾、點心都裝齊了，太棒了！我們到玄關集合準備出發！」",
         items: [
           {
             id: "umbrella",
@@ -341,15 +382,18 @@ const SCENARIOS_GRAPH = {
             desc: "下雨防淋濕",
             locationTag: "臥室書桌前",
             storyPrompt: "你看見雨傘，請說出它的名字，以及為什麼校外教學要帶它。你說：",
+            mandarinStoryPrompt: "你看見雨傘，請說出它的名字，以及為什麼校外教學要帶它。你說：",
             targetHakka: "𠊎愛帶遮仔，落雨做得用。",
             targetMandarin: "我要帶雨傘，下雨可以用。",
             keywords: ["遮仔", "落雨", "用"],
-        mandarinKeywords: ["我要帶","雨傘","下雨","可以用"],
+            mandarinKeywords: ["我要帶", "雨傘", "下雨", "可以用"],
             altKeywords: ["雨傘", "下雨", "遮仔"],
             npcRole: "媽媽",
             npcAvatar: "👩",
             npcSuccessResponse: "「真乖！下雨時就不怕淋濕了，放進書包側邊吧！」",
-            npcRetryResponse: "「請說出雨傘的名字與用途：『𠊎愛帶遮仔，落雨做得用』喔！」"
+            mandarinNpcSuccessResponse: "「真乖！下雨時就不怕淋濕了，放進書包側邊吧！」",
+            npcRetryResponse: "「請說出雨傘的名字與用途：『𠊎愛帶遮仔，落雨做得用』喔！」",
+            mandarinNpcRetryResponse: "「請說出雨傘的名字與用途：『我要帶雨傘，下雨可以用』喔！」"
           },
           {
             id: "bottle",
@@ -358,15 +402,18 @@ const SCENARIOS_GRAPH = {
             desc: "口渴喝水",
             locationTag: "廚房飲水機旁",
             storyPrompt: "你看見水壺，請說出它的名字，以及為什麼校外教學要帶它。你說：",
+            mandarinStoryPrompt: "你看見水壺，請說出它的名字，以及為什麼校外教學要帶它。你說：",
             targetHakka: "𠊎愛帶水壺，嘴渴做得啉水。",
             targetMandarin: "我要帶水壺，口渴可以喝水。",
             keywords: ["水壺", "嘴渴", "啉水"],
-        mandarinKeywords: ["我要帶","水壺","口渴","喝水"],
+            mandarinKeywords: ["我要帶", "水壺", "口渴", "喝水"],
             altKeywords: ["水壺", "喝水", "口渴"],
             npcRole: "媽媽",
             npcAvatar: "👩",
             npcSuccessResponse: "「很好！水壺裝滿溫水放好，走路流汗要多補充水分喔！」",
-            npcRetryResponse: "「請說出水壺與喝水：『𠊎愛帶水壺，嘴渴做得啉水』。」"
+            mandarinNpcSuccessResponse: "「很好！水壺裝滿溫水放好，走路流汗要多補充水分喔！」",
+            npcRetryResponse: "「請說出水壺與喝水：『𠊎愛帶水壺，嘴渴做得啉水』。」",
+            mandarinNpcRetryResponse: "「請說出水壺與喝水：『我要帶水壺，口渴可以喝水』。」"
           },
           {
             id: "towel",
@@ -375,15 +422,18 @@ const SCENARIOS_GRAPH = {
             desc: "流汗擦乾",
             locationTag: "客廳收納櫃前",
             storyPrompt: "你看見乾淨毛巾，請說出它的名字，以及為什麼校外教學要帶它。你說：",
+            mandarinStoryPrompt: "你看見乾淨毛巾，請說出它的名字，以及為什麼校外教學要帶它。你說：",
             targetHakka: "𠊎愛帶毛巾，流汗做得拭汗。",
             targetMandarin: "我要帶毛巾，流汗可以擦汗。",
             keywords: ["毛巾", "流汗", "拭汗"],
-        mandarinKeywords: ["我要帶","毛巾","流汗","擦汗"],
+            mandarinKeywords: ["我要帶", "毛巾", "流汗", "擦汗"],
             altKeywords: ["毛巾", "擦汗", "拭汗"],
             npcRole: "爸爸",
             npcAvatar: "👨",
             npcSuccessResponse: "「很細心！活動後把汗擦乾，比較不會著涼感冒。」",
-            npcRetryResponse: "「請說出毛巾與擦汗：『𠊎愛帶毛巾，流汗做得拭汗』。」"
+            mandarinNpcSuccessResponse: "「很細心！活動後把汗擦乾，比較不會著涼感冒。」",
+            npcRetryResponse: "「請說出毛巾與擦汗：『𠊎愛帶毛巾，流汗做得拭汗』。」",
+            mandarinNpcRetryResponse: "「請說出毛巾與擦汗：『我要帶毛巾，流汗可以擦汗』。」"
           },
           {
             id: "snack",
@@ -392,15 +442,18 @@ const SCENARIOS_GRAPH = {
             desc: "肚子餓補充體力",
             locationTag: "點心餅乾盒前",
             storyPrompt: "你看見美味點心餅乾，請說出它的名字，以及為什麼校外教學要帶它。你說：",
+            mandarinStoryPrompt: "你看見美味點心餅乾，請說出它的名字，以及為什麼校外教學要帶它。你說：",
             targetHakka: "𠊎愛帶點心，肚屎枵做得食。",
             targetMandarin: "我要帶點心，肚子餓可以吃。",
             keywords: ["點心", "肚屎枵", "食"],
-        mandarinKeywords: ["我要帶","點心","肚子餓","吃"],
+            mandarinKeywords: ["我要帶", "點心", "肚子餓", "吃"],
             altKeywords: ["點心", "肚子餓", "肚屎枵"],
             npcRole: "爸爸",
             npcAvatar: "👨",
             npcSuccessResponse: "「沒錯！健行休息肚子餓時，可以吃點心補充元氣！」",
-            npcRetryResponse: "「請說出點心與肚子餓：『𠊎愛帶點心，肚屎枵做得食』。」"
+            mandarinNpcSuccessResponse: "「沒錯！健行休息肚子餓時，可以吃點心補充元氣！」",
+            npcRetryResponse: "「請說出點心與肚子餓：『𠊎愛帶點心，肚屎枵做得食』。」",
+            mandarinNpcRetryResponse: "「請說出點心與肚子餓：『我要帶點心，肚子餓可以吃』。」"
           }
         ],
         nextNodeId: "pack_done"
@@ -411,22 +464,25 @@ const SCENARIOS_GRAPH = {
         nodeType: "集合點",
         locationTag: "玄關大門口",
         storyPrompt: "4 樣物品都順利放進背包了！你背起背包走到玄關，精神飽滿地向家人說：",
+        mandarinStoryPrompt: "4 樣物品都順利放進背包了！你背起背包走到玄關，精神飽滿地向家人說：",
         targetHakka: "𠊎東西都收好，準備好出發了！",
         targetMandarin: "我東西都收好了，準備好出發了！",
         keywords: ["收好", "出發"],
-        mandarinKeywords: ["東西","收好了","準備好","出發"],
+        mandarinKeywords: ["東西", "收好了", "準備好", "出發"],
         altKeywords: ["準備", "出發", "收好"],
         npcRole: "媽媽",
         npcAvatar: "👩",
         npcSuccessResponse: "「太棒了！裝備齊全，今天校外教學一定會非常順利又開心！」",
+        mandarinNpcSuccessResponse: "「太棒了！裝備齊全，今天校外教學一定會非常順利又開心！」",
         npcRetryResponse: "「跟媽媽說準備好出發了：『𠊎東西都收好，準備好出發了！』」",
+        mandarinNpcRetryResponse: "「跟媽媽說準備好出發了：『我東西都收好了，準備好出發了！』」",
         nextNodeId: null
       }
     }
   },
 
   // ----------------------------------------------------
-  // 情境 4：搭車問路 (比照動物園口說分支與指引邏輯)
+  // 情境 4：搭車問路 (口說分支與指引)
   // ----------------------------------------------------
   bus_directions: {
     id: "bus_directions",
@@ -435,6 +491,7 @@ const SCENARIOS_GRAPH = {
     bannerImage: "./assets/bus_directions.jpg",
     objectPosition: "80% 48%",
     objective: "看提示口說選擇目的地向站務員詢問路線，上車確認班次，並於下車後聽懂十字路口方向指引。",
+    mandarinObjective: "看提示口說選擇目的地向站務員詢問路線，上車確認班次，並於下車後聽懂十字路口方向指引。",
     startNodeId: "bus_choose_dest",
     nodes: {
       bus_choose_dest: {
@@ -443,15 +500,18 @@ const SCENARIOS_GRAPH = {
         nodeType: "選擇",
         locationTag: "市區公車站牌",
         storyPrompt: "你站在熱鬧的市區公車站前，看著站牌。請看上方提示，開口向站務員詢問你想去的目的地路線（如文化園區、學校或圖書館）：",
+        mandarinStoryPrompt: "你站在熱鬧的市區公車站前，看著站牌。請看上方提示，開口向站務員詢問你想去的目的地路線（如文化園區、學校或圖書館）：",
         targetHakka: "請問去文化園區愛坐哪一路公車？",
         targetMandarin: "請問去文化園區要搭哪一路公車？",
         keywords: ["請問", "哪一路", "公車"],
-        mandarinKeywords: ["請問","公車","搭哪一路"],
+        mandarinKeywords: ["請問", "公車", "搭哪一路"],
         altKeywords: ["文化園區", "學校", "圖書館", "公車"],
         npcRole: "站務人員",
         npcAvatar: "👮",
         npcSuccessResponse: "「選好目的地後，我會告訴你搭哪一路公車喔！」",
+        mandarinNpcSuccessResponse: "「選好目的地後，我會告訴你搭哪一路公車喔！」",
         npcRetryResponse: "「請清楚問要去哪個地方：文化園區、學校或圖書館。」",
+        mandarinNpcRetryResponse: "「請清楚詢問要去哪個地方：文化園區、學校或圖書館。」",
         choices: [
           {
             id: "culture",
@@ -459,8 +519,9 @@ const SCENARIOS_GRAPH = {
             sub: "搭乘 802 路公車",
             targetBranchId: "bus_ask_culture",
             keywords: ["文化園區", "文化", "園區"],
-            mandarinKeywords: ["文化園區","文化","園區"],
-            guideResponse: "「去文化園區要搭 802 路公車喔！大約再過三分鐘就會進站了，準備好悠遊卡喔！」"
+            mandarinKeywords: ["文化園區", "文化", "園區"],
+            guideResponse: "「去文化園區要搭 802 路公車喔！大約再過三分鐘就會進站了，準備好悠遊卡喔！」",
+            mandarinGuideResponse: "「去文化園區要搭 802 路公車喔！大約再過三分鐘就會進站了，準備好悠遊卡喔！」"
           },
           {
             id: "school",
@@ -468,8 +529,9 @@ const SCENARIOS_GRAPH = {
             sub: "搭乘 615 路公車",
             targetBranchId: "bus_ask_school",
             keywords: ["學校", "正門", "學校正門"],
-            mandarinKeywords: ["學校","學校正門","正門"],
-            guideResponse: "「去學校可以搭 615 路公車，請在右側站牌等候喔！」"
+            mandarinKeywords: ["學校", "學校正門", "正門"],
+            guideResponse: "「去學校可以搭 615 路公車，請在右側站牌等候喔！」",
+            mandarinGuideResponse: "「去學校可以搭 615 路公車，請在右側站牌等候喔！」"
           },
           {
             id: "library",
@@ -477,8 +539,9 @@ const SCENARIOS_GRAPH = {
             sub: "搭乘 306 路公車",
             targetBranchId: "bus_ask_library",
             keywords: ["圖書館", "市立圖書館"],
-            mandarinKeywords: ["圖書館","市立圖書館"],
-            guideResponse: "「去圖書館請搭 306 路公車，很快就到了喔！」"
+            mandarinKeywords: ["圖書館", "市立圖書館"],
+            guideResponse: "「去圖書館請搭 306 路公車，很快就到了喔！」",
+            mandarinGuideResponse: "「去圖書館請搭 306 路公車，很快就到了喔！」"
           }
         ],
         nextNodeId: "bus_ask_culture"
@@ -489,15 +552,18 @@ const SCENARIOS_GRAPH = {
         nodeType: "分支",
         locationTag: "802 站牌前",
         storyPrompt: "你來到 802 站牌前，向巡邏站務員再次禮貌確認。你說：",
+        mandarinStoryPrompt: "你來到 802 站牌前，向巡邏站務員再次禮貌確認。你說：",
         targetHakka: "請問去文化園區愛坐哪一路公車？",
         targetMandarin: "請問去文化園區要搭哪一路公車？",
         keywords: ["文化園區", "哪一路", "公車"],
-        mandarinKeywords: ["文化園區","公車","搭哪一路"],
+        mandarinKeywords: ["文化園區", "公車", "搭哪一路"],
         altKeywords: ["坐", "公車", "文化園區"],
         npcRole: "站務人員",
         npcAvatar: "👮",
         npcSuccessResponse: "「對！802 路公車馬上進站了，請在黃線後方排隊上車喔！」",
+        mandarinNpcSuccessResponse: "「對！802 路公車馬上進站了，請在黃線後方排隊上車喔！」",
         npcRetryResponse: "「請清楚問：『請問去文化園區愛坐哪一路公車？』」",
+        mandarinNpcRetryResponse: "「請清楚問：『請問去文化園區要搭哪一路公車？』」",
         nextNodeId: "bus_board"
       },
       bus_ask_school: {
@@ -506,15 +572,18 @@ const SCENARIOS_GRAPH = {
         nodeType: "分支",
         locationTag: "學校線站牌前",
         storyPrompt: "你來到學校線站牌前，向巡邏站務員再次禮貌確認。你說：",
+        mandarinStoryPrompt: "你來到學校線站牌前，向巡邏站務員再次禮貌確認。你說：",
         targetHakka: "請問去學校愛坐哪一路公車？",
         targetMandarin: "請問去學校要搭哪一路公車？",
         keywords: ["學校", "哪一路", "公車"],
-        mandarinKeywords: ["學校","公車","搭哪一路"],
+        mandarinKeywords: ["學校", "公車", "搭哪一路"],
         altKeywords: ["坐", "公車", "學校"],
         npcRole: "站務人員",
         npcAvatar: "👮",
         npcSuccessResponse: "「對！615 路公車馬上進站了，請在黃線後方排隊上車喔！」",
+        mandarinNpcSuccessResponse: "「對！615 路公車馬上進站了，請在黃線後方排隊上車喔！」",
         npcRetryResponse: "「請清楚問：『請問去學校愛坐哪一路公車？』」",
+        mandarinNpcRetryResponse: "「請清楚問：『請問去學校要搭哪一路公車？』」",
         nextNodeId: "bus_board"
       },
       bus_ask_library: {
@@ -523,15 +592,18 @@ const SCENARIOS_GRAPH = {
         nodeType: "分支",
         locationTag: "圖書館線站牌前",
         storyPrompt: "你來到圖書館線站牌前，向巡邏站務員再次禮貌確認。你說：",
+        mandarinStoryPrompt: "你來到圖書館線站牌前，向巡邏站務員再次禮貌確認。你說：",
         targetHakka: "請問去圖書館愛坐哪一路公車？",
         targetMandarin: "請問去圖書館要搭哪一路公車？",
         keywords: ["圖書館", "哪一路", "公車"],
-        mandarinKeywords: ["圖書館","公車","搭哪一路"],
+        mandarinKeywords: ["圖書館", "公車", "搭哪一路"],
         altKeywords: ["坐", "公車", "圖書館"],
         npcRole: "站務人員",
         npcAvatar: "👮",
         npcSuccessResponse: "「對！306 路公車馬上進站了，請在黃線後方排隊上車喔！」",
+        mandarinNpcSuccessResponse: "「對！306 路公車馬上進站了，請在黃線後方排隊上車喔！」",
         npcRetryResponse: "「請清楚問：『請問去圖書館愛坐哪一路公車？』」",
+        mandarinNpcRetryResponse: "「請清楚問：『請問去圖書館要搭哪一路公車？』」",
         nextNodeId: "bus_board"
       },
       bus_board: {
@@ -540,15 +612,18 @@ const SCENARIOS_GRAPH = {
         nodeType: "主線",
         locationTag: "公車前門刷卡處",
         storyPrompt: "公車停靠開門，你在刷卡上車時，向司機先生再次確認這班車會不會到目的地。你說：",
+        mandarinStoryPrompt: "公車停靠開門，你在刷卡上車時，向司機先生再次確認這班車會不會到目的地。你說：",
         targetHakka: "請問這台車有到目的地無？",
         targetMandarin: "請問這台車有到目的地嗎？",
         keywords: ["這台車", "有到", "無"],
-        mandarinKeywords: ["這台車","有到","目的地","嗎"],
+        mandarinKeywords: ["這台車", "有到", "目的地", "嗎"],
         altKeywords: ["目的地", "這台車", "有到無"],
         npcRole: "公車司機",
         npcAvatar: "👨‍✈️",
         npcSuccessResponse: "「有喔！這班車有到，快進去坐好、抓緊扶手喔！」",
+        mandarinNpcSuccessResponse: "「有喔！這班車有到，快進去坐好、抓緊扶手喔！」",
         npcRetryResponse: "「可以問司機：『請問這台車有到目的地無？』」",
+        mandarinNpcRetryResponse: "「可以問司機：『請問這台車有到目的地嗎？』」",
         nextNodeId: "bus_arrive"
       },
       bus_arrive: {
@@ -557,22 +632,25 @@ const SCENARIOS_GRAPH = {
         nodeType: "集合點",
         locationTag: "十字路口紅綠燈旁",
         storyPrompt: "下車後走到十字路口，你向路旁熱心阿婆確認向前走、過紅綠燈左轉就會到。你說：",
+        mandarinStoryPrompt: "下車後走到十字路口，你向路旁熱心阿婆確認向前走、過紅綠燈左轉就會到。你說：",
         targetHakka: "向前行，過紅綠燈越倒手就到了。",
         targetMandarin: "往前走，過紅綠燈左轉就到了。",
         keywords: ["向前行", "紅綠燈", "越倒手"],
-        mandarinKeywords: ["往前走","紅綠燈","左轉"],
+        mandarinKeywords: ["往前走", "紅綠燈", "左轉"],
         altKeywords: ["向前", "過紅綠燈", "左轉", "越倒手"],
         npcRole: "熱心阿婆",
         npcAvatar: "👵",
         npcSuccessResponse: "「無錯！過紅綠燈越倒手（左轉）走兩步路就看到大門了，祝你順利喔！」",
+        mandarinNpcSuccessResponse: "「沒錯！過紅綠燈左轉走兩步路就看到大門了，祝你順利喔！」",
         npcRetryResponse: "「照著方向唸：『向前行，過紅綠燈越倒手就到了』喔！」",
+        mandarinNpcRetryResponse: "「照著方向說：『往前走，過紅綠燈左轉就到了』喔！」",
         nextNodeId: null
       }
     }
   },
 
   // ----------------------------------------------------
-  // 情境 5：健康中心 (比照動物園口說分支與指引邏輯)
+  // 情境 5：健康中心求助
   // ----------------------------------------------------
   health_center: {
     id: "health_center",
@@ -582,6 +660,7 @@ const SCENARIOS_GRAPH = {
     objectFit: "cover",
     objectPosition: "37.25% 50%",
     objective: "看提示口說向護理師清楚描述症狀，配合擦藥休息並禮貌道謝。",
+    mandarinObjective: "看提示口說向護理師清楚描述症狀，配合擦藥休息並禮貌道謝。",
     startNodeId: "health_choose_symptom",
     nodes: {
       health_choose_symptom: {
@@ -590,15 +669,18 @@ const SCENARIOS_GRAPH = {
         nodeType: "選擇",
         locationTag: "學校健康中心諮詢桌",
         storyPrompt: "你走進安靜的健康中心，護理師溫柔地問你哪裡不舒服。請看上方提示，開口說明你的狀況（如頭痛肚子痛、膝蓋擦傷或身體發熱）：",
+        mandarinStoryPrompt: "你走進安靜的健康中心，護理師溫柔地問你哪裡不舒服。請看上方提示，開口說明你的狀況（如頭痛肚子痛、膝蓋擦傷或身體發熱）：",
         targetHakka: "護理師，𠊎頭那痛、肚痛。",
         targetMandarin: "護理師，我頭痛、肚子痛。",
         keywords: ["護理師", "痛"],
-        mandarinKeywords: ["護理師","痛","不舒服"],
+        mandarinKeywords: ["護理師", "痛", "不舒服"],
         altKeywords: ["頭痛", "肚痛", "擦傷", "發熱"],
         npcRole: "護理師",
         npcAvatar: "👩‍⚕️",
         npcSuccessResponse: "「慢慢說，哪裡不舒服都可以告訴我喔。」",
+        mandarinNpcSuccessResponse: "「慢慢說，哪裡不舒服都可以告訴我喔。」",
         npcRetryResponse: "「哪裡痛痛呢？可以開口說出頭痛、擦傷或發熱喔！」",
+        mandarinNpcRetryResponse: "「哪裡不舒服呢？可以開口說出頭痛肚子痛、擦傷或發熱喔！」",
         choices: [
           {
             id: "head_stomach",
@@ -606,8 +688,9 @@ const SCENARIOS_GRAPH = {
             sub: "頭暈腦脹、肚子陣陣疼痛",
             targetBranchId: "health_symptom_head",
             keywords: ["頭痛", "肚痛", "頭那痛", "肚子痛", "頭暈"],
-            mandarinKeywords: ["頭痛","肚子痛","頭暈","肚痛"],
-            guideResponse: "「小朋友辛苦了，先坐下來量體溫，阿姨倒一杯溫開水給你喝喔。」"
+            mandarinKeywords: ["頭痛", "肚子痛", "頭暈", "肚痛"],
+            guideResponse: "「小朋友辛苦了，先坐下來量體溫，阿姨倒一杯溫開水給你喝喔。」",
+            mandarinGuideResponse: "「小朋友辛苦了，先坐下來量體溫，阿姨倒一杯溫開水給你喝喔。」"
           },
           {
             id: "scratch",
@@ -615,8 +698,9 @@ const SCENARIOS_GRAPH = {
             sub: "操場跑步跌倒擦破皮",
             targetBranchId: "health_symptom_scratch",
             keywords: ["擦傷", "跌倒", "膝蓋", "跑太快", "腳痛", "流血"],
-            mandarinKeywords: ["擦傷","跌倒","膝蓋","流血","破皮"],
-            guideResponse: "「不要緊喔！阿姨幫你用生理食鹽水清洗傷口、擦藥膏喔！」"
+            mandarinKeywords: ["擦傷", "跌倒", "膝蓋", "流血", "破皮"],
+            guideResponse: "「不要緊喔！阿姨幫你用生理食鹽水清洗傷口、擦藥膏喔！」",
+            mandarinGuideResponse: "「不要緊喔！阿姨幫你用生理食鹽水清洗傷口、擦藥膏喔！」"
           },
           {
             id: "fever",
@@ -624,8 +708,9 @@ const SCENARIOS_GRAPH = {
             sub: "全身熱熱的、沒有力氣",
             targetBranchId: "health_symptom_fever",
             keywords: ["發熱", "發燒", "身體熱", "當燒", "無力", "燒"],
-            mandarinKeywords: ["發熱","發燒","身體熱","沒有力氣","無力"],
-            guideResponse: "「我先幫你量耳溫，稍微有一點發燒，等一下幫你聯絡家長與導師。」"
+            mandarinKeywords: ["發熱", "發燒", "身體熱", "沒有力氣", "無力"],
+            guideResponse: "「我先幫你量耳溫，稍微有一點發燒，等一下幫你聯絡家長與導師。」",
+            mandarinGuideResponse: "「我先幫你量耳溫，稍微有一點發燒，等一下幫你聯絡家長與導師。」"
           }
         ],
         nextNodeId: "health_symptom_head"
@@ -636,15 +721,18 @@ const SCENARIOS_GRAPH = {
         nodeType: "分支",
         locationTag: "學校健康中心諮詢桌",
         storyPrompt: "你向護理師詳細說明頭暈腦脹與肚子陣陣絞痛的情形。你說：",
+        mandarinStoryPrompt: "你向護理師詳細說明頭暈腦脹與肚子陣陣絞痛的情形。你說：",
         targetHakka: "護理師，𠊎頭那痛、肚痛。",
         targetMandarin: "護理師，我頭痛、肚子痛。",
         keywords: ["護理師", "頭那痛", "肚痛"],
-        mandarinKeywords: ["護理師","頭痛","肚子痛"],
+        mandarinKeywords: ["護理師", "頭痛", "肚子痛"],
         altKeywords: ["頭痛", "肚痛", "痛"],
         npcRole: "護理師",
         npcAvatar: "👩‍⚕️",
         npcSuccessResponse: "「我知道了，先坐下來量體溫，阿姨倒一杯溫開水給你喝喔。」",
+        mandarinNpcSuccessResponse: "「我知道了，先坐下來量體溫，阿姨倒一杯溫開水給你喝喔。」",
         npcRetryResponse: "「請說出頭痛與肚子痛：『護理師，𠊎頭那痛、肚痛』。」",
+        mandarinNpcRetryResponse: "「請說出頭痛與肚子痛：『護理師，我頭痛、肚子痛』。」",
         nextNodeId: "health_rest"
       },
       health_symptom_scratch: {
@@ -653,15 +741,18 @@ const SCENARIOS_GRAPH = {
         nodeType: "分支",
         locationTag: "傷口擦藥床位",
         storyPrompt: "護理師注意到你的膝蓋有紅紅擦傷，你跟護理師解釋剛剛體育課跑步太快跌倒了。你說：",
+        mandarinStoryPrompt: "護理師注意到你的膝蓋有紅紅擦傷，你跟護理師解釋剛剛體育課跑步太快跌倒了。你說：",
         targetHakka: "體育課跑太遽，𠊎腳跌倒痛痛。",
         targetMandarin: "體育課跑太快，我腳跌倒痛痛。",
         keywords: ["體育課", "跑太遽", "跌倒"],
-        mandarinKeywords: ["體育課","跑太快","跌倒","痛痛"],
+        mandarinKeywords: ["體育課", "跑太快", "跌倒", "痛痛"],
         altKeywords: ["跑太快", "腳痛", "跌倒", "跑太遽"],
         npcRole: "護理師",
         npcAvatar: "👩‍⚕️",
         npcSuccessResponse: "「不要緊喔！阿姨幫你擦消炎藥、貼上透氣紗布，很快就不會痛了。」",
+        mandarinNpcSuccessResponse: "「不要緊喔！阿姨幫你擦消炎藥、貼上透氣紗布，很快就不會痛了。」",
         npcRetryResponse: "「試著說明：『體育課跑太遽，𠊎腳跌倒痛痛』。」",
+        mandarinNpcRetryResponse: "「試著說明：『體育課跑太快，我跌倒腳痛痛』。」",
         nextNodeId: "health_rest"
       },
       health_symptom_fever: {
@@ -670,15 +761,18 @@ const SCENARIOS_GRAPH = {
         nodeType: "分支",
         locationTag: "量體溫區",
         storyPrompt: "你覺得身體熱熱的，全身沒有力氣，向護理師說明。你說：",
+        mandarinStoryPrompt: "你覺得身體熱熱的，全身沒有力氣，向護理師說明。你說：",
         targetHakka: "𠊎身體當燒，無麼个力。",
         targetMandarin: "我身體很熱，沒有什麼力氣。",
         keywords: ["身體", "當燒", "無力"],
-        mandarinKeywords: ["身體","很熱","沒有力氣","發燒"],
+        mandarinKeywords: ["身體", "很熱", "沒有力氣", "發燒"],
         altKeywords: ["發熱", "沒力", "當燒", "身體"],
         npcRole: "護理師",
         npcAvatar: "👩‍⚕️",
         npcSuccessResponse: "「我先幫你量耳溫，稍微有一點發燒，先在床上躺著休息一節課喔。」",
+        mandarinNpcSuccessResponse: "「我先幫你量耳溫，稍微有一點發燒，先在床上躺著休息一節課喔。」",
         npcRetryResponse: "「請說出身體很熱：『𠊎身體當燒，無麼个力』。」",
+        mandarinNpcRetryResponse: "「請說出身體很熱：『我身體很熱，沒有力氣』。」",
         nextNodeId: "health_rest"
       },
       health_rest: {
@@ -687,22 +781,25 @@ const SCENARIOS_GRAPH = {
         nodeType: "集合點",
         locationTag: "健康中心休息區",
         storyPrompt: "傷口包紮好後，護理師叮嚀你今天不要劇烈運動，要多喝溫水好好休息。你答應她並道謝。你說：",
+        mandarinStoryPrompt: "傷口包紮好後，護理師叮嚀你今天不要劇烈運動，要多喝溫水好好休息。你答應她並道謝。你說：",
         targetHakka: "𠊎會多啉水、好好歇睏，恁仔細！",
         targetMandarin: "我會多喝水、好好休息，謝謝您！",
         keywords: ["多啉水", "歇睏", "恁仔細"],
-        mandarinKeywords: ["多喝水","好好休息","謝謝"],
+        mandarinKeywords: ["多喝水", "好好休息", "謝謝"],
         altKeywords: ["喝水", "休息", "謝謝", "多啉水"],
         npcRole: "護理師",
         npcAvatar: "👩‍⚕️",
         npcSuccessResponse: "「真懂事！先在病床上躺著休息一節課，身體很快就會恢復元氣囉！」",
+        mandarinNpcSuccessResponse: "「真懂事！先在病床上躺著休息一節課，身體很快就會恢復元氣囉！」",
         npcRetryResponse: "「記得跟阿姨說：『𠊎會多啉水、好好歇睏，恁仔細！』」",
+        mandarinNpcRetryResponse: "「記得跟阿姨說：『我會多喝水、好好休息，謝謝您！』」",
         nextNodeId: null
       }
     }
   },
 
   // ----------------------------------------------------
-  // 情境 6：今日天氣與穿搭 (比照動物園口說分支與指引邏輯)
+  // 情境 6：今日天氣與穿搭
   // ----------------------------------------------------
   weather_outfit: {
     id: "weather_outfit",
@@ -711,6 +808,7 @@ const SCENARIOS_GRAPH = {
     bannerImage: "./assets/weather_outfit.jpg",
     objectPosition: "calc(50% + 100px) 50%",
     objective: "觀察早晨天氣狀況，看提示口說選擇下雨、酷熱或寒冷天氣，用客語說出合適的穿搭與防護提醒。",
+    mandarinObjective: "觀察早晨天氣狀況，看提示口說選擇下雨、酷熱或寒冷天氣，說出合適的穿搭與防護提醒。",
     startNodeId: "weather_choose_type",
     nodes: {
       weather_choose_type: {
@@ -719,15 +817,18 @@ const SCENARIOS_GRAPH = {
         nodeType: "選擇",
         locationTag: "玄關落地窗前",
         storyPrompt: "清晨拉開窗簾看天氣。請看上方提示，開口提醒家人今天的天氣與穿搭（如下雨天、大熱天或寒冷天）：",
+        mandarinStoryPrompt: "清晨拉開窗簾看天氣。請看上方提示，開口提醒家人今天的天氣與穿搭（如下雨天、大熱天或寒冷天）：",
         targetHakka: "今晡日落雨，愛帶遮仔著雨衣。",
         targetMandarin: "今天下雨，要帶雨傘穿雨衣。",
         keywords: ["今晡日", "愛"],
-        mandarinKeywords: ["今天","要"],
+        mandarinKeywords: ["今天", "要"],
         altKeywords: ["落雨", "當熱", "當冷", "雨傘", "帽子", "大衣"],
         npcRole: "家人",
         npcAvatar: "👨‍👩‍👧",
         npcSuccessResponse: "「看清楚天氣，再想想今天要穿什麼或帶什麼出門喔！」",
+        mandarinNpcSuccessResponse: "「看清楚天氣，再想想今天要穿什麼或帶什麼出門喔！」",
         npcRetryResponse: "「請看窗外天氣，開口提醒下雨、大熱天或寒冷天穿搭喔！」",
+        mandarinNpcRetryResponse: "「請看窗外天氣，開口提醒下雨、大熱天或寒冷天穿搭喔！」",
         choices: [
           {
             id: "rain",
@@ -735,8 +836,9 @@ const SCENARIOS_GRAPH = {
             sub: "天空飄雨、地面潮濕",
             targetBranchId: "weather_outfit_rain",
             keywords: ["落雨", "下雨", "雨天", "雨傘", "雨衣", "遮仔"],
-            mandarinKeywords: ["下雨","雨天","雨傘","雨衣","陰雨"],
-            guideResponse: "「無錯！落雨天路滑，著好雨衣、帶好遮仔，出門小心行喔！」"
+            mandarinKeywords: ["下雨", "雨天", "雨傘", "雨衣", "陰雨"],
+            guideResponse: "「無錯！落雨天路滑，著好雨衣、帶好遮仔，出門小心行喔！」",
+            mandarinGuideResponse: "「沒錯！下雨天路滑，穿好雨衣、帶好雨傘，出門小心走喔！」"
           },
           {
             id: "hot",
@@ -744,8 +846,9 @@ const SCENARIOS_GRAPH = {
             sub: "豔陽高照、氣溫偏高",
             targetBranchId: "weather_outfit_hot",
             keywords: ["當熱", "很熱", "大熱天", "晴天", "太陽", "遮陽帽"],
-            mandarinKeywords: ["很熱","大熱天","晴天","太陽","遮陽帽"],
-            guideResponse: "「大熱天陽光真烈，戴上帽仔、多喝水才不會中暑喔！」"
+            mandarinKeywords: ["很熱", "大熱天", "晴天", "太陽", "遮陽帽"],
+            guideResponse: "「大熱天陽光真烈，戴上帽仔、多喝水才不會中暑喔！」",
+            mandarinGuideResponse: "「大熱天太陽真大，戴上帽子、多喝水才不會中暑喔！」"
           },
           {
             id: "cold",
@@ -753,8 +856,9 @@ const SCENARIOS_GRAPH = {
             sub: "冷氣團來襲、北風呼呼",
             targetBranchId: "weather_outfit_cold",
             keywords: ["當冷", "很冷", "寒冷", "天冷", "冬天", "大衫", "圍巾"],
-            mandarinKeywords: ["很冷","寒冷","天冷","冬天","大衣","圍巾"],
-            guideResponse: "「乖孫真靈俐！著暖暖、圍巾圍好，出門就毋驚吹風冷著囉！」"
+            mandarinKeywords: ["很冷", "寒冷", "天冷", "冬天", "大衣", "圍巾"],
+            guideResponse: "「乖孫真靈俐！著暖暖、圍巾圍好，出門就毋驚吹風冷著囉！」",
+            mandarinGuideResponse: "「乖孫真貼心！穿得暖暖的、圍巾圍好，出門就不怕吹風著涼了！」"
           }
         ],
         nextNodeId: "weather_outfit_rain"
@@ -765,15 +869,18 @@ const SCENARIOS_GRAPH = {
         nodeType: "分支",
         locationTag: "雨具區落地窗前",
         storyPrompt: "窗外正滴滴答答下著細雨，地上濕漉漉的。你轉頭提醒即將出門的家人要備好雨具。你說：",
+        mandarinStoryPrompt: "窗外正滴滴答答下著細雨，地上濕漉漉的。你轉頭提醒即將出門的家人要備好雨具。你說：",
         targetHakka: "今晡日落雨，愛帶遮仔著雨衣。",
         targetMandarin: "今天下雨，要帶雨傘穿雨衣。",
         keywords: ["今晡日", "落雨", "遮仔", "雨衣"],
-        mandarinKeywords: ["今天","下雨","雨傘","雨衣"],
+        mandarinKeywords: ["今天", "下雨", "雨傘", "雨衣"],
         altKeywords: ["下雨", "雨傘", "雨衣", "遮仔"],
         npcRole: "媽媽",
         npcAvatar: "👩",
         npcSuccessResponse: "「無錯！落雨天路滑，著好雨衣、帶好遮仔，出門小心行喔！」",
+        mandarinNpcSuccessResponse: "「沒錯！下雨天路滑，穿好雨衣、帶好雨傘，出門小心走喔！」",
         npcRetryResponse: "「提醒家人下雨天：『今晡日落雨，愛帶遮仔著雨衣』喔！」",
+        mandarinNpcRetryResponse: "「提醒家人下雨天：『今天下雨，要帶雨傘穿雨衣』喔！」",
         nextNodeId: "weather_done"
       },
       weather_outfit_hot: {
@@ -782,15 +889,18 @@ const SCENARIOS_GRAPH = {
         nodeType: "分支",
         locationTag: "客廳日曆與陽臺旁",
         storyPrompt: "七月豔陽高照，外頭的大太陽曬得柏油路直冒熱氣。你戴上遮陽帽並提醒大家防曬。你說：",
+        mandarinStoryPrompt: "七月豔陽高照，外頭的大太陽曬得柏油路直冒熱氣。你戴上遮陽帽並提醒大家防曬。你說：",
         targetHakka: "今晡日當熱，愛戴等遮陽帽仔。",
         targetMandarin: "今天很熱，要戴著遮陽帽。",
         keywords: ["今晡日", "當熱", "遮陽帽仔"],
-        mandarinKeywords: ["今天","很熱","戴著","遮陽帽"],
+        mandarinKeywords: ["今天", "很熱", "戴著", "遮陽帽"],
         altKeywords: ["很熱", "帽子", "遮陽帽", "當熱"],
         npcRole: "爸爸",
         npcAvatar: "👨",
         npcSuccessResponse: "「大熱天陽光真烈，戴上帽仔、多喝水才不會中暑喔！」",
+        mandarinNpcSuccessResponse: "「大熱天太陽真大，戴上帽子、多喝水才不會中暑喔！」",
         npcRetryResponse: "「說說天氣熱的穿搭：『今晡日當熱，愛戴等遮陽帽仔』。」",
+        mandarinNpcRetryResponse: "「說說天氣熱的穿搭：『今天很熱，要戴著遮陽帽』。」",
         nextNodeId: "weather_done"
       },
       weather_outfit_cold: {
@@ -799,15 +909,18 @@ const SCENARIOS_GRAPH = {
         nodeType: "分支",
         locationTag: "臥室衣櫃前",
         storyPrompt: "寒流來襲，北風呼呼地吹著，溫度計顯示只有十度。你拿出厚厚的大衣和圍巾穿戴整齊。你說：",
+        mandarinStoryPrompt: "寒流來襲，北風呼呼地吹著，溫度計顯示只有十度。你拿出厚厚的大衣和圍巾穿戴整齊。你說：",
         targetHakka: "天時當冷，愛著大衫圍等圍巾。",
         targetMandarin: "天氣很冷，要穿大衣圍著圍巾。",
         keywords: ["天時", "當冷", "大衫", "圍巾"],
-        mandarinKeywords: ["天氣","很冷","穿大衣","圍巾"],
+        mandarinKeywords: ["天氣", "很冷", "穿大衣", "圍巾"],
         altKeywords: ["很冷", "大衣", "圍巾", "當冷"],
         npcRole: "阿公",
         npcAvatar: "👴",
         npcSuccessResponse: "「乖孫真靈俐！著暖暖、圍巾圍好，出門就毋驚吹風冷著囉！」",
+        mandarinNpcSuccessResponse: "「乖孫真貼心！穿得暖暖的、圍巾圍好，出門就不怕吹風著涼了！」",
         npcRetryResponse: "「天冷要穿暖，試著說：『天時當冷，愛著大衫圍等圍巾』喔！」",
+        mandarinNpcRetryResponse: "「天冷要穿暖，試著說：『天氣很冷，要穿大衣圍著圍巾』喔！」",
         nextNodeId: "weather_done"
       },
       weather_done: {
@@ -816,15 +929,18 @@ const SCENARIOS_GRAPH = {
         nodeType: "集合點",
         locationTag: "玄關大門口",
         storyPrompt: "穿戴整齊後，大家走到門口，準備精神奕奕地出門。你說：",
+        mandarinStoryPrompt: "穿戴整齊後，大家走到門口，準備精神奕奕地出門。你說：",
         targetHakka: "大家都準備好了，出門行囉！",
         targetMandarin: "大家都準備好了，出門走囉！",
         keywords: ["準備好", "出門"],
-        mandarinKeywords: ["大家都","準備好了","出門走囉"],
+        mandarinKeywords: ["大家都", "準備好了", "出門走囉"],
         altKeywords: ["準備", "出門", "準備好了"],
         npcRole: "家人",
         npcAvatar: "👨‍👩‍👧",
         npcSuccessResponse: "「太棒了！穿搭完全符合今天的天氣，出門平安順心！」",
+        mandarinNpcSuccessResponse: "「太棒了！穿搭完全符合今天的天氣，出門平安順心！」",
         npcRetryResponse: "「跟家人說出門囉：『大家都準備好了，出門行囉！』」",
+        mandarinNpcRetryResponse: "「跟家人說出門囉：『大家都準備好了，出門走囉！』」",
         nextNodeId: null
       }
     }
@@ -862,23 +978,34 @@ class HakkaASRAdapter {
     try {
       const recognition = new SpeechRecognition();
       recognition.lang = lang || "zh-TW";
-      recognition.continuous = false;
+      recognition.continuous = true;
       recognition.interimResults = true;
       recognition.maxAlternatives = 1;
 
       let finalTranscript = "";
+      let currentFullText = "";
+      let hasFinished = false;
+
+      const finishOnce = () => {
+        if (hasFinished) return;
+        hasFinished = true;
+        const text = (finalTranscript || currentFullText || "").trim();
+        if (onFinal) onFinal(text);
+      };
 
       recognition.onresult = (event) => {
         let interim = "";
-        for (let i = event.resultIndex; i < event.results.length; ++i) {
+        let final = "";
+        for (let i = 0; i < event.results.length; ++i) {
           if (event.results[i].isFinal) {
-            finalTranscript += event.results[i][0].transcript;
+            final += event.results[i][0].transcript;
           } else {
             interim += event.results[i][0].transcript;
           }
         }
-        const currentText = (finalTranscript || interim || "").trim();
-        if (onInterim) onInterim(currentText);
+        finalTranscript = final;
+        currentFullText = (final + interim).trim();
+        if (onInterim) onInterim(currentFullText);
       };
 
       recognition.onerror = (event) => {
@@ -887,11 +1014,16 @@ class HakkaASRAdapter {
       };
 
       recognition.onend = () => {
-        if (onFinal) onFinal(finalTranscript.trim());
+        finishOnce();
       };
 
       recognition.start();
-      return recognition;
+      return {
+        stop: () => {
+          try { recognition.stop(); } catch (e) {}
+          setTimeout(() => finishOnce(), 120);
+        }
+      };
     } catch (err) {
       if (onError) onError(err.message || "無法啟動麥克風錄音。");
       return null;
@@ -1181,15 +1313,17 @@ class LLMServiceAdapter {
   /**
    * 建構發送給 LLM 的 System Prompt (注入情境邊界、封閉意圖與 NPC 人設)
    */
-  static buildSystemPrompt(nodeConfig, scenario) {
+  static buildSystemPrompt(nodeConfig, scenario, isMandarin = false) {
     const rolePersonas = {
       "售票員": "說話客氣親切、專業有效率的售票人員，負責確認張數與票種。",
       "驗票志工": "和藹可親的社區志工奶奶，熱情問候並提醒安全注意事項。",
       "園區導覽員": "熱心開朗的生態解說員，清楚指引步道方向與各動物展區特點。",
       "同學阿明": "活潑好奇的同班同學，喜歡熱情分享在展區觀察到的動物特徵。",
       "老師": "溫和關心的帶隊老師，清點人數並提醒集合時間。",
+      "帶隊老師": "溫和關心的帶隊老師，清點人數並提醒集合時間。",
       "媽媽": "細心叮嚀的母親，關心生活起居、天氣穿搭與物品齊全度。",
       "爸爸": "幽默溫暖的父親，提醒補充水分與戶外防曬。",
+      "阿公": "慈祥和藹的長輩，提醒天冷注意保暖穿搭。",
       "站務人員": "清楚沉穩的公車調度站務員，明確指引搭乘路線與候車月台。",
       "公車司機": "專注安全的公車駕駛，提醒上下車刷卡與握好扶手。",
       "熱心阿婆": "住在附近的親切老奶奶，以清晰的地標方向指引路人。",
@@ -1201,6 +1335,32 @@ class LLMServiceAdapter {
     };
 
     const currentPersona = rolePersonas[nodeConfig.npcRole] || "熱情友善的情境對話 NPC 角色";
+
+    if (isMandarin) {
+      return [
+        `你是一位極其專業且細心的情境口說 AI 助教兼角色扮演考官（LLM-as-a-Judge & Roleplayer）。`,
+        `【情境主題】：${scenario?.title || ""}（目標：${scenario?.mandarinObjective || scenario?.objective || ""}）`,
+        `【當前關卡】：${nodeConfig?.title || ""}（地點：${nodeConfig?.locationTag || ""}，類型：${nodeConfig?.nodeType || "主線"}）`,
+        `【NPC 角色人設】：你將扮演「${nodeConfig?.npcRole || "NPC"}」— ${currentPersona}`,
+        `【標準目標華語句】：${nodeConfig?.targetMandarin || "（分支選擇/自由回答關卡）"}`,
+        `【核心華語關鍵詞】：${(nodeConfig?.mandarinKeywords || nodeConfig?.keywords || []).join("、") || "無"}`,
+        ``,
+        `【學生語言模式】：華語（國語）口說模式。`,
+        `【嚴格判定規則 (Strict Correctness & Guardrails)】：`,
+        `1. 精準對錯判定 (Strict Verification)：`,
+        `   - 請根據【華語】進行判定，絕對不要要求學生說客語，也不要以客語關鍵詞判定。`,
+        `   - 學生的回答必須精準符合當前題目的「核心動作」、「數量/張數」、「地點」或「指定項目」。`,
+        `   - 【數量/項目錯誤一律判錯】：例如題目要求「買三張學生票」，若學生說「兩張門票」、「一張票」或未提及學生票，數量或票種不符，必須判定 isMatch: false！`,
+        `   - 【答非所問/離題一律判錯】：若學生說不相干的話（如問路時說要買漢堡、天氣很冷等），必須判定 isMatch: false！`,
+        `   - 【只有正確表達才通過】：必須語意完整且數量/對象/關鍵詞正確，才判定 isMatch: true。`,
+        `2. 華語語音辨識合理容錯：若語音辨識產生同音錯字但華語語意與數量完全正確，可判定通過。`,
+        `3. 真實動態 NPC 角色扮演回應 (Dynamic NPC Roleplay)：`,
+        `   - 務必根據「學生實際說出的華語內容」客製化生成 20~35 字生動的 NPC 繁體中文對話。`,
+        `   - 若學生說錯（如說兩張票）：NPC 要針對他說的內容指正：「我們有三位同學，應該要買三張學生票喔！」`,
+        `   - 若學生說對：NPC 要自然接話並推進劇情。`,
+        `4. 輸出規範：請嚴格回傳標準 JSON 格式。`
+      ].join("\n");
+    }
 
     return [
       `你是一位極其專業且細心的客語情境口說 AI 助教兼角色扮演考官（LLM-as-a-Judge & Roleplayer）。`,
@@ -1227,13 +1387,39 @@ class LLMServiceAdapter {
   }
 
   /**
-   * 建構 User Prompt (注入客語原文、華語意圖與分支清單)
+   * 建構 User Prompt (注入客語原文/華語意圖與分支清單)
    */
-  static buildUserPrompt(hakkaTranscript, mandarinTranscript, nodeConfig) {
+  static buildUserPrompt(hakkaTranscript, mandarinTranscript, nodeConfig, isMandarin = false) {
     let choicesText = "";
     if (nodeConfig?.choices) {
-      choicesText = `\n【本題合法分支選項清單】：\n` + nodeConfig.choices.map(c => `  - [${c.id}] 名稱: ${c.title}, 說明: ${c.sub || c.title}, 關鍵字: [${(c.keywords || []).join(", ")}]`).join("\n");
+      if (isMandarin) {
+        choicesText = `\n【本題合法分支選項清單】：\n` + nodeConfig.choices.map(c => `  - [${c.id}] 名稱: ${c.title}, 說明: ${c.sub || c.title}, 華語關鍵字: [${(c.mandarinKeywords || c.keywords || []).join(", ")}]`).join("\n");
+      } else {
+        choicesText = `\n【本題合法分支選項清單】：\n` + nodeConfig.choices.map(c => `  - [${c.id}] 名稱: ${c.title}, 說明: ${c.sub || c.title}, 關鍵字: [${(c.keywords || []).join(", ")}]`).join("\n");
+      }
     }
+
+    if (isMandarin) {
+      return [
+        `【學生華語語音辨識文字】：「${mandarinTranscript || "（無輸入）"}」`,
+        `【目標華語句】：${nodeConfig?.targetMandarin || "無固定句"}`,
+        `【核心華語關鍵詞清單】：${(nodeConfig?.mandarinKeywords || nodeConfig?.keywords || []).join(", ") || "無"}`,
+        `${choicesText}`,
+        ``,
+        `請依據上述華語輸入評估是否通過，並嚴格依照以下 JSON 結構回傳：`,
+        `{`,
+        `  "isMatch": true 或 false,`,
+        `  "intent": "識別出的意圖或分支名稱",`,
+        `  "matchedChoiceId": "選定之分支 ID（若為選擇題）或 null",`,
+        `  "semanticAccuracy": 0 到 100 的整數,`,
+        `  "hitKeywords": ["命中之華語關鍵詞"],`,
+        `  "missingKeywords": ["缺漏之華語關鍵詞"],`,
+        `  "feedback": "華語教學引導短評",`,
+        `  "dynamicNpcResponse": "NPC 角色當下的情境回覆對話（20-35字）"`,
+        `}`
+      ].join("\n");
+    }
+
     return [
       `【學生客語 ASR 辨識文字】：「${hakkaTranscript || "（無輸入）"}」`,
       `【客轉華語意正規化意圖】：「${mandarinTranscript || hakkaTranscript || "（無輸入）"}」`,
@@ -1275,7 +1461,7 @@ class LLMServiceAdapter {
   /**
    * 精準解析選擇節點之分支物件 (跨 6 大情境支援 ID、意圖、關鍵字模糊比對)
    */
-  static resolveMatchedChoice(nodeConfig, evalData, hakkaText = "", mandarinText = "") {
+  static resolveMatchedChoice(nodeConfig, evalData, hakkaText = "", mandarinText = "", isMandarin = false) {
     if (nodeConfig?.nodeType !== "選擇" || !nodeConfig?.choices || nodeConfig.choices.length === 0) {
       return null;
     }
@@ -1302,7 +1488,8 @@ class LLMServiceAdapter {
     if (intent && intent !== "目標對話達成" && intent !== "無") {
       const foundByIntent = choices.find(c => {
         const title = c.title.toLowerCase();
-        const keywords = (c.keywords || []).map(k => k.toLowerCase());
+        const kwList = isMandarin ? (c.mandarinKeywords || c.keywords || []) : (c.keywords || []);
+        const keywords = kwList.map(k => k.toLowerCase());
         return intent.includes(title) || title.includes(intent) || keywords.some(k => intent.includes(k) || k.includes(intent));
       });
       if (foundByIntent) return foundByIntent;
@@ -1311,7 +1498,8 @@ class LLMServiceAdapter {
     // 4. 比對語音輸入內容 (客語/華語/命中關鍵詞/動態對話)
     const fullText = `${hakkaText || ""} ${mandarinText || ""} ${(evalData?.hitKeywords || []).join(" ")} ${evalData?.dynamicNpcResponse || ""}`.toLowerCase();
     for (const choice of choices) {
-      const keywords = (choice.keywords || [choice.title]).map(k => k.toLowerCase());
+      const kwList = isMandarin ? (choice.mandarinKeywords || choice.keywords || [choice.title]) : (choice.keywords || [choice.title]);
+      const keywords = kwList.map(k => k.toLowerCase());
       if (keywords.some(k => fullText.includes(k))) {
         return choice;
       }
@@ -1324,22 +1512,28 @@ class LLMServiceAdapter {
   /**
    * 當 LLM 遇到請求頻率限制 (429 Rate Limit) 時，生成完全融入角色情境的沉浸式緩衝台詞
    */
-  static getRateLimitNpcResponse(npcRole) {
+  static getRateLimitNpcResponse(npcRole, isMandarin = false) {
     const roleBuffers = {
-      "售票員": "「售票系統剛好在重新整理票務連線中，請同學深呼吸、稍等五秒再說一次喔！」",
-      "驗票志工": "「哎呀閘門感應器連線稍微慢了一下，請同學稍候五秒，再給奶奶看一次門票喔！」",
+      "售票員": isMandarin
+        ? "「售票機剛好在重新整理票務連線中，請同學深呼吸、稍等五秒再說一次喔！」"
+        : "「售票機連線稍微慢了一下，請同學深呼吸、稍等五秒再說一次喔！」",
+      "驗票志工": isMandarin
+        ? "「哎呀閘門感應器稍微感應中，請同學稍候五秒，再出示一次門票喔！」"
+        : "「哎呀閘門感應器連線稍微慢了一下，請同學稍候五秒，再給奶奶看一次門票喔！」",
       "園區導覽員": "「前面展區參觀人潮比較多、廣播連線稍候片刻，請稍等五秒再問一次路線喔！」",
       "小吃店老闆": "「老闆手邊正忙著翻鍋大火快炒，剛才沒聽清楚，請客官稍等五秒再點一次喔！」",
       "廚房阿姨": "「阿姨剛才正在掌杓煮湯，請稍等五秒再交代一次客製要求喔！」",
       "服務生": "「店內點餐機正在出單整理中，請客人稍等五秒再加點飲品喔！」",
       "媽媽": "「媽媽剛才在忙著收衣服整理東西，請稍等五秒再跟媽媽說一次喔！」",
       "爸爸": "「爸爸剛才在看行程地圖，請稍等五秒再說一次要帶什麼裝備喔！」",
+      "阿公": "「阿公剛才在戴老花眼鏡，請稍等五秒再跟阿公提醒一次穿搭喔！」",
       "站務人員": "「公車動態看板正在更新班次連線，請同學稍候五秒再詢問一次路線喔！」",
       "公車司機": "「司機先生正在專注看後照鏡進站，請稍等五秒上車再確認一次目的地喔！」",
       "熱心阿婆": "「阿婆剛才在看路邊紅綠燈，請稍等五秒再問一次方向喔！」",
       "護理師": "「阿姨剛才正在幫其他同學量體溫，請先坐下來喘口氣、稍等五秒再說一次喔！」",
       "家人": "「外頭風聲有點大剛才沒聽清楚，請喝口水稍等五秒再提醒一次穿搭喔！」",
       "同學阿明": "「阿明剛才在看旁邊的展區分心了，請稍等五秒再跟我分享一次你的發現喔！」",
+      "老師": "「老師剛才在點名冊上登記名字，請稍等五秒再向老師報告集合喔！」",
       "帶隊老師": "「老師剛才在點名冊上登記名字，請稍等五秒再向老師報告集合喔！」"
     };
     return roleBuffers[npcRole] || "「現場連線稍微整理中，請深呼吸稍等五秒再說一次喔！」";
@@ -1348,9 +1542,10 @@ class LLMServiceAdapter {
   /**
    * 執行 LLM 評估 (整合 Vercel /api/judge、線上 API 與本地安全網雙軌備援)
    */
-  static async evaluate({ hakkaTranscript, mandarinTranscript, nodeConfig, scenario }) {
-    const systemPrompt = this.buildSystemPrompt(nodeConfig, scenario);
-    const userPrompt = this.buildUserPrompt(hakkaTranscript, mandarinTranscript, nodeConfig);
+  static async evaluate({ hakkaTranscript, mandarinTranscript, nodeConfig, scenario, speechMode = "hakka" }) {
+    const isMandarin = speechMode === "mandarin" || (!hakkaTranscript && !!mandarinTranscript);
+    const systemPrompt = this.buildSystemPrompt(nodeConfig, scenario, isMandarin);
+    const userPrompt = this.buildUserPrompt(hakkaTranscript, mandarinTranscript, nodeConfig, isMandarin);
 
     // 模式 A: 透過 Vercel 後端 /api/judge 呼叫 (金鑰完全隱藏於後端)
     if (this.config.provider === "vercel_api" || (!this.config.apiKey && this.config.provider !== "local_judge")) {
@@ -1361,7 +1556,7 @@ class LLMServiceAdapter {
         const res = await fetch("/api/judge", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ systemPrompt, userPrompt, hakkaTranscript, mandarinTranscript }),
+          body: JSON.stringify({ systemPrompt, userPrompt, hakkaTranscript, mandarinTranscript, isMandarin }),
           signal: controller.signal
         });
         clearTimeout(timer);
@@ -1369,7 +1564,7 @@ class LLMServiceAdapter {
         if (res.ok) {
           const data = await res.json();
           if (data.ok && data.isMatch !== undefined) {
-            const matchedChoice = this.resolveMatchedChoice(nodeConfig, data, hakkaTranscript, mandarinTranscript);
+            const matchedChoice = this.resolveMatchedChoice(nodeConfig, data, hakkaTranscript, mandarinTranscript, isMandarin);
             return {
               ...data,
               matchedChoice,
@@ -1380,7 +1575,7 @@ class LLMServiceAdapter {
           }
         } else if (res.status === 429) {
           // 遇到 429 頻率限制，回傳自然情境緩衝台詞
-          const rateLimitReply = this.getRateLimitNpcResponse(nodeConfig.npcRole);
+          const rateLimitReply = this.getRateLimitNpcResponse(nodeConfig.npcRole, isMandarin);
           return {
             isMatch: false,
             isRateLimited: true,
@@ -1457,20 +1652,25 @@ class LLMServiceAdapter {
     }
 
     // 本地雙軌安全網：結合客語與華語意圖進行智能匹配
-    const isMandarin = !hakkaTranscript && !!mandarinTranscript;
     const combinedText = `${hakkaTranscript || ""} ${mandarinTranscript || ""}`.trim();
     const fallbackEval = SpeechService.evaluateAnswer(combinedText, nodeConfig, isMandarin);
     const matchedChoice = fallbackEval.matchedChoice;
 
     let dynamicNpcResponse = "";
     if (fallbackEval.isMatch) {
-      if (matchedChoice && matchedChoice.guideResponse) {
-        dynamicNpcResponse = matchedChoice.guideResponse;
+      if (matchedChoice) {
+        dynamicNpcResponse = isMandarin
+          ? (matchedChoice.mandarinGuideResponse || matchedChoice.guideResponse || "「好的，往這個方向走喔！」")
+          : (matchedChoice.guideResponse || "「好个，照等這隻方向行喔！」");
       } else {
-        dynamicNpcResponse = nodeConfig.npcSuccessResponse || "「很好！說得非常清楚！」";
+        dynamicNpcResponse = isMandarin
+          ? (nodeConfig.mandarinNpcSuccessResponse || nodeConfig.npcSuccessResponse || "「很好！說得非常清楚！」")
+          : (nodeConfig.npcSuccessResponse || "「很好！說得非常清楚！」");
       }
     } else {
-      dynamicNpcResponse = nodeConfig.npcRetryResponse || "「請再說一次喔！」";
+      dynamicNpcResponse = isMandarin
+        ? (nodeConfig.mandarinNpcRetryResponse || nodeConfig.npcRetryResponse || "「請再說一次喔！」")
+        : (nodeConfig.npcRetryResponse || "「請再說一次喔！」");
     }
 
     return {
@@ -1718,14 +1918,14 @@ class ZooMapEngine {
     this.onArrival = onArrivalCallback;
     this.onToast = onToastCallback;
 
-    // 園區關鍵地標座標 (寬 400, 高 250)
+    // 園區關鍵地標座標 (寬 400, 高 250) - 展區以問號呈現，讓學生依導覽員口說指引自行尋路
     this.zones = {
       GATE: { x: 200, y: 220, label: "大門入口", icon: "🚪", color: "#64748b" },
       FORK: { x: 200, y: 130, label: "十字分岔", icon: "🚏", color: "#3b82f6" },
-      A: { x: 65, y: 55, label: "🐘 大象展區", code: "A", icon: "🐘", radius: 36, color: "#10b981" },
-      B: { x: 200, y: 45, label: "🦁 獅子展區", code: "B", icon: "🦁", radius: 36, color: "#f59e0b" },
-      C: { x: 335, y: 55, label: "🐍 蛇展區", code: "C", icon: "🐍", radius: 36, color: "#8b5cf6" },
-      D: { x: 340, y: 215, label: "⭐ 出口集合點", code: "D", icon: "🚩", radius: 32, color: "#ef4444" }
+      A: { x: 65, y: 55, label: "展區 A", code: "A", icon: "❓", radius: 36, color: "#10b981", fullLabel: "🐘 大象展區" },
+      B: { x: 200, y: 45, label: "展區 B", code: "B", icon: "❓", radius: 36, color: "#f59e0b", fullLabel: "🦁 獅子展區" },
+      C: { x: 335, y: 55, label: "展區 C", code: "C", icon: "❓", radius: 36, color: "#8b5cf6", fullLabel: "🐍 蛇展區" },
+      D: { x: 340, y: 215, label: "⭐ 出口集合點", code: "D", icon: "🚩", radius: 32, color: "#ef4444", fullLabel: "🚩 出口集合點" }
     };
 
     this.player = { x: 200, y: 220, targetX: 200, targetY: 220, speed: 4 };
@@ -1882,43 +2082,27 @@ class ZooMapEngine {
     // 4. 繪製地標展區目標
     ["A", "B", "C", "D"].forEach((code) => {
       const zone = this.zones[code];
-      const isTarget = this.targetCode === code;
-
-      // 目標光暈
-      if (isTarget) {
-        ctx.save();
-        ctx.beginPath();
-        ctx.arc(zone.x, zone.y, zone.radius + 6 + Math.sin(Date.now() / 200) * 3, 0, Math.PI * 2);
-        ctx.fillStyle = "rgba(255, 235, 59, 0.45)";
-        ctx.fill();
-        ctx.restore();
-      }
+      const isExit = code === "D";
 
       // 展區圓形地基
       ctx.beginPath();
       ctx.arc(zone.x, zone.y, zone.radius, 0, Math.PI * 2);
-      ctx.fillStyle = isTarget ? "#ffffff" : "#f1f5f9";
+      ctx.fillStyle = "#ffffff";
       ctx.fill();
-      ctx.lineWidth = isTarget ? 3.5 : 2;
-      ctx.strokeStyle = isTarget ? "#f59e0b" : "#cbd5e1";
+      ctx.lineWidth = 2.5;
+      ctx.strokeStyle = isExit ? "#ef4444" : "#6366f1";
       ctx.stroke();
 
-      // 圖示
+      // 圖示 (A, B, C 均為 ❓，D 為 🚩)
       ctx.font = "20px sans-serif";
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
       ctx.fillText(zone.icon, zone.x, zone.y - 4);
 
-      // 目標星號標記
-      if (isTarget) {
-        ctx.font = "bold 13px sans-serif";
-        ctx.fillStyle = "#b45309";
-        ctx.fillText("⭐ 目標", zone.x, zone.y + 18);
-      } else {
-        ctx.font = "bold 10px sans-serif";
-        ctx.fillStyle = "#475569";
-        ctx.fillText(zone.label.split(" ")[1] || zone.label, zone.x, zone.y + 18);
-      }
+      // 地標文字 (展區 A / 展區 B / 展區 C / 出口集合)
+      ctx.font = "bold 11px sans-serif";
+      ctx.fillStyle = "#334155";
+      ctx.fillText(zone.label, zone.x, zone.y + 18);
     });
 
     // 5. 繪製大門起點
@@ -2298,6 +2482,7 @@ class UIController {
       }
       if (this.els.pipeMtText) this.els.pipeMtText.textContent = "（等待客語發音翻譯...）";
     }
+    this.render();
   }
 
   // 觸發真實 HakkaASRAdapter 錄音
@@ -2649,9 +2834,12 @@ class UIController {
     if (this.els.showcaseStepTag) this.els.showcaseStepTag.textContent = `節點：${node.title}`;
 
     // 左側情境資訊
+    const isMandarin = this.state.speechMode === "mandarin";
     if (this.els.themeIcon) this.els.themeIcon.textContent = scenario.icon;
     if (this.els.scenarioTitle) this.els.scenarioTitle.textContent = scenario.title;
-    if (this.els.scenarioObjective) this.els.scenarioObjective.textContent = scenario.objective;
+    if (this.els.scenarioObjective) {
+      this.els.scenarioObjective.textContent = isMandarin ? (scenario.mandarinObjective || scenario.objective) : scenario.objective;
+    }
 
     // 渲染節點軌跡 (Step Tracker)
     this.renderStepTracker(scenario, node);
@@ -2765,9 +2953,16 @@ class UIController {
 
   // 2. 渲染分支選擇節點 (純口說 + 靜態提詞卡片，不可點擊)
   renderChoiceNode(node) {
-    if (this.els.storyPrompt) this.els.storyPrompt.textContent = node.storyPrompt;
+    const isMandarin = this.state.speechMode === "mandarin";
+    if (this.els.storyPrompt) {
+      this.els.storyPrompt.textContent = isMandarin ? (node.mandarinStoryPrompt || node.storyPrompt) : node.storyPrompt;
+    }
     if (this.els.speechActionSection) this.els.speechActionSection.hidden = false;
-    if (this.els.statusTip) this.els.statusTip.textContent = "請看上方提示，點擊下方按鈕開始用客語開口說出你的選擇！";
+    if (this.els.statusTip) {
+      this.els.statusTip.textContent = isMandarin
+        ? "請看上方提示，點擊下方按鈕開始用華語開口說出你的選擇！"
+        : "請看上方提示，點擊下方按鈕開始用客語開口說出你的選擇！";
+    }
 
     // 呈現靜態提詞卡片 (禁止滑鼠點擊，僅供視覺輔助)
     if (this.els.speechHintSection && this.els.speechHintCards && node.choices) {
@@ -2791,14 +2986,17 @@ class UIController {
 
   // 3. 渲染 Canvas 2D 地圖尋路節點
   renderMapNavigationNode(node) {
-    if (this.els.storyPrompt) this.els.storyPrompt.textContent = node.storyPrompt;
+    const isMandarin = this.state.speechMode === "mandarin";
+    if (this.els.storyPrompt) {
+      this.els.storyPrompt.textContent = isMandarin ? (node.mandarinStoryPrompt || node.storyPrompt) : node.storyPrompt;
+    }
     if (this.els.speechActionSection) this.els.speechActionSection.hidden = true;
     if (this.els.speechHintSection) this.els.speechHintSection.hidden = true;
-    if (this.els.statusTip) this.els.statusTip.textContent = "請操作綠衣小人沿著石板路走向 ⭐ 星標展區，抵達後按【確定抵達】！";
+    if (this.els.statusTip) {
+      this.els.statusTip.textContent = "請根據導覽員剛才說明的路線，操縱綠衣小人走到對應的展區，抵達後按【確定抵達】！";
+    }
 
     const targetCode = this.state.targetZoneCode || "A";
-    const zoneNameMap = { A: "🐘 大象展區", B: "🦁 獅子展區", C: "🐍 蛇展區", D: "🚩 出口集合點" };
-    const currentTargetName = zoneNameMap[targetCode] || "指定展區";
 
     const mapSection = document.createElement("div");
     mapSection.className = "map-action-section";
@@ -2807,10 +3005,10 @@ class UIController {
         <div class="map-guide-icon">🧭</div>
         <div class="map-guide-info">
           <div class="map-guide-title">
-            <span>當前目的地：${currentTargetName}</span>
+            <span>尋路任務：依照剛才問路得到的方位前往目標展區</span>
             <span class="map-tip-pill">可點擊步道或按方向鍵移動</span>
           </div>
-          <div class="map-guide-sub">引導綠衣小人走到黃色光圈【⭐ 目標展區】，抵達後請按右下角【確定抵達】！</div>
+          <div class="map-guide-sub">請操縱綠衣小人走到剛才說好的展區位置（展區 A / B / C），抵達後請按右下角【確定抵達】！</div>
         </div>
       </div>
 
@@ -2863,12 +3061,17 @@ class UIController {
 
   // 4. 渲染 4 格背包非線性收集節點
   renderBackpackCollectionNode(node) {
+    const isMandarin = this.state.speechMode === "mandarin";
     const activeItem = node.items[this.state.activePackItemIndex] || node.items[0];
 
-    if (this.els.storyPrompt) this.els.storyPrompt.textContent = activeItem.storyPrompt;
+    if (this.els.storyPrompt) {
+      this.els.storyPrompt.textContent = isMandarin ? (activeItem.mandarinStoryPrompt || activeItem.storyPrompt) : activeItem.storyPrompt;
+    }
     if (this.els.speechActionSection) this.els.speechActionSection.hidden = false;
     if (this.els.speechHintSection) this.els.speechHintSection.hidden = true;
-    if (this.els.statusTip) this.els.statusTip.textContent = `正在整理【${activeItem.name}】，請點擊下方按鈕錄音回答。`;
+    if (this.els.statusTip) {
+      this.els.statusTip.textContent = isMandarin ? `正在整理【${activeItem.name}】，請點擊下方按鈕以華語回答。` : `正在整理【${activeItem.name}】，請點擊下方按鈕以客語回答。`;
+    }
 
     // 注入背包清單面板
     const backpackPanel = document.createElement("div");
@@ -2913,10 +3116,15 @@ class UIController {
 
   // 5. 渲染一般口說主線/分支/集合點節點
   renderSpeechNode(node) {
-    if (this.els.storyPrompt) this.els.storyPrompt.textContent = node.storyPrompt;
+    const isMandarin = this.state.speechMode === "mandarin";
+    if (this.els.storyPrompt) {
+      this.els.storyPrompt.textContent = isMandarin ? (node.mandarinStoryPrompt || node.storyPrompt) : node.storyPrompt;
+    }
     if (this.els.speechActionSection) this.els.speechActionSection.hidden = false;
     if (this.els.speechHintSection) this.els.speechHintSection.hidden = true;
-    if (this.els.statusTip) this.els.statusTip.textContent = "請點擊下方按鈕，開始用客語說出你想講的話。";
+    if (this.els.statusTip) {
+      this.els.statusTip.textContent = isMandarin ? "請點擊下方按鈕，開始用華語說出你想講的話。" : "請點擊下方按鈕，開始用客語說出你想講的話。";
+    }
 
     this.renderSpeechNodeControls(node);
   }
@@ -2963,13 +3171,20 @@ class UIController {
 
   // 渲染開發者側邊欄 (包含分支直接切換器)
   renderDevSidebar(nodeConfig, runtimeResult) {
+    const isMandarin = this.state.speechMode === "mandarin";
     if (this.els.devNodeIdText) this.els.devNodeIdText.textContent = nodeConfig.id || this.state.currentNodeId;
     if (this.els.devNodeTypeTag) this.els.devNodeTypeTag.textContent = nodeConfig.nodeType || "主線";
     if (this.els.devTargetLocText) this.els.devTargetLocText.textContent = nodeConfig.locationTag || "無指定";
 
-    if (this.els.devTargetHakka) this.els.devTargetHakka.textContent = nodeConfig.targetHakka || "（本節點為口說分支選擇）";
+    if (this.els.devTargetHakka) {
+      this.els.devTargetHakka.textContent = isMandarin
+        ? (nodeConfig.targetMandarin || "（本節點為口說分支選擇）")
+        : (nodeConfig.targetHakka || "（本節點為口說分支選擇）");
+    }
     if (this.els.devTargetMandarin) {
-      this.els.devTargetMandarin.textContent = nodeConfig.targetMandarin ? `（華語：${nodeConfig.targetMandarin}）` : "";
+      this.els.devTargetMandarin.textContent = isMandarin
+        ? (nodeConfig.targetHakka ? `（客語對照：${nodeConfig.targetHakka}）` : "")
+        : (nodeConfig.targetMandarin ? `（華語對照：${nodeConfig.targetMandarin}）` : "");
     }
 
     // 分支路線切換器 (Dev Branch Switcher)
@@ -3028,9 +3243,11 @@ class UIController {
       }
     }
 
-    // 關鍵字標籤
+    // 關鍵字標籤 (依據當前華語/客語模式顯示對應關鍵字)
     if (this.els.devKeywordsList) {
-      const kwList = nodeConfig.keywords || (nodeConfig.choices ? nodeConfig.choices.flatMap(c => c.keywords || []) : []);
+      const kwList = isMandarin
+        ? (nodeConfig.mandarinKeywords || (nodeConfig.choices ? nodeConfig.choices.flatMap(c => c.mandarinKeywords || c.keywords || []) : nodeConfig.keywords || []))
+        : (nodeConfig.keywords || (nodeConfig.choices ? nodeConfig.choices.flatMap(c => c.keywords || []) : []));
       this.els.devKeywordsList.innerHTML = kwList.map(kw => `<span class="kw-tag">${kw}</span>`).join("");
     }
 
