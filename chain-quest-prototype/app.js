@@ -938,10 +938,10 @@ class HakkaASRAdapter {
 // ==========================================
 class HakkaToMandarinAdapter {
   static config = {
-    engine: "builtin", // "builtin" | "external_mt"
+    engine: "external_mt", // "external_mt" (客委會 API) | "builtin" (本機字典)
     endpoint: "/api/translate",
     apiKey: "",
-    timeout: 3000
+    timeout: 4000
   };
 
   // 內建 60+ 組高頻生活情境客語詞彙對照表
@@ -1053,11 +1053,11 @@ class HakkaToMandarinAdapter {
 // ==========================================
 class LLMServiceAdapter {
   static config = {
-    provider: "local_judge", // "local_judge" | "vercel_api" | "openai_gemini"
+    provider: "vercel_api", // "vercel_api" (Vercel 後端 Google Gemini) | "local_judge" | "openai_gemini"
     model: "gemini-1.5-flash",
     apiEndpoint: "/api/judge",
     apiKey: "",
-    timeout: 3000
+    timeout: 6000
   };
 
   /**
@@ -1388,17 +1388,17 @@ class SpeechService {
           resultText = customText;
         } else if (nodeConfig.nodeType === "選擇" && nodeConfig.choices) {
           const choice = selectedChoice || nodeConfig.choices[0];
-          resultText = success ? `𠊎想愛去${choice.title.replace(/[^\u4e00-\u9fa5]/g, "")}` : "𠊎想愛去……（未清楚指明地點）";
+          resultText = success ? `𠊎想愛去${choice.title.replace(/[^\u4e00-\u9fa5]/g, "")}` : "𠊎愛去買玩具（完全不相干地點）";
         } else if (success) {
-          resultText = nodeConfig.targetHakka || "辨識通過";
+          resultText = nodeConfig.targetHakka || "𠊎愛買三張學生票。";
         } else {
-          resultText = "𠊎想愛……（未命中目標句）";
+          resultText = "𠊎愛食客家小炒（答非所問）";
         }
         resolve({
           text: resultText,
-          confidence: success ? 0.95 : 0.4
+          confidence: success ? 0.95 : 0.25
         });
-      }, 500);
+      }, 400);
     });
   }
 }

@@ -106,44 +106,13 @@
           </div>
         </div>
 
-        <!-- ⚙️ API 模式與串接設定 -->
+        <!-- ☁️ 雲端 API 運作狀態 -->
         <div class="dev-item">
-          <button id="toggleApiConfigBtn" class="dev-toggle-json-btn" type="button">⚙️ 展開 API 串接與降級設定</button>
-          <div id="apiConfigPanel" class="api-config-grid" hidden>
-            <div class="api-config-row">
-              <label class="api-config-label">ASR 客語辨識引擎：</label>
-              <select id="apiAsrSelect" class="api-select">
-                <option value="webspeech" selected>Web Speech API (本機原生，免金鑰)</option>
-                <option value="external_asr">外部客語 ASR API (POST 接口)</option>
-                <option value="mock">模擬模式 (測試用)</option>
-              </select>
-            </div>
-            <div class="api-config-row">
-              <label class="api-config-label">客轉華翻譯引擎：</label>
-              <select id="apiMtSelect" class="api-select">
-                <option value="builtin" selected>本機客華對照字典 (內建 50+ 組詞彙)</option>
-                <option value="external_mt">外部客轉華 API (POST 接口)</option>
-              </select>
-            </div>
-            <div class="api-config-row">
-              <label class="api-config-label">LLM 邊界判定引擎：</label>
-              <select id="apiLlmSelect" class="api-select">
-                <option value="local_judge" selected>本機智慧安全網 (離線零延遲)</option>
-                <option value="openai_gemini">線上 LLM (OpenAI / Gemini / 自訂)</option>
-              </select>
-            </div>
-            <div class="api-config-row" id="llmApiSecretRows">
-              <label class="api-config-label">線上 LLM Endpoint：</label>
-              <input type="text" id="apiLlmEndpointInput" class="api-input" value="https://api.openai.com/v1/chat/completions" placeholder="https://api.openai.com/v1/chat/completions">
-              <label class="api-config-label" style="margin-top: 3px;">模型名稱 (Model)：</label>
-              <input type="text" id="apiLlmModelInput" class="api-input" value="gpt-4o-mini" placeholder="gpt-4o-mini 或 gemini-1.5-flash">
-              <label class="api-config-label" style="margin-top: 3px;">API Key（僅儲存於本機瀏覽器，不外流）：</label>
-              <input type="password" id="apiLlmKeyInput" class="api-input" placeholder="sk-..." autocomplete="off">
-            </div>
-            <div class="api-config-row">
-              <label class="api-config-label">API 降級安全超時 (毫秒)：</label>
-              <input type="number" id="apiTimeoutInput" class="api-input" value="3000" min="500" max="10000" step="500">
-            </div>
+          <span class="dev-label">☁️ 雲端 AI 連線狀態</span>
+          <div class="dev-status-info">
+            <p>ASR 辨識：<span class="kw-tag" style="background:#e0f2fe;color:#0369a1;">客委會 ASR / 瀏覽器雙軌</span></p>
+            <p>客華轉譯：<span class="kw-tag" style="background:#fef3c7;color:#92400e;">客委會 MT (/api/translate)</span></p>
+            <p>LLM 判定：<span class="kw-tag" style="background:#dcfce7;color:#15803d;">Google Gemini (/api/judge)</span></p>
           </div>
         </div>
 
