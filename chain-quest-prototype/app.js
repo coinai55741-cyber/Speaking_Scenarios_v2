@@ -1160,19 +1160,26 @@ class LLMServiceAdapter {
     const currentPersona = rolePersonas[nodeConfig.npcRole] || "熱情友善的情境對話 NPC 角色";
 
     return [
-      `你是一位專業且熱情親切的客語情境教學與語音評估 AI 助教兼角色扮演者（LLM-as-a-Judge & Roleplayer）。`,
+      `你是一位極其專業且細心的客語情境口說 AI 助教兼角色扮演考官（LLM-as-a-Judge & Roleplayer）。`,
       `【情境主題】：${scenario?.title || ""}（目標：${scenario?.objective || ""}）`,
       `【當前關卡】：${nodeConfig?.title || ""}（地點：${nodeConfig?.locationTag || ""}，類型：${nodeConfig?.nodeType || "主線"}）`,
       `【NPC 角色人設】：你將扮演「${nodeConfig?.npcRole || "NPC"}」— ${currentPersona}`,
-      `【目標客語句】：${nodeConfig?.targetHakka || "（分支選擇/自由回答關卡）"}`,
-      `【華語對照意圖】：${nodeConfig?.targetMandarin || "（分支選擇/自由回答關卡）"}`,
+      `【標準目標客語句】：${nodeConfig?.targetHakka || "（分支選擇/自由回答關卡）"}`,
+      `【標準華語意圖】：${nodeConfig?.targetMandarin || "（分支選擇/自由回答關卡）"}`,
       `【核心關鍵詞】：${(nodeConfig?.keywords || []).join("、") || "無"}`,
       ``,
-      `【評估與邊界安全準則 (Guardrails)】：`,
-      `1. 封閉邊界約束 (Closed Intent Boundary)：學生的回答必須在當前情境合理範圍內。若學生答非所問或胡言亂語（例如問路時說要買玩具），必須判定 isMatch: false，並溫和引導回本題。`,
-      `2. 客語 ASR 諧音容錯：學生透過語音辨識可能產生諧音錯字（例如將「𠊎愛買」辨識為「哀愛買」或「我要買」），請以核心語意與情境意圖為準，給予合理寬容評分。`,
-      `3. 動態 NPC 回應生成 (Dynamic Persona Response)：請以「${nodeConfig?.npcRole || "NPC"}」的身份生成 20~35 字生動、自然的情境對話（通過時給予具體情境讚美或路線指引；未通過時給予溫和提示）。`,
-      `4. 輸出規範：請一律以繁體中文輸出嚴格 JSON 格式，不可包含額外註釋。`
+      `【嚴格判定規則 (Strict Correctness & Guardrails)】：`,
+      `1. 精準對錯判定 (Strict Verification)：`,
+      `   - 學生的回答必須精準符合當前題目的「核心動作」、「數量/張數」、「地點」或「指定項目」。`,
+      `   - 【數量/項目錯誤一律判錯】：例如題目要求「買三張學生票」，若學生說「兩張門票」、「一張票」或未提及學生票，數量或票種不符，必須判定 isMatch: false！`,
+      `   - 【答非所問/離題一律判錯】：若學生說不相干的話（如問路時說要買漢堡、天氣很冷等），必須判定 isMatch: false！`,
+      `   - 【只有正確表達才通過】：必須語意完整且數量/對象正確，才判定 isMatch: true。`,
+      `2. 客語 ASR 諧音合理容錯：若客語語音辨識產生同音錯字但語意數量完全正確，可判定通過。`,
+      `3. 真實動態 NPC 角色扮演回應 (Dynamic NPC Roleplay)：`,
+      `   - 務必根據「學生實際說出的內容」客製化生成 20~35 字生動的 NPC 繁體中文對話。`,
+      `   - 若學生說錯（如說兩張票）：NPC 要針對他說的內容指正：「我們有三位同學，應該要買三張學生票喔！」`,
+      `   - 若學生說對：NPC 要自然接話並推進劇情。`,
+      `4. 輸出規範：請嚴格回傳標準 JSON 格式。`
     ].join("\n");
   }
 
@@ -1245,7 +1252,13 @@ class LLMServiceAdapter {
 
         if (res.ok) {
           const data = await res.json();
-          if (data.ok && data.isMatch !== undefined) return data;
+          if (data.ok && data.isMatch !== undefined) {
+            return {
+              ...data,
+              isFromAPI: true,
+              provider: "gemini_api"
+            };
+          }
         }
       } catch (err) {
         console.warn("[LLMServiceAdapter] Vercel 後端 /api/judge 調用異常，自動降級至本地安全網：", err);
@@ -1378,28 +1391,23 @@ class SpeechService {
       }
     }
 
-    // 2. 一般口說比對
+    // 2. 一般口說比對 (嚴格要求核心關鍵字)
     const primaryKeywords = nodeConfig.keywords || [];
     const hitPrimary = primaryKeywords.filter(kw => cleanText.includes(kw));
     const missingPrimary = primaryKeywords.filter(kw => !cleanText.includes(kw));
 
-    const altKeywords = nodeConfig.altKeywords || [];
-    const hitAlt = altKeywords.filter(kw => cleanText.includes(kw));
-
     const targetClean = (nodeConfig.targetHakka || "").replace(/[。，！？、？\s\.,!?]/g, "");
     const isFullPrimaryHit = primaryKeywords.length > 0 && hitPrimary.length === primaryKeywords.length;
-    const isPartialHit = hitPrimary.length >= 1 && (hitPrimary.length / Math.max(1, primaryKeywords.length)) >= 0.5;
-    const isMatch = isFullPrimaryHit || isPartialHit || (targetClean && cleanText.includes(targetClean)) || (hitPrimary.length + hitAlt.length >= 2);
-
-    const allHits = Array.from(new Set([...hitPrimary, ...hitAlt]));
+    const isStrictHit = primaryKeywords.length >= 2 ? (hitPrimary.length >= primaryKeywords.length) : (hitPrimary.length >= 1);
+    const isMatch = isFullPrimaryHit || isStrictHit || (targetClean && cleanText.includes(targetClean));
 
     return {
-      isMatch,
+      isMatch: isMatch,
       matchedChoice: null,
-      hitKeywords: allHits,
+      hitKeywords: hitPrimary,
       missingKeywords: missingPrimary,
-      similarity: isFullPrimaryHit ? 100 : Math.round((allHits.length / Math.max(1, primaryKeywords.length)) * 85),
-      feedback: isMatch ? "辨識成功！語意明確且關鍵字命中。" : "部分字詞未命中，建議參考提示再說一次。"
+      similarity: isFullPrimaryHit ? 100 : Math.round((hitPrimary.length / Math.max(1, primaryKeywords.length)) * 100),
+      feedback: isMatch ? "辨識成功！語意明確且關鍵字命中。" : "關鍵字詞未完整命中（如數量或指定項目不符），請參考提示再說一次。"
     };
   }
 
@@ -2372,7 +2380,8 @@ class UIController {
       }
       if (status !== "running" && data) {
         if (this.els.pipeLlmResult) {
-          this.els.pipeLlmResult.textContent = data.isMatch ? "✓ 通過 (Match)" : "⚠️ 未通過 (Retry)";
+          const sourceTag = data.isFromAPI ? " [☁️ Gemini 雲端運算]" : " [🛡️ 本地安全網]";
+          this.els.pipeLlmResult.textContent = (data.isMatch ? "✓ 通過 (Match)" : "⚠️ 未命中重試 (Retry)") + sourceTag;
           this.els.pipeLlmResult.style.color = data.isMatch ? "#34d399" : "#f87171";
         }
         if (this.els.pipeLlmIntent) this.els.pipeLlmIntent.textContent = data.intent || "無";
