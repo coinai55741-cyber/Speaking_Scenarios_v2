@@ -793,10 +793,7 @@ const SCENARIOS_GRAPH = {
 // ==========================================
 class HakkaASRAdapter {
   static config = {
-    engine: "webspeech", // "webspeech" | "external_asr" | "mock"
-    endpoint: "",
-    apiKey: "",
-    timeout: 3000
+    timeout: 5000
   };
 
   /**
@@ -804,23 +801,12 @@ class HakkaASRAdapter {
    */
   static startRecognition({ onInterim, onFinal, onError, speechMode = "hakka" }) {
     if (speechMode === "mandarin") {
-      // 華語對照模式：強制調用瀏覽器內建 Web Speech API (zh-TW)
+      // 華語對照模式：直接調用瀏覽器內建 Web Speech API (zh-TW)
       return this.startWebSpeech({ onInterim, onFinal, onError, lang: "zh-TW" });
     }
 
-    if (this.config.engine === "mock") {
-      setTimeout(() => {
-        if (onFinal) onFinal("𠊎愛買三張學生票。");
-      }, 600);
-      return { stop: () => {} };
-    }
-
-    if (this.config.engine === "webspeech") {
-      return this.startWebSpeech({ onInterim, onFinal, onError, lang: "zh-TW" });
-    }
-
-    // 外部客語即時 ASR API (預留 POST Audio Blob / WebSocket，附帶超時降級保護)
-    return this.startExternalMediaRecorder({ onInterim, onFinal, onError });
+    // 客語模式：優先連線客委會即時 WebSocket ASR 串流
+    return this.startHakkaWebSocketASR({ onInterim, onFinal, onError });
   }
 
   static startWebSpeech({ onInterim, onFinal, onError, lang = "zh-TW" }) {
@@ -869,67 +855,156 @@ class HakkaASRAdapter {
     }
   }
 
-  static startExternalMediaRecorder({ onInterim, onFinal, onError }) {
+  static startHakkaWebSocketASR({ onInterim, onFinal, onError }) {
     if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-      if (onError) onError("無法取得音訊設備，自動降級至 Web Speech。");
-      return this.startWebSpeech({ onInterim, onFinal, onError });
+      if (onError) onError("無法取得麥克風，降級至 Web Speech。");
+      return this.startWebSpeech({ onInterim, onFinal, onError, lang: "zh-TW" });
     }
 
-    let mediaRecorder = null;
-    const audioChunks = [];
+    let ws = null;
+    let audioContext = null;
+    let sourceNode = null;
+    let processorNode = null;
+    let ready = false;
+    let closed = false;
+    let pending = [];
+    let segments = {};
+    let ownedStream = null;
 
-    navigator.mediaDevices.getUserMedia({ audio: true }).then((stream) => {
-      mediaRecorder = new MediaRecorder(stream);
-      mediaRecorder.ondataavailable = (e) => {
-        if (e.data.size > 0) audioChunks.push(e.data);
-      };
+    function currentText() {
+      return Object.keys(segments)
+        .sort((a, b) => Number(a) - Number(b))
+        .map((key) => segments[key])
+        .join("")
+        .trim();
+    }
 
-      mediaRecorder.onstop = async () => {
-        const audioBlob = new Blob(audioChunks, { type: "audio/wav" });
-        stream.getTracks().forEach((t) => t.stop());
+    function stopAudio() {
+      try { if (processorNode) processorNode.disconnect(); } catch (e) {}
+      try { if (sourceNode) sourceNode.disconnect(); } catch (e) {}
+      processorNode = null;
+      sourceNode = null;
+      if (ownedStream) {
+        try { ownedStream.getTracks().forEach(t => t.stop()); } catch (e) {}
+        ownedStream = null;
+      }
+    }
 
-        // 發送外部 ASR 請求 (若超時則自動降級)
-        try {
-          const controller = new AbortController();
-          const timer = setTimeout(() => controller.abort(), this.config.timeout);
+    function finish() {
+      if (closed) return;
+      closed = true;
+      stopAudio();
+      try { if (audioContext) audioContext.close(); } catch (e) {}
+      audioContext = null;
+      try { if (ws) ws.close(); } catch (e) {}
+      ws = null;
+      const text = currentText();
+      if (onFinal) onFinal(text || "");
+    }
 
-          if (this.config.endpoint) {
-            const formData = new FormData();
-            formData.append("audio", audioBlob, "speech.wav");
-            const res = await fetch(this.config.endpoint, {
-              method: "POST",
-              headers: this.config.apiKey ? { Authorization: `Bearer ${this.config.apiKey}` } : {},
-              body: formData,
-              signal: controller.signal
-            });
-            clearTimeout(timer);
-            if (res.ok) {
-              const data = await res.json();
-              if (onFinal) onFinal(data.transcript || data.text || "");
-              return;
-            }
+    (async () => {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({
+          audio: { channelCount: 1, sampleRate: { ideal: 16000 }, echoCancellation: true, noiseSuppression: true }
+        });
+        ownedStream = stream;
+
+        // 1. 向後端取票 (/api/realtime-ticket)
+        const ticketRes = await fetch("/api/realtime-ticket", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ language: "hak" })
+        });
+
+        if (!ticketRes.ok) throw new Error(`取票失敗 HTTP ${ticketRes.status}`);
+        const ticketData = await ticketRes.json();
+        if (!ticketData?.url || !ticketData?.ticket) throw new Error(ticketData?.error || "無效辨識票券");
+
+        // 2. 建立 WebSocket 連線至客委會即時 ASR
+        const query = `?ticket=${encodeURIComponent(ticketData.ticket)}&type=raw&rate=16000&channel=1&charactersToNumbers=0&noSpeechTimeout=20`;
+        ws = new WebSocket(ticketData.url + query);
+        ws.binaryType = "arraybuffer";
+
+        ws.onmessage = (event) => {
+          let payload = null;
+          try { payload = JSON.parse(event.data); } catch (e) { return; }
+          const code = Number(payload.code || 0);
+          if (code === 180) {
+            ready = true;
+            pending.forEach((chunk) => { try { ws.send(chunk); } catch (e) {} });
+            pending = [];
+            return;
           }
-        } catch (err) {
-          console.warn("[HakkaASRAdapter] 外部 ASR 異常或超時，自動啟用安全降級：", err);
-        }
+          if (code === 200 && Array.isArray(payload.result)) {
+            payload.result.forEach((item) => {
+              if (item?.transcript) segments[item.segment ?? 0] = item.transcript;
+            });
+            const text = currentText();
+            if (onInterim) onInterim(text);
+          }
+          if (code === 204 || payload.end === 1) finish();
+          if (code >= 400) finish();
+        };
 
-        // 安全降級
-        if (onFinal) onFinal("𠊎愛買三張學生票。");
-      };
+        ws.onerror = () => {
+          if (!closed) console.warn("[HakkaASRAdapter] 客委會 WebSocket 斷線");
+        };
 
-      mediaRecorder.start();
-      if (onInterim) onInterim("🎙️ 正在透過外部客語 ASR 錄音中...");
-    }).catch((err) => {
-      if (onError) onError("無法開啟麥克風：" + err.message);
-    });
+        ws.onclose = () => { if (!closed) finish(); };
+
+        // 3. 擷取音訊並即時轉為 16kHz PCM
+        audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        if (audioContext.state === "suspended") await audioContext.resume();
+
+        sourceNode = audioContext.createMediaStreamSource(stream);
+        processorNode = audioContext.createScriptProcessor(4096, 1, 1);
+        processorNode.onaudioprocess = (event) => {
+          if (!ws || ws.readyState > 1 || closed) return;
+          const pcm = HakkaASRAdapter.downsample(event.inputBuffer.getChannelData(0), audioContext.sampleRate, 16000);
+          if (ready) {
+            try { ws.send(pcm.buffer); } catch (e) {}
+          } else if (pending.length < 80) {
+            pending.push(pcm.buffer);
+          }
+        };
+        sourceNode.connect(processorNode);
+        processorNode.connect(audioContext.destination);
+
+        if (onInterim) onInterim("🎙️ 客委會即時客語辨識連線中，請開始說話...");
+      } catch (err) {
+        console.warn("[HakkaASRAdapter] 客委會即時 ASR 雲端連線失敗，自動降級至瀏覽器辨識：", err);
+        stopAudio();
+        HakkaASRAdapter.startWebSpeech({ onInterim, onFinal, onError, lang: "zh-TW" });
+      }
+    })();
 
     return {
       stop: () => {
-        if (mediaRecorder && mediaRecorder.state === "recording") {
-          mediaRecorder.stop();
+        stopAudio();
+        if (ws && ws.readyState === 1) {
+          try { ws.send("EOS"); } catch (e) {}
+          setTimeout(() => finish(), 1200);
+        } else {
+          finish();
         }
       }
     };
+  }
+
+  static downsample(buffer, fromRate, toRate = 16000) {
+    const ratio = fromRate / toRate;
+    const length = Math.floor(buffer.length / ratio);
+    const output = new Int16Array(length);
+    for (let i = 0; i < length; i += 1) {
+      const position = i * ratio;
+      const left = Math.floor(position);
+      const right = Math.min(buffer.length - 1, left + 1);
+      const mix = position - left;
+      const value = buffer[left] * (1 - mix) + buffer[right] * mix;
+      const sample = Math.max(-1, Math.min(1, value));
+      output[i] = sample < 0 ? sample * 0x8000 : sample * 0x7fff;
+    }
+    return output;
   }
 }
 
@@ -2038,14 +2113,28 @@ class UIController {
     if (this.els.modeHakkaBtn) this.els.modeHakkaBtn.classList.toggle("is-active", mode === "hakka");
     if (this.els.modeMandarinBtn) this.els.modeMandarinBtn.classList.toggle("is-active", mode === "mandarin");
 
+    const pipeStep1Title = document.querySelector("#pipeStep1Card .pipeline-step-title");
+
     if (mode === "mandarin") {
       if (this.els.recordBtnIcon) this.els.recordBtnIcon.textContent = "🗣️";
       if (this.els.recordBtnText) this.els.recordBtnText.textContent = "點擊說華語 (Web Speech)";
       if (this.els.statusTip) this.els.statusTip.textContent = "🗣️ 華語對照模式：請直接開口說華語（例如「我要買三張學生票」），系統將由瀏覽器直接辨識並由 AI 評審！";
+      if (pipeStep1Title) pipeStep1Title.textContent = "1️⃣ 華語 ASR 語音轉文字 (瀏覽器內建)";
+      if (this.els.pipeMtBadge) {
+        this.els.pipeMtBadge.textContent = "華語直通";
+        this.els.pipeMtBadge.className = "pipeline-badge badge-success";
+      }
+      if (this.els.pipeMtText) this.els.pipeMtText.textContent = "（華語模式：已略過客轉華轉譯直通）";
     } else {
       if (this.els.recordBtnIcon) this.els.recordBtnIcon.textContent = "🎙️";
       if (this.els.recordBtnText) this.els.recordBtnText.textContent = "按住／點擊錄音";
       if (this.els.statusTip) this.els.statusTip.textContent = "請點擊下方按鈕，開始用客語說出你想講的話。";
+      if (pipeStep1Title) pipeStep1Title.textContent = "1️⃣ 客語 ASR 語音轉文字 (客委會)";
+      if (this.els.pipeMtBadge) {
+        this.els.pipeMtBadge.textContent = "待處理";
+        this.els.pipeMtBadge.className = "pipeline-badge badge-pending";
+      }
+      if (this.els.pipeMtText) this.els.pipeMtText.textContent = "（等待客語發音翻譯...）";
     }
   }
 
