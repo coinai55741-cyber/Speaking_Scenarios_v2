@@ -1129,10 +1129,10 @@ class HakkaToMandarinAdapter {
 class LLMServiceAdapter {
   static config = {
     provider: "vercel_api", // "vercel_api" (Vercel 後端 Google Gemini) | "local_judge" | "openai_gemini"
-    model: "gemini-1.5-flash",
+    model: "gemini-3.6-flash",
     apiEndpoint: "/api/judge",
     apiKey: "",
-    timeout: 6000
+    timeout: 7000
   };
 
   /**
@@ -1391,15 +1391,19 @@ class SpeechService {
       }
     }
 
-    // 2. 一般口說比對 (嚴格要求核心關鍵字)
+    // 2. 一般口說比對 (嚴格要求核心關鍵字與數量匹配)
     const primaryKeywords = nodeConfig.keywords || [];
     const hitPrimary = primaryKeywords.filter(kw => cleanText.includes(kw));
     const missingPrimary = primaryKeywords.filter(kw => !cleanText.includes(kw));
 
+    // 數量衝突檢查 (若題目要求三張，但回答包含兩張/一張/二等衝突數字，則嚴格判錯)
+    const targetRequiresThree = (nodeConfig.targetHakka || "").includes("三") || (nodeConfig.targetMandarin || "").includes("三") || primaryKeywords.some(k => k.includes("三") || k.includes("3"));
+    const studentHasWrongQuantity = targetRequiresThree && (cleanText.includes("兩") || cleanText.includes("二") || cleanText.includes("一") || cleanText.includes("2") || cleanText.includes("1")) && !cleanText.includes("三") && !cleanText.includes("3");
+
     const targetClean = (nodeConfig.targetHakka || "").replace(/[。，！？、？\s\.,!?]/g, "");
     const isFullPrimaryHit = primaryKeywords.length > 0 && hitPrimary.length === primaryKeywords.length;
     const isStrictHit = primaryKeywords.length >= 2 ? (hitPrimary.length >= primaryKeywords.length) : (hitPrimary.length >= 1);
-    const isMatch = isFullPrimaryHit || isStrictHit || (targetClean && cleanText.includes(targetClean));
+    const isMatch = !studentHasWrongQuantity && (isFullPrimaryHit || isStrictHit || (targetClean && cleanText.includes(targetClean)));
 
     return {
       isMatch: isMatch,
@@ -1407,7 +1411,7 @@ class SpeechService {
       hitKeywords: hitPrimary,
       missingKeywords: missingPrimary,
       similarity: isFullPrimaryHit ? 100 : Math.round((hitPrimary.length / Math.max(1, primaryKeywords.length)) * 100),
-      feedback: isMatch ? "辨識成功！語意明確且關鍵字命中。" : "關鍵字詞未完整命中（如數量或指定項目不符），請參考提示再說一次。"
+      feedback: isMatch ? "辨識成功！語意明確且關鍵字命中。" : (studentHasWrongQuantity ? "數量不符（題目要求三張，非兩張或一張），請修正數量後再試一次。" : "關鍵字詞未完整命中（如數量或指定項目不符），請參考提示再說一次。")
     };
   }
 
@@ -2263,7 +2267,7 @@ class UIController {
     // 步驟 3: LLM 邊界意圖判定與 NPC 生成
     this.updatePipelineStep(3, "running", "LLM 評估中...");
     const evalResult = await LLMServiceAdapter.evaluate({
-      hakkaTranscript: isMandarinMode ? (nodeConfig.targetHakka || userText) : userText,
+      hakkaTranscript: isMandarinMode ? "" : userText,
       mandarinTranscript: mandarinText,
       nodeConfig,
       scenario
