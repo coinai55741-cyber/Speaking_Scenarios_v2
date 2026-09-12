@@ -1230,6 +1230,55 @@ class LLMServiceAdapter {
   }
 
   /**
+   * 精準解析選擇節點之分支物件 (跨 6 大情境支援 ID、意圖、關鍵字模糊比對)
+   */
+  static resolveMatchedChoice(nodeConfig, evalData, hakkaText = "", mandarinText = "") {
+    if (nodeConfig?.nodeType !== "選擇" || !nodeConfig?.choices || nodeConfig.choices.length === 0) {
+      return null;
+    }
+    const choices = nodeConfig.choices;
+
+    // 1. 若已有 matchedChoice 物件
+    if (evalData?.matchedChoice && typeof evalData.matchedChoice === "object") {
+      return evalData.matchedChoice;
+    }
+
+    // 2. 比對 matchedChoiceId (支援 raw id, 去除 choice_ 前綴, 或包含判斷)
+    const targetId = (evalData?.matchedChoiceId || "").trim().toLowerCase();
+    if (targetId && targetId !== "null" && targetId !== "undefined") {
+      const cleanTargetId = targetId.replace(/^choice_/, "");
+      const foundById = choices.find(c => {
+        const cId = c.id.toLowerCase();
+        return cId === targetId || cId === cleanTargetId || targetId.includes(cId) || (c.targetBranchId && targetId.includes(c.targetBranchId.toLowerCase()));
+      });
+      if (foundById) return foundById;
+    }
+
+    // 3. 比對 intent (例如 "大象展區", "獅子展區", "蛇展區", "文化園區", "學校", "膝蓋擦傷", "陰雨綿綿" 等)
+    const intent = (evalData?.intent || "").trim().toLowerCase();
+    if (intent && intent !== "目標對話達成" && intent !== "無") {
+      const foundByIntent = choices.find(c => {
+        const title = c.title.toLowerCase();
+        const keywords = (c.keywords || []).map(k => k.toLowerCase());
+        return intent.includes(title) || title.includes(intent) || keywords.some(k => intent.includes(k) || k.includes(intent));
+      });
+      if (foundByIntent) return foundByIntent;
+    }
+
+    // 4. 比對語音輸入內容 (客語/華語/命中關鍵詞/動態對話)
+    const fullText = `${hakkaText || ""} ${mandarinText || ""} ${(evalData?.hitKeywords || []).join(" ")} ${evalData?.dynamicNpcResponse || ""}`.toLowerCase();
+    for (const choice of choices) {
+      const keywords = (choice.keywords || [choice.title]).map(k => k.toLowerCase());
+      if (keywords.some(k => fullText.includes(k))) {
+        return choice;
+      }
+    }
+
+    // 5. 若皆無命中且判定通過，才安全回傳第一個選項
+    return evalData?.isMatch ? choices[0] : null;
+  }
+
+  /**
    * 執行 LLM 評估 (整合 Vercel /api/judge、線上 API 與本地安全網雙軌備援)
    */
   static async evaluate({ hakkaTranscript, mandarinTranscript, nodeConfig, scenario }) {
@@ -1253,8 +1302,11 @@ class LLMServiceAdapter {
         if (res.ok) {
           const data = await res.json();
           if (data.ok && data.isMatch !== undefined) {
+            const matchedChoice = this.resolveMatchedChoice(nodeConfig, data, hakkaTranscript, mandarinTranscript);
             return {
               ...data,
+              matchedChoice,
+              matchedChoiceId: matchedChoice ? matchedChoice.id : (data.matchedChoiceId || null),
               isFromAPI: true,
               provider: "gemini_api"
             };
@@ -1373,7 +1425,7 @@ class SpeechService {
 
     const cleanText = userTranscript.replace(/[。，！？、？\s\.,!?]/g, "");
 
-    // 1. 若為「選擇」節點，進行分支關鍵字匹配
+    // 1. 若為「選擇」節點，進行分支關鍵字匹配 (若皆未命中則判定 false)
     if (nodeConfig.nodeType === "選擇" && nodeConfig.choices) {
       for (const choice of nodeConfig.choices) {
         const choiceKeywords = choice.keywords || [choice.title];
@@ -1382,6 +1434,7 @@ class SpeechService {
           return {
             isMatch: true,
             matchedChoice: choice,
+            matchedChoiceId: choice.id,
             hitKeywords: choiceKeywords.filter(kw => cleanText.includes(kw)),
             missingKeywords: [],
             similarity: 100,
@@ -1389,6 +1442,15 @@ class SpeechService {
           };
         }
       }
+      return {
+        isMatch: false,
+        matchedChoice: null,
+        matchedChoiceId: null,
+        hitKeywords: [],
+        missingKeywords: nodeConfig.choices.map(c => c.title),
+        similarity: 0,
+        feedback: "未偵測到選項名稱（如 " + nodeConfig.choices.map(c => c.title).join("、") + "），請開口說出你想選的項目喔！"
+      };
     }
 
     // 2. 一般口說比對 (嚴格要求核心關鍵字與數量匹配)
@@ -2295,7 +2357,7 @@ class UIController {
 
       // 若為「選擇節點」
       if (currentNode.nodeType === "選擇") {
-        const choice = evalResult.matchedChoice || (currentNode.choices ? currentNode.choices[0] : null);
+        const choice = evalResult.matchedChoice || LLMServiceAdapter.resolveMatchedChoice(currentNode, evalResult, userText, mandarinText) || (currentNode.choices ? currentNode.choices[0] : null);
         if (choice) {
           this.state.selectedChoiceId = choice.id;
           this.state.selectedTargetBranchId = choice.targetBranchId;
@@ -2306,7 +2368,10 @@ class UIController {
           }
         }
         this.state.markCurrentNodeCompleted();
-        if (this.els.statusTip) this.els.statusTip.textContent = isMandarinMode ? "✓ [華語模式] 辨識通過！請點擊【繼續前進】進入下一步。" : "✓ 已辨識你的選擇！請點擊【繼續前進】進入下一步。";
+        const choiceTitle = choice ? choice.title : "";
+        if (this.els.statusTip) {
+          this.els.statusTip.textContent = isMandarinMode ? `✓ [華語模式] 成功選定【${choiceTitle}】！請點擊【繼續前進】。` : `✓ 已辨識你的選擇【${choiceTitle}】！請點擊【繼續前進】。`;
+        }
         if (this.els.nextStepBtnText) this.els.nextStepBtnText.textContent = "繼續前進 ➔";
       }
       // 若為「收集任務」（教學打包）
