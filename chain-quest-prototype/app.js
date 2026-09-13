@@ -1736,8 +1736,8 @@ class SpeechService {
         hitKeywords: [],
         missingKeywords: nodeConfig.choices.map(c => c.title),
         similarity: 0,
-        feedback: "未偵測到選項名稱，請開口向導覽員詢問你想去的展區喔！",
-        customNpcResponse: "「不好意思，沒聽清楚你想去哪裡，請再說一次你想去的展區喔！」"
+        feedback: "未偵測到選項關鍵字，請開口說出你想選擇的項目喔！",
+        customNpcResponse: isMandarinMode ? (nodeConfig.mandarinNpcRetryResponse || nodeConfig.npcRetryResponse) : (nodeConfig.npcRetryResponse || "「不好意思沒聽清楚，請再說一次喔！」")
       };
     }
 
@@ -1752,7 +1752,7 @@ class SpeechService {
     const targetRequiresThree = (nodeConfig.targetHakka || "").includes("三") || (nodeConfig.targetMandarin || "").includes("三") || primaryKeywords.some(k => k.includes("三") || k.includes("3"));
     const studentHasWrongQuantity = targetRequiresThree && (cleanText.includes("兩") || cleanText.includes("二") || cleanText.includes("一") || cleanText.includes("2") || cleanText.includes("1")) && !cleanText.includes("三") && !cleanText.includes("3");
 
-    // 禮貌度檢查 (例如驗票關卡，若只說「喂」或缺少謝謝/恁仔細，則給予指正)
+    // 禮貌度檢查 (例如驗票/健康中心致謝關卡，若只說「喂」或缺少謝謝/恁仔細，則給予指正)
     const requiresPoliteness = (nodeConfig.targetHakka || "").includes("恁仔細") || (nodeConfig.targetMandarin || "").includes("謝謝") || primaryKeywords.some(k => k.includes("恁仔細") || k.includes("謝謝"));
     const studentHasPoliteness = cleanText.includes("恁仔細") || cleanText.includes("謝謝") || cleanText.includes("多謝") || cleanText.includes("感謝");
     const isImpolite = requiresPoliteness && (!studentHasPoliteness || cleanText.startsWith("喂") || cleanText.includes("喂"));
@@ -1775,12 +1775,13 @@ class SpeechService {
     let feedbackMsg = "辨識成功！語意明確且關鍵字命中。";
 
     if (studentHasWrongQuantity) {
-      customNpcResponse = "「同學，你們有三位同學，應該要買三張學生票才夠喔！」";
-      feedbackMsg = "數量不符（題目要求買三張學生票），請修正數量後再試一次。";
+      customNpcResponse = isMandarinMode ? (nodeConfig.mandarinNpcRetryResponse || nodeConfig.npcRetryResponse) : nodeConfig.npcRetryResponse;
+      feedbackMsg = "數量不符，請確認正確數量後再試一次。";
     } else if (requiresPoliteness && !studentHasPoliteness) {
-      customNpcResponse = "「年輕人，票拿來了呀，但進場可要懂禮貌說聲謝謝喔！」";
-      feedbackMsg = "缺少道謝或禮貌問候，請記得向志工奶奶道謝（說聲謝謝或恁仔細）喔！";
+      customNpcResponse = isMandarinMode ? (nodeConfig.mandarinNpcRetryResponse || nodeConfig.npcRetryResponse) : nodeConfig.npcRetryResponse;
+      feedbackMsg = "缺少道謝或禮貌問候，請記得說聲謝謝（客語：恁仔細）喔！";
     } else if (!isMatch) {
+      customNpcResponse = isMandarinMode ? (nodeConfig.mandarinNpcRetryResponse || nodeConfig.npcRetryResponse) : nodeConfig.npcRetryResponse;
       feedbackMsg = "關鍵字詞未完整命中，請參考情境提示再說一次。";
     }
 
