@@ -1678,9 +1678,11 @@ html, body {
   background: #f8fafc;
   border: 1.5px solid #cbd5e1;
   border-radius: var(--radius-md);
-  padding: 10px 12px;
+  padding: 8px 10px;
   box-shadow: var(--shadow-sm);
   flex-shrink: 0;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .street-map-header {
@@ -1712,16 +1714,19 @@ html, body {
 
 .street-map-svg-wrap {
   width: 100%;
-  max-height: 210px;
   border-radius: var(--radius-sm);
   overflow: hidden;
   border: 1px solid #cbd5e1;
-  background: #f1f5f9;
+  background: #f8fafc;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .street-map-svg-wrap svg {
   display: block;
   width: 100%;
   height: auto;
+  max-height: 160px;
 }
 

@@ -3283,151 +3283,217 @@ class UIController {
     this.renderSpeechNodeControls(node);
   }
 
-  // 6. 渲染搭車問路步驟 3 棋盤式十字路口 SVG 地圖
+  // 6. 渲染搭車問路步驟 3 棋盤式十字路口 SVG 地圖 (依據所選公車路線呈現獨立專屬地圖)
   renderStreetMapSection(node) {
     const branch = this.state.selectedTargetBranchId || "bus_ask_culture";
-    let destName = "文化中心";
-    let destIcon = "🏛️";
+    
+    let mapSvgHtml = "";
+    let headerTitle = "";
+    let destBadge = "";
+
     if (branch === "bus_ask_school") {
-      destName = "學校正門";
-      destIcon = "🏫";
+      // 地圖 2: 🏫 學校正門 (搭乘 615 公車)
+      headerTitle = "🏫 學校路線地圖（615 公車站下車）";
+      destBadge = "🎯 目的地：🏫 學校正門";
+      mapSvgHtml = `
+        <svg viewBox="0 0 500 160" xmlns="http://www.w3.org/2000/svg" style="width:100%; height:auto; display:block;">
+          <rect width="500" height="160" fill="#f8fafc"/>
+          
+          <!-- 留白街區 -->
+          <rect x="180" y="10" width="130" height="50" rx="6" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5"/>
+          <rect x="340" y="10" width="145" height="50" rx="6" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5"/>
+          <rect x="20" y="90" width="130" height="60" rx="6" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5"/>
+          <rect x="180" y="90" width="130" height="60" rx="6" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5"/>
+
+          <!-- 唯一目的地街區：學校正門 (左上) -->
+          <rect x="20" y="10" width="130" height="50" rx="6" fill="#eff6ff" stroke="#3b82f6" stroke-width="2.5"/>
+          <text x="85" y="32" font-size="14" text-anchor="middle">🏫</text>
+          <text x="85" y="48" font-size="11" font-weight="900" fill="#1e3a8a" text-anchor="middle">學校正門 🎯</text>
+
+          <!-- 道路網 (學府路 & 校前大道) -->
+          <rect x="0" y="65" width="500" height="20" fill="#334155"/>
+          <line x1="0" y1="75" x2="500" y2="75" stroke="#94a3b8" stroke-dasharray="5,5" stroke-width="1.5"/>
+          
+          <rect x="155" y="0" width="20" height="160" fill="#334155"/>
+          <line x1="165" y1="0" x2="165" y2="160" stroke="#94a3b8" stroke-dasharray="5,5" stroke-width="1.5"/>
+
+          <rect x="315" y="0" width="20" height="160" fill="#334155"/>
+          <line x1="325" y1="0" x2="325" y2="160" stroke="#94a3b8" stroke-dasharray="5,5" stroke-width="1.5"/>
+
+          <!-- 路名 -->
+          <text x="440" y="78" font-size="9" font-weight="800" fill="#cbd5e1">校前大道</text>
+          <text x="325" y="152" font-size="8.5" font-weight="800" fill="#cbd5e1" text-anchor="middle">學府路</text>
+
+          <!-- 斑馬線 -->
+          <rect x="317" y="66" width="16" height="2.5" fill="#ffffff"/>
+          <rect x="317" y="71" width="16" height="2.5" fill="#ffffff"/>
+          <rect x="317" y="76" width="16" height="2.5" fill="#ffffff"/>
+          <rect x="317" y="81" width="16" height="2.5" fill="#ffffff"/>
+
+          <rect x="157" y="66" width="16" height="2.5" fill="#ffffff"/>
+          <rect x="157" y="71" width="16" height="2.5" fill="#ffffff"/>
+          <rect x="157" y="76" width="16" height="2.5" fill="#ffffff"/>
+          <rect x="157" y="81" width="16" height="2.5" fill="#ffffff"/>
+
+          <!-- 紅綠燈 (純圖示，無雜字) -->
+          <g transform="translate(338, 66)">
+            <rect x="0" y="0" width="10" height="18" rx="2" fill="#1e293b"/>
+            <circle cx="5" cy="4.5" r="2" fill="#ef4444"/>
+            <circle cx="5" cy="9" r="2" fill="#f59e0b"/>
+            <circle cx="5" cy="13.5" r="2" fill="#22c55e"/>
+          </g>
+
+          <!-- 導航行進路線 (直行 ➔ 左轉) -->
+          <path d="M 325 135 L 325 25 L 85 25" fill="none" stroke="#f59e0b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="4,3"/>
+          <polygon points="85,21 77,25 85,29" fill="#f59e0b"/>
+
+          <!-- 起點標示 (唯一標註目前位置) -->
+          <circle cx="325" cy="135" r="5.5" fill="#ef4444" stroke="#ffffff" stroke-width="2"/>
+          <g transform="translate(338, 126)">
+            <rect x="0" y="0" width="150" height="18" rx="4" fill="#ef4444"/>
+            <text x="75" y="13" font-size="9" font-weight="900" fill="#ffffff" text-anchor="middle">📍 615 公車站（你現在的位置）</text>
+          </g>
+        </svg>
+      `;
     } else if (branch === "bus_ask_library") {
-      destName = "市立圖書館";
-      destIcon = "📚";
+      // 地圖 3: 📚 市立圖書館 (搭乘 306 公車)
+      headerTitle = "📚 圖書館路線地圖（306 公車站下車）";
+      destBadge = "🎯 目的地：📚 市立圖書館";
+      mapSvgHtml = `
+        <svg viewBox="0 0 500 160" xmlns="http://www.w3.org/2000/svg" style="width:100%; height:auto; display:block;">
+          <rect width="500" height="160" fill="#f8fafc"/>
+          
+          <!-- 留白街區 -->
+          <rect x="180" y="10" width="140" height="50" rx="6" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5"/>
+          <rect x="350" y="10" width="135" height="50" rx="6" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5"/>
+          <rect x="20" y="90" width="130" height="60" rx="6" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5"/>
+          <rect x="180" y="90" width="140" height="60" rx="6" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5"/>
+
+          <!-- 唯一目的地街區：市立圖書館 (左上) -->
+          <rect x="20" y="10" width="130" height="50" rx="6" fill="#eff6ff" stroke="#3b82f6" stroke-width="2.5"/>
+          <text x="85" y="32" font-size="14" text-anchor="middle">📚</text>
+          <text x="85" y="48" font-size="11" font-weight="900" fill="#1e3a8a" text-anchor="middle">市立圖書館 🎯</text>
+
+          <!-- 道路網 (文教路 & 書香街) -->
+          <rect x="0" y="65" width="500" height="20" fill="#334155"/>
+          <line x1="0" y1="75" x2="500" y2="75" stroke="#94a3b8" stroke-dasharray="5,5" stroke-width="1.5"/>
+          
+          <rect x="155" y="0" width="20" height="160" fill="#334155"/>
+          <line x1="165" y1="0" x2="165" y2="160" stroke="#94a3b8" stroke-dasharray="5,5" stroke-width="1.5"/>
+
+          <rect x="325" y="0" width="20" height="160" fill="#334155"/>
+          <line x1="335" y1="0" x2="335" y2="160" stroke="#94a3b8" stroke-dasharray="5,5" stroke-width="1.5"/>
+
+          <!-- 路名 -->
+          <text x="440" y="78" font-size="9" font-weight="800" fill="#cbd5e1">書香街</text>
+          <text x="335" y="152" font-size="8.5" font-weight="800" fill="#cbd5e1" text-anchor="middle">文教路</text>
+
+          <!-- 斑馬線 -->
+          <rect x="327" y="66" width="16" height="2.5" fill="#ffffff"/>
+          <rect x="327" y="71" width="16" height="2.5" fill="#ffffff"/>
+          <rect x="327" y="76" width="16" height="2.5" fill="#ffffff"/>
+          <rect x="327" y="81" width="16" height="2.5" fill="#ffffff"/>
+
+          <rect x="157" y="66" width="16" height="2.5" fill="#ffffff"/>
+          <rect x="157" y="71" width="16" height="2.5" fill="#ffffff"/>
+          <rect x="157" y="76" width="16" height="2.5" fill="#ffffff"/>
+          <rect x="157" y="81" width="16" height="2.5" fill="#ffffff"/>
+
+          <!-- 紅綠燈 (純圖示，無雜字) -->
+          <g transform="translate(348, 66)">
+            <rect x="0" y="0" width="10" height="18" rx="2" fill="#1e293b"/>
+            <circle cx="5" cy="4.5" r="2" fill="#ef4444"/>
+            <circle cx="5" cy="9" r="2" fill="#f59e0b"/>
+            <circle cx="5" cy="13.5" r="2" fill="#22c55e"/>
+          </g>
+
+          <!-- 導航行進路線 (直行 ➔ 左轉) -->
+          <path d="M 335 135 L 335 25 L 85 25" fill="none" stroke="#f59e0b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="4,3"/>
+          <polygon points="85,21 77,25 85,29" fill="#f59e0b"/>
+
+          <!-- 起點標示 (唯一標註目前位置) -->
+          <circle cx="335" cy="135" r="5.5" fill="#ef4444" stroke="#ffffff" stroke-width="2"/>
+          <g transform="translate(348, 126)">
+            <rect x="0" y="0" width="150" height="18" rx="4" fill="#ef4444"/>
+            <text x="75" y="13" font-size="9" font-weight="900" fill="#ffffff" text-anchor="middle">📍 306 公車站（你現在的位置）</text>
+          </g>
+        </svg>
+      `;
+    } else {
+      // 地圖 1: 🏛️ 文化園區 (搭乘 802 公車)
+      headerTitle = "🏛️ 文化園區路線地圖（802 公車站下車）";
+      destBadge = "🎯 目的地：🏛️ 文化園區";
+      mapSvgHtml = `
+        <svg viewBox="0 0 500 160" xmlns="http://www.w3.org/2000/svg" style="width:100%; height:auto; display:block;">
+          <rect width="500" height="160" fill="#f8fafc"/>
+          
+          <!-- 留白街區 -->
+          <rect x="180" y="10" width="140" height="50" rx="6" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5"/>
+          <rect x="350" y="10" width="135" height="50" rx="6" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5"/>
+          <rect x="20" y="90" width="130" height="60" rx="6" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5"/>
+          <rect x="180" y="90" width="140" height="60" rx="6" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5"/>
+
+          <!-- 唯一目的地街區：文化園區 (左上) -->
+          <rect x="20" y="10" width="130" height="50" rx="6" fill="#eff6ff" stroke="#3b82f6" stroke-width="2.5"/>
+          <text x="85" y="32" font-size="14" text-anchor="middle">🏛️</text>
+          <text x="85" y="48" font-size="11" font-weight="900" fill="#1e3a8a" text-anchor="middle">文化園區 🎯</text>
+
+          <!-- 道路網 (文化大道 & 園區一路) -->
+          <rect x="0" y="65" width="500" height="20" fill="#334155"/>
+          <line x1="0" y1="75" x2="500" y2="75" stroke="#94a3b8" stroke-dasharray="5,5" stroke-width="1.5"/>
+          
+          <rect x="155" y="0" width="20" height="160" fill="#334155"/>
+          <line x1="165" y1="0" x2="165" y2="160" stroke="#94a3b8" stroke-dasharray="5,5" stroke-width="1.5"/>
+
+          <rect x="330" y="0" width="20" height="160" fill="#334155"/>
+          <line x1="340" y1="0" x2="340" y2="160" stroke="#94a3b8" stroke-dasharray="5,5" stroke-width="1.5"/>
+
+          <!-- 路名 -->
+          <text x="440" y="78" font-size="9" font-weight="800" fill="#cbd5e1">園區一路</text>
+          <text x="340" y="152" font-size="8.5" font-weight="800" fill="#cbd5e1" text-anchor="middle">文化大道</text>
+
+          <!-- 斑馬線 -->
+          <rect x="332" y="66" width="16" height="2.5" fill="#ffffff"/>
+          <rect x="332" y="71" width="16" height="2.5" fill="#ffffff"/>
+          <rect x="332" y="76" width="16" height="2.5" fill="#ffffff"/>
+          <rect x="332" y="81" width="16" height="2.5" fill="#ffffff"/>
+
+          <rect x="157" y="66" width="16" height="2.5" fill="#ffffff"/>
+          <rect x="157" y="71" width="16" height="2.5" fill="#ffffff"/>
+          <rect x="157" y="76" width="16" height="2.5" fill="#ffffff"/>
+          <rect x="157" y="81" width="16" height="2.5" fill="#ffffff"/>
+
+          <!-- 紅綠燈 (純圖示，無雜字) -->
+          <g transform="translate(353, 66)">
+            <rect x="0" y="0" width="10" height="18" rx="2" fill="#1e293b"/>
+            <circle cx="5" cy="4.5" r="2" fill="#ef4444"/>
+            <circle cx="5" cy="9" r="2" fill="#f59e0b"/>
+            <circle cx="5" cy="13.5" r="2" fill="#22c55e"/>
+          </g>
+
+          <!-- 導航行進路線 (直行 ➔ 左轉) -->
+          <path d="M 340 135 L 340 25 L 85 25" fill="none" stroke="#f59e0b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="4,3"/>
+          <polygon points="85,21 77,25 85,29" fill="#f59e0b"/>
+
+          <!-- 起點標示 (唯一標註目前位置) -->
+          <circle cx="340" cy="135" r="5.5" fill="#ef4444" stroke="#ffffff" stroke-width="2"/>
+          <g transform="translate(353, 126)">
+            <rect x="0" y="0" width="150" height="18" rx="4" fill="#ef4444"/>
+            <text x="75" y="13" font-size="9" font-weight="900" fill="#ffffff" text-anchor="middle">📍 802 公車站（你現在的位置）</text>
+          </g>
+        </svg>
+      `;
     }
 
     const mapSection = document.createElement("div");
     mapSection.className = "street-map-section";
     mapSection.innerHTML = `
       <div class="street-map-header">
-        <div style="display: flex; align-items: center; gap: 6px;">
-          <span class="street-map-badge">🧭 棋盤十字路口地圖</span>
-          <span style="font-size: 11px; font-weight: 800; color: #475569;">看著地圖指引阿婆走法</span>
-        </div>
-        <div class="street-map-dest-pill">🎯 目的地：${destIcon} ${destName}</div>
+        <span class="street-map-badge">🧭 ${headerTitle}</span>
+        <div class="street-map-dest-pill">${destBadge}</div>
       </div>
       <div class="street-map-svg-wrap">
-        <svg viewBox="0 0 540 210" xmlns="http://www.w3.org/2000/svg">
-          <!-- 背景底色 -->
-          <rect width="540" height="210" fill="#f1f5f9"/>
-
-          <!-- 建築街區 (Blocks) -->
-          <!-- 街區 1: 文化中心 (左上) -->
-          <rect x="15" y="12" width="125" height="65" rx="8" fill="${destName.includes('文化') ? '#eff6ff' : '#ffffff'}" stroke="${destName.includes('文化') ? '#3b82f6' : '#cbd5e1'}" stroke-width="${destName.includes('文化') ? '2.5' : '1.5'}"/>
-          <text x="77" y="38" font-size="16" text-anchor="middle">🏛️</text>
-          <text x="77" y="56" font-size="11" font-weight="900" fill="#1e293b" text-anchor="middle">文化中心</text>
-          ${destName.includes('文化') ? '<rect x="35" y="62" width="85" height="12" rx="4" fill="#3b82f6"/><text x="77" y="71" font-size="8" font-weight="900" fill="#ffffff" text-anchor="middle">🎯 你的目的地</text>' : ''}
-
-          <!-- 街區 2: 市立圖書館 (中上) -->
-          <rect x="175" y="12" width="150" height="65" rx="8" fill="${destName.includes('圖書館') ? '#eff6ff' : '#ffffff'}" stroke="${destName.includes('圖書館') ? '#3b82f6' : '#cbd5e1'}" stroke-width="${destName.includes('圖書館') ? '2.5' : '1.5'}"/>
-          <text x="250" y="38" font-size="16" text-anchor="middle">📚</text>
-          <text x="250" y="56" font-size="11" font-weight="900" fill="#1e293b" text-anchor="middle">市立圖書館</text>
-          ${destName.includes('圖書館') ? '<rect x="208" y="62" width="85" height="12" rx="4" fill="#3b82f6"/><text x="250" y="71" font-size="8" font-weight="900" fill="#ffffff" text-anchor="middle">🎯 你的目的地</text>' : ''}
-
-          <!-- 街區 3: 學校正門 (右上) -->
-          <rect x="360" y="12" width="165" height="65" rx="8" fill="${destName.includes('學校') ? '#eff6ff' : '#ffffff'}" stroke="${destName.includes('學校') ? '#3b82f6' : '#cbd5e1'}" stroke-width="${destName.includes('學校') ? '2.5' : '1.5'}"/>
-          <text x="442" y="38" font-size="16" text-anchor="middle">🏫</text>
-          <text x="442" y="56" font-size="11" font-weight="900" fill="#1e293b" text-anchor="middle">學校正門</text>
-          ${destName.includes('學校') ? '<rect x="400" y="62" width="85" height="12" rx="4" fill="#3b82f6"/><text x="442" y="71" font-size="8" font-weight="900" fill="#ffffff" text-anchor="middle">🎯 你的目的地</text>' : ''}
-
-          <!-- 街區 4: 公園綠地 (左下) -->
-          <rect x="15" y="120" width="125" height="78" rx="8" fill="#ecfdf5" stroke="#a7f3d0" stroke-width="1.5"/>
-          <text x="77" y="152" font-size="16" text-anchor="middle">🌳</text>
-          <text x="77" y="172" font-size="11" font-weight="800" fill="#047857" text-anchor="middle">市立森林公園</text>
-
-          <!-- 街區 5: 商店街區 (中下) -->
-          <rect x="175" y="120" width="150" height="78" rx="8" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5"/>
-          <text x="250" y="152" font-size="16" text-anchor="middle">🏪</text>
-          <text x="250" y="172" font-size="11" font-weight="800" fill="#475569" text-anchor="middle">文創商圈</text>
-
-          <!-- 街道馬路 (柏油路面) -->
-          <!-- 橫向道路 (東西向) -->
-          <rect x="0" y="85" width="540" height="26" fill="#334155"/>
-          <line x1="0" y1="98" x2="540" y2="98" stroke="#94a3b8" stroke-dasharray="6,6" stroke-width="1.5"/>
-
-          <!-- 縱向道路 1 (西側南北向) -->
-          <rect x="145" y="0" width="24" height="210" fill="#334155"/>
-          <line x1="157" y1="0" x2="157" y2="210" stroke="#94a3b8" stroke-dasharray="6,6" stroke-width="1.5"/>
-
-          <!-- 縱向道路 2 (東側南北向 - 出發大道) -->
-          <rect x="330" y="0" width="24" height="210" fill="#334155"/>
-          <line x1="342" y1="0" x2="342" y2="210" stroke="#94a3b8" stroke-dasharray="6,6" stroke-width="1.5"/>
-
-          <!-- 斑馬線 (Crosswalks) -->
-          <!-- 路口 1 (右下 342, 170) -->
-          <rect x="332" y="175" width="20" height="3" fill="#ffffff"/>
-          <rect x="332" y="181" width="20" height="3" fill="#ffffff"/>
-          <rect x="332" y="187" width="20" height="3" fill="#ffffff"/>
-
-          <!-- 路口 2 (右中 342, 98) -->
-          <rect x="332" y="86" width="20" height="3" fill="#ffffff"/>
-          <rect x="332" y="92" width="20" height="3" fill="#ffffff"/>
-          <rect x="332" y="98" width="20" height="3" fill="#ffffff"/>
-          <rect x="332" y="104" width="20" height="3" fill="#ffffff"/>
-
-          <!-- 路口 3 (右上 342, 20) -->
-          <rect x="332" y="14" width="20" height="3" fill="#ffffff"/>
-          <rect x="332" y="20" width="20" height="3" fill="#ffffff"/>
-          <rect x="332" y="26" width="20" height="3" fill="#ffffff"/>
-
-          <!-- 路口 4 (中上 157, 98) -->
-          <rect x="147" y="86" width="20" height="3" fill="#ffffff"/>
-          <rect x="147" y="92" width="20" height="3" fill="#ffffff"/>
-          <rect x="147" y="98" width="20" height="3" fill="#ffffff"/>
-
-          <!-- 紅綠燈標示 (Traffic Lights) -->
-          <!-- 紅綠燈 1 (右中路口) -->
-          <g transform="translate(358, 86)">
-            <rect x="0" y="0" width="14" height="24" rx="3" fill="#1e293b" stroke="#64748b" stroke-width="1"/>
-            <circle cx="7" cy="6" r="3" fill="#ef4444"/>
-            <circle cx="7" cy="12" r="3" fill="#f59e0b"/>
-            <circle cx="7" cy="18" r="3" fill="#22c55e"/>
-            <text x="18" y="16" font-size="9" font-weight="900" fill="#b91c1c">🚦第1個紅綠燈</text>
-          </g>
-
-          <!-- 紅綠燈 2 (右上轉彎路口) -->
-          <g transform="translate(358, 14)">
-            <rect x="0" y="0" width="14" height="24" rx="3" fill="#1e293b" stroke="#64748b" stroke-width="1"/>
-            <circle cx="7" cy="6" r="3" fill="#ef4444"/>
-            <circle cx="7" cy="12" r="3" fill="#f59e0b"/>
-            <circle cx="7" cy="18" r="3" fill="#22c55e"/>
-            <text x="18" y="16" font-size="9" font-weight="900" fill="#b91c1c">🚦第2個紅綠燈</text>
-          </g>
-
-          <!-- 紅綠燈 3 (中上路口) -->
-          <g transform="translate(172, 86)">
-            <rect x="0" y="0" width="14" height="24" rx="3" fill="#1e293b" stroke="#64748b" stroke-width="1"/>
-            <circle cx="7" cy="6" r="3" fill="#ef4444"/>
-            <circle cx="7" cy="12" r="3" fill="#f59e0b"/>
-            <circle cx="7" cy="18" r="3" fill="#22c55e"/>
-            <text x="18" y="16" font-size="9" font-weight="900" fill="#b91c1c">🚦再過1個紅綠燈</text>
-          </g>
-
-          <!-- 導航行走路線箭頭 (Highlighted Navigation Path) -->
-          <!-- 1. 往前直直走 (直行向上穿過 2 個紅綠燈) -->
-          <path d="M 342 195 L 342 30" fill="none" stroke="#f59e0b" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="4,3"/>
-          
-          <!-- 2. 向左轉 (轉向西側道路) -->
-          <path d="M 342 30 L 100 30" fill="none" stroke="#f59e0b" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="4,3"/>
-
-          <!-- 路線節點動畫點與提示 -->
-          <!-- 起點標記 (📍 你的位置) -->
-          <circle cx="342" cy="195" r="7" fill="#ef4444" stroke="#ffffff" stroke-width="2"/>
-          <g transform="translate(356, 185)">
-            <rect x="0" y="0" width="145" height="18" rx="4" fill="#ef4444"/>
-            <text x="72" y="13" font-size="9" font-weight="900" fill="#ffffff" text-anchor="middle">📍 你與阿婆所在位置 (起點)</text>
-          </g>
-
-          <!-- 左轉箭頭 -->
-          <polygon points="342,24 334,30 342,36" fill="#f59e0b"/>
-          <text x="315" y="24" font-size="9" font-weight="900" fill="#d97706">↰ 向左轉</text>
-
-          <!-- 右手邊抵達指示 (指出目的地在行進方向的右手邊) -->
-          <g transform="translate(40, 18)">
-            <rect x="0" y="0" width="95" height="15" rx="3" fill="#2563eb"/>
-            <text x="47" y="11" font-size="8.5" font-weight="900" fill="#ffffff" text-anchor="middle">👉 右手邊即目的地</text>
-          </g>
-        </svg>
+        ${mapSvgHtml}
       </div>
     `;
 
