@@ -971,6 +971,45 @@ const WEATHER_RANDOM_PRESETS = {
 };
 
 // ==========================================
+// 2.2 搭車問路第三步路線導航對照組 (Bus Arrive Route Presets: 文化園區、學校正門、市立圖書館)
+// ==========================================
+const BUS_ARRIVE_ROUTES = {
+  bus_ask_culture: {
+    id: "bus_ask_culture",
+    destName: "文化園區",
+    storyPrompt: "下車後走到十字路口，旁邊的阿婆想去文化園區，她問你怎麼走。你看著路口地圖（文化園區在右上方）回答她。你說：",
+    mandarinStoryPrompt: "下車後走到十字路口，旁邊的阿婆想去文化園區，她問你怎麼走。你看著路口地圖（文化園區在右上方）回答她。你說：",
+    targetHakka: "文化園區係向北行一個紅綠燈，再向正手邊行一個紅綠燈，文化園區就喺你个倒手前。",
+    targetMandarin: "文化園區是往北方走一個紅綠燈，再往右邊走一個紅綠燈，然後文化園區就在你的左前方。",
+    keywords: ["文化園區", "北方", "一個紅綠燈", "右邊", "左前方"],
+    mandarinKeywords: ["文化園區", "北方", "一個紅綠燈", "右邊", "左前方"],
+    altKeywords: ["文化園區", "文化", "北方", "向北", "往北", "北邊", "直走", "直行", "紅綠燈", "一個紅綠燈", "右邊", "向右", "右轉", "正手", "左前方", "倒手前", "倒手", "左邊"]
+  },
+  bus_ask_school: {
+    id: "bus_ask_school",
+    destName: "學校正門",
+    storyPrompt: "下車後走到十字路口，旁邊的阿婆想去學校正門，她問你怎麼走。你看著路口地圖（學校正門在左上方）回答她。你說：",
+    mandarinStoryPrompt: "下車後走到十字路口，旁邊的阿婆想去學校正門，她問你怎麼走。你看著路口地圖（學校正門在左上方）回答她。你說：",
+    targetHakka: "學校正門係向北直直行一個紅綠燈，再越倒手行一個紅綠燈，學校正門就喺你个正手前。",
+    targetMandarin: "學校正門是往北邊直走一個紅綠燈，再往左轉走一個紅綠燈，學校的正門就在你的右前方。",
+    keywords: ["學校正門", "北邊", "直走", "一個紅綠燈", "左轉", "右前方"],
+    mandarinKeywords: ["學校正門", "北邊", "直走", "一個紅綠燈", "左轉", "右前方"],
+    altKeywords: ["學校正門", "學校", "正門", "北邊", "北方", "向北", "往北", "直走", "直直行", "直行", "紅綠燈", "一個紅綠燈", "左轉", "越倒手", "倒手", "左邊", "右前方", "正手前", "正手", "右邊"]
+  },
+  bus_ask_library: {
+    id: "bus_ask_library",
+    destName: "市立圖書館",
+    storyPrompt: "下車後走到十字路口，旁邊的阿婆想去市立圖書館，她問你怎麼走。你看著路口地圖（市立圖書館在右下方）回答她。你說：",
+    mandarinStoryPrompt: "下車後走到十字路口，旁邊的阿婆想去市立圖書館，她問你怎麼走。你看著路口地圖（市立圖書館在右下方）回答她。你說：",
+    targetHakka: "市立圖書館請你向東行兩個紅綠燈，市立圖書館就喺你个正手前。",
+    targetMandarin: "市立圖書館請你往東方走兩個紅綠燈，市立圖書館就在你的右前方。",
+    keywords: ["市立圖書館", "東方", "兩個紅綠燈", "右前方"],
+    mandarinKeywords: ["市立圖書館", "東方", "兩個紅綠燈", "右前方"],
+    altKeywords: ["市立圖書館", "圖書館", "東方", "向東", "往東", "直走", "直行", "紅綠燈", "兩個紅綠燈", "右前方", "正手前", "正手", "右手邊", "正手邊"]
+  }
+};
+
+// ==========================================
 // 3. 第二階段：客語語音辨識適配器 (Hakka ASR Adapter)
 // ==========================================
 class HakkaASRAdapter {
@@ -1416,8 +1455,11 @@ class LLMServiceAdapter {
       `     * 【客家小吃店第 3 關 (加點評價)】：核心目標是加點飲品或稱讚美味。`,
       `     * 【健康中心第 1 & 2 關 (說明症狀)】：核心目標是明確描述身體不適病徵（頭痛肚子痛/拉肚子/膝蓋擦傷流血/發熱無力等）。`,
       `     * 【健康中心第 3 關 (休息道謝)】：核心目標是答應好好休息/多喝水並道謝。`,
-      `     * 【搭車問路第 3 關 (看地圖向阿婆指引路線)】：核心目標是學生看著地圖向阿婆清楚說明路線走法（包含往前直走、過紅綠燈、轉彎或目的地在哪一邊）。`,
-      `       - 【通過時 (isMatch: true)】：熱心阿婆親切稱讚並感謝小朋友（例如：『哎唷～聽你這樣說好清楚喔，謝謝你呀小朋友！』），【注意】：不要把特定路線細節唸出來，直接自然表達感謝即可。`,
+      `     * 【搭車問路第 3 關 (看地圖向阿婆指引路線)】：核心目標是學生看著地圖向阿婆清楚指引路線走法（包含方向、紅綠燈數量、轉彎與目的地相對位置）：`,
+      `       - 🏛️ 文化園區 (802)：往北方走一個紅綠燈，再往右邊走一個紅綠燈，文化園區就在左前方。`,
+      `       - 🏫 學校正門 (615)：往北邊直走一個紅綠燈，再往左轉走一個紅綠燈，學校的正門就在右前方。`,
+      `       - 📚 市立圖書館 (306)：往東方走兩個紅綠燈，市立圖書館就在右前方。`,
+      `       - 【通過時 (isMatch: true)】：熱心阿婆親切稱讚並感謝小朋友（例如：『哇，這樣聽你說的好清楚喔，謝謝你小朋友！』），【注意】：不要死板把路線全部唸出來，直接自然表達感謝即可。`,
       `       - 【未通過/未清楚指明走法時 (isMatch: false)】：熱心阿婆親切請小朋友看地圖再講慢一點（例如：『阿婆笑著說：「欸，我沒聽清楚，你再講慢一點、跟我說怎麼走好嗎？」』）。`,
       `     * 【今日天氣穿搭關卡】：核心目標是根據天氣（寒冷天冷/夏日大熱天/雨天）提出對應穿搭防護。【極重要智慧天氣情境推理判定】：`,
       `       - 【1. 寒冷冬天 (天冷/寒流/選衣服)】：`,
@@ -2126,7 +2168,22 @@ class GraphStateManager {
 
   getCurrentNode() {
     const scenario = this.getScenario();
-    return scenario.nodes[this.currentNodeId] || scenario.nodes[scenario.startNodeId];
+    const node = scenario.nodes[this.currentNodeId] || scenario.nodes[scenario.startNodeId];
+    if (node && node.id === "bus_arrive") {
+      const branchId = this.selectedTargetBranchId || "bus_ask_culture";
+      const routeInfo = BUS_ARRIVE_ROUTES[branchId] || BUS_ARRIVE_ROUTES.bus_ask_culture;
+      return {
+        ...node,
+        storyPrompt: routeInfo.storyPrompt,
+        mandarinStoryPrompt: routeInfo.mandarinStoryPrompt,
+        targetHakka: routeInfo.targetHakka,
+        targetMandarin: routeInfo.targetMandarin,
+        keywords: routeInfo.keywords,
+        mandarinKeywords: routeInfo.mandarinKeywords,
+        altKeywords: routeInfo.altKeywords
+      };
+    }
+    return node;
   }
 
   setScenario(scenarioId) {
