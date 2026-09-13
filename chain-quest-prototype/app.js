@@ -548,62 +548,62 @@ const SCENARIOS_GRAPH = {
       },
       bus_ask_culture: {
         id: "bus_ask_culture",
-        title: "步驟 2：802 站牌候車問候",
+        title: "步驟 2：802 站牌確認公車班次",
         nodeType: "分支",
         locationTag: "802 站牌前",
-        storyPrompt: "你來到 802 站牌前，向巡邏站務員再次禮貌確認。你說：",
-        mandarinStoryPrompt: "你來到 802 站牌前，向巡邏站務員再次禮貌確認。你說：",
-        targetHakka: "請問去文化園區愛坐哪一路公車？",
-        targetMandarin: "請問去文化園區要搭哪一路公車？",
-        keywords: ["文化園區", "哪一路", "公車"],
-        mandarinKeywords: ["文化園區", "公車", "搭哪一路"],
-        altKeywords: ["坐", "公車", "文化園區"],
+        storyPrompt: "你來到 802 站牌前，向巡邏站務員禮貌確認去文化園區是不是搭 802 公車。你說：",
+        mandarinStoryPrompt: "你來到 802 站牌前，向巡邏站務員禮貌確認去文化園區是不是搭 802 公車。你說：",
+        targetHakka: "請問站務員，去文化園區係坐 802 公車無？",
+        targetMandarin: "請問站務員，文化園區是搭 802 公車嗎？",
+        keywords: ["文化園區", "802", "公車"],
+        mandarinKeywords: ["文化園區", "802", "公車"],
+        altKeywords: ["文化園區", "文化", "802", "八零二", "802路", "公車", "站務員"],
         npcRole: "站務人員",
         npcAvatar: "👮",
         npcSuccessResponse: "「對！802 路公車馬上進站了，請在黃線後方排隊上車喔！」",
         mandarinNpcSuccessResponse: "「對！802 路公車馬上進站了，請在黃線後方排隊上車喔！」",
-        npcRetryResponse: "「站務員沒聽清楚，請再次向站務員確認文化園區的公車路線喔！」",
-        mandarinNpcRetryResponse: "「站務員沒聽清楚，請再次向站務員確認文化園區的公車路線喔！」",
+        npcRetryResponse: "「站務員沒聽清楚，請向站務員確認去文化園區是否搭 802 公車喔！」",
+        mandarinNpcRetryResponse: "「站務員沒聽清楚，請向站務員確認去文化園區是否搭 802 公車喔！」",
         nextNodeId: "bus_board"
       },
       bus_ask_school: {
         id: "bus_ask_school",
-        title: "步驟 2：615 站牌候車問候",
+        title: "步驟 2：615 站牌確認公車班次",
         nodeType: "分支",
         locationTag: "學校線站牌前",
-        storyPrompt: "你來到學校線站牌前，向巡邏站務員再次禮貌確認。你說：",
-        mandarinStoryPrompt: "你來到學校線站牌前，向巡邏站務員再次禮貌確認。你說：",
-        targetHakka: "請問去學校愛坐哪一路公車？",
-        targetMandarin: "請問去學校要搭哪一路公車？",
-        keywords: ["學校", "哪一路", "公車"],
-        mandarinKeywords: ["學校", "公車", "搭哪一路"],
-        altKeywords: ["坐", "公車", "學校"],
+        storyPrompt: "你來到 615 站牌前，向巡邏站務員禮貌確認去學校是不是搭 615 公車。你說：",
+        mandarinStoryPrompt: "你來到 615 站牌前，向巡邏站務員禮貌確認去學校是不是搭 615 公車。你說：",
+        targetHakka: "請問站務員，去學校係坐 615 公車無？",
+        targetMandarin: "請問站務員，學校是搭 615 公車嗎？",
+        keywords: ["學校", "615", "公車"],
+        mandarinKeywords: ["學校", "615", "公車"],
+        altKeywords: ["學校", "學校正門", "正門", "615", "六一五", "615路", "公車", "站務員"],
         npcRole: "站務人員",
         npcAvatar: "👮",
         npcSuccessResponse: "「對！615 路公車馬上進站了，請在黃線後方排隊上車喔！」",
         mandarinNpcSuccessResponse: "「對！615 路公車馬上進站了，請在黃線後方排隊上車喔！」",
-        npcRetryResponse: "「站務員沒聽清楚，請再次向站務員確認去學校的公車路線喔！」",
-        mandarinNpcRetryResponse: "「站務員沒聽清楚，請再次向站務員確認去學校的公車路線喔！」",
+        npcRetryResponse: "「站務員沒聽清楚，請向站務員確認去學校是否搭 615 公車喔！」",
+        mandarinNpcRetryResponse: "「站務員沒聽清楚，請向站務員確認去學校是否搭 615 公車喔！」",
         nextNodeId: "bus_board"
       },
       bus_ask_library: {
         id: "bus_ask_library",
-        title: "步驟 2：306 站牌候車問候",
+        title: "步驟 2：306 站牌確認公車班次",
         nodeType: "分支",
         locationTag: "圖書館線站牌前",
-        storyPrompt: "你來到圖書館線站牌前，向巡邏站務員再次禮貌確認。你說：",
-        mandarinStoryPrompt: "你來到圖書館線站牌前，向巡邏站務員再次禮貌確認。你說：",
-        targetHakka: "請問去圖書館愛坐哪一路公車？",
-        targetMandarin: "請問去圖書館要搭哪一路公車？",
-        keywords: ["圖書館", "哪一路", "公車"],
-        mandarinKeywords: ["圖書館", "公車", "搭哪一路"],
-        altKeywords: ["坐", "公車", "圖書館"],
+        storyPrompt: "你來到 306 站牌前，向巡邏站務員禮貌確認去圖書館是不是搭 306 公車。你說：",
+        mandarinStoryPrompt: "你來到 306 站牌前，向巡邏站務員禮貌確認去圖書館是不是搭 306 公車。你說：",
+        targetHakka: "請問站務員，去圖書館係坐 306 公車無？",
+        targetMandarin: "請問站務員，圖書館是搭 306 公車嗎？",
+        keywords: ["圖書館", "306", "公車"],
+        mandarinKeywords: ["圖書館", "306", "公車"],
+        altKeywords: ["圖書館", "市立圖書館", "306", "三零六", "306路", "公車", "站務員"],
         npcRole: "站務人員",
         npcAvatar: "👮",
         npcSuccessResponse: "「對！306 路公車馬上進站了，請在黃線後方排隊上車喔！」",
         mandarinNpcSuccessResponse: "「對！306 路公車馬上進站了，請在黃線後方排隊上車喔！」",
-        npcRetryResponse: "「站務員沒聽清楚，請再次向站務員確認去圖書館的公車路線喔！」",
-        mandarinNpcRetryResponse: "「站務員沒聽清楚，請再次向站務員確認去圖書館的公車路線喔！」",
+        npcRetryResponse: "「站務員沒聽清楚，請向站務員確認去圖書館是否搭 306 公車喔！」",
+        mandarinNpcRetryResponse: "「站務員沒聽清楚，請向站務員確認去圖書館是否搭 306 公車喔！」",
         nextNodeId: "bus_board"
       },
       bus_board: {
@@ -1282,7 +1282,11 @@ class HakkaToMandarinAdapter {
     { hakka: "湯粄條", mandarin: "湯粄條" },
     { hakka: "當好食", mandarin: "真好吃" },
     { hakka: "擂茶", mandarin: "客家擂茶" },
-    { hakka: "客家小炒", mandarin: "客家小炒" }
+    { hakka: "客家小炒", mandarin: "客家小炒" },
+    { hakka: "係坐", mandarin: "是搭" },
+    { hakka: "八零二", mandarin: "802" },
+    { hakka: "六一五", mandarin: "615" },
+    { hakka: "三零六", mandarin: "306" }
   ];
 
   /**
@@ -1757,6 +1761,10 @@ class SpeechService {
     }
 
     const cleanText = userTranscript.replace(/[。，！？、？\s\.,!?]/g, "");
+    const normalizedCleanText = cleanText
+      .replace(/八零二|八百零二/g, "802")
+      .replace(/六一五|六百一十五/g, "615")
+      .replace(/三零六|三百零六/g, "306");
 
     // 1. 若為「選擇」節點，進行分支關鍵字匹配 (若皆未命中則判定 false)
     if (nodeConfig.nodeType === "選擇" && nodeConfig.choices) {
@@ -1764,13 +1772,13 @@ class SpeechService {
         const choiceKeywords = isMandarinMode
           ? (choice.mandarinKeywords || choice.keywords || [choice.title])
           : (choice.keywords || [choice.title]);
-        const isChoiceHit = choiceKeywords.some(kw => cleanText.includes(kw));
+        const isChoiceHit = choiceKeywords.some(kw => normalizedCleanText.includes(kw) || cleanText.includes(kw));
         if (isChoiceHit) {
           return {
             isMatch: true,
             matchedChoice: choice,
             matchedChoiceId: choice.id,
-            hitKeywords: choiceKeywords.filter(kw => cleanText.includes(kw)),
+            hitKeywords: choiceKeywords.filter(kw => normalizedCleanText.includes(kw) || cleanText.includes(kw)),
             missingKeywords: [],
             similarity: 100,
             feedback: `辨識成功！偵測到選擇【${choice.title}】。`,
@@ -1794,8 +1802,8 @@ class SpeechService {
     const primaryKeywords = isMandarinMode
       ? (nodeConfig.mandarinKeywords || nodeConfig.keywords || [])
       : (nodeConfig.keywords || []);
-    const hitPrimary = primaryKeywords.filter(kw => cleanText.includes(kw));
-    const missingPrimary = primaryKeywords.filter(kw => !cleanText.includes(kw));
+    const hitPrimary = primaryKeywords.filter(kw => normalizedCleanText.includes(kw) || cleanText.includes(kw));
+    const missingPrimary = primaryKeywords.filter(kw => !normalizedCleanText.includes(kw) && !cleanText.includes(kw));
 
     // 數量衝突檢查 (若題目要求三張，但回答包含兩張/一張/二等衝突數字，則嚴格判錯)
     const targetRequiresThree = (nodeConfig.targetHakka || "").includes("三") || (nodeConfig.targetMandarin || "").includes("三") || primaryKeywords.some(k => k.includes("三") || k.includes("3"));
