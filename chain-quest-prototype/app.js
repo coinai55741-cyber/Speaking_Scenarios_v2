@@ -259,9 +259,9 @@ const SCENARIOS_GRAPH = {
         mandarinStoryPrompt: "參觀完動物展區後，大家走到【⭐ 出口集合點】集合，老師正在清點人數。你向老師報告大家都到齊了：",
         targetHakka: "老師，𠊎兜都參觀好了，人都到齊了！",
         targetMandarin: "老師，我們都參觀好了，人都到齊了！",
-        keywords: ["老師", "參觀好了", "到齊"],
-        mandarinKeywords: ["老師", "參觀好了", "到齊"],
-        altKeywords: ["老師", "好了", "參觀好了", "到齊了", "人都到了", "大家都到了"],
+        keywords: ["參觀好了", "到齊", "人都到齊了"],
+        mandarinKeywords: ["參觀好了", "到齊", "大家都到了"],
+        altKeywords: ["都參觀好了", "都到齊了", "全到齊了", "大家都到了", "人都到了", "到齊"],
         npcRole: "帶隊老師",
         npcAvatar: "👩‍🏫",
         npcSuccessResponse: "「太棒了！大家都準時到齊而且學到很多動物知識，動物園探索大成功！」",
@@ -1793,6 +1793,11 @@ class SpeechService {
     const hitAll = searchKeywords.filter(kw => normalizedCleanText.includes(kw) || cleanText.includes(kw));
     const missingPrimary = primaryKeywords.filter(kw => !normalizedCleanText.includes(kw) && !cleanText.includes(kw));
 
+    // 稱謂黑名單：不可單靠稱謂過關（必須包含實質動作或內容詞）
+    const SALUTATIONS = new Set(["老師", "老闆", "護理師", "阿姨", "站務員", "站務人員", "司機", "媽媽", "爸爸", "阿公", "奶奶", "同學", "阿明", "先生", "小姐"]);
+    const substantiveHitPrimary = hitPrimary.filter(k => !SALUTATIONS.has(k));
+    const substantiveHitAll = hitAll.filter(k => !SALUTATIONS.has(k));
+
     // 數量衝突檢查 (若題目要求三張，但回答包含兩張/一張/二等衝突數字，則嚴格判錯)
     const targetRequiresThree = (nodeConfig.targetHakka || "").includes("三") || (nodeConfig.targetMandarin || "").includes("三") || primaryKeywords.some(k => k.includes("三") || k.includes("3"));
     const studentHasWrongQuantity = targetRequiresThree && (cleanText.includes("兩") || cleanText.includes("二") || cleanText.includes("一") || cleanText.includes("2") || cleanText.includes("1")) && !cleanText.includes("三") && !cleanText.includes("3");
@@ -1825,8 +1830,8 @@ class SpeechService {
     if (nid === "health_rest" && studentHasPoliteness) isSemanticContextMatch = true;
     if (nid === "bus_arrive" && (/直直|向前|往前|左轉|越倒手|紅綠燈|右手邊|正手邊|目的地/.test(normalizedCleanText))) isSemanticContextMatch = true;
 
-    // 命中判定規則：命中 >= 1 個擴展詞，或符合主題語意，或命中目標句，皆判定通過（若只是問推薦則未點菜，需繼續引導）
-    const isKeywordHit = !askingForRecommendation && (hitAll.length >= 1 || hitPrimary.length >= 1);
+    // 命中判定規則：命中 >= 1 個實質關鍵詞（排除純稱謂），或符合主題語意，或完整命中目標句
+    const isKeywordHit = !askingForRecommendation && (substantiveHitAll.length >= 1 || substantiveHitPrimary.length >= 1);
     let isMatch = !studentHasWrongQuantity && !askingForRecommendation && (isKeywordHit || isSemanticContextMatch || (targetClean && cleanText.includes(targetClean)));
     
     // 若題目要求禮貌道謝但學生未道謝或語氣粗魯，一律判錯
@@ -1834,10 +1839,19 @@ class SpeechService {
       isMatch = false;
     }
 
-    // 人數到齊檢查 (出口集合清點人數關卡，若學生提到還有人沒到、上廁所、少一人等，嚴格判錯並要求等待)
-    const hasMissingPersons = nid === "zoo_meet_point" && /還有人|還沒|沒到|上廁所|洗手間|少一|少兩|缺一|缺人|去廁所|還在等|沒來|落單/.test(normalizedCleanText);
-    if (hasMissingPersons) {
-      isMatch = false;
+    // 出口集合清點人數關卡 (zoo_meet_point) 嚴格把關：
+    // 1. 若含有未到齊、缺人、沒到、上廁所、延遲等詞彙，一律判錯！
+    // 2. 必須明確表達「到齊 / 都到了 / 參觀好了」等全員正面完成意圖，才可通過！
+    const hasMissingPersons = nid === "zoo_meet_point" && (
+      /還有.*(沒|未|一人|一個|同學|上廁所|洗手間|等)|(沒有|沒|未|還沒).*(到|來|齊|好)|上廁所|洗手間|去廁所|少[一兩個人]|缺[一兩個人]|差[一兩個人]|等一下|還在等|落單|不見|迷路/.test(normalizedCleanText) ||
+      /還有(一個|一人|人|同學|誰|兩個|兩人)|(沒有|沒|未|還沒)(到|來|齊|好)|(上|去|在)(廁所|洗手間)/.test(normalizedCleanText)
+    );
+    const hasPositiveArrival = nid === "zoo_meet_point" && /到齊|全到|都到|都齊|全齊|人都到了|大家都到了|參觀好了|參觀完了|準備好了|好勢了|到齊了/.test(normalizedCleanText);
+
+    if (nid === "zoo_meet_point") {
+      if (hasMissingPersons || !hasPositiveArrival) {
+        isMatch = false;
+      }
     }
 
     let customNpcResponse = null;
@@ -1848,11 +1862,11 @@ class SpeechService {
         ? "「我們店裡的招牌是現煮湯粄條跟客家小炒，香噴噴的，你要來一碗哪一樣呢？」"
         : "「𠊎兜店裡个招牌係現煮湯粄條同客家小炒，當香喔，你愛食哪一隻呢？」";
       feedbackMsg = "老闆已為您推薦招牌菜色，請開口點選想吃的餐點喔！";
-    } else if (hasMissingPersons) {
+    } else if (nid === "zoo_meet_point" && (hasMissingPersons || !isMatch)) {
       customNpcResponse = isMandarinMode
         ? "「那我們再等一下下，等全部人都到齊、都參觀完了之後再出發喔！」"
         : "「該𠊎兜過等一下仔，等全部人都到齊、都參觀好後再出發喔！」";
-      feedbackMsg = "同學尚未全員到齊，請等大家都到齊後再向老師報告出發喔！";
+      feedbackMsg = "同學尚未全員到齊或尚未完成參觀報告，請等大家都到齊後再向老師報告出發喔！";
     } else if (isMatch && nid === "zoo_start" && /打折|算便宜|優惠/.test(normalizedCleanText)) {
       customNpcResponse = isMandarinMode
         ? "「同學，學生票已經是優惠票價了，沒辦法再打折囉！這是你們的三張學生票，祝你們玩得開心！」"
@@ -1874,12 +1888,12 @@ class SpeechService {
       feedbackMsg = "語意未達標，請參考情境提示再說一次。";
     }
 
-    const accuracyScore = isMatch ? Math.max(85, Math.round((hitAll.length / Math.max(1, primaryKeywords.length)) * 100)) : 50;
+    const accuracyScore = isMatch ? Math.max(85, Math.round((substantiveHitAll.length / Math.max(1, primaryKeywords.length)) * 100)) : 35;
 
     return {
       isMatch: isMatch,
       matchedChoice: null,
-      hitKeywords: hitAll.length > 0 ? hitAll : hitPrimary,
+      hitKeywords: substantiveHitAll.length > 0 ? substantiveHitAll : substantiveHitPrimary,
       missingKeywords: missingPrimary,
       similarity: accuracyScore,
       feedback: feedbackMsg,
