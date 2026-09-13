@@ -7,7 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@500;900&family=Noto+Sans+TC:wght@400;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="./hakka-font.css?v=20260907-font4">
+<link rel="stylesheet" href="./hakka-font.css?v=20260913-font5">
 <link rel="stylesheet" href="./unit-menu.css?v=20260909-fixed-back2">
 <style>
   :root{--indigo:#1F3A5F;--brick:#B85C3C;--grain:#E8C87A;--paper:#FDFBF5;
@@ -16,6 +16,18 @@
   body{background:var(--indigo);font-family:"Noto Sans TC",system-ui,sans-serif;
     color:var(--paper);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:14px}
   .frame{width:100%;max-width:920px}
+
+  /* 客語字專用字體優先宣告 */
+  .slots .slot,
+  .tray .tile,
+  .tha,
+  .tha em,
+  .sq-ans,
+  .say,
+  .target-sentence strong,
+  .tab b {
+    font-family: "GenSekiGothic2TW", "Noto Serif TC", "Noto Sans TC", system-ui, sans-serif !important;
+  }
 
   /* 開發者模式開關與向右平移 (同 standard demo_v2) */
   body.debug-mode {

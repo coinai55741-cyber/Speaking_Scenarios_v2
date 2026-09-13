@@ -7,7 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&family=Noto+Serif+TC:wght@700;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="./hakka-font.css?v=20260907-font4">
+<link rel="stylesheet" href="./hakka-font.css?v=20260913-font5">
 <style>
   :root{
     --indigo:#1F3A5F;--grain:#E8C87A;--paper:#FDFBF5;--bamboo:#4A7A5E;
@@ -18,6 +18,17 @@
     margin:0;background:var(--indigo);color:var(--paper);
     font-family:"Noto Sans TC",sans-serif;-webkit-text-size-adjust:100%;
     min-height:100vh;
+  }
+
+  /* 客語字專用字體優先宣告 */
+  .q .word,
+  .ask input,
+  .pal button,
+  .reveal .zh,
+  .tab span,
+  .tab b,
+  .target-sentence strong {
+    font-family: "GenSekiGothic2TW", "Noto Serif TC", "Noto Sans TC", "Microsoft JhengHei", sans-serif !important;
   }
 
   /* 頂部導覽列 */

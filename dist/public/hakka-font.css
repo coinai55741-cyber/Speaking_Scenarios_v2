@@ -16,6 +16,7 @@
 
 .hakka-font,
 [lang="hak"],
+[lang="hak-Hant-TW"],
 .hakka-line,
 #questionPrompt,
 #questionTitle,
@@ -28,13 +29,23 @@
 .token-chip,
 .hit-tags span,
 .target-sentence strong,
-.sentence-line-text {
-  font-family: "GenSekiGothic2TW", "Noto Sans TC", "Microsoft JhengHei", sans-serif;
+.sentence-line-text,
+.word,
+.slot,
+.tile,
+.tha,
+.tha em,
+.sq-ans,
+.pal button,
+.ask input,
+.say {
+  font-family: "GenSekiGothic2TW", "Noto Serif TC", "Noto Sans TC", "Microsoft JhengHei", sans-serif !important;
 }
 
 /* Hakka lighter weights */
 .hakka-font,
 [lang="hak"],
+[lang="hak-Hant-TW"],
 .hakka-line,
 #questionPrompt,
 .hakka-text,
@@ -44,11 +55,15 @@
 .answer-token,
 .token-chip,
 .hit-tags span,
-.sentence-line-text {
+.sentence-line-text,
+.pal button {
   font-weight: 500;
 }
 
-.target-sentence strong {
-  font-weight: 600;
+.target-sentence strong,
+.word,
+.slot,
+.tile,
+.sq-ans {
+  font-weight: 700 900;
 }
-
