@@ -2119,14 +2119,23 @@ class SpeechService {
 // ==========================================
 class GraphStateManager {
   constructor() {
-    this.currentScenarioId = "zoo_chain";
-    this.currentNodeId = "zoo_start";
+    let initialScenarioId = "zoo_chain";
+    try {
+      const savedScenarioId = localStorage.getItem("chainQuest_activeScenario");
+      if (savedScenarioId && SCENARIOS_GRAPH[savedScenarioId]) {
+        initialScenarioId = savedScenarioId;
+      }
+    } catch (e) {}
+
+    this.currentScenarioId = initialScenarioId;
+    const initialScenario = SCENARIOS_GRAPH[initialScenarioId] || SCENARIOS_GRAPH.zoo_chain;
+    this.currentNodeId = initialScenario.startNodeId;
     this.selectedChoiceId = null; // 紀錄使用者在選擇節點挑選的分支
     this.selectedTargetBranchId = null;
     this.collectedItems = new Set(); // 用於背包自由收集任務
     this.activePackItemIndex = 0; // 目前正在練習哪一個背包物品
     this.completedNodes = new Set();
-    this.pathHistory = [];
+    this.pathHistory = [this.currentNodeId];
     this.isRecognizing = false;
     this.isDevMode = false;
     this.speechMode = "hakka"; // "hakka" (客委會客語 ASR) | "mandarin" (瀏覽器內建華語 Web Speech)
@@ -2189,6 +2198,9 @@ class GraphStateManager {
   setScenario(scenarioId) {
     if (SCENARIOS_GRAPH[scenarioId]) {
       this.currentScenarioId = scenarioId;
+      try {
+        localStorage.setItem("chainQuest_activeScenario", scenarioId);
+      } catch (e) {}
       const scenario = SCENARIOS_GRAPH[scenarioId];
       if (scenarioId === "weather_outfit") {
         this.initRandomWeather();
@@ -2571,9 +2583,20 @@ class UIController {
     this.state = stateManager;
     this.mapEngine = null;
     this.initElements();
+    this.restorePersistedSettings();
     this.bindEvents();
     this.initMapEngine();
     this.render();
+  }
+
+  restorePersistedSettings() {
+    try {
+      const savedDevMode = localStorage.getItem("chainQuest_devModeOpen");
+      if (savedDevMode !== null) {
+        const isDevOpen = savedDevMode === "true";
+        this.setDevMode(isDevOpen);
+      }
+    } catch (e) {}
   }
 
   initElements() {
@@ -2853,6 +2876,9 @@ class UIController {
     this.state.isDevMode = isOpen;
     if (this.els.layoutShell) this.els.layoutShell.classList.toggle("is-dev-open", isOpen);
     if (this.els.debugToggle) this.els.debugToggle.checked = isOpen;
+    try {
+      localStorage.setItem("chainQuest_devModeOpen", isOpen ? "true" : "false");
+    } catch (e) {}
   }
 
   // 切換口說辨識模式 (客語專用 ASR vs 瀏覽器內建華語對照)
