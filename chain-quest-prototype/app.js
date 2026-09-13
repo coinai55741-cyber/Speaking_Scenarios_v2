@@ -1382,8 +1382,9 @@ class LLMServiceAdapter {
         `   - 【語氣/禮貌反應】：若學生態度隨便、粗魯或缺少必要禮貌（例如在驗票時只說『喂，這是票』而沒有說『謝謝』或向奶奶問候），NPC 必須在對話中做出相應反應（例如驗票奶奶說：『年輕人，門票拿來了呀，但進場要有禮貌說聲謝謝喔！』），並依據關卡要求判定 isMatch: false！`,
         `   - 【數量/內容錯誤指正】：若學生說錯張數（如說兩張、一張）或點錯品項，NPC 要針對該錯誤點指出（例如售票員說：『同學，你們不是有三位嗎？要買三張學生票才夠喔！』），判定 isMatch: false！`,
         `   - 【嚴禁直接餵答案】：NPC 對話中「絕對不要」直接說出『你要說：...』或『請說：...』等直接給答案的提示句！請完全以 NPC 角色情境身分自然互動與引導。`,
-        `2. 精準對錯判定 (Strict Verification)：`,
-        `   - 只有在學生語意清晰、核心要素完整且符合角色情境時，才判定 isMatch: true。`,
+        `2. 精準對錯判定 (Verification Criteria)：`,
+        `   - 命中門檻：只要學生發言命中至少 2 個核心關鍵詞（若題目關鍵詞總數只有 1 個則命中 1 個即可；即使有 1~2 個未命中標籤也算通過），且語意符合情境，即可判定 isMatch: true！`,
+        `   - 只有在學生回答完全偏離主題、數量嚴重講錯或缺少必要禮貌時，才判定 isMatch: false。`,
         `3. 輸出規範：請嚴格回傳標準 JSON 格式。`
       ].join("\n");
     }
@@ -1404,8 +1405,9 @@ class LLMServiceAdapter {
       `   - 【語氣/禮貌反應】：若學生態度隨便、粗魯或缺少必要禮貌（例如在驗票時只說『喂，這是票』而沒有說『恁仔細/謝謝』或向奶奶問候），NPC 必須在對話中做出相應反應（例如驗票奶奶說：『年輕人，門票拿來了呀，但進場要有禮貌說聲謝謝喔！』），並依據關卡要求判定 isMatch: false！`,
       `   - 【數量/內容錯誤指正】：若學生說錯張數（如說兩張、一張）或講錯項目，NPC 要針對該錯誤點指正（例如售票員說：『同學，你們不是有三位嗎？要買三張學生票才夠喔！』），判定 isMatch: false！`,
       `   - 【嚴禁直接餵答案】：NPC 對話中「絕對不要」直接說出『你要說：...』或『請說：...』等直接給答案的提示句！請完全以 NPC 角色情境身分自然互動與引導。`,
-      `2. 精準對錯判定 (Strict Verification)：`,
-      `   - 只有在學生語意清晰、核心要素完整且符合角色情境時，才判定 isMatch: true。`,
+      `2. 精準對錯判定 (Verification Criteria)：`,
+      `   - 命中門檻：只要學生發言命中至少 2 個核心關鍵詞（若題目關鍵詞總數只有 1 個則命中 1 個即可；即使有 1~2 個未命中標籤也算通過），且語意符合情境，即可判定 isMatch: true！`,
+      `   - 只有在學生回答完全偏離主題、數量嚴重講錯或缺少必要禮貌時，才判定 isMatch: false。`,
       `3. 輸出規範：請嚴格回傳標準 JSON 格式。`
     ].join("\n");
   }
@@ -1797,11 +1799,11 @@ class SpeechService {
     const targetTarget = isMandarinMode ? (nodeConfig.targetMandarin || "") : (nodeConfig.targetHakka || "");
     const targetClean = targetTarget.replace(/[。，！？、？\s\.,!?]/g, "");
     
-    // 必須命中所有關鍵詞，或完整命中目標句
-    const isFullPrimaryHit = primaryKeywords.length > 0 && hitPrimary.length === primaryKeywords.length;
-    const isStrictHit = primaryKeywords.length >= 2 ? (hitPrimary.length >= Math.ceil(primaryKeywords.length * 0.8)) : (hitPrimary.length >= 1);
+    // 命中判定規則：只要命中至少 2 個關鍵詞（若題目關鍵詞總數只有 1 個則命中 1 個），或完整命中目標句，即判定通過
+    const minHitRequired = Math.min(2, Math.max(1, primaryKeywords.length));
+    const isKeywordHit = hitPrimary.length >= minHitRequired;
     
-    let isMatch = !studentHasWrongQuantity && (isFullPrimaryHit || isStrictHit || (targetClean && cleanText.includes(targetClean)));
+    let isMatch = !studentHasWrongQuantity && (isKeywordHit || (targetClean && cleanText.includes(targetClean)));
     
     // 若題目要求禮貌道謝但學生未道謝或語氣粗魯，一律判錯
     if (requiresPoliteness && !studentHasPoliteness) {
@@ -1809,7 +1811,7 @@ class SpeechService {
     }
 
     let customNpcResponse = null;
-    let feedbackMsg = "辨識成功！語意明確且關鍵字命中。";
+    let feedbackMsg = isMatch ? "辨識成功！語意明確且關鍵字命中。" : "關鍵字詞未達標準，請參考情境提示再說一次。";
 
     if (studentHasWrongQuantity) {
       customNpcResponse = isMandarinMode ? (nodeConfig.mandarinNpcRetryResponse || nodeConfig.npcRetryResponse) : nodeConfig.npcRetryResponse;
@@ -1819,15 +1821,19 @@ class SpeechService {
       feedbackMsg = "缺少道謝或禮貌問候，請記得說聲謝謝（客語：恁仔細）喔！";
     } else if (!isMatch) {
       customNpcResponse = isMandarinMode ? (nodeConfig.mandarinNpcRetryResponse || nodeConfig.npcRetryResponse) : nodeConfig.npcRetryResponse;
-      feedbackMsg = "關鍵字詞未完整命中，請參考情境提示再說一次。";
+      feedbackMsg = "關鍵字詞未達標，請參考情境提示再說一次。";
     }
+
+    const accuracyScore = isMatch
+      ? Math.max(80, Math.round((hitPrimary.length / Math.max(1, primaryKeywords.length)) * 100))
+      : Math.round((hitPrimary.length / Math.max(1, primaryKeywords.length)) * 100);
 
     return {
       isMatch: isMatch,
       matchedChoice: null,
       hitKeywords: hitPrimary,
       missingKeywords: missingPrimary,
-      similarity: isFullPrimaryHit ? 100 : Math.round((hitPrimary.length / Math.max(1, primaryKeywords.length)) * 100),
+      similarity: accuracyScore,
       feedback: feedbackMsg,
       customNpcResponse: customNpcResponse
     };
