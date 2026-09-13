@@ -1469,6 +1469,54 @@ html, body {
   color: #27ae60;
 }
 
+.backpack-next-action {
+  margin-top: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 14px;
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(5, 150, 105, 0.18));
+  border: 1.5px solid #10b981;
+  border-radius: var(--radius-md);
+  animation: pulseGlow 2.5s infinite ease-in-out;
+}
+
+.backpack-next-hint {
+  font-size: 13px;
+  font-weight: 800;
+  color: #065f46;
+}
+
+.btn-pack-go-next {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  max-width: 320px;
+  padding: 11px 20px;
+  font-size: 15px;
+  font-weight: 900;
+  color: #ffffff;
+  background: linear-gradient(135deg, #059669, #10b981);
+  border: none;
+  border-radius: 9999px;
+  box-shadow: 0 4px 14px rgba(16, 185, 129, 0.35);
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.btn-pack-go-next:hover {
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 6px 18px rgba(16, 185, 129, 0.45);
+  background: linear-gradient(135deg, #047857, #059669);
+}
+
+.btn-pack-go-next:active {
+  transform: translateY(0) scale(0.98);
+}
+
 /* ==========================================
    Canvas Zoo Map Navigation (動物園小人走地圖)
    ========================================== */

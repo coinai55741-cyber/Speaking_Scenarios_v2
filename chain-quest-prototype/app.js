@@ -365,7 +365,7 @@ const SCENARIOS_GRAPH = {
     nodes: {
       pack_hub: {
         id: "pack_hub",
-        title: "背包打包任務",
+        title: "任務一：背包 4 項整理",
         nodeType: "收集任務",
         locationTag: "客廳背包整理區",
         storyPrompt: "明天要校外教學，媽媽提醒你把需要的東西放進背包。請在下方【背包清單】點選物品，說出它的客語名稱與原因！",
@@ -460,7 +460,7 @@ const SCENARIOS_GRAPH = {
       },
       pack_done: {
         id: "pack_done",
-        title: "完成整理：玄關出發",
+        title: "任務二：完成整理：玄關出發",
         nodeType: "集合點",
         locationTag: "玄關大門口",
         storyPrompt: "4 樣物品都順利放進背包了！你背起背包走到玄關，精神飽滿地向家人說：",
@@ -2894,7 +2894,7 @@ class UIController {
           this.els.npcDialogText.textContent = dynamicReply;
         }
         if (this.els.statusTip) {
-          this.els.statusTip.textContent = isAllCollected ? "🎉 4 樣背包物品全數裝入完成！請點擊繼續前往玄關！" : "✓ 本項物品已成功放入背包！請切換其他物品或前進。";
+          this.els.statusTip.textContent = isAllCollected ? "🎉 4 樣背包物品全數裝入完成！請點選下方【前往下一關】！" : "✓ 本項物品已成功放入背包！請切換其他物品繼續整理。";
         }
         this.render();
       }
@@ -3132,8 +3132,10 @@ class UIController {
       visibleSteps.push({ id: "food_step2", title: "步驟 2：客製化飲食需求" });
       visibleSteps.push({ id: "food_step3", title: "步驟 3：加點飲品與評價" });
     } else if (scenario.id === "field_trip_pack") {
-      visibleSteps.push({ id: "pack_hub", title: "任務：背包 4 項整理" });
-      visibleSteps.push({ id: "pack_done", title: "完成：玄關集合出發" });
+      visibleSteps.push({ id: "pack_hub", title: "任務一：背包 4 項整理" });
+      if (this.state.completedNodes.has("pack_hub") || currentNode.id === "pack_done") {
+        visibleSteps.push({ id: "pack_done", title: "任務二：完成整理：玄關出發" });
+      }
     } else if (scenario.id === "bus_directions") {
       visibleSteps.push({ id: "bus_choose_dest", title: "步驟 1：詢問搭車路線" });
       if (this.state.selectedTargetBranchId || this.state.completedNodes.has("bus_choose_dest")) {
@@ -3299,6 +3301,8 @@ class UIController {
   renderBackpackCollectionNode(node) {
     const isMandarin = this.state.speechMode === "mandarin";
     const activeItem = node.items[this.state.activePackItemIndex] || node.items[0];
+    const totalItems = (node.items || []).length;
+    const isAllCollected = this.state.collectedItems.size >= totalItems;
 
     if (this.els.storyPrompt) {
       this.els.storyPrompt.textContent = isMandarin ? (activeItem.mandarinStoryPrompt || activeItem.storyPrompt) : activeItem.storyPrompt;
@@ -3306,7 +3310,13 @@ class UIController {
     if (this.els.speechActionSection) this.els.speechActionSection.hidden = false;
     if (this.els.speechHintSection) this.els.speechHintSection.hidden = true;
     if (this.els.statusTip) {
-      this.els.statusTip.textContent = isMandarin ? `正在整理【${activeItem.name}】，請點擊下方按鈕以華語回答。` : `正在整理【${activeItem.name}】，請點擊下方按鈕以客語回答。`;
+      if (isAllCollected) {
+        this.els.statusTip.textContent = isMandarin
+          ? "🎉 4 樣物品已全數打包齊全！請點擊背包下方【前往下一關】！"
+          : "🎉 4 樣物品已全數打包齊全！請點擊背包下方【前往下一關】！";
+      } else {
+        this.els.statusTip.textContent = isMandarin ? `正在整理【${activeItem.name}】，請點擊下方按鈕以華語回答。` : `正在整理【${activeItem.name}】，請點擊下方按鈕以客語回答。`;
+      }
     }
 
     // 注入背包清單面板
@@ -3330,6 +3340,15 @@ class UIController {
           `;
         }).join("")}
       </div>
+      ${isAllCollected ? `
+        <div class="backpack-next-action">
+          <div class="backpack-next-hint">🎉 4 樣物品已全數打包齊全！</div>
+          <button id="btnPackGoNext" type="button" class="btn-pack-go-next">
+            <span>🎒 前往下一關（任務二：玄關出發）</span>
+            <span>➔</span>
+          </button>
+        </div>
+      ` : ''}
     `;
 
     const narrativeBody = document.querySelector(".narrative-card") || document.querySelector(".stage-dialogue-col");
@@ -3346,6 +3365,17 @@ class UIController {
         }
       });
     });
+
+    // 綁定前往下一關按鈕
+    if (isAllCollected) {
+      const btnGoNext = backpackPanel.querySelector("#btnPackGoNext");
+      if (btnGoNext) {
+        btnGoNext.addEventListener("click", () => {
+          SoundFX.success();
+          this.advanceToNextNode();
+        });
+      }
+    }
 
     this.renderSpeechNodeControls(activeItem);
   }
