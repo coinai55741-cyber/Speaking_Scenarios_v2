@@ -69,7 +69,39 @@ async function callGemini(apiKey, models, systemPrompt, userPrompt) {
   throw lastError || new Error("All Gemini candidate models failed.");
 }
 
+const fs = require("fs");
+const path = require("path");
+
+function loadEnv() {
+  const envPaths = [
+    path.join(__dirname, "../.env"),
+    path.join(__dirname, ".env"),
+    path.join(process.cwd(), ".env"),
+    path.join(process.cwd(), "chain-quest-prototype/.env")
+  ];
+  for (const p of envPaths) {
+    if (fs.existsSync(p)) {
+      try {
+        const lines = fs.readFileSync(p, "utf8").split("\n");
+        for (const line of lines) {
+          const trimmed = line.trim();
+          if (trimmed && !trimmed.startsWith("#") && trimmed.includes("=")) {
+            const idx = trimmed.indexOf("=");
+            const k = trimmed.slice(0, idx).trim();
+            const v = trimmed.slice(idx + 1).trim().replace(/^["']|["']$/g, "");
+            if (!process.env[k]) {
+              process.env[k] = v;
+            }
+          }
+        }
+      } catch (e) {}
+    }
+  }
+}
+
 module.exports = async function handler(req, res) {
+  loadEnv();
+
   if (req.method === "OPTIONS") {
     json(res, 204, { ok: true });
     return;
@@ -93,7 +125,7 @@ module.exports = async function handler(req, res) {
     const body = await readBody(req);
     const { systemPrompt, userPrompt } = body;
 
-    const apiKey = process.env.LLM_API_KEY || "";
+    const apiKey = process.env.LLM_API_KEY || process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY || process.env.OPENAI_API_KEY || "";
     const primaryModel = process.env.LLM_MODEL || "gemini-3.6-flash";
     const endpoint = process.env.LLM_ENDPOINT || "";
 
@@ -112,10 +144,9 @@ module.exports = async function handler(req, res) {
       const candidateModels = [
         primaryModel,
         "gemini-3.6-flash",
-        "gemini-3.5-flash",
-        "gemini-3.1-flash-lite",
-        "gemini-2.5-pro"
-      ].filter((v, i, a) => a.indexOf(v) === i && !v.includes("1.5")); // 排除已廢棄的 1.5 系列
+        "gemini-2.0-flash",
+        "gemini-1.5-flash"
+      ].filter((v, i, a) => a.indexOf(v) === i);
 
       const result = await callGemini(apiKey, candidateModels, systemPrompt, userPrompt);
       llmResponseContent = result.text;

@@ -97,8 +97,8 @@ const SCENARIOS_GRAPH = {
         npcAvatar: "🧑‍💼",
         npcSuccessResponse: "「好，三張學生票。這是你的門票，請收好，祝你們玩得開心！」",
         mandarinNpcSuccessResponse: "「好，三張學生票。這是你的門票，請收好，祝你們玩得開心！」",
-        npcRetryResponse: "「不好意思我沒聽清楚，請問是要買幾張呢？例如說：『𠊎愛買三張學生票』。」",
-        mandarinNpcRetryResponse: "「不好意思我沒聽清楚，請問是要買幾張呢？例如說：『我要買三張學生票』。」",
+        npcRetryResponse: "「不好意思我沒聽清楚，請問要買幾張票呢？請再說一次喔！」",
+        mandarinNpcRetryResponse: "「不好意思我沒聽清楚，請問要買幾張票呢？請再說一次喔！」",
         nextNodeId: "zoo_gate"
       },
       zoo_gate: {
@@ -117,8 +117,8 @@ const SCENARIOS_GRAPH = {
         npcAvatar: "👵",
         npcSuccessResponse: "「歡迎光臨！閘門打開了，進去請小心腳步，慢慢參觀喔！」",
         mandarinNpcSuccessResponse: "「歡迎光臨！閘門打開了，進去請小心腳步，慢慢參觀喔！」",
-        npcRetryResponse: "「志工奶奶正在等你出示門票，可以說：『這係𠊎个門票，恁仔細』喔！」",
-        mandarinNpcRetryResponse: "「志工奶奶正在等你出示門票，可以說：『這是我的門票，謝謝』喔！」",
+        npcRetryResponse: "「志工奶奶正在等您出示門票並道謝喔，請再說一次！」",
+        mandarinNpcRetryResponse: "「志工奶奶正在等您出示門票並道謝喔，請再說一次！」",
         nextNodeId: "zoo_choose_animal"
       },
       zoo_choose_animal: {
@@ -137,8 +137,8 @@ const SCENARIOS_GRAPH = {
         npcAvatar: "👨‍🌾",
         npcSuccessResponse: "「想好要看哪一種動物後，就看清楚路線提示，操縱小人出發吧！」",
         mandarinNpcSuccessResponse: "「想好要看哪一種動物後，就看清楚路線提示，操縱角色出發吧！」",
-        npcRetryResponse: "「請問你想去哪裡呢？請開口說出大象、獅子或蛇其中一個展區喔！」",
-        mandarinNpcRetryResponse: "「請問你想去哪裡呢？請開口說出大象、獅子或蛇其中一個展區喔！」",
+        npcRetryResponse: "「請問你想去哪裡呢？請開口向導覽員詢問你想去的展區喔！」",
+        mandarinNpcRetryResponse: "「請問你想去哪裡呢？請開口向導覽員詢問你想去的展區喔！」",
         choices: [
           {
             id: "elephant",
@@ -206,8 +206,8 @@ const SCENARIOS_GRAPH = {
         npcAvatar: "👦",
         npcSuccessResponse: "「真的耶！你看牠還會用長鼻子捲草吃，大象真的好得意喔！」",
         mandarinNpcSuccessResponse: "「真的耶！你看牠還會用長鼻子吸水噴在背上，大象真的好可愛喔！」",
-        npcRetryResponse: "「蛤，你剛剛說什麼？試著說說大象的鼻子：『大象个鼻仔當長，當得人惜！』」",
-        mandarinNpcRetryResponse: "「蛤，你剛剛說什麼？試著說說大象的長鼻子：『大象的鼻子好長，好可愛！』」",
+        npcRetryResponse: "「阿明沒聽清楚，請跟同學分享大象長鼻子洗澡的可愛特徵喔！」",
+        mandarinNpcRetryResponse: "「阿明沒聽清楚，請跟同學分享大象長鼻子洗澡的可愛特徵喔！」",
         nextNodeId: "zoo_meet_point"
       },
       zoo_lion: {
@@ -226,8 +226,8 @@ const SCENARIOS_GRAPH = {
         npcAvatar: "👦",
         npcSuccessResponse: "「對啊，牠趴在岩石上，看起來就像草原之王一樣威風！」",
         mandarinNpcSuccessResponse: "「對啊，牠趴在岩石上，看起來就像草原之王一樣威風！」",
-        npcRetryResponse: "「試著用客語說：『獅仔看起來當威風』喔！」",
-        mandarinNpcRetryResponse: "「試著說說看：『獅子看起來很威風』喔！」",
+        npcRetryResponse: "「阿明沒聽清楚，請跟同學分享獅子趴在石頭上的威風模樣喔！」",
+        mandarinNpcRetryResponse: "「阿明沒聽清楚，請跟同學分享獅子趴在石頭上的威風模樣喔！」",
         nextNodeId: "zoo_meet_point"
       },
       zoo_snake: {
@@ -246,8 +246,8 @@ const SCENARIOS_GRAPH = {
         npcAvatar: "👦",
         npcSuccessResponse: "「真的，牠在樹枝上滑行得好慢，幾乎一點聲音都沒有！」",
         mandarinNpcSuccessResponse: "「真的，牠在樹枝上滑行得好慢，幾乎一點聲音都沒有！」",
-        npcRetryResponse: "「試著用客語說：『蛇仔行路當靜』喔！」",
-        mandarinNpcRetryResponse: "「試著說說看：『蛇移動得很安靜』喔！」",
+        npcRetryResponse: "「阿明沒聽清楚，請跟同學分享蛇在樹枝上安靜爬行的特徵喔！」",
+        mandarinNpcRetryResponse: "「阿明沒聽清楚，請跟同學分享蛇在樹枝上安靜爬行的特徵喔！」",
         nextNodeId: "zoo_meet_point"
       },
       zoo_meet_point: {
@@ -266,8 +266,8 @@ const SCENARIOS_GRAPH = {
         npcAvatar: "👩‍🏫",
         npcSuccessResponse: "「太棒了！大家都準時集合而且學到很多動物知識，動物園探索大成功！」",
         mandarinNpcSuccessResponse: "「太棒了！大家都準時集合而且學到很多動物知識，動物園探索大成功！」",
-        npcRetryResponse: "「跟老師報告大家參觀好了：『老師，𠊎兜都參觀好了！』」",
-        mandarinNpcRetryResponse: "「跟老師報告大家參觀好了：『老師，我們都參觀好了！』」",
+        npcRetryResponse: "「老師正在等大家報告參觀完畢喔，請向老師報告！」",
+        mandarinNpcRetryResponse: "「老師正在等大家報告參觀完畢喔，請向老師報告！」",
         nextNodeId: null // 結束
       }
     }
@@ -302,8 +302,8 @@ const SCENARIOS_GRAPH = {
         npcAvatar: "👨‍🍳",
         npcSuccessResponse: "「好，我收你五十箍，你去那邊稍坐一下喔，等一下就上菜了！」",
         mandarinNpcSuccessResponse: "「好，我收你五十元，你去那邊稍坐一下喔，等一下就上菜了！」",
-        npcRetryResponse: "「想吃粄條嗎？可以跟老闆說：『老闆，𠊎愛一碗湯粄條』喔！」",
-        mandarinNpcRetryResponse: "「想吃粄條嗎？可以跟老闆說：『老闆，我要一碗湯粄條』喔！」",
+        npcRetryResponse: "「老闆沒聽清楚，請問你想點什麼主食呢？請再說一次喔！」",
+        mandarinNpcRetryResponse: "「老闆沒聽清楚，請問你想點什麼主食呢？請再說一次喔！」",
         nextNodeId: "food_step2"
       },
       food_step2: {
@@ -322,8 +322,8 @@ const SCENARIOS_GRAPH = {
         npcAvatar: "👩‍🍳",
         npcSuccessResponse: "「沒問題！阿姨記下來了，不放香菜，幫你煮得甘甜甘甜！」",
         mandarinNpcSuccessResponse: "「沒問題！阿姨記下來了，不放香菜，幫你煮得甘甜甘甜！」",
-        npcRetryResponse: "「如果不加香菜，可以說：『毋好放香菜，甜一點』喔！」",
-        mandarinNpcRetryResponse: "「如果不加香菜，可以說：『不要放香菜，甜一點』喔！」",
+        npcRetryResponse: "「阿姨沒聽清楚，請清楚告訴阿姨你的口味與客製要求喔！」",
+        mandarinNpcRetryResponse: "「阿姨沒聽清楚，請清楚告訴阿姨你的口味與客製要求喔！」",
         nextNodeId: "food_step3"
       },
       food_step3: {
@@ -342,8 +342,8 @@ const SCENARIOS_GRAPH = {
         npcAvatar: "🧑‍💼",
         npcSuccessResponse: "「多謝你喜歡！冰涼濃郁的現磨擂茶馬上送上來，請慢用喔！」",
         mandarinNpcSuccessResponse: "「多謝你喜歡！冰涼濃郁的現磨擂茶馬上送上來，請慢用喔！」",
-        npcRetryResponse: "「可以試著說：『再加一杯擂茶，這道客家小炒當好食！』」",
-        mandarinNpcRetryResponse: "「可以試著說：『再加一杯擂茶，這道客家小炒真好吃！』」",
+        npcRetryResponse: "「服務生沒聽清楚，請向服務生加點飲品並稱讚小吃美味喔！」",
+        mandarinNpcRetryResponse: "「服務生沒聽清楚，請向服務生加點飲品並稱讚小吃美味喔！」",
         nextNodeId: null
       }
     }
@@ -392,8 +392,8 @@ const SCENARIOS_GRAPH = {
             npcAvatar: "👩",
             npcSuccessResponse: "「真乖！下雨時就不怕淋濕了，放進書包側邊吧！」",
             mandarinNpcSuccessResponse: "「真乖！下雨時就不怕淋濕了，放進書包側邊吧！」",
-            npcRetryResponse: "「請說出雨傘的名字與用途：『𠊎愛帶遮仔，落雨做得用』喔！」",
-            mandarinNpcRetryResponse: "「請說出雨傘的名字與用途：『我要帶雨傘，下雨可以用』喔！」"
+            npcRetryResponse: "「媽媽沒聽清楚，請說出雨傘的名稱與出遊攜帶的原因喔！」",
+            mandarinNpcRetryResponse: "「媽媽沒聽清楚，請說出雨傘的名稱與出遊攜帶的原因喔！」"
           },
           {
             id: "bottle",
@@ -412,8 +412,8 @@ const SCENARIOS_GRAPH = {
             npcAvatar: "👩",
             npcSuccessResponse: "「很好！水壺裝滿溫水放好，走路流汗要多補充水分喔！」",
             mandarinNpcSuccessResponse: "「很好！水壺裝滿溫水放好，走路流汗要多補充水分喔！」",
-            npcRetryResponse: "「請說出水壺與喝水：『𠊎愛帶水壺，嘴渴做得啉水』。」",
-            mandarinNpcRetryResponse: "「請說出水壺與喝水：『我要帶水壺，口渴可以喝水』。」"
+            npcRetryResponse: "「媽媽沒聽清楚，請說出水壺的名稱與喝水補水的原因喔！」",
+            mandarinNpcRetryResponse: "「媽媽沒聽清楚，請說出水壺的名稱與喝水補水的原因喔！」"
           },
           {
             id: "towel",
@@ -432,8 +432,8 @@ const SCENARIOS_GRAPH = {
             npcAvatar: "👨",
             npcSuccessResponse: "「很細心！活動後把汗擦乾，比較不會著涼感冒。」",
             mandarinNpcSuccessResponse: "「很細心！活動後把汗擦乾，比較不會著涼感冒。」",
-            npcRetryResponse: "「請說出毛巾與擦汗：『𠊎愛帶毛巾，流汗做得拭汗』。」",
-            mandarinNpcRetryResponse: "「請說出毛巾與擦汗：『我要帶毛巾，流汗可以擦汗』。」"
+            npcRetryResponse: "「爸爸沒聽清楚，請說出毛巾的名稱與擦汗的原因喔！」",
+            mandarinNpcRetryResponse: "「爸爸沒聽清楚，請說出毛巾的名稱與擦汗的原因喔！」"
           },
           {
             id: "snack",
@@ -452,8 +452,8 @@ const SCENARIOS_GRAPH = {
             npcAvatar: "👨",
             npcSuccessResponse: "「沒錯！健行休息肚子餓時，可以吃點心補充元氣！」",
             mandarinNpcSuccessResponse: "「沒錯！健行休息肚子餓時，可以吃點心補充元氣！」",
-            npcRetryResponse: "「請說出點心與肚子餓：『𠊎愛帶點心，肚屎枵做得食』。」",
-            mandarinNpcRetryResponse: "「請說出點心與肚子餓：『我要帶點心，肚子餓可以吃』。」"
+            npcRetryResponse: "「爸爸沒聽清楚，請說出點心的名稱與肚子餓補充體力的原因喔！」",
+            mandarinNpcRetryResponse: "「爸爸沒聽清楚，請說出點心的名稱與肚子餓補充體力的原因喔！」"
           }
         ],
         nextNodeId: "pack_done"
@@ -474,8 +474,8 @@ const SCENARIOS_GRAPH = {
         npcAvatar: "👩",
         npcSuccessResponse: "「太棒了！裝備齊全，今天校外教學一定會非常順利又開心！」",
         mandarinNpcSuccessResponse: "「太棒了！裝備齊全，今天校外教學一定會非常順利又開心！」",
-        npcRetryResponse: "「跟媽媽說準備好出發了：『𠊎東西都收好，準備好出發了！』」",
-        mandarinNpcRetryResponse: "「跟媽媽說準備好出發了：『我東西都收好了，準備好出發了！』」",
+        npcRetryResponse: "「媽媽正在等您確認物品齊全並報告出發喔！」",
+        mandarinNpcRetryResponse: "「媽媽正在等您確認物品齊全並報告出發喔！」",
         nextNodeId: null
       }
     }
@@ -510,8 +510,8 @@ const SCENARIOS_GRAPH = {
         npcAvatar: "👮",
         npcSuccessResponse: "「選好目的地後，我會告訴你搭哪一路公車喔！」",
         mandarinNpcSuccessResponse: "「選好目的地後，我會告訴你搭哪一路公車喔！」",
-        npcRetryResponse: "「請清楚問要去哪個地方：文化園區、學校或圖書館。」",
-        mandarinNpcRetryResponse: "「請清楚詢問要去哪個地方：文化園區、學校或圖書館。」",
+        npcRetryResponse: "「站務員沒聽清楚，請開口詢問你要前往的目的地公車路線喔！」",
+        mandarinNpcRetryResponse: "「站務員沒聽清楚，請開口詢問你要前往的目的地公車路線喔！」",
         choices: [
           {
             id: "culture",
@@ -562,8 +562,8 @@ const SCENARIOS_GRAPH = {
         npcAvatar: "👮",
         npcSuccessResponse: "「對！802 路公車馬上進站了，請在黃線後方排隊上車喔！」",
         mandarinNpcSuccessResponse: "「對！802 路公車馬上進站了，請在黃線後方排隊上車喔！」",
-        npcRetryResponse: "「請清楚問：『請問去文化園區愛坐哪一路公車？』」",
-        mandarinNpcRetryResponse: "「請清楚問：『請問去文化園區要搭哪一路公車？』」",
+        npcRetryResponse: "「站務員沒聽清楚，請再次向站務員確認文化園區的公車路線喔！」",
+        mandarinNpcRetryResponse: "「站務員沒聽清楚，請再次向站務員確認文化園區的公車路線喔！」",
         nextNodeId: "bus_board"
       },
       bus_ask_school: {
@@ -582,8 +582,8 @@ const SCENARIOS_GRAPH = {
         npcAvatar: "👮",
         npcSuccessResponse: "「對！615 路公車馬上進站了，請在黃線後方排隊上車喔！」",
         mandarinNpcSuccessResponse: "「對！615 路公車馬上進站了，請在黃線後方排隊上車喔！」",
-        npcRetryResponse: "「請清楚問：『請問去學校愛坐哪一路公車？』」",
-        mandarinNpcRetryResponse: "「請清楚問：『請問去學校要搭哪一路公車？』」",
+        npcRetryResponse: "「站務員沒聽清楚，請再次向站務員確認去學校的公車路線喔！」",
+        mandarinNpcRetryResponse: "「站務員沒聽清楚，請再次向站務員確認去學校的公車路線喔！」",
         nextNodeId: "bus_board"
       },
       bus_ask_library: {
@@ -602,8 +602,8 @@ const SCENARIOS_GRAPH = {
         npcAvatar: "👮",
         npcSuccessResponse: "「對！306 路公車馬上進站了，請在黃線後方排隊上車喔！」",
         mandarinNpcSuccessResponse: "「對！306 路公車馬上進站了，請在黃線後方排隊上車喔！」",
-        npcRetryResponse: "「請清楚問：『請問去圖書館愛坐哪一路公車？』」",
-        mandarinNpcRetryResponse: "「請清楚問：『請問去圖書館要搭哪一路公車？』」",
+        npcRetryResponse: "「站務員沒聽清楚，請再次向站務員確認去圖書館的公車路線喔！」",
+        mandarinNpcRetryResponse: "「站務員沒聽清楚，請再次向站務員確認去圖書館的公車路線喔！」",
         nextNodeId: "bus_board"
       },
       bus_board: {
@@ -622,8 +622,8 @@ const SCENARIOS_GRAPH = {
         npcAvatar: "👨‍✈️",
         npcSuccessResponse: "「有喔！這班車有到，快進去坐好、抓緊扶手喔！」",
         mandarinNpcSuccessResponse: "「有喔！這班車有到，快進去坐好、抓緊扶手喔！」",
-        npcRetryResponse: "「可以問司機：『請問這台車有到目的地無？』」",
-        mandarinNpcRetryResponse: "「可以問司機：『請問這台車有到目的地嗎？』」",
+        npcRetryResponse: "「司機先生沒聽清楚，請上車時向司機確認這班車是否到達目的地喔！」",
+        mandarinNpcRetryResponse: "「司機先生沒聽清楚，請上車時向司機確認這班車是否到達目的地喔！」",
         nextNodeId: "bus_arrive"
       },
       bus_arrive: {
@@ -642,8 +642,8 @@ const SCENARIOS_GRAPH = {
         npcAvatar: "👵",
         npcSuccessResponse: "「無錯！過紅綠燈越倒手（左轉）走兩步路就看到大門了，祝你順利喔！」",
         mandarinNpcSuccessResponse: "「沒錯！過紅綠燈左轉走兩步路就看到大門了，祝你順利喔！」",
-        npcRetryResponse: "「照著方向唸：『向前行，過紅綠燈越倒手就到了』喔！」",
-        mandarinNpcRetryResponse: "「照著方向說：『往前走，過紅綠燈左轉就到了』喔！」",
+        npcRetryResponse: "「阿婆沒聽清楚，請向阿婆確認路口直走或轉彎的方向指引喔！」",
+        mandarinNpcRetryResponse: "「阿婆沒聽清楚，請向阿婆確認路口直走或轉彎的方向指引喔！」",
         nextNodeId: null
       }
     }
@@ -679,8 +679,8 @@ const SCENARIOS_GRAPH = {
         npcAvatar: "👩‍⚕️",
         npcSuccessResponse: "「慢慢說，哪裡不舒服都可以告訴我喔。」",
         mandarinNpcSuccessResponse: "「慢慢說，哪裡不舒服都可以告訴我喔。」",
-        npcRetryResponse: "「哪裡痛痛呢？可以開口說出頭痛、擦傷或發熱喔！」",
-        mandarinNpcRetryResponse: "「哪裡不舒服呢？可以開口說出頭痛肚子痛、擦傷或發熱喔！」",
+        npcRetryResponse: "「護理師溫柔地詢問你，請開口說明身體哪裡不舒服喔！」",
+        mandarinNpcRetryResponse: "「護理師溫柔地詢問你，請開口說明身體哪裡不舒服喔！」",
         choices: [
           {
             id: "head_stomach",
@@ -731,8 +731,8 @@ const SCENARIOS_GRAPH = {
         npcAvatar: "👩‍⚕️",
         npcSuccessResponse: "「我知道了，先坐下來量體溫，阿姨倒一杯溫開水給你喝喔。」",
         mandarinNpcSuccessResponse: "「我知道了，先坐下來量體溫，阿姨倒一杯溫開水給你喝喔。」",
-        npcRetryResponse: "「請說出頭痛與肚子痛：『護理師，𠊎頭那痛、肚痛』。」",
-        mandarinNpcRetryResponse: "「請說出頭痛與肚子痛：『護理師，我頭痛、肚子痛』。」",
+        npcRetryResponse: "「護理師沒聽清楚，請清楚向護理師描述頭痛與肚子絞痛的感覺喔！」",
+        mandarinNpcRetryResponse: "「護理師沒聽清楚，請清楚向護理師描述頭痛與肚子絞痛的感覺喔！」",
         nextNodeId: "health_rest"
       },
       health_symptom_scratch: {
@@ -751,8 +751,8 @@ const SCENARIOS_GRAPH = {
         npcAvatar: "👩‍⚕️",
         npcSuccessResponse: "「不要緊喔！阿姨幫你擦消炎藥、貼上透氣紗布，很快就不會痛了。」",
         mandarinNpcSuccessResponse: "「不要緊喔！阿姨幫你擦消炎藥、貼上透氣紗布，很快就不會痛了。」",
-        npcRetryResponse: "「試著說明：『體育課跑太遽，𠊎腳跌倒痛痛』。」",
-        mandarinNpcRetryResponse: "「試著說明：『體育課跑太快，我跌倒腳痛痛』。」",
+        npcRetryResponse: "「護理師沒聽清楚，請向護理師說明剛剛體育課跌倒擦傷的情形喔！」",
+        mandarinNpcRetryResponse: "「護理師沒聽清楚，請向護理師說明剛剛體育課跌倒擦傷的情形喔！」",
         nextNodeId: "health_rest"
       },
       health_symptom_fever: {
@@ -771,8 +771,8 @@ const SCENARIOS_GRAPH = {
         npcAvatar: "👩‍⚕️",
         npcSuccessResponse: "「我先幫你量耳溫，稍微有一點發燒，先在床上躺著休息一節課喔。」",
         mandarinNpcSuccessResponse: "「我先幫你量耳溫，稍微有一點發燒，先在床上躺著休息一節課喔。」",
-        npcRetryResponse: "「請說出身體很熱：『𠊎身體當燒，無麼个力』。」",
-        mandarinNpcRetryResponse: "「請說出身體很熱：『我身體很熱，沒有力氣』。」",
+        npcRetryResponse: "「護理師沒聽清楚，請向護理師描述身體發熱與沒有力氣的狀況喔！」",
+        mandarinNpcRetryResponse: "「護理師沒聽清楚，請向護理師描述身體發熱與沒有力氣的狀況喔！」",
         nextNodeId: "health_rest"
       },
       health_rest: {
@@ -791,8 +791,8 @@ const SCENARIOS_GRAPH = {
         npcAvatar: "👩‍⚕️",
         npcSuccessResponse: "「真懂事！先在病床上躺著休息一節課，身體很快就會恢復元氣囉！」",
         mandarinNpcSuccessResponse: "「真懂事！先在病床上躺著休息一節課，身體很快就會恢復元氣囉！」",
-        npcRetryResponse: "「記得跟阿姨說：『𠊎會多啉水、好好歇睏，恁仔細！』」",
-        mandarinNpcRetryResponse: "「記得跟阿姨說：『我會多喝水、好好休息，謝謝您！』」",
+        npcRetryResponse: "「護理師正在等您答應好好休息與禮貌致謝喔！」",
+        mandarinNpcRetryResponse: "「護理師正在等您答應好好休息與禮貌致謝喔！」",
         nextNodeId: null
       }
     }
@@ -827,8 +827,8 @@ const SCENARIOS_GRAPH = {
         npcAvatar: "👨‍👩‍👧",
         npcSuccessResponse: "「看清楚天氣，再想想今天要穿什麼或帶什麼出門喔！」",
         mandarinNpcSuccessResponse: "「看清楚天氣，再想想今天要穿什麼或帶什麼出門喔！」",
-        npcRetryResponse: "「請看窗外天氣，開口提醒下雨、大熱天或寒冷天穿搭喔！」",
-        mandarinNpcRetryResponse: "「請看窗外天氣，開口提醒下雨、大熱天或寒冷天穿搭喔！」",
+        npcRetryResponse: "「請看窗外天氣，開口提醒家人今天的天氣與出門裝備喔！」",
+        mandarinNpcRetryResponse: "「請看窗外天氣，開口提醒家人今天的天氣與出門裝備喔！」",
         choices: [
           {
             id: "rain",
@@ -879,8 +879,8 @@ const SCENARIOS_GRAPH = {
         npcAvatar: "👩",
         npcSuccessResponse: "「無錯！落雨天路滑，著好雨衣、帶好遮仔，出門小心行喔！」",
         mandarinNpcSuccessResponse: "「沒錯！下雨天路滑，穿好雨衣、帶好雨傘，出門小心走喔！」",
-        npcRetryResponse: "「提醒家人下雨天：『今晡日落雨，愛帶遮仔著雨衣』喔！」",
-        mandarinNpcRetryResponse: "「提醒家人下雨天：『今天下雨，要帶雨傘穿雨衣』喔！」",
+        npcRetryResponse: "「媽媽沒聽清楚，請提醒家人外面下雨要帶上的雨具穿搭喔！」",
+        mandarinNpcRetryResponse: "「媽媽沒聽清楚，請提醒家人外面下雨要帶上的雨具穿搭喔！」",
         nextNodeId: "weather_done"
       },
       weather_outfit_hot: {
@@ -899,8 +899,8 @@ const SCENARIOS_GRAPH = {
         npcAvatar: "👨",
         npcSuccessResponse: "「大熱天陽光真烈，戴上帽仔、多喝水才不會中暑喔！」",
         mandarinNpcSuccessResponse: "「大熱天太陽真大，戴上帽子、多喝水才不會中暑喔！」",
-        npcRetryResponse: "「說說天氣熱的穿搭：『今晡日當熱，愛戴等遮陽帽仔』。」",
-        mandarinNpcRetryResponse: "「說說天氣熱的穿搭：『今天很熱，要戴著遮陽帽』。」",
+        npcRetryResponse: "「爸爸沒聽清楚，請提醒家人外面大太陽要準備的防曬穿搭喔！」",
+        mandarinNpcRetryResponse: "「爸爸沒聽清楚，請提醒家人外面大太陽要準備的防曬穿搭喔！」",
         nextNodeId: "weather_done"
       },
       weather_outfit_cold: {
@@ -919,8 +919,8 @@ const SCENARIOS_GRAPH = {
         npcAvatar: "👴",
         npcSuccessResponse: "「乖孫真靈俐！著暖暖、圍巾圍好，出門就毋驚吹風冷著囉！」",
         mandarinNpcSuccessResponse: "「乖孫真貼心！穿得暖暖的、圍巾圍好，出門就不怕吹風著涼了！」",
-        npcRetryResponse: "「天冷要穿暖，試著說：『天時當冷，愛著大衫圍等圍巾』喔！」",
-        mandarinNpcRetryResponse: "「天冷要穿暖，試著說：『天氣很冷，要穿大衣圍著圍巾』喔！」",
+        npcRetryResponse: "「阿公沒聽清楚，請提醒家人寒流天冷要穿戴的保暖衣物喔！」",
+        mandarinNpcRetryResponse: "「阿公沒聽清楚，請提醒家人寒流天冷要穿戴的保暖衣物喔！」",
         nextNodeId: "weather_done"
       },
       weather_done: {
@@ -939,8 +939,8 @@ const SCENARIOS_GRAPH = {
         npcAvatar: "👨‍👩‍👧",
         npcSuccessResponse: "「太棒了！穿搭完全符合今天的天氣，出門平安順心！」",
         mandarinNpcSuccessResponse: "「太棒了！穿搭完全符合今天的天氣，出門平安順心！」",
-        npcRetryResponse: "「跟家人說出門囉：『大家都準備好了，出門行囉！』」",
-        mandarinNpcRetryResponse: "「跟家人說出門囉：『大家都準備好了，出門走囉！』」",
+        npcRetryResponse: "「家人正在等大家確認準備完成、一起出發喔！」",
+        mandarinNpcRetryResponse: "「家人正在等大家確認準備完成、一起出發喔！」",
         nextNodeId: null
       }
     }
@@ -1316,7 +1316,7 @@ class LLMServiceAdapter {
   static buildSystemPrompt(nodeConfig, scenario, isMandarin = false) {
     const rolePersonas = {
       "售票員": "說話客氣親切、專業有效率的售票人員，負責確認張數與票種。",
-      "驗票志工": "和藹可親的社區志工奶奶，熱情問候並提醒安全注意事項。",
+      "驗票志工": "和藹可親的社區志工奶奶，熱情問候並提醒安全注意事項，非常重視禮貌與道謝。",
       "園區導覽員": "熱心開朗的生態解說員，清楚指引步道方向與各動物展區特點。",
       "同學阿明": "活潑好奇的同班同學，喜歡熱情分享在展區觀察到的動物特徵。",
       "老師": "溫和關心的帶隊老師，清點人數並提醒集合時間。",
@@ -1338,7 +1338,7 @@ class LLMServiceAdapter {
 
     if (isMandarin) {
       return [
-        `你是一位極其專業且細心的情境口說 AI 助教兼角色扮演考官（LLM-as-a-Judge & Roleplayer）。`,
+        `你是一位極其專業、生動且具備情境互動感的 AI 口說助教兼角色扮演考官（LLM-as-a-Judge & Roleplayer）。`,
         `【情境主題】：${scenario?.title || ""}（目標：${scenario?.mandarinObjective || scenario?.objective || ""}）`,
         `【當前關卡】：${nodeConfig?.title || ""}（地點：${nodeConfig?.locationTag || ""}，類型：${nodeConfig?.nodeType || "主線"}）`,
         `【NPC 角色人設】：你將扮演「${nodeConfig?.npcRole || "NPC"}」— ${currentPersona}`,
@@ -1346,24 +1346,21 @@ class LLMServiceAdapter {
         `【核心華語關鍵詞】：${(nodeConfig?.mandarinKeywords || nodeConfig?.keywords || []).join("、") || "無"}`,
         ``,
         `【學生語言模式】：華語（國語）口說模式。`,
-        `【嚴格判定規則 (Strict Correctness & Guardrails)】：`,
-        `1. 精準對錯判定 (Strict Verification)：`,
-        `   - 請根據【華語】進行判定，絕對不要要求學生說客語，也不要以客語關鍵詞判定。`,
-        `   - 學生的回答必須精準符合當前題目的「核心動作」、「數量/張數」、「地點」或「指定項目」。`,
-        `   - 【數量/項目錯誤一律判錯】：例如題目要求「買三張學生票」，若學生說「兩張門票」、「一張票」或未提及學生票，數量或票種不符，必須判定 isMatch: false！`,
-        `   - 【答非所問/離題一律判錯】：若學生說不相干的話（如問路時說要買漢堡、天氣很冷等），必須判定 isMatch: false！`,
-        `   - 【只有正確表達才通過】：必須語意完整且數量/對象/關鍵詞正確，才判定 isMatch: true。`,
-        `2. 華語語音辨識合理容錯：若語音辨識產生同音錯字但華語語意與數量完全正確，可判定通過。`,
-        `3. 真實動態 NPC 角色扮演回應 (Dynamic NPC Roleplay)：`,
-        `   - 務必根據「學生實際說出的華語內容」客製化生成 20~35 字生動的 NPC 繁體中文對話。`,
-        `   - 若學生說錯（如說兩張票）：NPC 要針對他說的內容指正：「我們有三位同學，應該要買三張學生票喔！」`,
-        `   - 若學生說對：NPC 要自然接話並推進劇情。`,
-        `4. 輸出規範：請嚴格回傳標準 JSON 格式。`
+        `【重要核心原則 — 針對學生實際錄音內容產生動態角色反應】：`,
+        `1. 動態 NPC 即時回饋 (Dynamic In-Character Reaction)：`,
+        `   - 務必根據「學生實際說出的華語內容」客製化生成 20~35 字生動自然的 NPC 繁體中文對話。`,
+        `   - 嚴禁給予千篇一律的機械式罐頭稱讚！`,
+        `   - 【語氣/禮貌反應】：若學生態度隨便、粗魯或缺少必要禮貌（例如在驗票時只說『喂，這是票』而沒有說『謝謝』或向奶奶問候），NPC 必須在對話中做出相應反應（例如驗票奶奶說：『年輕人，門票拿來了呀，但進場要有禮貌說聲謝謝喔！』），並依據關卡要求判定 isMatch: false！`,
+        `   - 【數量/內容錯誤指正】：若學生說錯張數（如說兩張、一張）或點錯品項，NPC 要針對該錯誤點指出（例如售票員說：『同學，你們不是有三位嗎？要買三張學生票才夠喔！』），判定 isMatch: false！`,
+        `   - 【嚴禁直接餵答案】：NPC 對話中「絕對不要」直接說出『你要說：...』或『請說：...』等直接給答案的提示句！請完全以 NPC 角色情境身分自然互動與引導。`,
+        `2. 精準對錯判定 (Strict Verification)：`,
+        `   - 只有在學生語意清晰、核心要素完整且符合角色情境時，才判定 isMatch: true。`,
+        `3. 輸出規範：請嚴格回傳標準 JSON 格式。`
       ].join("\n");
     }
 
     return [
-      `你是一位極其專業且細心的客語情境口說 AI 助教兼角色扮演考官（LLM-as-a-Judge & Roleplayer）。`,
+      `你是一位極其專業、生動且具備情境互動感的客語情境口說 AI 助教兼角色扮演考官（LLM-as-a-Judge & Roleplayer）。`,
       `【情境主題】：${scenario?.title || ""}（目標：${scenario?.objective || ""}）`,
       `【當前關卡】：${nodeConfig?.title || ""}（地點：${nodeConfig?.locationTag || ""}，類型：${nodeConfig?.nodeType || "主線"}）`,
       `【NPC 角色人設】：你將扮演「${nodeConfig?.npcRole || "NPC"}」— ${currentPersona}`,
@@ -1371,18 +1368,16 @@ class LLMServiceAdapter {
       `【標準華語意圖】：${nodeConfig?.targetMandarin || "（分支選擇/自由回答關卡）"}`,
       `【核心關鍵詞】：${(nodeConfig?.keywords || []).join("、") || "無"}`,
       ``,
-      `【嚴格判定規則 (Strict Correctness & Guardrails)】：`,
-      `1. 精準對錯判定 (Strict Verification)：`,
-      `   - 學生的回答必須精準符合當前題目的「核心動作」、「數量/張數」、「地點」或「指定項目」。`,
-      `   - 【數量/項目錯誤一律判錯】：例如題目要求「買三張學生票」，若學生說「兩張門票」、「一張票」或未提及學生票，數量或票種不符，必須判定 isMatch: false！`,
-      `   - 【答非所問/離題一律判錯】：若學生說不相干的話（如問路時說要買漢堡、天氣很冷等），必須判定 isMatch: false！`,
-      `   - 【只有正確表達才通過】：必須語意完整且數量/對象正確，才判定 isMatch: true。`,
-      `2. 客語 ASR 諧音合理容錯：若客語語音辨識產生同音錯字但語意數量完全正確，可判定通過。`,
-      `3. 真實動態 NPC 角色扮演回應 (Dynamic NPC Roleplay)：`,
-      `   - 務必根據「學生實際說出的內容」客製化生成 20~35 字生動的 NPC 繁體中文對話。`,
-      `   - 若學生說錯（如說兩張票）：NPC 要針對他說的內容指正：「我們有三位同學，應該要買三張學生票喔！」`,
-      `   - 若學生說對：NPC 要自然接話並推進劇情。`,
-      `4. 輸出規範：請嚴格回傳標準 JSON 格式。`
+      `【重要核心原則 — 針對學生實際錄音內容產生動態角色反應】：`,
+      `1. 動態 NPC 即時回饋 (Dynamic In-Character Reaction)：`,
+      `   - 務必根據「學生實際說出的內容」客製化生成 20~35 字生動自然的 NPC 繁體中文對話。`,
+      `   - 嚴禁給予千篇一律的機械式罐頭稱讚！`,
+      `   - 【語氣/禮貌反應】：若學生態度隨便、粗魯或缺少必要禮貌（例如在驗票時只說『喂，這是票』而沒有說『恁仔細/謝謝』或向奶奶問候），NPC 必須在對話中做出相應反應（例如驗票奶奶說：『年輕人，門票拿來了呀，但進場要有禮貌說聲謝謝喔！』），並依據關卡要求判定 isMatch: false！`,
+      `   - 【數量/內容錯誤指正】：若學生說錯張數（如說兩張、一張）或講錯項目，NPC 要針對該錯誤點指正（例如售票員說：『同學，你們不是有三位嗎？要買三張學生票才夠喔！』），判定 isMatch: false！`,
+      `   - 【嚴禁直接餵答案】：NPC 對話中「絕對不要」直接說出『你要說：...』或『請說：...』等直接給答案的提示句！請完全以 NPC 角色情境身分自然互動與引導。`,
+      `2. 精準對錯判定 (Strict Verification)：`,
+      `   - 只有在學生語意清晰、核心要素完整且符合角色情境時，才判定 isMatch: true。`,
+      `3. 輸出規範：請嚴格回傳標準 JSON 格式。`
     ].join("\n");
   }
 
@@ -1406,7 +1401,7 @@ class LLMServiceAdapter {
         `【核心華語關鍵詞清單】：${(nodeConfig?.mandarinKeywords || nodeConfig?.keywords || []).join(", ") || "無"}`,
         `${choicesText}`,
         ``,
-        `請依據上述華語輸入評估是否通過，並嚴格依照以下 JSON 結構回傳：`,
+        `請依據上述華語輸入評估是否通過，並嚴格依照以下 JSON 結構回傳（注意：dynamicNpcResponse 必須針對學生實際說的話做出角色化回應，不要給千篇一律的固定稱讚，且絕對不要在 NPC 對話中直接說『你要說：...』給予答案）：`,
         `{`,
         `  "isMatch": true 或 false,`,
         `  "intent": "識別出的意圖或分支名稱",`,
@@ -1414,8 +1409,8 @@ class LLMServiceAdapter {
         `  "semanticAccuracy": 0 到 100 的整數,`,
         `  "hitKeywords": ["命中之華語關鍵詞"],`,
         `  "missingKeywords": ["缺漏之華語關鍵詞"],`,
-        `  "feedback": "華語教學引導短評",`,
-        `  "dynamicNpcResponse": "NPC 角色當下的情境回覆對話（20-35字）"`,
+        `  "feedback": "教學引導短評",`,
+        `  "dynamicNpcResponse": "NPC 角色針對學生發言的情境回覆對話（20-35字）"`,
         `}`
       ].join("\n");
     }
@@ -1428,7 +1423,7 @@ class LLMServiceAdapter {
       `【關鍵詞清單】：${(nodeConfig?.keywords || []).join(", ") || "無"}`,
       `${choicesText}`,
       ``,
-      `請依據上述輸入評估是否通過，並嚴格依照以下 JSON 結構回傳：`,
+      `請依據上述輸入評估是否通過，並嚴格依照以下 JSON 結構回傳（注意：dynamicNpcResponse 必須針對學生實際說的話做出角色化回應，不要給千篇一律的固定稱讚，且絕對不要在 NPC 對話中直接說『你要說：...』給予答案）：`,
       `{`,
       `  "isMatch": true 或 false,`,
       `  "intent": "識別出的意圖或分支名稱",`,
@@ -1437,7 +1432,7 @@ class LLMServiceAdapter {
       `  "hitKeywords": ["命中之關鍵詞"],`,
       `  "missingKeywords": ["缺漏之關鍵詞"],`,
       `  "feedback": "客語教學引導短評",`,
-      `  "dynamicNpcResponse": "NPC 角色當下的情境回覆對話（20-35字）"`,
+      `  "dynamicNpcResponse": "NPC 角色針對學生發言的情境回覆對話（20-35字）"`,
       `}`
     ].join("\n");
   }
@@ -1547,7 +1542,7 @@ class LLMServiceAdapter {
     const systemPrompt = this.buildSystemPrompt(nodeConfig, scenario, isMandarin);
     const userPrompt = this.buildUserPrompt(hakkaTranscript, mandarinTranscript, nodeConfig, isMandarin);
 
-    // 模式 A: 透過 Vercel 後端 /api/judge 呼叫 (金鑰完全隱藏於後端)
+    // 模式 A: 透過後端 /api/judge 呼叫 (金鑰安全隔離於後端)
     if (this.config.provider === "vercel_api" || (!this.config.apiKey && this.config.provider !== "local_judge")) {
       try {
         const controller = new AbortController();
@@ -1590,11 +1585,11 @@ class LLMServiceAdapter {
           };
         }
       } catch (err) {
-        console.warn("[LLMServiceAdapter] Vercel 後端 /api/judge 調用異常，自動降級至本地安全網：", err);
+        console.warn("[LLMServiceAdapter] 後端 /api/judge 調用異常，自動降級至本地安全網：", err);
       }
     }
 
-    // 模式 B: 線上 LLM 直接呼叫 (若有本機輸入 Key)
+    // 模式 B: 線上 LLM 直接呼叫 (若有輸入 Key)
     if (this.config.provider === "openai_gemini" && this.config.apiKey) {
       try {
         const controller = new AbortController();
@@ -1603,7 +1598,7 @@ class LLMServiceAdapter {
         const isGemini = this.config.apiKey.startsWith("AQ.") || this.config.apiKey.startsWith("AIza") || this.config.apiEndpoint.includes("googleapis.com");
 
         if (isGemini) {
-          const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${this.config.model || "gemini-1.5-flash"}:generateContent?key=${this.config.apiKey}`;
+          const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${this.config.model || "gemini-3.6-flash"}:generateContent?key=${this.config.apiKey}`;
           const res = await fetch(geminiUrl, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -1668,9 +1663,14 @@ class LLMServiceAdapter {
           : (nodeConfig.npcSuccessResponse || "「很好！說得非常清楚！」");
       }
     } else {
-      dynamicNpcResponse = isMandarin
-        ? (nodeConfig.mandarinNpcRetryResponse || nodeConfig.npcRetryResponse || "「請再說一次喔！」")
-        : (nodeConfig.npcRetryResponse || "「請再說一次喔！」");
+      // 本機降級情境動態回覆（避免罐頭稱讚）
+      if (fallbackEval.customNpcResponse) {
+        dynamicNpcResponse = fallbackEval.customNpcResponse;
+      } else {
+        dynamicNpcResponse = isMandarin
+          ? (nodeConfig.mandarinNpcRetryResponse || nodeConfig.npcRetryResponse || "「請再說一次喔！」")
+          : (nodeConfig.npcRetryResponse || "「請再說一次喔！」");
+      }
     }
 
     return {
@@ -1702,7 +1702,8 @@ class SpeechService {
         hitKeywords: [],
         missingKeywords: isMandarinMode ? (nodeConfig.mandarinKeywords || nodeConfig.keywords || []) : (nodeConfig.keywords || []),
         similarity: 0,
-        feedback: "未偵測到清晰語音，請靠近麥克風再試一次。"
+        feedback: "未偵測到清晰語音，請靠近麥克風再試一次。",
+        customNpcResponse: null
       };
     }
 
@@ -1723,7 +1724,8 @@ class SpeechService {
             hitKeywords: choiceKeywords.filter(kw => cleanText.includes(kw)),
             missingKeywords: [],
             similarity: 100,
-            feedback: `辨識成功！偵測到選擇【${choice.title}】。`
+            feedback: `辨識成功！偵測到選擇【${choice.title}】。`,
+            customNpcResponse: null
           };
         }
       }
@@ -1734,11 +1736,12 @@ class SpeechService {
         hitKeywords: [],
         missingKeywords: nodeConfig.choices.map(c => c.title),
         similarity: 0,
-        feedback: "未偵測到選項名稱（如 " + nodeConfig.choices.map(c => c.title).join("、") + "），請開口說出你想選的項目喔！"
+        feedback: "未偵測到選項名稱，請開口向導覽員詢問你想去的展區喔！",
+        customNpcResponse: "「不好意思，沒聽清楚你想去哪裡，請再說一次你想去的展區喔！」"
       };
     }
 
-    // 2. 一般口說比對 (嚴格要求核心關鍵字與數量匹配)
+    // 2. 一般口說比對 (嚴格要求核心關鍵字與語意匹配)
     const primaryKeywords = isMandarinMode
       ? (nodeConfig.mandarinKeywords || nodeConfig.keywords || [])
       : (nodeConfig.keywords || []);
@@ -1749,11 +1752,37 @@ class SpeechService {
     const targetRequiresThree = (nodeConfig.targetHakka || "").includes("三") || (nodeConfig.targetMandarin || "").includes("三") || primaryKeywords.some(k => k.includes("三") || k.includes("3"));
     const studentHasWrongQuantity = targetRequiresThree && (cleanText.includes("兩") || cleanText.includes("二") || cleanText.includes("一") || cleanText.includes("2") || cleanText.includes("1")) && !cleanText.includes("三") && !cleanText.includes("3");
 
+    // 禮貌度檢查 (例如驗票關卡，若只說「喂」或缺少謝謝/恁仔細，則給予指正)
+    const requiresPoliteness = (nodeConfig.targetHakka || "").includes("恁仔細") || (nodeConfig.targetMandarin || "").includes("謝謝") || primaryKeywords.some(k => k.includes("恁仔細") || k.includes("謝謝"));
+    const studentHasPoliteness = cleanText.includes("恁仔細") || cleanText.includes("謝謝") || cleanText.includes("多謝") || cleanText.includes("感謝");
+    const isImpolite = requiresPoliteness && (!studentHasPoliteness || cleanText.startsWith("喂") || cleanText.includes("喂"));
+
     const targetTarget = isMandarinMode ? (nodeConfig.targetMandarin || "") : (nodeConfig.targetHakka || "");
     const targetClean = targetTarget.replace(/[。，！？、？\s\.,!?]/g, "");
+    
+    // 必須命中所有關鍵詞，或完整命中目標句
     const isFullPrimaryHit = primaryKeywords.length > 0 && hitPrimary.length === primaryKeywords.length;
-    const isStrictHit = primaryKeywords.length >= 2 ? (hitPrimary.length >= Math.ceil(primaryKeywords.length * 0.65)) : (hitPrimary.length >= 1);
-    const isMatch = !studentHasWrongQuantity && (isFullPrimaryHit || isStrictHit || (targetClean && cleanText.includes(targetClean)));
+    const isStrictHit = primaryKeywords.length >= 2 ? (hitPrimary.length >= Math.ceil(primaryKeywords.length * 0.8)) : (hitPrimary.length >= 1);
+    
+    let isMatch = !studentHasWrongQuantity && (isFullPrimaryHit || isStrictHit || (targetClean && cleanText.includes(targetClean)));
+    
+    // 若題目要求禮貌道謝但學生未道謝或語氣粗魯，一律判錯
+    if (requiresPoliteness && !studentHasPoliteness) {
+      isMatch = false;
+    }
+
+    let customNpcResponse = null;
+    let feedbackMsg = "辨識成功！語意明確且關鍵字命中。";
+
+    if (studentHasWrongQuantity) {
+      customNpcResponse = "「同學，你們有三位同學，應該要買三張學生票才夠喔！」";
+      feedbackMsg = "數量不符（題目要求買三張學生票），請修正數量後再試一次。";
+    } else if (requiresPoliteness && !studentHasPoliteness) {
+      customNpcResponse = "「年輕人，票拿來了呀，但進場可要懂禮貌說聲謝謝喔！」";
+      feedbackMsg = "缺少道謝或禮貌問候，請記得向志工奶奶道謝（說聲謝謝或恁仔細）喔！";
+    } else if (!isMatch) {
+      feedbackMsg = "關鍵字詞未完整命中，請參考情境提示再說一次。";
+    }
 
     return {
       isMatch: isMatch,
@@ -1761,7 +1790,8 @@ class SpeechService {
       hitKeywords: hitPrimary,
       missingKeywords: missingPrimary,
       similarity: isFullPrimaryHit ? 100 : Math.round((hitPrimary.length / Math.max(1, primaryKeywords.length)) * 100),
-      feedback: isMatch ? (isMandarinMode ? "華語辨識成功！語意明確且關鍵詞命中。" : "辨識成功！語意明確且關鍵字命中。") : (studentHasWrongQuantity ? "數量不符（題目要求三張，非兩張或一張），請修正數量後再試一次。" : "關鍵字詞未完整命中，請參考提示再說一次。")
+      feedback: feedbackMsg,
+      customNpcResponse: customNpcResponse
     };
   }
 
