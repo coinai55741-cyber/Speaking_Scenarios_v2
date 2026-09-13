@@ -130,9 +130,9 @@ const SCENARIOS_GRAPH = {
         mandarinStoryPrompt: "進到園區後，你們想先看一種動物。請看上方提示，開口向導覽員詢問你想去的展區（例如大象、獅子或蛇）：",
         targetHakka: "請問大象區愛仰般行？",
         targetMandarin: "請問大象展區要怎麼走？",
-        keywords: ["請問", "愛仰般行"],
-        mandarinKeywords: ["請問", "怎麼走"],
-        altKeywords: ["大象", "獅子", "蛇", "仰般行"],
+        keywords: ["大象", "獅子", "蛇"],
+        mandarinKeywords: ["大象", "獅子", "蛇"],
+        altKeywords: ["大象", "獅子", "蛇", "水池", "岩石", "溫室", "仰般行", "怎麼走"],
         npcRole: "園區導覽員",
         npcAvatar: "👨‍🌾",
         npcSuccessResponse: "「想好要看哪一種動物後，就看清楚路線提示，操縱小人出發吧！」",
@@ -503,9 +503,9 @@ const SCENARIOS_GRAPH = {
         mandarinStoryPrompt: "你站在熱鬧的市區公車站前，看著站牌。請看上方提示，開口向站務員詢問你想去的目的地路線（如文化園區、學校或圖書館）：",
         targetHakka: "請問去文化園區愛坐哪一路公車？",
         targetMandarin: "請問去文化園區要搭哪一路公車？",
-        keywords: ["請問", "哪一路", "公車"],
-        mandarinKeywords: ["請問", "公車", "搭哪一路"],
-        altKeywords: ["文化園區", "學校", "圖書館", "公車"],
+        keywords: ["文化園區", "學校", "圖書館"],
+        mandarinKeywords: ["文化園區", "學校", "圖書館"],
+        altKeywords: ["文化園區", "學校", "圖書館", "公車", "802", "615", "306"],
         npcRole: "站務人員",
         npcAvatar: "👮",
         npcSuccessResponse: "「選好目的地後，我會告訴你搭哪一路公車喔！」",
@@ -518,8 +518,8 @@ const SCENARIOS_GRAPH = {
             title: "🏛️ 文化園區",
             sub: "搭乘 802 路公車",
             targetBranchId: "bus_ask_culture",
-            keywords: ["文化園區", "文化", "園區"],
-            mandarinKeywords: ["文化園區", "文化", "園區"],
+            keywords: ["文化園區", "文化", "園區", "802"],
+            mandarinKeywords: ["文化園區", "文化", "園區", "802", "802路"],
             guideResponse: "「去文化園區要搭 802 路公車喔！大約再過三分鐘就會進站了，準備好悠遊卡喔！」",
             mandarinGuideResponse: "「去文化園區要搭 802 路公車喔！大約再過三分鐘就會進站了，準備好悠遊卡喔！」"
           },
@@ -528,8 +528,8 @@ const SCENARIOS_GRAPH = {
             title: "🏫 學校正門",
             sub: "搭乘 615 路公車",
             targetBranchId: "bus_ask_school",
-            keywords: ["學校", "正門", "學校正門"],
-            mandarinKeywords: ["學校", "學校正門", "正門"],
+            keywords: ["學校", "正門", "學校正門", "615"],
+            mandarinKeywords: ["學校", "學校正門", "正門", "615", "615路"],
             guideResponse: "「去學校可以搭 615 路公車，請在右側站牌等候喔！」",
             mandarinGuideResponse: "「去學校可以搭 615 路公車，請在右側站牌等候喔！」"
           },
@@ -538,8 +538,8 @@ const SCENARIOS_GRAPH = {
             title: "📚 市立圖書館",
             sub: "搭乘 306 路公車",
             targetBranchId: "bus_ask_library",
-            keywords: ["圖書館", "市立圖書館"],
-            mandarinKeywords: ["圖書館", "市立圖書館"],
+            keywords: ["圖書館", "市立圖書館", "306"],
+            mandarinKeywords: ["圖書館", "市立圖書館", "306", "306路"],
             guideResponse: "「去圖書館請搭 306 路公車，很快就到了喔！」",
             mandarinGuideResponse: "「去圖書館請搭 306 路公車，很快就到了喔！」"
           }
@@ -672,9 +672,9 @@ const SCENARIOS_GRAPH = {
         mandarinStoryPrompt: "你走進安靜的健康中心，護理師溫柔地問你哪裡不舒服。請看上方提示，開口說明你的狀況（如頭痛肚子痛、膝蓋擦傷或身體發熱）：",
         targetHakka: "護理師，𠊎頭那痛、肚痛。",
         targetMandarin: "護理師，我頭痛、肚子痛。",
-        keywords: ["護理師", "痛"],
-        mandarinKeywords: ["護理師", "痛", "不舒服"],
-        altKeywords: ["頭痛", "肚痛", "擦傷", "發熱"],
+        keywords: ["頭那痛", "擦傷", "身體當燒"],
+        mandarinKeywords: ["頭痛肚子痛", "膝蓋擦傷", "身體發熱"],
+        altKeywords: ["頭痛", "肚子痛", "頭那痛", "肚痛", "擦傷", "跌倒", "膝蓋", "發熱", "發燒", "身體熱"],
         npcRole: "護理師",
         npcAvatar: "👩‍⚕️",
         npcSuccessResponse: "「慢慢說，哪裡不舒服都可以告訴我喔。」",
@@ -687,8 +687,8 @@ const SCENARIOS_GRAPH = {
             title: "🤕 頭痛肚子痛",
             sub: "頭暈腦脹、肚子陣陣疼痛",
             targetBranchId: "health_symptom_head",
-            keywords: ["頭痛", "肚痛", "頭那痛", "肚子痛", "頭暈"],
-            mandarinKeywords: ["頭痛", "肚子痛", "頭暈", "肚痛"],
+            keywords: ["頭那痛", "肚痛", "頭痛", "肚子痛", "頭暈"],
+            mandarinKeywords: ["頭痛", "肚子痛", "頭暈", "肚痛", "肚子"],
             guideResponse: "「小朋友辛苦了，先坐下來量體溫，阿姨倒一杯溫開水給你喝喔。」",
             mandarinGuideResponse: "「小朋友辛苦了，先坐下來量體溫，阿姨倒一杯溫開水給你喝喔。」"
           },
@@ -697,8 +697,8 @@ const SCENARIOS_GRAPH = {
             title: "🩹 膝蓋擦傷",
             sub: "操場跑步跌倒擦破皮",
             targetBranchId: "health_symptom_scratch",
-            keywords: ["擦傷", "跌倒", "膝蓋", "跑太快", "腳痛", "流血"],
-            mandarinKeywords: ["擦傷", "跌倒", "膝蓋", "流血", "破皮"],
+            keywords: ["擦傷", "跌倒", "膝蓋", "跑太遽", "腳痛", "流血", "痛痛"],
+            mandarinKeywords: ["擦傷", "跌倒", "膝蓋", "流血", "破皮", "跑太快", "腳痛"],
             guideResponse: "「不要緊喔！阿姨幫你用生理食鹽水清洗傷口、擦藥膏喔！」",
             mandarinGuideResponse: "「不要緊喔！阿姨幫你用生理食鹽水清洗傷口、擦藥膏喔！」"
           },
@@ -707,8 +707,8 @@ const SCENARIOS_GRAPH = {
             title: "🤒 身體發熱",
             sub: "全身熱熱的、沒有力氣",
             targetBranchId: "health_symptom_fever",
-            keywords: ["發熱", "發燒", "身體熱", "當燒", "無力", "燒"],
-            mandarinKeywords: ["發熱", "發燒", "身體熱", "沒有力氣", "無力"],
+            keywords: ["身體當燒", "發熱", "發燒", "當燒", "無麼个力", "無力", "燒"],
+            mandarinKeywords: ["身體很熱", "發熱", "發燒", "身體熱", "沒有力氣", "無力", "很熱"],
             guideResponse: "「我先幫你量耳溫，稍微有一點發燒，等一下幫你聯絡家長與導師。」",
             mandarinGuideResponse: "「我先幫你量耳溫，稍微有一點發燒，等一下幫你聯絡家長與導師。」"
           }
@@ -820,9 +820,9 @@ const SCENARIOS_GRAPH = {
         mandarinStoryPrompt: "清晨拉開窗簾看天氣。請看上方提示，開口提醒家人今天的天氣與穿搭（如下雨天、大熱天或寒冷天）：",
         targetHakka: "今晡日落雨，愛帶遮仔著雨衣。",
         targetMandarin: "今天下雨，要帶雨傘穿雨衣。",
-        keywords: ["今晡日", "愛"],
-        mandarinKeywords: ["今天", "要"],
-        altKeywords: ["落雨", "當熱", "當冷", "雨傘", "帽子", "大衣"],
+        keywords: ["落雨", "當熱", "當冷"],
+        mandarinKeywords: ["下雨", "很熱", "很冷"],
+        altKeywords: ["落雨", "當熱", "當冷", "下雨天", "大熱天", "寒冷天", "雨傘", "遮陽帽", "大衣"],
         npcRole: "家人",
         npcAvatar: "👨‍👩‍👧",
         npcSuccessResponse: "「看清楚天氣，再想想今天要穿什麼或帶什麼出門喔！」",
@@ -836,7 +836,7 @@ const SCENARIOS_GRAPH = {
             sub: "天空飄雨、地面潮濕",
             targetBranchId: "weather_outfit_rain",
             keywords: ["落雨", "下雨", "雨天", "雨傘", "雨衣", "遮仔"],
-            mandarinKeywords: ["下雨", "雨天", "雨傘", "雨衣", "陰雨"],
+            mandarinKeywords: ["下雨", "雨天", "雨傘", "雨衣", "陰雨", "落雨"],
             guideResponse: "「無錯！落雨天路滑，著好雨衣、帶好遮仔，出門小心行喔！」",
             mandarinGuideResponse: "「沒錯！下雨天路滑，穿好雨衣、帶好雨傘，出門小心走喔！」"
           },
@@ -845,8 +845,8 @@ const SCENARIOS_GRAPH = {
             title: "☀️ 炎熱大晴天",
             sub: "豔陽高照、氣溫偏高",
             targetBranchId: "weather_outfit_hot",
-            keywords: ["當熱", "很熱", "大熱天", "晴天", "太陽", "遮陽帽"],
-            mandarinKeywords: ["很熱", "大熱天", "晴天", "太陽", "遮陽帽"],
+            keywords: ["當熱", "很熱", "大熱天", "晴天", "太陽", "遮陽帽仔", "遮陽帽"],
+            mandarinKeywords: ["很熱", "大熱天", "晴天", "太陽", "遮陽帽", "防曬"],
             guideResponse: "「大熱天陽光真烈，戴上帽仔、多喝水才不會中暑喔！」",
             mandarinGuideResponse: "「大熱天太陽真大，戴上帽子、多喝水才不會中暑喔！」"
           },
@@ -855,8 +855,8 @@ const SCENARIOS_GRAPH = {
             title: "❄️ 寒冷冬日",
             sub: "冷氣團來襲、北風呼呼",
             targetBranchId: "weather_outfit_cold",
-            keywords: ["當冷", "很冷", "寒冷", "天冷", "冬天", "大衫", "圍巾"],
-            mandarinKeywords: ["很冷", "寒冷", "天冷", "冬天", "大衣", "圍巾"],
+            keywords: ["當冷", "天時當冷", "很冷", "寒冷", "天冷", "冬天", "大衫", "圍巾"],
+            mandarinKeywords: ["天氣很冷", "很冷", "寒冷", "天冷", "冬天", "大衣", "圍巾", "保暖"],
             guideResponse: "「乖孫真靈俐！著暖暖、圍巾圍好，出門就毋驚吹風冷著囉！」",
             mandarinGuideResponse: "「乖孫真貼心！穿得暖暖的、圍巾圍好，出門就不怕吹風著涼了！」"
           }
@@ -1335,6 +1335,9 @@ class LLMServiceAdapter {
     };
 
     const currentPersona = rolePersonas[nodeConfig.npcRole] || "熱情友善的情境對話 NPC 角色";
+    const coreKeywordsStr = (nodeConfig?.nodeType === "選擇" && nodeConfig?.choices)
+      ? nodeConfig.choices.map(c => `${c.title}: [${(isMandarin ? (c.mandarinKeywords || c.keywords || []) : (c.keywords || [])).join(", ")}]`).join("； ")
+      : ((isMandarin ? (nodeConfig?.mandarinKeywords || nodeConfig?.keywords || []) : (nodeConfig?.keywords || [])).join("、") || "無");
 
     if (isMandarin) {
       return [
@@ -1343,7 +1346,7 @@ class LLMServiceAdapter {
         `【當前關卡】：${nodeConfig?.title || ""}（地點：${nodeConfig?.locationTag || ""}，類型：${nodeConfig?.nodeType || "主線"}）`,
         `【NPC 角色人設】：你將扮演「${nodeConfig?.npcRole || "NPC"}」— ${currentPersona}`,
         `【標準目標華語句】：${nodeConfig?.targetMandarin || "（分支選擇/自由回答關卡）"}`,
-        `【核心華語關鍵詞】：${(nodeConfig?.mandarinKeywords || nodeConfig?.keywords || []).join("、") || "無"}`,
+        `【核心華語關鍵詞】：${coreKeywordsStr}`,
         ``,
         `【學生語言模式】：華語（國語）口說模式。`,
         `【重要核心原則 — 針對學生實際錄音內容產生動態角色反應】：`,
@@ -1366,7 +1369,7 @@ class LLMServiceAdapter {
       `【NPC 角色人設】：你將扮演「${nodeConfig?.npcRole || "NPC"}」— ${currentPersona}`,
       `【標準目標客語句】：${nodeConfig?.targetHakka || "（分支選擇/自由回答關卡）"}`,
       `【標準華語意圖】：${nodeConfig?.targetMandarin || "（分支選擇/自由回答關卡）"}`,
-      `【核心關鍵詞】：${(nodeConfig?.keywords || []).join("、") || "無"}`,
+      `【核心關鍵詞】：${coreKeywordsStr}`,
       ``,
       `【重要核心原則 — 針對學生實際錄音內容產生動態角色反應】：`,
       `1. 動態 NPC 即時回饋 (Dynamic In-Character Reaction)：`,
@@ -1394,11 +1397,15 @@ class LLMServiceAdapter {
       }
     }
 
+    const coreKwList = (nodeConfig?.nodeType === "選擇" && nodeConfig?.choices)
+      ? nodeConfig.choices.flatMap(c => isMandarin ? (c.mandarinKeywords || c.keywords || []) : (c.keywords || []))
+      : (isMandarin ? (nodeConfig?.mandarinKeywords || nodeConfig?.keywords || []) : (nodeConfig?.keywords || []));
+
     if (isMandarin) {
       return [
         `【學生華語語音辨識文字】：「${mandarinTranscript || "（無輸入）"}」`,
         `【目標華語句】：${nodeConfig?.targetMandarin || "無固定句"}`,
-        `【核心華語關鍵詞清單】：${(nodeConfig?.mandarinKeywords || nodeConfig?.keywords || []).join(", ") || "無"}`,
+        `【核心華語關鍵詞清單】：${coreKwList.join(", ") || "無"}`,
         `${choicesText}`,
         ``,
         `請依據上述華語輸入評估是否通過，並嚴格依照以下 JSON 結構回傳（注意：dynamicNpcResponse 必須針對學生實際說的話做出角色化回應，不要給千篇一律的固定稱讚，且絕對不要在 NPC 對話中直接說『你要說：...』給予答案）：`,
@@ -1420,7 +1427,7 @@ class LLMServiceAdapter {
       `【客轉華語意正規化意圖】：「${mandarinTranscript || hakkaTranscript || "（無輸入）"}」`,
       `【目標客語句】：${nodeConfig?.targetHakka || "無固定句"}`,
       `【目標華語意圖】：${nodeConfig?.targetMandarin || "無"}`,
-      `【關鍵詞清單】：${(nodeConfig?.keywords || []).join(", ") || "無"}`,
+      `【關鍵詞清單】：${coreKwList.join(", ") || "無"}`,
       `${choicesText}`,
       ``,
       `請依據上述輸入評估是否通過，並嚴格依照以下 JSON 結構回傳（注意：dynamicNpcResponse 必須針對學生實際說的話做出角色化回應，不要給千篇一律的固定稱讚，且絕對不要在 NPC 對話中直接說『你要說：...』給予答案）：`,
@@ -3271,12 +3278,27 @@ class UIController {
       }
     }
 
-    // 關鍵字標籤 (依據當前華語/客語模式顯示對應關鍵字)
+    // 關鍵字標籤 (依據當前華語/客語模式顯示對應關鍵字，若為分支選擇關卡則依分支分組列出)
     if (this.els.devKeywordsList) {
-      const kwList = isMandarin
-        ? (nodeConfig.mandarinKeywords || (nodeConfig.choices ? nodeConfig.choices.flatMap(c => c.mandarinKeywords || c.keywords || []) : nodeConfig.keywords || []))
-        : (nodeConfig.keywords || (nodeConfig.choices ? nodeConfig.choices.flatMap(c => c.keywords || []) : []));
-      this.els.devKeywordsList.innerHTML = kwList.map(kw => `<span class="kw-tag">${kw}</span>`).join("");
+      if (nodeConfig.nodeType === "選擇" && nodeConfig.choices) {
+        const choicesHtml = nodeConfig.choices.map(c => {
+          const kws = isMandarin ? (c.mandarinKeywords || c.keywords || []) : (c.keywords || []);
+          return `
+            <div style="margin-bottom: 8px; background: rgba(30, 41, 59, 0.6); border-radius: 6px; padding: 6px 8px; border: 1px solid rgba(148, 163, 184, 0.2);">
+              <div style="font-size: 11px; font-weight: bold; color: #93c5fd; margin-bottom: 4px;">${c.title}</div>
+              <div style="display: flex; flex-wrap: wrap; gap: 4px;">
+                ${kws.map(kw => `<span class="kw-tag">${kw}</span>`).join("")}
+              </div>
+            </div>
+          `;
+        }).join("");
+        this.els.devKeywordsList.innerHTML = choicesHtml;
+      } else {
+        const kwList = isMandarin
+          ? (nodeConfig.mandarinKeywords || nodeConfig.keywords || [])
+          : (nodeConfig.keywords || []);
+        this.els.devKeywordsList.innerHTML = kwList.map(kw => `<span class="kw-tag">${kw}</span>`).join("");
+      }
     }
 
     if (runtimeResult) {
