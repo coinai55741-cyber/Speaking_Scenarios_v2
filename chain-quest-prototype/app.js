@@ -255,19 +255,19 @@ const SCENARIOS_GRAPH = {
         title: "第六關：展區出口集合",
         nodeType: "集合點",
         locationTag: "園區出口集合點",
-        storyPrompt: "參觀完動物展區後，大家走到【⭐ 出口集合點】集合，老師正在清點人數。你向老師報告：",
-        mandarinStoryPrompt: "參觀完動物展區後，大家走到【⭐ 出口集合點】集合，老師正在清點人數。你向老師報告：",
-        targetHakka: "老師，𠊎兜都參觀好了！",
-        targetMandarin: "老師，我們都參觀好了！",
-        keywords: ["老師", "參觀", "好了"],
-        mandarinKeywords: ["老師", "我們", "參觀好了"],
-        altKeywords: ["老師", "好了", "參觀好了"],
+        storyPrompt: "參觀完動物展區後，大家走到【⭐ 出口集合點】集合，老師正在清點人數。你向老師報告大家都到齊了：",
+        mandarinStoryPrompt: "參觀完動物展區後，大家走到【⭐ 出口集合點】集合，老師正在清點人數。你向老師報告大家都到齊了：",
+        targetHakka: "老師，𠊎兜都參觀好了，人都到齊了！",
+        targetMandarin: "老師，我們都參觀好了，人都到齊了！",
+        keywords: ["老師", "參觀好了", "到齊"],
+        mandarinKeywords: ["老師", "參觀好了", "到齊"],
+        altKeywords: ["老師", "好了", "參觀好了", "到齊了", "人都到了", "大家都到了"],
         npcRole: "帶隊老師",
         npcAvatar: "👩‍🏫",
-        npcSuccessResponse: "「太棒了！大家都準時集合而且學到很多動物知識，動物園探索大成功！」",
-        mandarinNpcSuccessResponse: "「太棒了！大家都準時集合而且學到很多動物知識，動物園探索大成功！」",
-        npcRetryResponse: "「老師笑著看大家：『同學們都參觀完了嗎？到齊了要跟老師報告一聲喔！』」",
-        mandarinNpcRetryResponse: "「老師笑著看大家：『同學們都參觀完了嗎？到齊了要跟老師報告一聲喔！』」",
+        npcSuccessResponse: "「太棒了！大家都準時到齊而且學到很多動物知識，動物園探索大成功！」",
+        mandarinNpcSuccessResponse: "「太棒了！大家都準時到齊而且學到很多動物知識，動物園探索大成功！」",
+        npcRetryResponse: "「那我們再等一下下，等全部人都到齊、都參觀完了之後再出發喔！」",
+        mandarinNpcRetryResponse: "「那我們再等一下下，等全部人都到齊、都參觀完了之後再出發喔！」",
         nextNodeId: null // 結束
       }
     }
@@ -1383,6 +1383,7 @@ class LLMServiceAdapter {
       `     * 【動物園第 1 關 (購票)】：核心目標是說出買學生票且數量為 3 位（3張）。`,
       `     * 【動物園第 2 關 (驗票)】：核心目標是出示門票並表達禮貌道謝（謝謝/恁仔細）。`,
       `     * 【動物園第 3 關 (問路選擇)】：核心目標是明確詢問想去的展區（大象/獅子/蛇）怎麼走。`,
+      `     * 【動物園第 6 關 (出口集合清點人數)】：核心目標是向帶隊老師報告「大家都到齊了/我們都參觀好了準備出發」。【極關鍵審核鐵律】：若學生發言表達「還有人沒到」、「還有人在上廁所」、「少了一個人/少人」、「還沒到齊/還在等某人」等缺人狀況，代表全體尚未齊全，【一律嚴格判定未通過 (isMatch: false)】！帶隊老師必須站在老師角色親切回答：『那我們再等一下下，等全部人都到齊、都參觀完了之後再出發喔！』`,
       `     * 【客家小吃店第 1 關 (點主食)】：核心目標是明確點出店內合理有的客家主食/菜色（粄條/小炒/擂茶/米苔目/肉粽/鹹豬肉等）。`,
       `     * 【客家小吃店第 2 關 (客製需求)】：核心目標是交代口味偏好（不要放香菜/甜一點/少油少鹽等）。`,
       `     * 【客家小吃店第 3 關 (加點評價)】：核心目標是加點飲品或稱讚美味。`,
@@ -1833,6 +1834,12 @@ class SpeechService {
       isMatch = false;
     }
 
+    // 人數到齊檢查 (出口集合清點人數關卡，若學生提到還有人沒到、上廁所、少一人等，嚴格判錯並要求等待)
+    const hasMissingPersons = nid === "zoo_meet_point" && /還有人|還沒|沒到|上廁所|洗手間|少一|少兩|缺一|缺人|去廁所|還在等|沒來|落單/.test(normalizedCleanText);
+    if (hasMissingPersons) {
+      isMatch = false;
+    }
+
     let customNpcResponse = null;
     let feedbackMsg = isMatch ? "辨識成功！語意明確且符合情境交流。" : "情境語意未達標，請參考提示再說一次。";
 
@@ -1841,6 +1848,11 @@ class SpeechService {
         ? "「我們店裡的招牌是現煮湯粄條跟客家小炒，香噴噴的，你要來一碗哪一樣呢？」"
         : "「𠊎兜店裡个招牌係現煮湯粄條同客家小炒，當香喔，你愛食哪一隻呢？」";
       feedbackMsg = "老闆已為您推薦招牌菜色，請開口點選想吃的餐點喔！";
+    } else if (hasMissingPersons) {
+      customNpcResponse = isMandarinMode
+        ? "「那我們再等一下下，等全部人都到齊、都參觀完了之後再出發喔！」"
+        : "「該𠊎兜過等一下仔，等全部人都到齊、都參觀好後再出發喔！」";
+      feedbackMsg = "同學尚未全員到齊，請等大家都到齊後再向老師報告出發喔！";
     } else if (isMatch && nid === "zoo_start" && /打折|算便宜|優惠/.test(normalizedCleanText)) {
       customNpcResponse = isMandarinMode
         ? "「同學，學生票已經是優惠票價了，沒辦法再打折囉！這是你們的三張學生票，祝你們玩得開心！」"
