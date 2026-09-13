@@ -97,8 +97,8 @@ const SCENARIOS_GRAPH = {
         npcAvatar: "🧑‍💼",
         npcSuccessResponse: "「好，三張學生票。這是你的門票，請收好，祝你們玩得開心！」",
         mandarinNpcSuccessResponse: "「好，三張學生票。這是你的門票，請收好，祝你們玩得開心！」",
-        npcRetryResponse: "「不好意思我沒聽清楚，請問要買幾張票呢？請再說一次喔！」",
-        mandarinNpcRetryResponse: "「不好意思我沒聽清楚，請問要買幾張票呢？請再說一次喔！」",
+        npcRetryResponse: "「不好意思售票窗口聲音比較雜，請問你們幾位、要買幾張票呢？」",
+        mandarinNpcRetryResponse: "「不好意思售票窗口聲音比較雜，請問你們幾位、要買幾張票呢？」",
         nextNodeId: "zoo_gate"
       },
       zoo_gate: {
@@ -117,8 +117,8 @@ const SCENARIOS_GRAPH = {
         npcAvatar: "👵",
         npcSuccessResponse: "「歡迎光臨！閘門打開了，進去請小心腳步，慢慢參觀喔！」",
         mandarinNpcSuccessResponse: "「歡迎光臨！閘門打開了，進去請小心腳步，慢慢參觀喔！」",
-        npcRetryResponse: "「志工奶奶正在等您出示門票並道謝喔，請再說一次！」",
-        mandarinNpcRetryResponse: "「志工奶奶正在等您出示門票並道謝喔，請再說一次！」",
+        npcRetryResponse: "「嗯……年輕人，進場要有禮貌說聲謝謝喔！奶奶也在等著幫你驗門票呢，要不要再說一次？」",
+        mandarinNpcRetryResponse: "「嗯……年輕人，進場要有禮貌說聲謝謝喔！奶奶也在等著幫你驗門票呢，要不要再說一次？」",
         nextNodeId: "zoo_choose_animal"
       },
       zoo_choose_animal: {
@@ -137,8 +137,8 @@ const SCENARIOS_GRAPH = {
         npcAvatar: "👨‍🌾",
         npcSuccessResponse: "「想好要看哪一種動物後，就看清楚路線提示，操縱小人出發吧！」",
         mandarinNpcSuccessResponse: "「想好要看哪一種動物後，就看清楚路線提示，操縱角色出發吧！」",
-        npcRetryResponse: "「請問你想去哪裡呢？請開口向導覽員詢問你想去的展區喔！」",
-        mandarinNpcRetryResponse: "「請問你想去哪裡呢？請開口向導覽員詢問你想去的展區喔！」",
+        npcRetryResponse: "「同學，你想要先看哪一種動物呢？大象、獅子還是蛇，告訴我我幫你指路喔！」",
+        mandarinNpcRetryResponse: "「同學，你想要先看哪一種動物呢？大象、獅子還是蛇，告訴我我幫你指路喔！」",
         choices: [
           {
             id: "elephant",
@@ -206,8 +206,8 @@ const SCENARIOS_GRAPH = {
         npcAvatar: "👦",
         npcSuccessResponse: "「真的耶！你看牠還會用長鼻子捲草吃，大象真的好得意喔！」",
         mandarinNpcSuccessResponse: "「真的耶！你看牠還會用長鼻子吸水噴在背上，大象真的好可愛喔！」",
-        npcRetryResponse: "「阿明沒聽清楚，請跟同學分享大象長鼻子洗澡的可愛特徵喔！」",
-        mandarinNpcRetryResponse: "「阿明沒聽清楚，請跟同學分享大象長鼻子洗澡的可愛特徵喔！」",
+        npcRetryResponse: "「阿明歪著頭問：『大象到底在做什麼呀？我剛才沒看清楚，快跟我說說看！』」",
+        mandarinNpcRetryResponse: "「阿明歪著頭問：『大象到底在做什麼呀？我剛才沒看清楚，快跟我說說看！』」",
         nextNodeId: "zoo_meet_point"
       },
       zoo_lion: {
@@ -226,8 +226,8 @@ const SCENARIOS_GRAPH = {
         npcAvatar: "👦",
         npcSuccessResponse: "「對啊，牠趴在岩石上，看起來就像草原之王一樣威風！」",
         mandarinNpcSuccessResponse: "「對啊，牠趴在岩石上，看起來就像草原之王一樣威風！」",
-        npcRetryResponse: "「阿明沒聽清楚，請跟同學分享獅子趴在石頭上的威風模樣喔！」",
-        mandarinNpcRetryResponse: "「阿明沒聽清楚，請跟同學分享獅子趴在石頭上的威風模樣喔！」",
+        npcRetryResponse: "「阿明指著岩石說：『你看獅子趴在那邊，看起來像什麼呢？快跟我分享！』」",
+        mandarinNpcRetryResponse: "「阿明指著岩石說：『你看獅子趴在那邊，看起來像什麼呢？快跟我分享！』」",
         nextNodeId: "zoo_meet_point"
       },
       zoo_snake: {
@@ -246,8 +246,8 @@ const SCENARIOS_GRAPH = {
         npcAvatar: "👦",
         npcSuccessResponse: "「真的，牠在樹枝上滑行得好慢，幾乎一點聲音都沒有！」",
         mandarinNpcSuccessResponse: "「真的，牠在樹枝上滑行得好慢，幾乎一點聲音都沒有！」",
-        npcRetryResponse: "「阿明沒聽清楚，請跟同學分享蛇在樹枝上安靜爬行的特徵喔！」",
-        mandarinNpcRetryResponse: "「阿明沒聽清楚，請跟同學分享蛇在樹枝上安靜爬行的特徵喔！」",
+        npcRetryResponse: "「阿明靠在玻璃窗邊說：『蛇在樹枝上是怎麼移動的呀？快跟我說說看！』」",
+        mandarinNpcRetryResponse: "「阿明靠在玻璃窗邊說：『蛇在樹枝上是怎麼移動的呀？快跟我說說看！』」",
         nextNodeId: "zoo_meet_point"
       },
       zoo_meet_point: {
@@ -266,8 +266,8 @@ const SCENARIOS_GRAPH = {
         npcAvatar: "👩‍🏫",
         npcSuccessResponse: "「太棒了！大家都準時集合而且學到很多動物知識，動物園探索大成功！」",
         mandarinNpcSuccessResponse: "「太棒了！大家都準時集合而且學到很多動物知識，動物園探索大成功！」",
-        npcRetryResponse: "「老師正在等大家報告參觀完畢喔，請向老師報告！」",
-        mandarinNpcRetryResponse: "「老師正在等大家報告參觀完畢喔，請向老師報告！」",
+        npcRetryResponse: "「老師笑著看大家：『同學們都參觀完了嗎？到齊了要跟老師報告一聲喔！』」",
+        mandarinNpcRetryResponse: "「老師笑著看大家：『同學們都參觀完了嗎？到齊了要跟老師報告一聲喔！』」",
         nextNodeId: null // 結束
       }
     }
@@ -302,8 +302,8 @@ const SCENARIOS_GRAPH = {
         npcAvatar: "👨‍🍳",
         npcSuccessResponse: "「好，我收你五十箍，你去那邊稍坐一下喔，等一下就上菜了！」",
         mandarinNpcSuccessResponse: "「好，我收你五十元，你去那邊稍坐一下喔，等一下就上菜了！」",
-        npcRetryResponse: "「老闆沒聽清楚，請問你想點什麼主食呢？請再說一次喔！」",
-        mandarinNpcRetryResponse: "「老闆沒聽清楚，請問你想點什麼主食呢？請再說一次喔！」",
+        npcRetryResponse: "「老闆熱情問道：『同學，今天想吃點什麼好料的？我們招牌有現煮湯粄條跟客家小炒喔！』」",
+        mandarinNpcRetryResponse: "「老闆熱情問道：『同學，今天想吃點什麼好料的？我們招牌有現煮湯粄條跟客家小炒喔！』」",
         nextNodeId: "food_step2"
       },
       food_step2: {
@@ -322,8 +322,8 @@ const SCENARIOS_GRAPH = {
         npcAvatar: "👩‍🍳",
         npcSuccessResponse: "「沒問題！阿姨記下來了，不放香菜，幫你煮得甘甜甘甜！」",
         mandarinNpcSuccessResponse: "「沒問題！阿姨記下來了，不放香菜，幫你煮得甘甜甘甜！」",
-        npcRetryResponse: "「阿姨沒聽清楚，請清楚告訴阿姨你的口味與客製要求喔！」",
-        mandarinNpcRetryResponse: "「阿姨沒聽清楚，請清楚告訴阿姨你的口味與客製要求喔！」",
+        npcRetryResponse: "「阿姨拿著杓子問：『同學，你的粄條口味上有什麼特別交代嗎？比如不要放香菜還是要甜一點？』」",
+        mandarinNpcRetryResponse: "「阿姨拿著杓子問：『同學，你的粄條口味上有什麼特別交代嗎？比如不要放香菜還是要甜一點？』」",
         nextNodeId: "food_step3"
       },
       food_step3: {
@@ -342,8 +342,8 @@ const SCENARIOS_GRAPH = {
         npcAvatar: "🧑‍💼",
         npcSuccessResponse: "「多謝你喜歡！冰涼濃郁的現磨擂茶馬上送上來，請慢用喔！」",
         mandarinNpcSuccessResponse: "「多謝你喜歡！冰涼濃郁的現磨擂茶馬上送上來，請慢用喔！」",
-        npcRetryResponse: "「服務生沒聽清楚，請向服務生加點飲品並稱讚小吃美味喔！」",
-        mandarinNpcRetryResponse: "「服務生沒聽清楚，請向服務生加點飲品並稱讚小吃美味喔！」",
+        npcRetryResponse: "「服務生親切問：『吃得還滿意嗎？需要再加點一杯冰涼濃郁的現磨擂茶解解渴嗎？』」",
+        mandarinNpcRetryResponse: "「服務生親切問：『吃得還滿意嗎？需要再加點一杯冰涼濃郁的現磨擂茶解解渴嗎？』」",
         nextNodeId: null
       }
     }
@@ -392,8 +392,8 @@ const SCENARIOS_GRAPH = {
             npcAvatar: "👩",
             npcSuccessResponse: "「真乖！下雨時就不怕淋濕了，放進書包側邊吧！」",
             mandarinNpcSuccessResponse: "「真乖！下雨時就不怕淋濕了，放進書包側邊吧！」",
-            npcRetryResponse: "「媽媽沒聽清楚，請說出雨傘的名稱與出遊攜帶的原因喔！」",
-            mandarinNpcRetryResponse: "「媽媽沒聽清楚，請說出雨傘的名稱與出遊攜帶的原因喔！」"
+            npcRetryResponse: "「媽媽叮嚀：『書桌上的雨傘要記得收進去喔，出門下雨才不會淋濕，快收好跟媽媽說！』」",
+            mandarinNpcRetryResponse: "「媽媽叮嚀：『書桌上的雨傘要記得收進去喔，出門下雨才不會淋濕，快收好跟媽媽說！』」"
           },
           {
             id: "bottle",
@@ -412,8 +412,8 @@ const SCENARIOS_GRAPH = {
             npcAvatar: "👩",
             npcSuccessResponse: "「很好！水壺裝滿溫水放好，走路流汗要多補充水分喔！」",
             mandarinNpcSuccessResponse: "「很好！水壺裝滿溫水放好，走路流汗要多補充水分喔！」",
-            npcRetryResponse: "「媽媽沒聽清楚，請說出水壺的名稱與喝水補水的原因喔！」",
-            mandarinNpcRetryResponse: "「媽媽沒聽清楚，請說出水壺的名稱與喝水補水的原因喔！」"
+            npcRetryResponse: "「媽媽提醒：『水壺裝好溫水了嗎？健行走路要多補充水分，快收好跟媽媽說！』」",
+            mandarinNpcRetryResponse: "「媽媽提醒：『水壺裝好溫水了嗎？健行走路要多補充水分，快收好跟媽媽說！』」"
           },
           {
             id: "towel",
@@ -432,8 +432,8 @@ const SCENARIOS_GRAPH = {
             npcAvatar: "👨",
             npcSuccessResponse: "「很細心！活動後把汗擦乾，比較不會著涼感冒。」",
             mandarinNpcSuccessResponse: "「很細心！活動後把汗擦乾，比較不會著涼感冒。」",
-            npcRetryResponse: "「爸爸沒聽清楚，請說出毛巾的名稱與擦汗的原因喔！」",
-            mandarinNpcRetryResponse: "「爸爸沒聽清楚，請說出毛巾的名稱與擦汗的原因喔！」"
+            npcRetryResponse: "「爸爸笑著說：『活動流汗要記得帶毛巾擦乾才不會著涼喔，收好跟爸爸說一聲！』」",
+            mandarinNpcRetryResponse: "「爸爸笑著說：『活動流汗要記得帶毛巾擦乾才不會著涼喔，收好跟爸爸說一聲！』」"
           },
           {
             id: "snack",
@@ -452,8 +452,8 @@ const SCENARIOS_GRAPH = {
             npcAvatar: "👨",
             npcSuccessResponse: "「沒錯！健行休息肚子餓時，可以吃點心補充元氣！」",
             mandarinNpcSuccessResponse: "「沒錯！健行休息肚子餓時，可以吃點心補充元氣！」",
-            npcRetryResponse: "「爸爸沒聽清楚，請說出點心的名稱與肚子餓補充體力的原因喔！」",
-            mandarinNpcRetryResponse: "「爸爸沒聽清楚，請說出點心的名稱與肚子餓補充體力的原因喔！」"
+            npcRetryResponse: "「爸爸提醒：『健行如果走累了肚子餓，點心餅乾很重要喔，放進背包跟爸爸說！』」",
+            mandarinNpcRetryResponse: "「爸爸提醒：『健行如果走累了肚子餓，點心餅乾很重要喔，放進背包跟爸爸說！』」"
           }
         ],
         nextNodeId: "pack_done"
@@ -474,8 +474,8 @@ const SCENARIOS_GRAPH = {
         npcAvatar: "👩",
         npcSuccessResponse: "「太棒了！裝備齊全，今天校外教學一定會非常順利又開心！」",
         mandarinNpcSuccessResponse: "「太棒了！裝備齊全，今天校外教學一定會非常順利又開心！」",
-        npcRetryResponse: "「媽媽正在等您確認物品齊全並報告出發喔！」",
-        mandarinNpcRetryResponse: "「媽媽正在等您確認物品齊全並報告出發喔！」",
+        npcRetryResponse: "「媽媽在玄關笑著問：『東西都檢查齊全了嗎？準備好我們就要出發囉！』」",
+        mandarinNpcRetryResponse: "「媽媽在玄關笑著問：『東西都檢查齊全了嗎？準備好我們就要出發囉！』」",
         nextNodeId: null
       }
     }
@@ -510,8 +510,8 @@ const SCENARIOS_GRAPH = {
         npcAvatar: "👮",
         npcSuccessResponse: "「選好目的地後，我會告訴你搭哪一路公車喔！」",
         mandarinNpcSuccessResponse: "「選好目的地後，我會告訴你搭哪一路公車喔！」",
-        npcRetryResponse: "「站務員沒聽清楚，請開口詢問你要前往的目的地公車路線喔！」",
-        mandarinNpcRetryResponse: "「站務員沒聽清楚，請開口詢問你要前往的目的地公車路線喔！」",
+        npcRetryResponse: "「站務員熱心問：『同學，你要去文化園區、學校還是圖書館呢？告訴我我幫你查公車！』」",
+        mandarinNpcRetryResponse: "「站務員熱心問：『同學，你要去文化園區、學校還是圖書館呢？告訴我我幫你查公車！』」",
         choices: [
           {
             id: "culture",
@@ -562,8 +562,8 @@ const SCENARIOS_GRAPH = {
         npcAvatar: "👮",
         npcSuccessResponse: "「對！802 路公車馬上進站了，請在黃線後方排隊上車喔！」",
         mandarinNpcSuccessResponse: "「對！802 路公車馬上進站了，請在黃線後方排隊上車喔！」",
-        npcRetryResponse: "「站務員沒聽清楚，請向站務員確認去文化園區是否搭 802 公車喔！」",
-        mandarinNpcRetryResponse: "「站務員沒聽清楚，請向站務員確認去文化園區是否搭 802 公車喔！」",
+        npcRetryResponse: "「站務員指著站牌：『同學，去文化園區要搭哪一路公車呢？看清楚站牌再跟我確認一次喔！』」",
+        mandarinNpcRetryResponse: "「站務員指著站牌：『同學，去文化園區要搭哪一路公車呢？看清楚站牌再跟我確認一次喔！』」",
         nextNodeId: "bus_arrive"
       },
       bus_ask_school: {
@@ -582,8 +582,8 @@ const SCENARIOS_GRAPH = {
         npcAvatar: "👮",
         npcSuccessResponse: "「對！615 路公車馬上進站了，請在黃線後方排隊上車喔！」",
         mandarinNpcSuccessResponse: "「對！615 路公車馬上進站了，請在黃線後方排隊上車喔！」",
-        npcRetryResponse: "「站務員沒聽清楚，請向站務員確認去學校是否搭 615 公車喔！」",
-        mandarinNpcRetryResponse: "「站務員沒聽清楚，請向站務員確認去學校是否搭 615 公車喔！」",
+        npcRetryResponse: "「站務員指著站牌：『同學，去學校要搭哪一路公車呢？看清楚站牌再跟我確認一次喔！』」",
+        mandarinNpcRetryResponse: "「站務員指著站牌：『同學，去學校要搭哪一路公車呢？看清楚站牌再跟我確認一次喔！』」",
         nextNodeId: "bus_arrive"
       },
       bus_ask_library: {
@@ -602,8 +602,8 @@ const SCENARIOS_GRAPH = {
         npcAvatar: "👮",
         npcSuccessResponse: "「對！306 路公車馬上進站了，請在黃線後方排隊上車喔！」",
         mandarinNpcSuccessResponse: "「對！306 路公車馬上進站了，請在黃線後方排隊上車喔！」",
-        npcRetryResponse: "「站務員沒聽清楚，請向站務員確認去圖書館是否搭 306 公車喔！」",
-        mandarinNpcRetryResponse: "「站務員沒聽清楚，請向站務員確認去圖書館是否搭 306 公車喔！」",
+        npcRetryResponse: "「站務員指著站牌：『同學，去圖書館要搭哪一路公車呢？看清楚站牌再跟我確認一次喔！』」",
+        mandarinNpcRetryResponse: "「站務員指著站牌：『同學，去圖書館要搭哪一路公車呢？看清楚站牌再跟我確認一次喔！』」",
         nextNodeId: "bus_arrive"
       },
       bus_arrive: {
@@ -622,8 +622,8 @@ const SCENARIOS_GRAPH = {
         npcAvatar: "👵",
         npcSuccessResponse: "「無錯！過紅綠燈越倒手（左轉）走兩步路就看到大門了，祝你順利喔！」",
         mandarinNpcSuccessResponse: "「沒錯！過紅綠燈左轉走兩步路就看到大門了，祝你順利喔！」",
-        npcRetryResponse: "「阿婆沒聽清楚，請向阿婆確認路口直走或轉彎的方向指引喔！」",
-        mandarinNpcRetryResponse: "「阿婆沒聽清楚，請向阿婆確認路口直走或轉彎的方向指引喔！」",
+        npcRetryResponse: "「熱心阿婆笑瞇瞇地問：『小朋友，下了公車要往前走還是轉彎呢？阿婆再聽你確認一次！』」",
+        mandarinNpcRetryResponse: "「熱心阿婆笑瞇瞇地問：『小朋友，下了公車要往前走還是轉彎呢？阿婆再聽你確認一次！』」",
         nextNodeId: null
       }
     }
@@ -659,8 +659,8 @@ const SCENARIOS_GRAPH = {
         npcAvatar: "👩‍⚕️",
         npcSuccessResponse: "「慢慢說，哪裡不舒服都可以告訴我喔。」",
         mandarinNpcSuccessResponse: "「慢慢說，哪裡不舒服都可以告訴我喔。」",
-        npcRetryResponse: "「護理師溫柔地詢問你，請開口說明身體哪裡不舒服喔！」",
-        mandarinNpcRetryResponse: "「護理師溫柔地詢問你，請開口說明身體哪裡不舒服喔！」",
+        npcRetryResponse: "「護理師溫柔地問：『小朋友，看你臉色不太對，是頭痛肚子痛、跌倒擦傷還是身體發熱呢？』」",
+        mandarinNpcRetryResponse: "「護理師溫柔地問：『小朋友，看你臉色不太對，是頭痛肚子痛、跌倒擦傷還是身體發熱呢？』」",
         choices: [
           {
             id: "head_stomach",
@@ -711,8 +711,8 @@ const SCENARIOS_GRAPH = {
         npcAvatar: "👩‍⚕️",
         npcSuccessResponse: "「我知道了，先坐下來量體溫，阿姨倒一杯溫開水給你喝喔。」",
         mandarinNpcSuccessResponse: "「我知道了，先坐下來量體溫，阿姨倒一杯溫開水給你喝喔。」",
-        npcRetryResponse: "「護理師沒聽清楚，請清楚向護理師描述頭痛與肚子絞痛的感覺喔！」",
-        mandarinNpcRetryResponse: "「護理師沒聽清楚，請清楚向護理師描述頭痛與肚子絞痛的感覺喔！」",
+        npcRetryResponse: "「護理師輕聲問：『是頭暈腦脹還是肚子陣陣在痛呢？坐下來慢慢跟阿姨說清楚喔。』」",
+        mandarinNpcRetryResponse: "「護理師輕聲問：『是頭暈腦脹還是肚子陣陣在痛呢？坐下來慢慢跟阿姨說清楚喔。』」",
         nextNodeId: "health_rest"
       },
       health_symptom_scratch: {
@@ -731,8 +731,8 @@ const SCENARIOS_GRAPH = {
         npcAvatar: "👩‍⚕️",
         npcSuccessResponse: "「不要緊喔！阿姨幫你擦消炎藥、貼上透氣紗布，很快就不會痛了。」",
         mandarinNpcSuccessResponse: "「不要緊喔！阿姨幫你擦消炎藥、貼上透氣紗布，很快就不會痛了。」",
-        npcRetryResponse: "「護理師沒聽清楚，請向護理師說明剛剛體育課跌倒擦傷的情形喔！」",
-        mandarinNpcRetryResponse: "「護理師沒聽清楚，請向護理師說明剛剛體育課跌倒擦傷的情形喔！」",
+        npcRetryResponse: "「護理師看著你的膝蓋：『哎呀膝蓋紅紅的，剛剛體育課是怎麼受傷的呢？跟阿姨說。』」",
+        mandarinNpcRetryResponse: "「護理師看著你的膝蓋：『哎呀膝蓋紅紅的，剛剛體育課是怎麼受傷的呢？跟阿姨說。』」",
         nextNodeId: "health_rest"
       },
       health_symptom_fever: {
@@ -751,8 +751,8 @@ const SCENARIOS_GRAPH = {
         npcAvatar: "👩‍⚕️",
         npcSuccessResponse: "「我先幫你量耳溫，稍微有一點發燒，先在床上躺著休息一節課喔。」",
         mandarinNpcSuccessResponse: "「我先幫你量耳溫，稍微有一點發燒，先在床上躺著休息一節課喔。」",
-        npcRetryResponse: "「護理師沒聽清楚，請向護理師描述身體發熱與沒有力氣的狀況喔！」",
-        mandarinNpcRetryResponse: "「護理師沒聽清楚，請向護理師描述身體發熱與沒有力氣的狀況喔！」",
+        npcRetryResponse: "「護理師摸摸你的額頭：『額頭稍微有點溫溫的，身體還有哪裡覺得熱熱沒力氣嗎？』」",
+        mandarinNpcRetryResponse: "「護理師摸摸你的額頭：『額頭稍微有點溫溫的，身體還有哪裡覺得熱熱沒力氣嗎？』」",
         nextNodeId: "health_rest"
       },
       health_rest: {
@@ -771,8 +771,8 @@ const SCENARIOS_GRAPH = {
         npcAvatar: "👩‍⚕️",
         npcSuccessResponse: "「真懂事！先在病床上躺著休息一節課，身體很快就會恢復元氣囉！」",
         mandarinNpcSuccessResponse: "「真懂事！先在病床上躺著休息一節課，身體很快就會恢復元氣囉！」",
-        npcRetryResponse: "「護理師正在等您答應好好休息與禮貌致謝喔！」",
-        mandarinNpcRetryResponse: "「護理師正在等您答應好好休息與禮貌致謝喔！」",
+        npcRetryResponse: "「護理師叮嚀：『阿姨幫你擦好藥了，今天不要劇烈運動，要答應阿姨多喝溫水好好休息喔！』」",
+        mandarinNpcRetryResponse: "「護理師叮嚀：『阿姨幫你擦好藥了，今天不要劇烈運動，要答應阿姨多喝溫水好好休息喔！』」",
         nextNodeId: null
       }
     }
@@ -807,8 +807,8 @@ const SCENARIOS_GRAPH = {
         npcAvatar: "👨‍👩‍👧",
         npcSuccessResponse: "「看清楚天氣，再想想今天要穿什麼或帶什麼出門喔！」",
         mandarinNpcSuccessResponse: "「看清楚天氣，再想想今天要穿什麼或帶什麼出門喔！」",
-        npcRetryResponse: "「請看窗外天氣，開口提醒家人今天的天氣與出門裝備喔！」",
-        mandarinNpcRetryResponse: "「請看窗外天氣，開口提醒家人今天的天氣與出門裝備喔！」",
+        npcRetryResponse: "「家人笑著問：『拉開窗簾看看，外面今天是下雨、大熱天還是寒流天呢？該提醒大家穿什麼？』」",
+        mandarinNpcRetryResponse: "「家人笑著問：『拉開窗簾看看，外面今天是下雨、大熱天還是寒流天呢？該提醒大家穿什麼？』」",
         choices: [
           {
             id: "rain",
@@ -859,8 +859,8 @@ const SCENARIOS_GRAPH = {
         npcAvatar: "👩",
         npcSuccessResponse: "「無錯！落雨天路滑，著好雨衣、帶好遮仔，出門小心行喔！」",
         mandarinNpcSuccessResponse: "「沒錯！下雨天路滑，穿好雨衣、帶好雨傘，出門小心走喔！」",
-        npcRetryResponse: "「媽媽沒聽清楚，請提醒家人外面下雨要帶上的雨具穿搭喔！」",
-        mandarinNpcRetryResponse: "「媽媽沒聽清楚，請提醒家人外面下雨要帶上的雨具穿搭喔！」",
+        npcRetryResponse: "「媽媽看著窗外：『外頭在下雨呢，出門要帶什麼雨具才不會淋濕呀？』」",
+        mandarinNpcRetryResponse: "「媽媽看著窗外：『外頭在下雨呢，出門要帶什麼雨具才不會淋濕呀？』」",
         nextNodeId: "weather_done"
       },
       weather_outfit_hot: {
@@ -879,8 +879,8 @@ const SCENARIOS_GRAPH = {
         npcAvatar: "👨",
         npcSuccessResponse: "「大熱天陽光真烈，戴上帽仔、多喝水才不會中暑喔！」",
         mandarinNpcSuccessResponse: "「大熱天太陽真大，戴上帽子、多喝水才不會中暑喔！」",
-        npcRetryResponse: "「爸爸沒聽清楚，請提醒家人外面大太陽要準備的防曬穿搭喔！」",
-        mandarinNpcRetryResponse: "「爸爸沒聽清楚，請提醒家人外面大太陽要準備的防曬穿搭喔！」",
+        npcRetryResponse: "「爸爸指著大太陽：『外頭太陽好大好熱，出門要戴什麼防曬呢？』」",
+        mandarinNpcRetryResponse: "「爸爸指著大太陽：『外頭太陽好大好熱，出門要戴什麼防曬呢？』」",
         nextNodeId: "weather_done"
       },
       weather_outfit_cold: {
@@ -899,8 +899,8 @@ const SCENARIOS_GRAPH = {
         npcAvatar: "👴",
         npcSuccessResponse: "「乖孫真靈俐！著暖暖、圍巾圍好，出門就毋驚吹風冷著囉！」",
         mandarinNpcSuccessResponse: "「乖孫真貼心！穿得暖暖的、圍巾圍好，出門就不怕吹風著涼了！」",
-        npcRetryResponse: "「阿公沒聽清楚，請提醒家人寒流天冷要穿戴的保暖衣物喔！」",
-        mandarinNpcRetryResponse: "「阿公沒聽清楚，請提醒家人寒流天冷要穿戴的保暖衣物喔！」",
+        npcRetryResponse: "「阿公搓搓雙手：『冷氣團來了風好冷喔，出門要穿什麼保暖才不會著涼呀？』」",
+        mandarinNpcRetryResponse: "「阿公搓搓雙手：『冷氣團來了風好冷喔，出門要穿什麼保暖才不會著涼呀？』」",
         nextNodeId: "weather_done"
       },
       weather_done: {
@@ -919,8 +919,8 @@ const SCENARIOS_GRAPH = {
         npcAvatar: "👨‍👩‍👧",
         npcSuccessResponse: "「太棒了！穿搭完全符合今天的天氣，出門平安順心！」",
         mandarinNpcSuccessResponse: "「太棒了！穿搭完全符合今天的天氣，出門平安順心！」",
-        npcRetryResponse: "「家人正在等大家確認準備完成、一起出發喔！」",
-        mandarinNpcRetryResponse: "「家人正在等大家確認準備完成、一起出發喔！」",
+        npcRetryResponse: "「家人在玄關問：『大家都穿戴整齊、準備好出發了嗎？』」",
+        mandarinNpcRetryResponse: "「家人在玄關問：『大家都穿戴整齊、準備好出發了嗎？』」",
         nextNodeId: null
       }
     }
