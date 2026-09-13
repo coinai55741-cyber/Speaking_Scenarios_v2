@@ -490,8 +490,8 @@ const SCENARIOS_GRAPH = {
     icon: "🚌",
     bannerImage: "./assets/bus_directions.jpg",
     objectPosition: "80% 48%",
-    objective: "看提示口說選擇目的地向站務員詢問路線，上車確認班次，並於下車後聽懂十字路口方向指引。",
-    mandarinObjective: "看提示口說選擇目的地向站務員詢問路線，上車確認班次，並於下車後聽懂十字路口方向指引。",
+    objective: "看提示口說選擇目的地向站務員確認公車班次，並於下車後聽懂十字路口方向指引。",
+    mandarinObjective: "看提示口說選擇目的地向站務員確認公車班次，並於下車後聽懂十字路口方向指引。",
     startNodeId: "bus_choose_dest",
     nodes: {
       bus_choose_dest: {
@@ -564,7 +564,7 @@ const SCENARIOS_GRAPH = {
         mandarinNpcSuccessResponse: "「對！802 路公車馬上進站了，請在黃線後方排隊上車喔！」",
         npcRetryResponse: "「站務員沒聽清楚，請向站務員確認去文化園區是否搭 802 公車喔！」",
         mandarinNpcRetryResponse: "「站務員沒聽清楚，請向站務員確認去文化園區是否搭 802 公車喔！」",
-        nextNodeId: "bus_board"
+        nextNodeId: "bus_arrive"
       },
       bus_ask_school: {
         id: "bus_ask_school",
@@ -584,7 +584,7 @@ const SCENARIOS_GRAPH = {
         mandarinNpcSuccessResponse: "「對！615 路公車馬上進站了，請在黃線後方排隊上車喔！」",
         npcRetryResponse: "「站務員沒聽清楚，請向站務員確認去學校是否搭 615 公車喔！」",
         mandarinNpcRetryResponse: "「站務員沒聽清楚，請向站務員確認去學校是否搭 615 公車喔！」",
-        nextNodeId: "bus_board"
+        nextNodeId: "bus_arrive"
       },
       bus_ask_library: {
         id: "bus_ask_library",
@@ -604,31 +604,11 @@ const SCENARIOS_GRAPH = {
         mandarinNpcSuccessResponse: "「對！306 路公車馬上進站了，請在黃線後方排隊上車喔！」",
         npcRetryResponse: "「站務員沒聽清楚，請向站務員確認去圖書館是否搭 306 公車喔！」",
         mandarinNpcRetryResponse: "「站務員沒聽清楚，請向站務員確認去圖書館是否搭 306 公車喔！」",
-        nextNodeId: "bus_board"
-      },
-      bus_board: {
-        id: "bus_board",
-        title: "步驟 3：上車確認到站",
-        nodeType: "主線",
-        locationTag: "公車前門刷卡處",
-        storyPrompt: "公車停靠開門，你在刷卡上車時，向司機先生再次確認這班車會不會到目的地。你說：",
-        mandarinStoryPrompt: "公車停靠開門，你在刷卡上車時，向司機先生再次確認這班車會不會到目的地。你說：",
-        targetHakka: "請問這台車有到目的地無？",
-        targetMandarin: "請問這台車有到目的地嗎？",
-        keywords: ["這台車", "有到", "無"],
-        mandarinKeywords: ["這台車", "有到", "目的地", "嗎"],
-        altKeywords: ["目的地", "這台車", "有到無"],
-        npcRole: "公車司機",
-        npcAvatar: "👨‍✈️",
-        npcSuccessResponse: "「有喔！這班車有到，快進去坐好、抓緊扶手喔！」",
-        mandarinNpcSuccessResponse: "「有喔！這班車有到，快進去坐好、抓緊扶手喔！」",
-        npcRetryResponse: "「司機先生沒聽清楚，請上車時向司機確認這班車是否到達目的地喔！」",
-        mandarinNpcRetryResponse: "「司機先生沒聽清楚，請上車時向司機確認這班車是否到達目的地喔！」",
         nextNodeId: "bus_arrive"
       },
       bus_arrive: {
         id: "bus_arrive",
-        title: "步驟 4：下車路口方向指引",
+        title: "步驟 3：下車路口方向指引",
         nodeType: "集合點",
         locationTag: "十字路口紅綠燈旁",
         storyPrompt: "下車後走到十字路口，你向路旁熱心阿婆確認向前走、過紅綠燈左轉就會到。你說：",
@@ -3014,9 +2994,8 @@ class UIController {
       visibleSteps.push({ id: "bus_choose_dest", title: "步驟 1：詢問搭車路線" });
       if (this.state.selectedTargetBranchId || this.state.completedNodes.has("bus_choose_dest")) {
         const branchId = this.state.selectedTargetBranchId || "bus_ask_culture";
-        visibleSteps.push({ id: branchId, title: scenario.nodes[branchId]?.title || "步驟 2：站牌候車問候" });
-        visibleSteps.push({ id: "bus_board", title: "步驟 3：上車確認到站" });
-        visibleSteps.push({ id: "bus_arrive", title: "步驟 4：下車路口方向指引" });
+        visibleSteps.push({ id: branchId, title: scenario.nodes[branchId]?.title || "步驟 2：站牌確認公車班次" });
+        visibleSteps.push({ id: "bus_arrive", title: "步驟 3：下車路口方向指引" });
       }
     } else if (scenario.id === "health_center") {
       visibleSteps.push({ id: "health_choose_symptom", title: "步驟 1：向護理師表達不適" });
