@@ -2437,6 +2437,92 @@ class ZooMapEngine {
 
     // 6. 繪製小人 (🧍 學生玩家)
     this.drawPlayer(ctx, this.player.x, this.player.y);
+
+    // 7. 繪製右下角精緻指北針 (Compass Rose)
+    this.drawCompass(ctx, 368, 38, 18);
+  }
+
+  drawCompass(ctx, x, y, radius = 18) {
+    ctx.save();
+    
+    // 背景圓盤
+    ctx.beginPath();
+    ctx.arc(x, y, radius, 0, Math.PI * 2);
+    ctx.fillStyle = "rgba(255, 255, 255, 0.92)";
+    ctx.shadowColor = "rgba(0, 0, 0, 0.2)";
+    ctx.shadowBlur = 4;
+    ctx.shadowOffsetY = 1;
+    ctx.fill();
+    ctx.lineWidth = 1.2;
+    ctx.strokeStyle = "#94a3b8";
+    ctx.stroke();
+
+    // 內圈虛線
+    ctx.shadowColor = "transparent";
+    ctx.beginPath();
+    ctx.arc(x, y, radius - 3.5, 0, Math.PI * 2);
+    ctx.lineWidth = 0.8;
+    ctx.strokeStyle = "#cbd5e1";
+    ctx.setLineDash([2, 2]);
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    // 北指針 (紅色三角)
+    ctx.beginPath();
+    ctx.moveTo(x, y - (radius - 4));
+    ctx.lineTo(x - 3.5, y);
+    ctx.lineTo(x, y - 2);
+    ctx.fillStyle = "#ef4444";
+    ctx.fill();
+
+    ctx.beginPath();
+    ctx.moveTo(x, y - (radius - 4));
+    ctx.lineTo(x + 3.5, y);
+    ctx.lineTo(x, y - 2);
+    ctx.fillStyle = "#dc2626";
+    ctx.fill();
+
+    // 南指針 (灰藍色三角)
+    ctx.beginPath();
+    ctx.moveTo(x, y + (radius - 4));
+    ctx.lineTo(x - 3.5, y);
+    ctx.lineTo(x, y + 2);
+    ctx.fillStyle = "#94a3b8";
+    ctx.fill();
+
+    ctx.beginPath();
+    ctx.moveTo(x, y + (radius - 4));
+    ctx.lineTo(x + 3.5, y);
+    ctx.lineTo(x, y + 2);
+    ctx.fillStyle = "#64748b";
+    ctx.fill();
+
+    // 中心微型轉軸
+    ctx.beginPath();
+    ctx.arc(x, y, 2, 0, Math.PI * 2);
+    ctx.fillStyle = "#1e293b";
+    ctx.fill();
+
+    // 方位文字標示 (北、東、南、西)
+    ctx.font = "900 7px sans-serif";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "bottom";
+    ctx.fillStyle = "#ef4444";
+    ctx.fillText("北", x, y - radius + 3.5);
+
+    ctx.font = "800 6px sans-serif";
+    ctx.fillStyle = "#64748b";
+    ctx.textBaseline = "middle";
+    ctx.textAlign = "left";
+    ctx.fillText("東", x + radius - 4, y);
+    ctx.textAlign = "center";
+    ctx.textBaseline = "top";
+    ctx.fillText("南", x, y + radius - 3);
+    ctx.textAlign = "right";
+    ctx.textBaseline = "middle";
+    ctx.fillText("西", x - radius + 4, y);
+
+    ctx.restore();
   }
 
   drawPlayer(ctx, px, py) {
@@ -3327,7 +3413,19 @@ class UIController {
         </div>
       </div>
 
-      <div class="map-canvas-wrapper" id="mapCanvasHost"></div>
+      <div class="map-canvas-wrapper" id="mapCanvasHost">
+        <!-- 容器右下角指北針 (Compass Widget) -->
+        <div class="map-compass-badge" title="指北針：上方為北">
+          <div class="compass-dial">
+            <span class="compass-n">北</span>
+            <div class="compass-needle"></div>
+            <div class="compass-pivot"></div>
+            <span class="compass-s">南</span>
+            <span class="compass-e">東</span>
+            <span class="compass-w">西</span>
+          </div>
+        </div>
+      </div>
 
       <!-- 虛擬 D-pad 控制 -->
       <div class="map-dpad">
@@ -3565,6 +3663,20 @@ class UIController {
             <rect x="0" y="0" width="195" height="20" rx="4" fill="#ef4444" stroke="#ffffff" stroke-width="1"/>
             <text x="97" y="14" font-size="9" font-weight="900" fill="#ffffff" text-anchor="middle">📍 615 公車站（道路左側站牌・你的位置）</text>
           </g>
+          <!-- 右下角指北針 (Compass Rose) -->
+          <g transform="translate(465, 128)">
+            <circle cx="0" cy="0" r="18" fill="rgba(255, 255, 255, 0.95)" stroke="#94a3b8" stroke-width="1.2"/>
+            <circle cx="0" cy="0" r="14.5" fill="none" stroke="#cbd5e1" stroke-width="0.8" stroke-dasharray="2,2"/>
+            <polygon points="0,-12 -3.5,0 0,-2.5" fill="#ef4444"/>
+            <polygon points="0,-12 3.5,0 0,-2.5" fill="#dc2626"/>
+            <polygon points="0,12 -3.5,0 0,2.5" fill="#94a3b8"/>
+            <polygon points="0,12 3.5,0 0,2.5" fill="#64748b"/>
+            <circle cx="0" cy="0" r="2" fill="#1e293b"/>
+            <text x="0" y="-13" font-size="7.5" font-weight="900" fill="#ef4444" text-anchor="middle" dominant-baseline="auto">北</text>
+            <text x="13.5" y="2.5" font-size="6" font-weight="800" fill="#64748b" text-anchor="start" dominant-baseline="middle">東</text>
+            <text x="0" y="14" font-size="6" font-weight="800" fill="#64748b" text-anchor="middle" dominant-baseline="hanging">南</text>
+            <text x="-13.5" y="2.5" font-size="6" font-weight="800" fill="#64748b" text-anchor="end" dominant-baseline="middle">西</text>
+          </g>
         </svg>
       `;
     } else if (branch === "bus_ask_library") {
@@ -3632,6 +3744,21 @@ class UIController {
             <rect x="0" y="0" width="195" height="20" rx="4" fill="#ef4444" stroke="#ffffff" stroke-width="1"/>
             <text x="97" y="14" font-size="9" font-weight="900" fill="#ffffff" text-anchor="middle">📍 306 公車站（道路右側站牌・你的位置）</text>
           </g>
+
+          <!-- 右上角指北針 (Compass Rose) -->
+          <g transform="translate(465, 35)">
+            <circle cx="0" cy="0" r="18" fill="rgba(255, 255, 255, 0.95)" stroke="#94a3b8" stroke-width="1.2"/>
+            <circle cx="0" cy="0" r="14.5" fill="none" stroke="#cbd5e1" stroke-width="0.8" stroke-dasharray="2,2"/>
+            <polygon points="0,-12 -3.5,0 0,-2.5" fill="#ef4444"/>
+            <polygon points="0,-12 3.5,0 0,-2.5" fill="#dc2626"/>
+            <polygon points="0,12 -3.5,0 0,2.5" fill="#94a3b8"/>
+            <polygon points="0,12 3.5,0 0,2.5" fill="#64748b"/>
+            <circle cx="0" cy="0" r="2" fill="#1e293b"/>
+            <text x="0" y="-13" font-size="7.5" font-weight="900" fill="#ef4444" text-anchor="middle" dominant-baseline="auto">北</text>
+            <text x="13.5" y="2.5" font-size="6" font-weight="800" fill="#64748b" text-anchor="start" dominant-baseline="middle">東</text>
+            <text x="0" y="14" font-size="6" font-weight="800" fill="#64748b" text-anchor="middle" dominant-baseline="hanging">南</text>
+            <text x="-13.5" y="2.5" font-size="6" font-weight="800" fill="#64748b" text-anchor="end" dominant-baseline="middle">西</text>
+          </g>
         </svg>
       `;
     } else {
@@ -3698,6 +3825,21 @@ class UIController {
           <g transform="translate(180, 121)">
             <rect x="0" y="0" width="195" height="20" rx="4" fill="#ef4444" stroke="#ffffff" stroke-width="1"/>
             <text x="97" y="14" font-size="9" font-weight="900" fill="#ffffff" text-anchor="middle">📍 802 公車站（道路右側站牌・你的位置）</text>
+          </g>
+
+          <!-- 右下角指北針 (Compass Rose) -->
+          <g transform="translate(465, 128)">
+            <circle cx="0" cy="0" r="18" fill="rgba(255, 255, 255, 0.95)" stroke="#94a3b8" stroke-width="1.2"/>
+            <circle cx="0" cy="0" r="14.5" fill="none" stroke="#cbd5e1" stroke-width="0.8" stroke-dasharray="2,2"/>
+            <polygon points="0,-12 -3.5,0 0,-2.5" fill="#ef4444"/>
+            <polygon points="0,-12 3.5,0 0,-2.5" fill="#dc2626"/>
+            <polygon points="0,12 -3.5,0 0,2.5" fill="#94a3b8"/>
+            <polygon points="0,12 3.5,0 0,2.5" fill="#64748b"/>
+            <circle cx="0" cy="0" r="2" fill="#1e293b"/>
+            <text x="0" y="-13" font-size="7.5" font-weight="900" fill="#ef4444" text-anchor="middle" dominant-baseline="auto">北</text>
+            <text x="13.5" y="2.5" font-size="6" font-weight="800" fill="#64748b" text-anchor="start" dominant-baseline="middle">東</text>
+            <text x="0" y="14" font-size="6" font-weight="800" fill="#64748b" text-anchor="middle" dominant-baseline="hanging">南</text>
+            <text x="-13.5" y="2.5" font-size="6" font-weight="800" fill="#64748b" text-anchor="end" dominant-baseline="middle">西</text>
           </g>
         </svg>
       `;
