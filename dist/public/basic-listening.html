@@ -506,12 +506,12 @@ async function submit(){
     lastTranslationDebug.output = zh;
     if(!zh) throw new Error("空");
 
-    if(clean(zh) === clean(q.w)){
-      $("zh").textContent = q.c;
-      $("mt").innerHTML = 'AI 即時翻譯這隻詞翻毋動，原樣退轉來。頂高係課本解釋。';
-    } else if(clean(zh) === clean(q.c)){
+    if(clean(zh) === clean(q.c)){
       $("zh").textContent = zh;
       $("mt").innerHTML = "AI 即時翻譯同課本解釋共樣。";
+    } else if(clean(zh) === clean(q.w)){
+      $("zh").textContent = q.c;
+      $("mt").innerHTML = "AI 即時翻譯保留原詞。頂高係課本解釋。";
     } else {
       $("zh").textContent = zh;
       $("mt").innerHTML = 'AI 即時翻譯：<b>'+zh+'</b>　課本解釋：'+q.c
