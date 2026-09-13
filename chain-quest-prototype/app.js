@@ -1341,7 +1341,7 @@ class LLMServiceAdapter {
    */
   static buildSystemPrompt(nodeConfig, scenario, isMandarin = false) {
     const rolePersonas = {
-      "售票員": "親切熱情的動物園售票專員，負責核對購票人數與發售票券。",
+      "售票員": "親切專業的動物園售票專員，負責核對購票人數與發售票券。",
       "驗票志工": "慈祥親切的動物園門口志工老奶奶，重視禮貌與問候，引導遊客安全入園。",
       "園區導覽員": "熱心博學的動物園導覽員，熟悉各展區位置、動物習性與最佳參觀路線。",
       "同學阿明": "活潑好奇的同班同學，喜歡熱情分享在展區觀察到的動物特徵。",
@@ -1366,36 +1366,49 @@ class LLMServiceAdapter {
       : ((isMandarin ? (nodeConfig?.mandarinKeywords || nodeConfig?.keywords || []) : (nodeConfig?.keywords || [])).join("、") || "無");
 
     return [
-      `你是一位極其專業、具備高度語意推理能力與生動情境互動感的 AI 口說助教兼角色扮演考官（LLM-as-a-Judge & Roleplayer）。`,
+      `你是一位極其專業、具備深度語意推理能力與真實情境互動感的 AI 角色扮演考官兼情境引導助教（LLM-as-a-Judge & Roleplayer）。`,
       `【情境主題】：${scenario?.title || ""}（情境目標：${(isMandarin ? scenario?.mandarinObjective : scenario?.objective) || scenario?.objective || ""}）`,
       `【當前關卡】：${nodeConfig?.title || ""}（地點：${nodeConfig?.locationTag || ""}，類型：${nodeConfig?.nodeType || "主線"}）`,
       `【NPC 角色人設】：你將扮演「${nodeConfig?.npcRole || "NPC"}」— ${currentPersona}`,
-      `【標準目標句參考】：${(isMandarin ? nodeConfig?.targetMandarin : nodeConfig?.targetHakka) || "（自由表達/分支選擇）"}`,
-      `【參考核心關鍵詞】：${coreKeywordsStr}`,
+      `【本關通關任務目標】：`,
+      `   - 標準目標句參考：${(isMandarin ? nodeConfig?.targetMandarin : nodeConfig?.targetHakka) || "（自由表達/分支選擇）"}`,
+      `   - 參考核心概念詞：${coreKeywordsStr}`,
       ``,
       `【語言模式】：${isMandarin ? "華語（國語）模式" : "客語口說模式（含客轉華語意譯）"}。`,
       ``,
-      `【核心評估與對話生成原則】：`,
-      `1. 語意情境理解優先（Semantic & Contextual Judgement）：`,
-      `   - 【不要死板數關鍵字】：核心關鍵詞僅為參考輔助，絕對不是硬性扣分條件！只要學生說出的內容「符合該主題情境之合理語意與溝通意圖」，即應判定為通過（isMatch: true）！`,
-      `   - 【主題範例寬容判定】：`,
-      `     * 客家美食小吃情境：若學生點了客家傳統餐點（如粄條、客家小炒、薑絲大腸、擂茶、鹹豬肉、米苔目、仙草等），或主動詢問「哇好香喔老闆推薦什麼菜？」、「老闆有什麼招牌菜嗎？」，這屬於極佳的情境互動，老闆 NPC 應熱情推薦招牌並判定 isMatch: true！在備料交代不加香菜、甜一點等客製化要求亦屬完全符合！`,
-      `     * 健康中心/保健室情境：學生只要表達身體不舒服或描述具體病徵（如「頭好痛喔，肚子也一直拉」、「頭暈肚子痛」、「體育課跌倒膝蓋擦傷流血」、「身體熱熱沒力氣發燒」等），即便用語與標準句不同，護理師都應完全理解其病徵、給予溫柔照護與衛教叮嚀，並判定 isMatch: true！`,
-      `     * 動物園情境：表達購票（數量符合）、驗票道謝、詢問展區位置（大象/獅子/蛇）、或描述動物特徵（大象長鼻子洗澡、獅子威風、蛇安靜），皆判定 isMatch: true！`,
-      `     * 搭車問路情境：詢問目的地（文化園區/學校/圖書館）、確認公車班次（802/615/306）或確認轉彎直走方向，皆判定 isMatch: true！`,
-      `     * 今日天氣穿搭情境：根據寒冷/炎熱/雨天給予合理的衣著、配件或出門提醒，皆判定 isMatch: true！`,
-      `     * 校外教學打包情境：表達雨傘、水壺、毛巾、點心等物品或攜帶原因，皆判定 isMatch: true！`,
-      `2. 判定失敗的條件 (isMatch: false)：`,
-      `   - 只有在以下情況才判定為 false：`,
-      `     a. 發言內容「完全離題」（例如在小吃店點餐時突然說要去搭太空船、或胡言亂語完全無關）。`,
-      `     b. 明顯數量/事實矛盾（例如題目要求 3 位買 3 張票，學生卻說買 1 張或 2 張）。`,
-      `     c. 嚴重缺乏禮貌（例如在需要道謝的關卡態度粗魯傲慢地說『喂，門票拿去啦』而無任何問候感謝）。`,
-      `3. 動態角色化即時回饋 (Dynamic In-Character Reaction)：`,
-      `   - 務必根據「學生實際說出的話」生成 20~35 字極具沉浸感、生動自然的 NPC 繁體中文對話。`,
-      `   - 嚴禁機械式罐頭稱讚！`,
-      `   - 【引導而非打槍】：即使判定 isMatch: false，NPC 也應依據角色身分自然地回應與引導（例如小吃店老闆說：『同學，我們店裡沒有賣牛排耶，要不要試試看我們現炒的客家粄條？』）。`,
-      `   - 【嚴禁直接洩漏答案】：NPC 對話中「絕對不要」直接說出『你要說：...』或『請說：...』等直接給答案的提示句！`,
-      `4. 輸出規範：請嚴格回傳標準 JSON 格式。`
+      `【核心評估與對話互動邏輯（極重要）】：`,
+      `1. 「以任務達成 (Quest Goal) 為唯一通過標準」：`,
+      `   - 每個關卡都有具體的任務目標。學生「必須在語音中真正達成該任務目標」，才判定通過（isMatch: true）。`,
+      `   - 【各情境通關判定標準與引導邏輯】：`,
+      `     * 【客家小吃店第 1 關 (點主食)】：`,
+      `       - 通關條件：學生「必須明確說出他要點/吃哪一道該小吃店合理有賣的傳統客家主食/菜色」（如粄條、湯粄條、炒粄條、客家小炒、米苔目、客家肉粽、鹹豬肉、薑絲大腸等）。`,
+      `       - 引導邏輯（isMatch: false）：若學生只是問「好香喔老闆推薦什麼菜？」、「有沒有特色小吃？」、「可以算便宜一點嗎？」或閒聊，老闆 NPC 要極具人設地熱情介紹菜色（例如：『我們店裡招牌是湯粄條跟客家小炒，香噴噴的，你要來一碗哪一樣呢？』）或幽默回絕額外要求，判定 isMatch: false，繼續引導學生說出他要點什麼！`,
+      `       - 不合理菜色（isMatch: false）：若學生點了小吃店不可能賣的食物（如牛排、披薩）或不常在熱食小吃店賣的節慶糕點（如紅龜粿），老闆 NPC 委婉回絕並引導（例如：『哎呀我們小吃店沒有賣紅龜粿耶，你要不要試試看我們現煮的湯粄條？』），判定 isMatch: false！`,
+      `     * 【客家小吃店第 2 關 (客製需求)】：`,
+      `       - 通關條件：交代口味偏好（如不要放香菜、甜一點、少油少鹽、不要太鹹等）。若未說明口味，阿姨詢問引導，isMatch: false。`,
+      `     * 【客家小吃店第 3 關 (加點評價)】：`,
+      `       - 通關條件：加點客家飲品（如擂茶、仙草茶）或稱讚料理美味。`,
+      `     * 【健康中心第 1 & 2 關 (表達不適/說明症狀)】：`,
+      `       - 通關條件：學生「必須明確描述身體哪裡不舒服或具體症狀」（如「頭好痛喔，肚子也一直拉」、「我頭痛肚子痛」、「體育課跌倒膝蓋擦傷流血」、「身體發熱沒力氣」等，只要有表達出具體病徵即可通過）。若只說「護理師我來了」但沒講症狀，護理師溫柔詢問哪裡不舒服，isMatch: false。`,
+      `     * 【健康中心第 3 關 (休息與道謝)】：`,
+      `       - 通關條件：答應會好好休息/多喝水，並說出禮貌感謝（謝謝/恁仔細）。`,
+      `     * 【動物園第 1 關 (購票)】：`,
+      `       - 通關條件：說出買學生票且數量必須符合 3 位（3張）。若張數錯誤（說1張/2張）或只說「老闆買票」沒講幾張，售票員詢問/指正，isMatch: false。`,
+      `     * 【動物園第 2 關 (驗票)】：`,
+      `       - 通關條件：出示門票並表達禮貌道謝問候（謝謝/恁仔細）。若粗魯或沒道謝，奶奶提醒引導，isMatch: false。`,
+      `     * 【動物園第 3 關 (問路選擇)】：`,
+      `       - 通關條件：明確說出想去的展區（大象/獅子/蛇）並詢問怎麼走。若只問有什麼動物，導覽員介紹並請他選一個，isMatch: false。`,
+      `     * 【搭車問路關卡】：`,
+      `       - 通關條件：詢問特定目的地路線（文化園區/學校/圖書館）、確認公車號碼（802/615/306）或確認轉彎直走方向。若未說出目標，站務員/阿婆詢問引導，isMatch: false。`,
+      `     * 【今日天氣穿搭關卡】：`,
+      `       - 通關條件：根據寒冷/大熱天/下雨天說出符合天氣的穿搭與防護裝備（如大衣圍巾/防曬遮陽帽/雨傘雨衣）。`,
+      `     * 【校外教學打包關卡】：`,
+      `       - 通關條件：說出雨傘/水壺/毛巾/點心名稱並說明攜帶原因。`,
+      `2. 「未達成目標時，用 LLM 角色扮演持續對話與引導（一直跟他耗）」：`,
+      `   - 當學生發言尚未達成該關通關條件時，判定 isMatch: false。`,
+      `   - NPC 必須完全以角色身分，根據學生剛才說的話做出真實生動的 20~35 字情境回覆（例如學生開口問推薦，老闆就推薦；學生殺價/要折扣，老闆就幽默回絕；學生點了店裡沒有的菜，老闆就說明沒賣並推薦招牌）。`,
+      `   - 嚴禁機械式罐頭錯誤訊息！嚴禁在 NPC 對話中直接說『你要說：...』或『請說：...』等直接給答案的提示句！`,
+      `3. 輸出規範：請嚴格回傳標準 JSON 格式。`
     ].join("\n");
   }
 
@@ -1416,47 +1429,29 @@ class LLMServiceAdapter {
       ? nodeConfig.choices.flatMap(c => isMandarin ? (c.mandarinKeywords || c.keywords || []) : (c.keywords || []))
       : (isMandarin ? (nodeConfig?.mandarinKeywords || nodeConfig?.keywords || []) : (nodeConfig?.keywords || []));
 
-    if (isMandarin) {
-      return [
-        `【學生華語語音辨識文字】：「${mandarinTranscript || "（無輸入）"}」`,
-        `【目標華語句參考】：${nodeConfig?.targetMandarin || "無固定句"}`,
-        `【核心參考關鍵詞】：${coreKwList.join(", ") || "無"}`,
-        `${choicesText}`,
-        ``,
-        `請依據學生的實際發言進行語意理解與情境評估（符合小吃店點餐/詢問推薦、保健室陳述症狀、問路、穿搭等主題皆應判定通過），並嚴格依照以下 JSON 結構回傳：`,
-        `{`,
-        `  "isMatch": true 或 false,`,
-        `  "intent": "識別出的意圖或分支名稱",`,
-        `  "matchedChoiceId": "選定之分支 ID（若為選擇題）或 null",`,
-        `  "semanticAccuracy": 0 到 100 的整數,`,
-        `  "hitKeywords": ["命中或相關之華語概念詞"],`,
-        `  "missingKeywords": ["缺漏之概念詞"],`,
-        `  "feedback": "教學引導短評",`,
-        `  "dynamicNpcResponse": "NPC 角色針對學生發言的情境回覆對話（20-35字）"`,
-        `}`
-      ].join("\n");
-    }
-
     return [
-      `【學生客語 ASR 辨識文字】：「${hakkaTranscript || "（無輸入）"}」`,
-      `【客轉華語意正規化意圖】：「${mandarinTranscript || hakkaTranscript || "（無輸入）"}」`,
-      `【目標客語句參考】：${nodeConfig?.targetHakka || "無固定句"}`,
-      `【目標華語意圖參考】：${nodeConfig?.targetMandarin || "無"}`,
-      `【核心參考關鍵詞】：${coreKwList.join(", ") || "無"}`,
+      `【學生實際語音輸入】：「${(isMandarin ? mandarinTranscript : (hakkaTranscript || mandarinTranscript)) || "（無輸入）"}」`,
+      isMandarin ? "" : `【客轉華語意譯】：「${mandarinTranscript || hakkaTranscript || "（無輸入）"}」`,
+      `【本關目標句參考】：${(isMandarin ? nodeConfig?.targetMandarin : nodeConfig?.targetHakka) || "無固定句"}`,
+      `【本關核心概念詞】：${coreKwList.join(", ") || "無"}`,
       `${choicesText}`,
       ``,
-      `請依據學生的實際發言進行語意理解與情境評估（符合小吃店點餐/詢問推薦、保健室陳述症狀、問路、穿搭等主題皆應判定通過），並嚴格依照以下 JSON 結構回傳：`,
+      `請依據系統指令的「通關任務目標與引導邏輯」嚴格評估：`,
+      `1. 若學生發言已實質達成通關目標（例如小吃店已明確點了合理客家菜、保健室已說明具體病徵、問路已說出地點/公車號碼等），請回傳 isMatch: true，並生成 NPC 成功的熱情對話！`,
+      `2. 若學生尚未達成目標（例如只是問推薦、閒聊、點了店裡沒賣的東西、或缺少必要張數/道謝），請回傳 isMatch: false，並由 NPC 根據學生說的話自然回應與引導（嚴禁直接給出「你要說：...」提示句）！`,
+      ``,
+      `請嚴格依照以下 JSON 結構回傳：`,
       `{`,
       `  "isMatch": true 或 false,`,
       `  "intent": "識別出的意圖或分支名稱",`,
       `  "matchedChoiceId": "選定之分支 ID（若為選擇題）或 null",`,
       `  "semanticAccuracy": 0 到 100 的整數,`,
-      `  "hitKeywords": ["命中或相關之概念詞"],`,
+      `  "hitKeywords": ["命中之概念詞"],`,
       `  "missingKeywords": ["缺漏之概念詞"],`,
-      `  "feedback": "客語教學引導短評",`,
+      `  "feedback": "教學引導短評",`,
       `  "dynamicNpcResponse": "NPC 角色針對學生發言的情境回覆對話（20-35字）"`,
       `}`
-    ].join("\n");
+    ].filter(Boolean).join("\n");
   }
 
   /**
@@ -1810,8 +1805,17 @@ class SpeechService {
     
     // 主題情境語意語境補充判斷 (如小吃點餐/問推薦、保健室陳述症狀、天氣穿搭等)
     let isSemanticContextMatch = false;
+    let askingForRecommendation = false;
     const nid = nodeConfig.id || "";
-    if (nid === "food_step1" && /推薦|好香|什麼菜|招牌|菜單|粄條|小炒|擂茶|點菜|老闆|吃/.test(normalizedCleanText)) isSemanticContextMatch = true;
+
+    if (nid === "food_step1") {
+      // 若學生只是問推薦或特色
+      if (/推薦|好香|什麼菜|招牌|有什麼好吃的|菜單/.test(normalizedCleanText) && !/粄條|小炒|擂茶|米苔目|肉粽|鹹豬肉|大腸|一碗/.test(normalizedCleanText)) {
+        askingForRecommendation = true;
+      } else if (/粄條|小炒|擂茶|米苔目|肉粽|鹹豬肉|大腸|湯粄條|炒粄條|愛一碗|我要一碗/.test(normalizedCleanText)) {
+        isSemanticContextMatch = true;
+      }
+    }
     if (nid === "food_step2" && /香菜|毋好|不要|甜|少油|少鹽|口味|阿姨/.test(normalizedCleanText)) isSemanticContextMatch = true;
     if (nid === "food_step3" && /擂茶|小炒|好吃|好食|好喝|再來|加點|美味/.test(normalizedCleanText)) isSemanticContextMatch = true;
     if (nid === "health_symptom_head" && /頭|肚|拉|痛|暈|不舒服|肚屎|頭那/.test(normalizedCleanText)) isSemanticContextMatch = true;
@@ -1819,9 +1823,9 @@ class SpeechService {
     if (nid === "health_symptom_fever" && /熱|燒|發熱|發燒|沒力|無力|身體/.test(normalizedCleanText)) isSemanticContextMatch = true;
     if (nid === "health_rest" && studentHasPoliteness) isSemanticContextMatch = true;
 
-    // 命中判定規則：命中 >= 1 個擴展詞，或符合主題語意，或命中目標句，皆判定通過
-    const isKeywordHit = hitAll.length >= 1 || hitPrimary.length >= 1;
-    let isMatch = !studentHasWrongQuantity && (isKeywordHit || isSemanticContextMatch || (targetClean && cleanText.includes(targetClean)));
+    // 命中判定規則：命中 >= 1 個擴展詞，或符合主題語意，或命中目標句，皆判定通過（若只是問推薦則未點菜，需繼續引導）
+    const isKeywordHit = !askingForRecommendation && (hitAll.length >= 1 || hitPrimary.length >= 1);
+    let isMatch = !studentHasWrongQuantity && !askingForRecommendation && (isKeywordHit || isSemanticContextMatch || (targetClean && cleanText.includes(targetClean)));
     
     // 若題目要求禮貌道謝但學生未道謝或語氣粗魯，一律判錯
     if (requiresPoliteness && !studentHasPoliteness) {
@@ -1831,7 +1835,12 @@ class SpeechService {
     let customNpcResponse = null;
     let feedbackMsg = isMatch ? "辨識成功！語意明確且符合情境交流。" : "情境語意未達標，請參考提示再說一次。";
 
-    if (studentHasWrongQuantity) {
+    if (askingForRecommendation) {
+      customNpcResponse = isMandarinMode
+        ? "「我們店裡的招牌是現煮湯粄條跟客家小炒，香噴噴的，你要來一碗哪一樣呢？」"
+        : "「𠊎兜店裡个招牌係現煮湯粄條同客家小炒，當香喔，你愛食哪一隻呢？」";
+      feedbackMsg = "老闆已為您推薦招牌菜色，請開口點選想吃的餐點喔！";
+    } else if (studentHasWrongQuantity) {
       customNpcResponse = isMandarinMode ? (nodeConfig.mandarinNpcRetryResponse || nodeConfig.npcRetryResponse) : nodeConfig.npcRetryResponse;
       feedbackMsg = "數量不符，請確認正確數量後再試一次。";
     } else if (requiresPoliteness && !studentHasPoliteness) {

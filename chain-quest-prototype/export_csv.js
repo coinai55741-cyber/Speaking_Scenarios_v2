@@ -4,14 +4,15 @@ const path = require('path');
 const appJsPath = path.join(__dirname, 'app.js');
 const appJsContent = fs.readFileSync(appJsPath, 'utf8');
 
-const match = appJsContent.match(/const SCENARIOS_GRAPH = (\{[\s\S]*?\n\};\n\n\/\/ ===)/);
+const match = appJsContent.match(/const SCENARIOS_GRAPH = (\{[\s\S]*?\r?\n\};(?:\r?\n)+\/\/ ===)/);
 if (!match) {
   console.error('SCENARIOS_GRAPH not found in app.js');
   process.exit(1);
 }
 
 const sandbox = {};
-const fn = new Function('sandbox', 'sandbox.SCENARIOS_GRAPH = ' + match[1].replace(/\n\n\/\/ ===$/, ''));
+const graphStr = match[1].replace(/(?:\r?\n)+\/\/ ===$/, '');
+const fn = new Function('sandbox', 'sandbox.SCENARIOS_GRAPH = ' + graphStr);
 fn(sandbox);
 const graph = sandbox.SCENARIOS_GRAPH;
 
