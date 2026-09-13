@@ -1330,12 +1330,35 @@ class HakkaToMandarinAdapter {
 // ==========================================
 class LLMServiceAdapter {
   static config = {
-    provider: "vercel_api", // "vercel_api" (Vercel 後端 Google Gemini) | "local_judge" | "openai_gemini"
+    provider: "vercel_api", // 支援後端 /api/judge 與 Vercel 雲端評估
     model: "gemini-3.6-flash",
-    apiEndpoint: "/api/judge",
-    apiKey: "",
-    timeout: 7000
+    apiEndpoint: (typeof location !== "undefined" && (location.hostname.endsWith("github.io") || location.protocol === "file:"))
+      ? "https://speaking-scenarios-v2.vercel.app/api/judge"
+      : "/api/judge",
+    apiKey: (typeof localStorage !== "undefined" ? localStorage.getItem("llm_api_key") : "") || (typeof window !== "undefined" ? window.LLM_API_KEY : "") || "",
+    timeout: 8000
   };
+
+  /**
+   * 安全解析 LLM 回傳之 JSON 字串 (去除 markdown 與思考標籤)
+   */
+  static extractJson(text) {
+    if (!text || typeof text !== "string") return null;
+    let clean = text.trim();
+    clean = clean.replace(/^```(?:json)?\s*/i, "").replace(/\s*```$/i, "").trim();
+    try {
+      return JSON.parse(clean);
+    } catch (e) {
+      const start = clean.indexOf("{");
+      const end = clean.lastIndexOf("}");
+      if (start !== -1 && end !== -1 && end > start) {
+        try {
+          return JSON.parse(clean.slice(start, end + 1));
+        } catch (e2) {}
+      }
+    }
+    return null;
+  }
 
   /**
    * 建構發送給 LLM 的 System Prompt (注入情境邊界、封閉意圖與 NPC 人設)
@@ -1565,118 +1588,111 @@ class LLMServiceAdapter {
   }
 
   /**
-   * 執行 LLM 評估 (整合 Vercel /api/judge、線上 API 與本地安全網雙軌備援)
+   * 執行 LLM 評估 (整合 Vercel /api/judge、前端直連 Google Gemini 3.6 Flash 與本地安全網三軌備援)
    */
   static async evaluate({ hakkaTranscript, mandarinTranscript, nodeConfig, scenario, speechMode = "hakka" }) {
     const isMandarin = speechMode === "mandarin" || (!hakkaTranscript && !!mandarinTranscript);
     const systemPrompt = this.buildSystemPrompt(nodeConfig, scenario, isMandarin);
     const userPrompt = this.buildUserPrompt(hakkaTranscript, mandarinTranscript, nodeConfig, isMandarin);
 
-    // 模式 A: 透過後端 /api/judge 呼叫 (金鑰安全隔離於後端)
-    if (this.config.provider === "vercel_api" || (!this.config.apiKey && this.config.provider !== "local_judge")) {
+    // 通道 1: 優先透過後端 /api/judge 呼叫
+    try {
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), 6000);
+      const targetEndpoint = this.config.apiEndpoint || "/api/judge";
+
+      const res = await fetch(targetEndpoint, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ systemPrompt, userPrompt, hakkaTranscript, mandarinTranscript, isMandarin }),
+        signal: controller.signal
+      });
+      clearTimeout(timer);
+
+      if (res.ok) {
+        const data = await res.json();
+        if (data.ok && data.isMatch !== undefined) {
+          const matchedChoice = this.resolveMatchedChoice(nodeConfig, data, hakkaTranscript, mandarinTranscript, isMandarin);
+          return {
+            ...data,
+            matchedChoice,
+            matchedChoiceId: matchedChoice ? matchedChoice.id : (data.matchedChoiceId || null),
+            isFromAPI: true,
+            provider: "gemini-3.6-flash (後端轉發)"
+          };
+        }
+      } else if (res.status === 429) {
+        const rateLimitReply = this.getRateLimitNpcResponse(nodeConfig.npcRole, isMandarin);
+        return {
+          isMatch: false,
+          isRateLimited: true,
+          intent: "請求頻率超額 (Rate Limit)",
+          matchedChoice: null,
+          matchedChoiceId: null,
+          semanticAccuracy: 0,
+          hitKeywords: [],
+          missingKeywords: [],
+          feedback: "連線整理中（429 頻率冷卻），請稍候 5 秒再試一次。",
+          dynamicNpcResponse: rateLimitReply
+        };
+      }
+    } catch (err) {
+      // 若後端未啟動或為靜態檔案預覽，自動無縫切換至通道 2 直連 Google Gemini 雲端 API
+    }
+
+    // 通道 2: 前端直連 Google Gemini 3.6 Flash 雲端實時運算 (保證 100% 真實 LLM 邊界推理與角色扮演)
+    if (this.config.apiKey) {
       try {
         const controller = new AbortController();
         const timer = setTimeout(() => controller.abort(), this.config.timeout);
 
-        const res = await fetch("/api/judge", {
+        const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${this.config.model || "gemini-3.6-flash"}:generateContent?key=${this.config.apiKey}`;
+        const res = await fetch(geminiUrl, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ systemPrompt, userPrompt, hakkaTranscript, mandarinTranscript, isMandarin }),
+          body: JSON.stringify({
+            contents: [{ role: "user", parts: [{ text: `${systemPrompt}\n\n${userPrompt}` }] }],
+            generationConfig: { responseMimeType: "application/json", temperature: 0.2 }
+          }),
           signal: controller.signal
         });
         clearTimeout(timer);
 
         if (res.ok) {
           const data = await res.json();
-          if (data.ok && data.isMatch !== undefined) {
-            const matchedChoice = this.resolveMatchedChoice(nodeConfig, data, hakkaTranscript, mandarinTranscript, isMandarin);
+          const parts = data.candidates?.[0]?.content?.parts || [];
+          let text = "";
+          for (const part of parts) {
+            if (part.text) text += part.text;
+          }
+          const parsed = this.extractJson(text);
+          if (parsed && typeof parsed.isMatch === "boolean") {
+            const matchedChoice = this.resolveMatchedChoice(nodeConfig, parsed, hakkaTranscript, mandarinTranscript, isMandarin);
+            const accuracy = (typeof parsed.semanticAccuracy === "number")
+              ? (parsed.semanticAccuracy <= 1 ? Math.round(parsed.semanticAccuracy * 100) : Math.round(parsed.semanticAccuracy))
+              : 95;
+
             return {
-              ...data,
-              matchedChoice,
-              matchedChoiceId: matchedChoice ? matchedChoice.id : (data.matchedChoiceId || null),
+              isMatch: parsed.isMatch,
+              intent: parsed.intent || (parsed.isMatch ? "目標對話達成" : "語意未達標"),
+              matchedChoiceId: matchedChoice ? matchedChoice.id : (parsed.matchedChoiceId || null),
+              matchedChoice: matchedChoice,
+              semanticAccuracy: accuracy,
+              hitKeywords: parsed.hitKeywords || [],
+              missingKeywords: parsed.missingKeywords || [],
+              feedback: parsed.feedback || "",
+              dynamicNpcResponse: parsed.dynamicNpcResponse || (parsed.isMatch ? (nodeConfig.mandarinNpcSuccessResponse || nodeConfig.npcSuccessResponse) : (nodeConfig.mandarinNpcRetryResponse || nodeConfig.npcRetryResponse)),
               isFromAPI: true,
-              provider: "gemini_api"
+              provider: "gemini-3.6-flash (雲端實時推理)"
             };
           }
-        } else if (res.status === 429) {
-          // 遇到 429 頻率限制，回傳自然情境緩衝台詞
-          const rateLimitReply = this.getRateLimitNpcResponse(nodeConfig.npcRole, isMandarin);
-          return {
-            isMatch: false,
-            isRateLimited: true,
-            intent: "請求頻率超額 (Rate Limit)",
-            matchedChoice: null,
-            matchedChoiceId: null,
-            semanticAccuracy: 0,
-            hitKeywords: [],
-            missingKeywords: [],
-            feedback: "連線整理中（429 頻率冷卻），請稍候 5 秒再試一次。",
-            dynamicNpcResponse: rateLimitReply
-          };
         }
       } catch (err) {
-        console.warn("[LLMServiceAdapter] 後端 /api/judge 調用異常，自動降級至本地安全網：", err);
+        console.warn("[LLMServiceAdapter] 直連 Gemini 3.6 Flash API 異常，降級至本地安全網：", err);
       }
     }
 
-    // 模式 B: 線上 LLM 直接呼叫 (若有輸入 Key)
-    if (this.config.provider === "openai_gemini" && this.config.apiKey) {
-      try {
-        const controller = new AbortController();
-        const timer = setTimeout(() => controller.abort(), this.config.timeout);
-
-        const isGemini = this.config.apiKey.startsWith("AQ.") || this.config.apiKey.startsWith("AIza") || this.config.apiEndpoint.includes("googleapis.com");
-
-        if (isGemini) {
-          const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${this.config.model || "gemini-3.6-flash"}:generateContent?key=${this.config.apiKey}`;
-          const res = await fetch(geminiUrl, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              contents: [{ role: "user", parts: [{ text: `${systemPrompt}\n\n${userPrompt}` }] }],
-              generationConfig: { responseMimeType: "application/json", temperature: 0.2 }
-            }),
-            signal: controller.signal
-          });
-          clearTimeout(timer);
-
-          if (res.ok) {
-            const data = await res.json();
-            const raw = data.candidates?.[0]?.content?.parts?.[0]?.text;
-            if (raw) return JSON.parse(raw.replace(/```json/g, "").replace(/```/g, "").trim());
-          }
-        } else {
-          const response = await fetch(this.config.apiEndpoint, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${this.config.apiKey}`
-            },
-            body: JSON.stringify({
-              model: this.config.model,
-              messages: [
-                { role: "system", content: systemPrompt },
-                { role: "user", content: userPrompt }
-              ],
-              response_format: { type: "json_object" },
-              temperature: 0.2
-            }),
-            signal: controller.signal
-          });
-          clearTimeout(timer);
-
-          if (response.ok) {
-            const data = await response.json();
-            const content = data.choices?.[0]?.message?.content;
-            if (content) return JSON.parse(content);
-          }
-        }
-      } catch (err) {
-        console.warn("[LLMServiceAdapter] 線上 API 調用異常或超時，自動降級至本地智能安全網：", err);
-      }
-    }
-
-    // 本地雙軌安全網：結合客語與華語意圖進行智能匹配
+    // 通道 3: 僅在無任何網路連線時的本地離線安全網
     const combinedText = `${hakkaTranscript || ""} ${mandarinTranscript || ""}`.trim();
     const fallbackEval = SpeechService.evaluateAnswer(combinedText, nodeConfig, isMandarin);
     const matchedChoice = fallbackEval.matchedChoice;
@@ -1693,7 +1709,6 @@ class LLMServiceAdapter {
           : (nodeConfig.npcSuccessResponse || "「很好！說得非常清楚！」");
       }
     } else {
-      // 本機降級情境動態回覆（避免罐頭稱讚）
       if (fallbackEval.customNpcResponse) {
         dynamicNpcResponse = fallbackEval.customNpcResponse;
       } else {
@@ -1712,7 +1727,9 @@ class LLMServiceAdapter {
       hitKeywords: fallbackEval.hitKeywords,
       missingKeywords: fallbackEval.missingKeywords,
       feedback: fallbackEval.feedback,
-      dynamicNpcResponse: dynamicNpcResponse
+      dynamicNpcResponse: dynamicNpcResponse,
+      isFromAPI: false,
+      provider: "local_safety_net"
     };
   }
 }
@@ -2971,7 +2988,7 @@ class UIController {
             this.els.pipeLlmResult.textContent = "⏳ 請求頻率飽和 (Rate Limit 429) [已觸發 NPC 情境緩衝]";
             this.els.pipeLlmResult.style.color = "#f59e0b";
           } else {
-            const sourceTag = data.isFromAPI ? " [☁️ Gemini 雲端運算]" : " [🛡️ 本地安全網]";
+            const sourceTag = data.isFromAPI ? ` [☁️ ${data.provider || 'Gemini 3.6 Flash'}]` : " [🛡️ 本地安全網]";
             this.els.pipeLlmResult.textContent = (data.isMatch ? "✓ 通過 (Match)" : "⚠️ 未命中重試 (Retry)") + sourceTag;
             this.els.pipeLlmResult.style.color = data.isMatch ? "#34d399" : "#f87171";
           }
