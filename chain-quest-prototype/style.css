@@ -1668,3 +1668,60 @@ html, body {
   transform: scale(0.96);
 }
 
+/* ==========================================
+   Street Intersection Chessboard Map (搭車問路步驟 3)
+   ========================================== */
+.street-map-section {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  background: #f8fafc;
+  border: 1.5px solid #cbd5e1;
+  border-radius: var(--radius-md);
+  padding: 10px 12px;
+  box-shadow: var(--shadow-sm);
+  flex-shrink: 0;
+}
+
+.street-map-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+
+.street-map-badge {
+  background: #3b82f6;
+  color: #ffffff;
+  font-size: 11px;
+  font-weight: 900;
+  padding: 2px 8px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+
+.street-map-dest-pill {
+  font-size: 12px;
+  font-weight: 800;
+  color: #1e3a8a;
+  background: #dbeafe;
+  border: 1px solid #bfdbfe;
+  padding: 2px 8px;
+  border-radius: 6px;
+}
+
+.street-map-svg-wrap {
+  width: 100%;
+  max-height: 210px;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  border: 1px solid #cbd5e1;
+  background: #f1f5f9;
+}
+
+.street-map-svg-wrap svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+

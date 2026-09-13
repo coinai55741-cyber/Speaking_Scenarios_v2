@@ -608,22 +608,22 @@ const SCENARIOS_GRAPH = {
       },
       bus_arrive: {
         id: "bus_arrive",
-        title: "步驟 3：下車路口方向指引",
+        title: "步驟 3：看地圖向阿婆指引路線",
         nodeType: "集合點",
-        locationTag: "十字路口紅綠燈旁",
-        storyPrompt: "下車後走到十字路口，你向路旁熱心阿婆確認向前走、過紅綠燈左轉就會到。你說：",
-        mandarinStoryPrompt: "下車後走到十字路口，你向路旁熱心阿婆確認向前走、過紅綠燈左轉就會到。你說：",
-        targetHakka: "向前行，過紅綠燈越倒手就到了。",
-        targetMandarin: "往前走，過紅綠燈左轉就到了。",
-        keywords: ["向前行", "紅綠燈", "越倒手"],
-        mandarinKeywords: ["往前走", "紅綠燈", "左轉"],
-        altKeywords: ["向前", "過紅綠燈", "左轉", "越倒手"],
+        locationTag: "街頭十字路口地圖前",
+        storyPrompt: "下車後走到十字路口，旁邊的阿婆也想去同一個地方，她問你怎麼走。你看著路口地圖回答她。你說：",
+        mandarinStoryPrompt: "下車後走到十字路口，旁邊的阿婆也想去同一個地方，她問你怎麼走。你看著路口地圖回答她。你說：",
+        targetHakka: "向前直直行，行兩個紅綠燈，越倒手，再行一個紅綠燈，正手邊就係你个目的地。",
+        targetMandarin: "往前直直走，走兩個紅綠燈，然後向左轉，再走一個紅綠燈，右手邊就是你的目的地。",
+        keywords: ["向前直直行", "兩個紅綠燈", "越倒手", "一個紅綠燈", "正手邊"],
+        mandarinKeywords: ["往前直直走", "兩個紅綠燈", "向左轉", "一個紅綠燈", "右手邊"],
+        altKeywords: ["直直走", "直直行", "紅綠燈", "兩個紅綠燈", "左轉", "向左轉", "越倒手", "一個紅綠燈", "右手邊", "正手邊", "目的地", "往前", "向前"],
         npcRole: "熱心阿婆",
         npcAvatar: "👵",
-        npcSuccessResponse: "「無錯！過紅綠燈越倒手（左轉）走兩步路就看到大門了，祝你順利喔！」",
-        mandarinNpcSuccessResponse: "「沒錯！過紅綠燈左轉走兩步路就看到大門了，祝你順利喔！」",
-        npcRetryResponse: "「熱心阿婆笑瞇瞇地問：『小朋友，下了公車要往前走還是轉彎呢？阿婆再聽你確認一次！』」",
-        mandarinNpcRetryResponse: "「熱心阿婆笑瞇瞇地問：『小朋友，下了公車要往前走還是轉彎呢？阿婆再聽你確認一次！』」",
+        npcSuccessResponse: "「哎唷～聽你這樣說好清楚喔！向前直直走過兩個紅綠燈左轉，再走一個紅綠燈右手邊就到了，謝謝你呀小朋友！」",
+        mandarinNpcSuccessResponse: "「哎唷～聽你這樣說好清楚喔！往前直直走過兩個紅綠燈左轉，再走一個紅綠燈右手邊就到了，謝謝你呀小朋友！」",
+        npcRetryResponse: "「阿婆年紀大看不懂地圖上的十字路口，小朋友你看著地圖，要怎麼走、過幾個紅綠燈再轉彎呢？再跟阿婆說一次好嗎？」",
+        mandarinNpcRetryResponse: "「阿婆年紀大看不懂地圖上的十字路口，小朋友你看著地圖，要怎麼走、過幾個紅綠燈再轉彎呢？再跟阿婆說一次好嗎？」",
         nextNodeId: null
       }
     }
@@ -1822,6 +1822,7 @@ class SpeechService {
     if (nid === "health_symptom_scratch" && /擦傷|跌倒|膝蓋|流血|破皮|跑太快|腳痛|體育課/.test(normalizedCleanText)) isSemanticContextMatch = true;
     if (nid === "health_symptom_fever" && /熱|燒|發熱|發燒|沒力|無力|身體/.test(normalizedCleanText)) isSemanticContextMatch = true;
     if (nid === "health_rest" && studentHasPoliteness) isSemanticContextMatch = true;
+    if (nid === "bus_arrive" && (/直直|向前|往前|左轉|越倒手|紅綠燈|右手邊|正手邊|目的地/.test(normalizedCleanText))) isSemanticContextMatch = true;
 
     // 命中判定規則：命中 >= 1 個擴展詞，或符合主題語意，或命中目標句，皆判定通過（若只是問推薦則未點菜，需繼續引導）
     const isKeywordHit = !askingForRecommendation && (hitAll.length >= 1 || hitPrimary.length >= 1);
@@ -3001,7 +3002,7 @@ class UIController {
   }
 
   cleanupDynamicSections() {
-    document.querySelectorAll(".choice-action-section, .backpack-panel, .map-action-section").forEach(el => el.remove());
+    document.querySelectorAll(".choice-action-section, .backpack-panel, .map-action-section, .street-map-section").forEach(el => el.remove());
   }
 
   // 1. 渲染動態任務關卡進度 Step Tracker
@@ -3274,7 +3275,170 @@ class UIController {
       this.els.statusTip.textContent = isMandarin ? "請點擊下方按鈕，開始用華語說出你想講的話。" : "請點擊下方按鈕，開始用客語說出你想講的話。";
     }
 
+    // 搭車問路步驟 3 (bus_arrive) 繪製街頭十字路口棋盤地圖
+    if (node.id === "bus_arrive") {
+      this.renderStreetMapSection(node);
+    }
+
     this.renderSpeechNodeControls(node);
+  }
+
+  // 6. 渲染搭車問路步驟 3 棋盤式十字路口 SVG 地圖
+  renderStreetMapSection(node) {
+    const branch = this.state.selectedTargetBranchId || "bus_ask_culture";
+    let destName = "文化中心";
+    let destIcon = "🏛️";
+    if (branch === "bus_ask_school") {
+      destName = "學校正門";
+      destIcon = "🏫";
+    } else if (branch === "bus_ask_library") {
+      destName = "市立圖書館";
+      destIcon = "📚";
+    }
+
+    const mapSection = document.createElement("div");
+    mapSection.className = "street-map-section";
+    mapSection.innerHTML = `
+      <div class="street-map-header">
+        <div style="display: flex; align-items: center; gap: 6px;">
+          <span class="street-map-badge">🧭 棋盤十字路口地圖</span>
+          <span style="font-size: 11px; font-weight: 800; color: #475569;">看著地圖指引阿婆走法</span>
+        </div>
+        <div class="street-map-dest-pill">🎯 目的地：${destIcon} ${destName}</div>
+      </div>
+      <div class="street-map-svg-wrap">
+        <svg viewBox="0 0 540 210" xmlns="http://www.w3.org/2000/svg">
+          <!-- 背景底色 -->
+          <rect width="540" height="210" fill="#f1f5f9"/>
+
+          <!-- 建築街區 (Blocks) -->
+          <!-- 街區 1: 文化中心 (左上) -->
+          <rect x="15" y="12" width="125" height="65" rx="8" fill="${destName.includes('文化') ? '#eff6ff' : '#ffffff'}" stroke="${destName.includes('文化') ? '#3b82f6' : '#cbd5e1'}" stroke-width="${destName.includes('文化') ? '2.5' : '1.5'}"/>
+          <text x="77" y="38" font-size="16" text-anchor="middle">🏛️</text>
+          <text x="77" y="56" font-size="11" font-weight="900" fill="#1e293b" text-anchor="middle">文化中心</text>
+          ${destName.includes('文化') ? '<rect x="35" y="62" width="85" height="12" rx="4" fill="#3b82f6"/><text x="77" y="71" font-size="8" font-weight="900" fill="#ffffff" text-anchor="middle">🎯 你的目的地</text>' : ''}
+
+          <!-- 街區 2: 市立圖書館 (中上) -->
+          <rect x="175" y="12" width="150" height="65" rx="8" fill="${destName.includes('圖書館') ? '#eff6ff' : '#ffffff'}" stroke="${destName.includes('圖書館') ? '#3b82f6' : '#cbd5e1'}" stroke-width="${destName.includes('圖書館') ? '2.5' : '1.5'}"/>
+          <text x="250" y="38" font-size="16" text-anchor="middle">📚</text>
+          <text x="250" y="56" font-size="11" font-weight="900" fill="#1e293b" text-anchor="middle">市立圖書館</text>
+          ${destName.includes('圖書館') ? '<rect x="208" y="62" width="85" height="12" rx="4" fill="#3b82f6"/><text x="250" y="71" font-size="8" font-weight="900" fill="#ffffff" text-anchor="middle">🎯 你的目的地</text>' : ''}
+
+          <!-- 街區 3: 學校正門 (右上) -->
+          <rect x="360" y="12" width="165" height="65" rx="8" fill="${destName.includes('學校') ? '#eff6ff' : '#ffffff'}" stroke="${destName.includes('學校') ? '#3b82f6' : '#cbd5e1'}" stroke-width="${destName.includes('學校') ? '2.5' : '1.5'}"/>
+          <text x="442" y="38" font-size="16" text-anchor="middle">🏫</text>
+          <text x="442" y="56" font-size="11" font-weight="900" fill="#1e293b" text-anchor="middle">學校正門</text>
+          ${destName.includes('學校') ? '<rect x="400" y="62" width="85" height="12" rx="4" fill="#3b82f6"/><text x="442" y="71" font-size="8" font-weight="900" fill="#ffffff" text-anchor="middle">🎯 你的目的地</text>' : ''}
+
+          <!-- 街區 4: 公園綠地 (左下) -->
+          <rect x="15" y="120" width="125" height="78" rx="8" fill="#ecfdf5" stroke="#a7f3d0" stroke-width="1.5"/>
+          <text x="77" y="152" font-size="16" text-anchor="middle">🌳</text>
+          <text x="77" y="172" font-size="11" font-weight="800" fill="#047857" text-anchor="middle">市立森林公園</text>
+
+          <!-- 街區 5: 商店街區 (中下) -->
+          <rect x="175" y="120" width="150" height="78" rx="8" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5"/>
+          <text x="250" y="152" font-size="16" text-anchor="middle">🏪</text>
+          <text x="250" y="172" font-size="11" font-weight="800" fill="#475569" text-anchor="middle">文創商圈</text>
+
+          <!-- 街道馬路 (柏油路面) -->
+          <!-- 橫向道路 (東西向) -->
+          <rect x="0" y="85" width="540" height="26" fill="#334155"/>
+          <line x1="0" y1="98" x2="540" y2="98" stroke="#94a3b8" stroke-dasharray="6,6" stroke-width="1.5"/>
+
+          <!-- 縱向道路 1 (西側南北向) -->
+          <rect x="145" y="0" width="24" height="210" fill="#334155"/>
+          <line x1="157" y1="0" x2="157" y2="210" stroke="#94a3b8" stroke-dasharray="6,6" stroke-width="1.5"/>
+
+          <!-- 縱向道路 2 (東側南北向 - 出發大道) -->
+          <rect x="330" y="0" width="24" height="210" fill="#334155"/>
+          <line x1="342" y1="0" x2="342" y2="210" stroke="#94a3b8" stroke-dasharray="6,6" stroke-width="1.5"/>
+
+          <!-- 斑馬線 (Crosswalks) -->
+          <!-- 路口 1 (右下 342, 170) -->
+          <rect x="332" y="175" width="20" height="3" fill="#ffffff"/>
+          <rect x="332" y="181" width="20" height="3" fill="#ffffff"/>
+          <rect x="332" y="187" width="20" height="3" fill="#ffffff"/>
+
+          <!-- 路口 2 (右中 342, 98) -->
+          <rect x="332" y="86" width="20" height="3" fill="#ffffff"/>
+          <rect x="332" y="92" width="20" height="3" fill="#ffffff"/>
+          <rect x="332" y="98" width="20" height="3" fill="#ffffff"/>
+          <rect x="332" y="104" width="20" height="3" fill="#ffffff"/>
+
+          <!-- 路口 3 (右上 342, 20) -->
+          <rect x="332" y="14" width="20" height="3" fill="#ffffff"/>
+          <rect x="332" y="20" width="20" height="3" fill="#ffffff"/>
+          <rect x="332" y="26" width="20" height="3" fill="#ffffff"/>
+
+          <!-- 路口 4 (中上 157, 98) -->
+          <rect x="147" y="86" width="20" height="3" fill="#ffffff"/>
+          <rect x="147" y="92" width="20" height="3" fill="#ffffff"/>
+          <rect x="147" y="98" width="20" height="3" fill="#ffffff"/>
+
+          <!-- 紅綠燈標示 (Traffic Lights) -->
+          <!-- 紅綠燈 1 (右中路口) -->
+          <g transform="translate(358, 86)">
+            <rect x="0" y="0" width="14" height="24" rx="3" fill="#1e293b" stroke="#64748b" stroke-width="1"/>
+            <circle cx="7" cy="6" r="3" fill="#ef4444"/>
+            <circle cx="7" cy="12" r="3" fill="#f59e0b"/>
+            <circle cx="7" cy="18" r="3" fill="#22c55e"/>
+            <text x="18" y="16" font-size="9" font-weight="900" fill="#b91c1c">🚦第1個紅綠燈</text>
+          </g>
+
+          <!-- 紅綠燈 2 (右上轉彎路口) -->
+          <g transform="translate(358, 14)">
+            <rect x="0" y="0" width="14" height="24" rx="3" fill="#1e293b" stroke="#64748b" stroke-width="1"/>
+            <circle cx="7" cy="6" r="3" fill="#ef4444"/>
+            <circle cx="7" cy="12" r="3" fill="#f59e0b"/>
+            <circle cx="7" cy="18" r="3" fill="#22c55e"/>
+            <text x="18" y="16" font-size="9" font-weight="900" fill="#b91c1c">🚦第2個紅綠燈</text>
+          </g>
+
+          <!-- 紅綠燈 3 (中上路口) -->
+          <g transform="translate(172, 86)">
+            <rect x="0" y="0" width="14" height="24" rx="3" fill="#1e293b" stroke="#64748b" stroke-width="1"/>
+            <circle cx="7" cy="6" r="3" fill="#ef4444"/>
+            <circle cx="7" cy="12" r="3" fill="#f59e0b"/>
+            <circle cx="7" cy="18" r="3" fill="#22c55e"/>
+            <text x="18" y="16" font-size="9" font-weight="900" fill="#b91c1c">🚦再過1個紅綠燈</text>
+          </g>
+
+          <!-- 導航行走路線箭頭 (Highlighted Navigation Path) -->
+          <!-- 1. 往前直直走 (直行向上穿過 2 個紅綠燈) -->
+          <path d="M 342 195 L 342 30" fill="none" stroke="#f59e0b" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="4,3"/>
+          
+          <!-- 2. 向左轉 (轉向西側道路) -->
+          <path d="M 342 30 L 100 30" fill="none" stroke="#f59e0b" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="4,3"/>
+
+          <!-- 路線節點動畫點與提示 -->
+          <!-- 起點標記 (📍 你的位置) -->
+          <circle cx="342" cy="195" r="7" fill="#ef4444" stroke="#ffffff" stroke-width="2"/>
+          <g transform="translate(356, 185)">
+            <rect x="0" y="0" width="145" height="18" rx="4" fill="#ef4444"/>
+            <text x="72" y="13" font-size="9" font-weight="900" fill="#ffffff" text-anchor="middle">📍 你與阿婆所在位置 (起點)</text>
+          </g>
+
+          <!-- 左轉箭頭 -->
+          <polygon points="342,24 334,30 342,36" fill="#f59e0b"/>
+          <text x="315" y="24" font-size="9" font-weight="900" fill="#d97706">↰ 向左轉</text>
+
+          <!-- 右手邊抵達指示 (指出目的地在行進方向的右手邊) -->
+          <g transform="translate(40, 18)">
+            <rect x="0" y="0" width="95" height="15" rx="3" fill="#2563eb"/>
+            <text x="47" y="11" font-size="8.5" font-weight="900" fill="#ffffff" text-anchor="middle">👉 右手邊即目的地</text>
+          </g>
+        </svg>
+      </div>
+    `;
+
+    const narrativeBody = document.querySelector(".narrative-card") || document.querySelector(".stage-dialogue-col");
+    // 插入在 speechActionSection 或 story-narrative-box 之後
+    const storyBox = narrativeBody.querySelector(".story-narrative-box");
+    if (storyBox && storyBox.nextSibling) {
+      narrativeBody.insertBefore(mapSection, storyBox.nextSibling);
+    } else {
+      narrativeBody.appendChild(mapSection);
+    }
   }
 
   updateRecordButtonDefaultState() {
