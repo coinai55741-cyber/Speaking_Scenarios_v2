@@ -2654,9 +2654,6 @@ class UIController {
 
       const currentNode = this.state.getCurrentNode();
       let dynamicReply = evalResult.dynamicNpcResponse || nodeConfig.npcSuccessResponse;
-      if (isMandarinMode && nodeConfig.targetHakka) {
-        dynamicReply += `\n（💡 華語說得很清楚！客語請說：『${nodeConfig.targetHakka}』喔！）`;
-      }
 
       // 若為「選擇節點」
       if (currentNode.nodeType === "選擇") {
