@@ -1393,11 +1393,16 @@ class LLMServiceAdapter {
       `     * 【客家小吃店第 3 關 (加點評價)】：核心目標是加點飲品或稱讚美味。`,
       `     * 【健康中心第 1 & 2 關 (說明症狀)】：核心目標是明確描述身體不適病徵（頭痛肚子痛/拉肚子/膝蓋擦傷流血/發熱無力等）。`,
       `     * 【健康中心第 3 關 (休息道謝)】：核心目標是答應好好休息/多喝水並道謝。`,
-      `     * 【今日天氣穿搭關卡】：核心目標是根據天氣（寒冷天冷/夏日大熱天/雨天）提出對應穿搭防護。【極重要智慧衣物冷暖推理判定】：`,
-      `       - 當情境為「天冷/寒流/出門選衣服（步驟1）」時：`,
-      `         * 【保暖/冬日衣物 (通過)】：若學生說出具備保暖效果的衣物（如大衣、厚外套、毛衣、羽絨衣/羽絨服、毛線衣、長袖、厚長褲、衛生衣、發熱衣、圍巾、手套、毛帽、暖暖包等），判定通過（isMatch: true）！媽媽/長輩 NPC 親切讚許學生的保暖搭配：『真聰明！穿大衣和毛衣圍巾穿得暖暖的，這樣出門就不會著涼了！』`,
-      `         * 【單薄/夏日/寒冷衣物 (嚴格不通過)】：若學生說出短袖、短褲、吊嘎、背心、薄T恤、拖鞋、涼鞋、短裙、泳衣等不保暖衣物，【一律嚴格判定未通過 (isMatch: false)】！媽媽 NPC 必須以關心語氣溫和阻止與引導：『哎呀！外面寒風刺骨只有十度，穿短袖短褲出門會感冒著涼啦！快去換厚大衣或毛衣穿暖再出門！』`,
-      `         * 若學生點了保暖衣物但夾帶額外要求（如穿大衣但想穿拖鞋/吃冰棒）：判定通過 (isMatch: true)，媽媽以角色回答：『大衣穿暖很棒！但天氣太冷不能穿拖鞋啦，換好布鞋再出門！』`,
+      `     * 【今日天氣穿搭關卡】：核心目標是根據天氣（寒冷天冷/夏日大熱天/雨天）提出對應穿搭防護。【極重要智慧天氣情境推理判定】：`,
+      `       - 【1. 寒冷冬天 (天冷/寒流/選衣服)】：`,
+      `         * 【保暖冬裝 (通過 isMatch: true)】：說出大衣、厚外套、毛衣、羽絨衣、長袖、長褲、發熱衣、圍巾、手套、毛帽等保暖衣物。媽媽/阿公讚許：『真聰明！穿大衣和毛衣圍巾穿得暖暖的，這樣出門就不會著涼了！』`,
+      `         * 【單薄夏裝 (嚴格未通過 isMatch: false)】：說出短袖、短褲、吊嘎、背心、拖鞋、短裙等不保暖衣物。媽媽阻止並引導：『哎呀！外面寒風刺骨只有十度，穿短袖短褲出門會感冒著涼啦！快去換厚大衣或毛衣穿暖再出門！』`,
+      `       - 【2. 炎熱大晴天 (夏天/高溫酷暑)】：`,
+      `         * 【清涼防曬 (通過 isMatch: true)】：說出短袖、短褲、薄衣、遮陽帽、太陽眼鏡、擦防曬、多喝水。爸爸/媽媽讚許：『真細心！戴上遮陽帽、穿輕便短袖，多補充水分才不會中暑喔！』`,
+      `         * 【穿太厚/冬裝 (嚴格未通過 isMatch: false)】：若在大熱天說要穿大衣、羽絨衣、厚外套、毛衣、圍巾等厚重衣服。爸爸/媽媽幽默阻止：『哎呀！外面太陽好大好熱、氣溫三十多度，穿厚大衣和毛衣出門會滿頭大汗中暑啦！快去換清涼短袖、戴上遮陽帽喔！』`,
+      `       - 【3. 陰雨綿綿 (下雨天)】：`,
+      `         * 【防雨裝備 (通過 isMatch: true)】：說出帶雨傘、穿雨衣、穿雨鞋等雨具。媽媽讚許：『太棒了！帶好雨傘、穿好雨衣，出門下雨就不怕淋濕了，路上小心走喔！』`,
+      `         * 【沒帶雨具/只穿普通衣服 (嚴格未通過 isMatch: false)】：若下雨天沒說帶雨傘/雨衣，或說不帶雨具直接出門。媽媽提醒並引導：『看著窗外滴滴答答在下雨呢！不帶雨傘或雨衣出門，衣服和書包馬上就會淋成落湯雞感冒啦！快去玄關拿雨傘或穿上雨衣再出門喔！』`,
       `     * 【校外教學打包關卡】：核心目標是說出物品名稱（雨傘/水壺/毛巾/點心）與攜帶原因。`,
       ``,
       `2. 【關鍵規則 — 符合目標但夾帶額外要求/問題/閒聊時的 NPC 反應】：`,
@@ -1845,8 +1850,11 @@ class SpeechService {
     if (nid === "health_rest" && studentHasPoliteness) isSemanticContextMatch = true;
     if (nid === "bus_arrive" && (/直直|向前|往前|左轉|越倒手|紅綠燈|右手邊|正手邊|目的地/.test(normalizedCleanText))) isSemanticContextMatch = true;
 
-    // 今日天氣與穿搭（步驟1天冷選衣服 / 步驟2寒冷天穿搭）：智慧衣服冷暖判斷
+    // 今日天氣與穿搭（寒冷天、大熱天、下雨天）：智慧情境穿搭判斷
     let isColdClothesWarning = false;
+    let isHotClothesWarning = false;
+    let isRainGearWarning = false;
+
     if (nid === "weather_choose_type" || nid === "weather_outfit_cold") {
       const isWarmClothes = /大衫|大衣|厚外套|外套|毛衣|羽絨|羽絨衣|羽絨服|毛線衣|長袖|長褲|圍巾|發熱衣|衛生衣|保暖|手套|毛帽|暖暖包|厚長褲|穿暖|著暖/.test(normalizedCleanText);
       const isColdClothes = /短袖|短褲|背心|吊嘎|拖鞋|涼鞋|薄衫|泳衣|短裙|薄外套/.test(normalizedCleanText);
@@ -1857,9 +1865,30 @@ class SpeechService {
       }
     }
 
+    if (nid === "weather_outfit_hot") {
+      const isOverdressed = /大衫|大衣|厚外套|毛衣|羽絨|羽絨衣|羽絨服|毛線衣|圍巾|毛帽|暖暖包/.test(normalizedCleanText);
+      const isCoolClothes = /短袖|短褲|薄衫|遮陽帽|帽子|帽仔|防曬|多喝水|多啉水|晴天|大熱天|當熱/.test(normalizedCleanText);
+      if (isOverdressed && !isCoolClothes) {
+        isHotClothesWarning = true;
+      } else if (isCoolClothes) {
+        isSemanticContextMatch = true;
+      }
+    }
+
+    if (nid === "weather_outfit_rain") {
+      const isRefusingRainGear = /不要帶雨傘|不要帶傘|不用帶雨傘|不用帶傘|沒帶雨傘|沒有帶雨傘|不帶雨傘|沒帶傘|沒有帶傘|不帶傘|不穿雨衣|沒穿雨衣|無帶遮仔|毋著雨衣|毋帶遮仔/.test(normalizedCleanText);
+      const hasPositiveRainGear = !isRefusingRainGear && (/帶.*(雨傘|遮仔|傘)|著.*雨衣|穿.*雨衣|帶遮仔|著雨衣|帶雨傘|穿雨衣|拿雨傘|備好雨具|拿遮仔|雨鞋/.test(normalizedCleanText) || /雨傘|雨衣|遮仔/.test(normalizedCleanText));
+
+      if (isRefusingRainGear || !hasPositiveRainGear) {
+        isRainGearWarning = true;
+      } else if (hasPositiveRainGear) {
+        isSemanticContextMatch = true;
+      }
+    }
+
     // 命中判定規則：命中 >= 1 個實質關鍵詞（排除純稱謂），或符合主題語意，或完整命中目標句
     const isKeywordHit = !askingForRecommendation && !unavailableFoodOrdered && (substantiveHitAll.length >= 1 || substantiveHitPrimary.length >= 1);
-    let isMatch = !studentHasWrongQuantity && !askingForRecommendation && !unavailableFoodOrdered && !isColdClothesWarning && (isKeywordHit || isSemanticContextMatch || (targetClean && cleanText.includes(targetClean)));
+    let isMatch = !studentHasWrongQuantity && !askingForRecommendation && !unavailableFoodOrdered && !isColdClothesWarning && !isHotClothesWarning && !isRainGearWarning && (isKeywordHit || isSemanticContextMatch || (targetClean && cleanText.includes(targetClean)));
     
     // 若題目要求禮貌道謝但學生未道謝或語氣粗魯，一律判錯
     if (requiresPoliteness && !studentHasPoliteness) {
@@ -1899,6 +1928,16 @@ class SpeechService {
         ? "「哎呀！外面寒風刺骨只有十度，穿短袖短褲出門會感冒著涼啦！快去換厚外套或大衣穿暖再出門！」"
         : "「哎呀！外背風當冷，著短袖會冷著啦！遽遽去換大衫穿暖暖喔！」";
       feedbackMsg = "天氣寒冷，請選擇大衣、毛衣或圍巾等保暖衣物喔！";
+    } else if (isHotClothesWarning) {
+      customNpcResponse = isMandarinMode
+        ? "「哎呀！外面太陽好大好熱、氣溫三十多度，穿厚大衣和毛衣出門會滿頭大汗中暑啦！快去換清涼短袖、戴上遮陽帽喔！」"
+        : "「哎呀！外背日頭當大當熱，著大衫會流汗著痧啦！遽遽換短袖戴帽仔喔！」";
+      feedbackMsg = "天氣炎熱，請選擇短袖、遮陽帽等輕便防曬衣物喔！";
+    } else if (isRainGearWarning) {
+      customNpcResponse = isMandarinMode
+        ? "「看著窗外滴滴答答在下雨呢！不帶雨傘或雨衣出門，衣服和書包馬上就會淋成落湯雞感冒啦！快去玄關拿雨傘或穿上雨衣再出門喔！」"
+        : "「看著外背落雨呢！無帶遮仔著雨衣，衫同書包會淋濕濕啦！遽遽去拿遮仔著雨衣出門喔！」";
+      feedbackMsg = "下雨天路滑容易淋濕，請記得帶雨傘或穿雨衣喔！";
     } else if (nid === "zoo_meet_point" && (hasMissingPersons || !isMatch)) {
       customNpcResponse = isMandarinMode
         ? "「那我們再等一下下，等全部人都到齊、都參觀完了之後再出發喔！」"
