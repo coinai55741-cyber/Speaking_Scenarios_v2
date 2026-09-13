@@ -760,8 +760,8 @@ const SCENARIOS_GRAPH = {
         title: "步驟 3：承諾休息叮嚀與致謝",
         nodeType: "集合點",
         locationTag: "健康中心休息區",
-        storyPrompt: "傷口包紮好後，護理師叮嚀你今天不要劇烈運動，要多喝溫水好好休息。你答應她並道謝。你說：",
-        mandarinStoryPrompt: "傷口包紮好後，護理師叮嚀你今天不要劇烈運動，要多喝溫水好好休息。你答應她並道謝。你說：",
+        storyPrompt: "護理師細心幫你照護完後，叮嚀你今天不要勉強運動，要多喝溫水好好休息。你答應她並道謝。你說：",
+        mandarinStoryPrompt: "護理師細心幫你照護完後，叮嚀你今天不要勉強運動，要多喝溫水好好休息。你答應她並道謝。你說：",
         targetHakka: "𠊎會多啉水、好好歇睏，恁仔細！",
         targetMandarin: "我會多喝水、好好休息，謝謝您！",
         keywords: ["多啉水", "歇睏", "恁仔細"],
@@ -3209,8 +3209,23 @@ class UIController {
   // 5. 渲染一般口說主線/分支/集合點節點
   renderSpeechNode(node) {
     const isMandarin = this.state.speechMode === "mandarin";
+    let promptText = isMandarin ? (node.mandarinStoryPrompt || node.storyPrompt) : node.storyPrompt;
+
+    // 健康中心步驟 3 (health_rest) 動態針對前一關選擇的症狀呈現最符合情境的引導提示：
+    if (node.id === "health_rest") {
+      const branchId = this.state.selectedTargetBranchId || "health_symptom_head";
+      if (branchId === "health_symptom_scratch") {
+        promptText = "傷口包紮好後，護理師叮嚀你今天不要劇烈運動，要多喝溫水好好休息。你答應她並道謝。你說：";
+      } else if (branchId === "health_symptom_fever") {
+        promptText = "量完耳溫確認微燒後，護理師叮嚀你先在病床上躺著休息、多喝溫開水。你答應她並道謝。你說：";
+      } else {
+        // 頭痛肚子痛 (health_symptom_head)
+        promptText = "量完體溫並倒好溫開水後，護理師叮嚀你先坐著休息、多喝溫水。你答應她並道謝。你說：";
+      }
+    }
+
     if (this.els.storyPrompt) {
-      this.els.storyPrompt.textContent = isMandarin ? (node.mandarinStoryPrompt || node.storyPrompt) : node.storyPrompt;
+      this.els.storyPrompt.textContent = promptText;
     }
     if (this.els.speechActionSection) this.els.speechActionSection.hidden = false;
     if (this.els.speechHintSection) this.els.speechHintSection.hidden = true;
