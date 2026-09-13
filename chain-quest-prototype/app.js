@@ -948,6 +948,48 @@ const SCENARIOS_GRAPH = {
 };
 
 // ==========================================
+// 2.1 今日天氣情境隨機預設組 (Weather Random Presets: 寒冷、夏天、下雨)
+// ==========================================
+const WEATHER_RANDOM_PRESETS = {
+  rain: {
+    id: "rain",
+    weatherName: "陰雨綿綿 (下雨天)",
+    weatherIcon: "🌧️",
+    badgeLabel: "🌧️ 今日天氣：陰雨綿綿",
+    targetBranchId: "weather_outfit_rain",
+    locationTag: "玄關落地窗前（🌧️ 今日天氣：陰雨綿綿）",
+    storyPrompt: "清晨拉開窗簾看天氣，看見外頭烏雲密布、陰雨綿綿（正在下雨）。請看上方提示，開口提醒家人今天的天氣狀況與合適的雨具穿搭！",
+    mandarinStoryPrompt: "清晨拉開窗簾看天氣，看見外頭烏雲密布、陰雨綿綿（正在下雨）。請看上方提示，開口提醒家人今天的天氣狀況與合適的雨具穿搭！",
+    targetHakka: "今晡日落雨，愛帶遮仔著雨衣。",
+    targetMandarin: "今天下雨，要帶雨傘穿雨衣。"
+  },
+  hot: {
+    id: "hot",
+    weatherName: "炎熱大晴天 (夏天/大熱天)",
+    weatherIcon: "☀️",
+    badgeLabel: "☀️ 今日天氣：炎熱大晴天",
+    targetBranchId: "weather_outfit_hot",
+    locationTag: "玄關落地窗前（☀️ 今日天氣：炎熱大晴天）",
+    storyPrompt: "清晨拉開窗簾看天氣，看見外頭豔陽高照、天氣非常炎熱（大晴天）。請看上方提示，開口提醒家人今天的天氣狀況與合適的防曬穿搭！",
+    mandarinStoryPrompt: "清晨拉開窗簾看天氣，看見外頭豔陽高照、天氣非常炎熱（大晴天）。請看上方提示，開口提醒家人今天的天氣狀況與合適的防曬穿搭！",
+    targetHakka: "今晡日當熱，愛戴等遮陽帽仔。",
+    targetMandarin: "今天很熱，要戴著遮陽帽。"
+  },
+  cold: {
+    id: "cold",
+    weatherName: "寒冷冬日 (寒流來襲/冬天)",
+    weatherIcon: "❄️",
+    badgeLabel: "❄️ 今日天氣：寒冷冬日",
+    targetBranchId: "weather_outfit_cold",
+    locationTag: "玄關落地窗前（❄️ 今日天氣：寒冷冬日）",
+    storyPrompt: "清晨拉開窗簾看天氣，一陣冷風吹來，今天氣溫驟降非常寒冷（寒流來襲）。請看上方提示，開口提醒家人今天的天氣狀況與合適的保暖穿搭！",
+    mandarinStoryPrompt: "清晨拉開窗簾看天氣，一陣冷風吹來，今天氣溫驟降非常寒冷（寒流來襲）。請看上方提示，開口提醒家人今天的天氣狀況與合適的保暖穿搭！",
+    targetHakka: "天時當冷，愛著大衫圍等圍巾。",
+    targetMandarin: "天氣很冷，要穿大衣圍著圍巾。"
+  }
+};
+
+// ==========================================
 // 3. 第二階段：客語語音辨識適配器 (Hakka ASR Adapter)
 // ==========================================
 class HakkaASRAdapter {
@@ -1899,6 +1941,31 @@ class GraphStateManager {
     // 地圖導航狀態
     this.playerPos = { x: 200, y: 220 }; // 起點在入口大門
     this.targetZoneCode = "A"; // A: 大象, B: 獅子, C: 蛇, D: 出口集合
+
+    // 今日天氣隨機狀態 (下雨 rain | 炎熱 hot | 寒冷 cold)
+    this.randomWeatherKey = "rain";
+    this.initRandomWeather();
+  }
+
+  initRandomWeather() {
+    const keys = ["rain", "hot", "cold"];
+    const randomKey = keys[Math.floor(Math.random() * keys.length)];
+    this.applyRandomWeather(randomKey);
+  }
+
+  applyRandomWeather(key) {
+    this.randomWeatherKey = key;
+    const preset = WEATHER_RANDOM_PRESETS[key] || WEATHER_RANDOM_PRESETS.rain;
+    const weatherScenario = SCENARIOS_GRAPH.weather_outfit;
+    if (weatherScenario && weatherScenario.nodes && weatherScenario.nodes.weather_choose_type) {
+      const node = weatherScenario.nodes.weather_choose_type;
+      node.locationTag = preset.locationTag;
+      node.storyPrompt = preset.storyPrompt;
+      node.mandarinStoryPrompt = preset.mandarinStoryPrompt;
+      node.targetHakka = preset.targetHakka;
+      node.targetMandarin = preset.targetMandarin;
+      node.currentWeatherPreset = preset;
+    }
   }
 
   getScenario() {
@@ -1914,6 +1981,9 @@ class GraphStateManager {
     if (SCENARIOS_GRAPH[scenarioId]) {
       this.currentScenarioId = scenarioId;
       const scenario = SCENARIOS_GRAPH[scenarioId];
+      if (scenarioId === "weather_outfit") {
+        this.initRandomWeather();
+      }
       this.currentNodeId = scenario.startNodeId;
       this.selectedChoiceId = null;
       this.selectedTargetBranchId = null;
@@ -3238,7 +3308,22 @@ class UIController {
 
       if (choicesList && choicesList.length > 0) {
         this.els.devBranchSection.hidden = false;
-        this.els.devBranchGrid.innerHTML = choicesList.map(c => {
+        let weatherQuickHtml = "";
+        if (scenario.id === "weather_outfit") {
+          const currentPreset = WEATHER_RANDOM_PRESETS[this.state.randomWeatherKey] || WEATHER_RANDOM_PRESETS.rain;
+          weatherQuickHtml = `
+            <div style="margin-bottom: 8px; padding: 6px 8px; background: rgba(14, 165, 233, 0.15); border: 1px solid rgba(56, 189, 248, 0.3); border-radius: 6px;">
+              <div style="font-size: 11px; color: #bae6fd; font-weight: bold; margin-bottom: 4px;">🎲 今日隨機天氣：${currentPreset.weatherName}</div>
+              <div style="display: flex; gap: 4px;">
+                <button class="dev-weather-quick-btn ${this.state.randomWeatherKey === 'rain' ? 'is-active' : ''}" data-w="rain" type="button" style="padding: 2px 6px; font-size: 11px; border-radius: 4px; border: 1px solid #38bdf8; background: ${this.state.randomWeatherKey === 'rain' ? '#0284c7' : 'transparent'}; color: white; cursor: pointer;">🌧️ 陰雨天</button>
+                <button class="dev-weather-quick-btn ${this.state.randomWeatherKey === 'hot' ? 'is-active' : ''}" data-w="hot" type="button" style="padding: 2px 6px; font-size: 11px; border-radius: 4px; border: 1px solid #38bdf8; background: ${this.state.randomWeatherKey === 'hot' ? '#0284c7' : 'transparent'}; color: white; cursor: pointer;">☀️ 大熱天</button>
+                <button class="dev-weather-quick-btn ${this.state.randomWeatherKey === 'cold' ? 'is-active' : ''}" data-w="cold" type="button" style="padding: 2px 6px; font-size: 11px; border-radius: 4px; border: 1px solid #38bdf8; background: ${this.state.randomWeatherKey === 'cold' ? '#0284c7' : 'transparent'}; color: white; cursor: pointer;">❄️ 寒冷天</button>
+              </div>
+            </div>
+          `;
+        }
+
+        this.els.devBranchGrid.innerHTML = weatherQuickHtml + choicesList.map(c => {
           const isCurrent = this.state.selectedChoiceId === c.id || this.state.selectedTargetBranchId === c.targetBranchId;
           return `
             <button class="dev-branch-btn ${isCurrent ? 'is-active' : ''}" type="button" data-choice-id="${c.id}" data-target-branch="${c.targetBranchId}" data-zone-code="${c.zoneCode || ''}">
@@ -3247,6 +3332,15 @@ class UIController {
             </button>
           `;
         }).join("");
+
+        // 綁定天氣隨機切換按鈕
+        this.els.devBranchGrid.querySelectorAll(".dev-weather-quick-btn").forEach(btn => {
+          btn.addEventListener("click", () => {
+            SoundFX.select();
+            this.state.applyRandomWeather(btn.dataset.w);
+            this.render();
+          });
+        });
 
         // 綁定開發者分支切換按鈕
         this.els.devBranchGrid.querySelectorAll(".dev-branch-btn").forEach(btn => {
