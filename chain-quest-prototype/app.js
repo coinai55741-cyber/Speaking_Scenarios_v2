@@ -793,22 +793,22 @@ const SCENARIOS_GRAPH = {
     nodes: {
       weather_choose_type: {
         id: "weather_choose_type",
-        title: "步驟 1：選擇今日天氣提醒",
+        title: "步驟 1：你今天要穿什麼衣服出門？",
         nodeType: "選擇",
-        locationTag: "玄關落地窗前",
-        storyPrompt: "清晨拉開窗簾看天氣。請看上方提示，開口提醒家人今天的天氣與穿搭（如下雨天、大熱天或寒冷天）：",
-        mandarinStoryPrompt: "清晨拉開窗簾看天氣。請看上方提示，開口提醒家人今天的天氣與穿搭（如下雨天、大熱天或寒冷天）：",
-        targetHakka: "今晡日落雨，愛帶遮仔著雨衣。",
-        targetMandarin: "今天下雨，要帶雨傘穿雨衣。",
-        keywords: ["落雨", "當熱", "當冷"],
-        mandarinKeywords: ["下雨", "很熱", "很冷"],
-        altKeywords: ["落雨", "當熱", "當冷", "下雨天", "大熱天", "寒冷天", "雨傘", "遮陽帽", "大衣"],
-        npcRole: "家人",
-        npcAvatar: "👨‍👩‍👧",
-        npcSuccessResponse: "「看清楚天氣，再想想今天要穿什麼或帶什麼出門喔！」",
-        mandarinNpcSuccessResponse: "「看清楚天氣，再想想今天要穿什麼或帶什麼出門喔！」",
-        npcRetryResponse: "「家人笑著問：『拉開窗簾看看，外面今天是下雨、大熱天還是寒流天呢？該提醒大家穿什麼？』」",
-        mandarinNpcRetryResponse: "「家人笑著問：『拉開窗簾看看，外面今天是下雨、大熱天還是寒流天呢？該提醒大家穿什麼？』」",
+        locationTag: "臥室衣櫃前",
+        storyPrompt: "媽媽提醒你，外面真的很冷，要記得多穿衣服。你看了一下衣櫃，準備說出你想穿哪些衣服出門。你說：",
+        mandarinStoryPrompt: "媽媽提醒你，外面真的很冷，要記得多穿衣服。你看了一下衣櫃，準備說出你想穿哪些衣服出門。你說：",
+        targetHakka: "天時當冷，𠊎愛著大衫，圍等圍巾。",
+        targetMandarin: "天氣很冷，我要穿大衣，圍著圍巾。",
+        keywords: ["天時當冷", "大衫", "圍巾"],
+        mandarinKeywords: ["天氣很冷", "穿大衣", "圍巾"],
+        altKeywords: ["大衣", "圍巾", "毛衣", "羽絨衣", "厚外套", "長袖", "長褲", "發熱衣", "衛生衣", "大衫", "保暖", "穿暖", "很冷", "當冷"],
+        npcRole: "媽媽",
+        npcAvatar: "👩",
+        npcSuccessResponse: "「真聰明！穿大衣跟圍巾穿得暖暖的，這樣出門就不會著涼了！」",
+        mandarinNpcSuccessResponse: "「真聰明！穿大衣跟圍巾穿得暖暖的，這樣出門就不會著涼了！」",
+        npcRetryResponse: "「外面只有十度冷颼颼的，穿短袖短褲會感冒啦！快去衣櫃挑厚大衣或毛衣穿暖喔！」",
+        mandarinNpcRetryResponse: "「外面只有十度冷颼颼的，穿短袖短褲會感冒啦！快去衣櫃挑厚大衣或毛衣穿暖喔！」",
         choices: [
           {
             id: "rain",
@@ -835,10 +835,11 @@ const SCENARIOS_GRAPH = {
             title: "❄️ 寒冷冬日",
             sub: "冷氣團來襲、北風呼呼",
             targetBranchId: "weather_outfit_cold",
-            keywords: ["當冷", "天時當冷", "很冷", "寒冷", "天冷", "冬天", "大衫", "圍巾"],
-            mandarinKeywords: ["天氣很冷", "很冷", "寒冷", "天冷", "冬天", "大衣", "圍巾", "保暖"],
-            guideResponse: "「乖孫真靈俐！著暖暖、圍巾圍好，出門就毋驚吹風冷著囉！」",
-            mandarinGuideResponse: "「乖孫真貼心！穿得暖暖的、圍巾圍好，出門就不怕吹風著涼了！」"
+            keywords: ["當冷", "天時當冷", "很冷", "寒冷", "天冷", "冬天", "大衫", "圍巾", "毛衣", "羽絨衣", "厚外套", "長袖", "長褲", "發熱衣", "保暖", "穿暖"],
+            mandarinKeywords: ["天氣很冷", "很冷", "寒冷", "天冷", "冬天", "大衣", "圍巾", "毛衣", "羽絨衣", "外套", "厚外套", "長袖", "長褲", "發熱衣", "保暖", "穿暖"],
+            altKeywords: ["毛衣", "羽絨", "長褲", "長袖", "外套", "手套", "毛帽", "衛生衣", "大衫", "保暖"],
+            guideResponse: "「真聰明！穿大衣跟圍巾穿得暖暖的，這樣出門就不會著涼了！」",
+            mandarinGuideResponse: "「真聰明！穿大衣跟圍巾穿得暖暖的，這樣出門就不會著涼了！」"
           }
         ],
         nextNodeId: "weather_outfit_rain"
@@ -961,11 +962,11 @@ const WEATHER_RANDOM_PRESETS = {
     weatherIcon: "❄️",
     badgeLabel: "❄️ 今日天氣：寒冷冬日",
     targetBranchId: "weather_outfit_cold",
-    locationTag: "玄關落地窗前（❄️ 今日天氣：寒冷冬日）",
-    storyPrompt: "清晨拉開窗簾看天氣，一陣冷風吹來，今天氣溫驟降非常寒冷（寒流來襲）。請看上方提示，開口提醒阿公今天的天氣狀況與合適的保暖穿搭！",
-    mandarinStoryPrompt: "清晨拉開窗簾看天氣，一陣冷風吹來，今天氣溫驟降非常寒冷（寒流來襲）。請看上方提示，開口提醒阿公今天的天氣狀況與合適的保暖穿搭！",
-    targetHakka: "天時當冷，愛著大衫圍等圍巾。",
-    targetMandarin: "天氣很冷，要穿大衣圍著圍巾。"
+    locationTag: "臥室衣櫃前（❄️ 今日天氣：寒冷冬日）",
+    storyPrompt: "媽媽提醒你，外面真的很冷，要記得多穿衣服。你看了一下衣櫃，準備說出你想穿哪些衣服出門。你說：",
+    mandarinStoryPrompt: "媽媽提醒你，外面真的很冷，要記得多穿衣服。你看了一下衣櫃，準備說出你想穿哪些衣服出門。你說：",
+    targetHakka: "天時當冷，𠊎愛著大衫，圍等圍巾。",
+    targetMandarin: "天氣很冷，我要穿大衣，圍著圍巾。"
   }
 };
 
@@ -1389,8 +1390,11 @@ class LLMServiceAdapter {
       `     * 【客家小吃店第 3 關 (加點評價)】：核心目標是加點飲品或稱讚美味。`,
       `     * 【健康中心第 1 & 2 關 (說明症狀)】：核心目標是明確描述身體不適病徵（頭痛肚子痛/拉肚子/膝蓋擦傷流血/發熱無力等）。`,
       `     * 【健康中心第 3 關 (休息道謝)】：核心目標是答應好好休息/多喝水並道謝。`,
-      `     * 【搭車問路關卡】：核心目標是詢問路線目的地（文化園區/學校/圖書館）、確認公車號碼（802/615/306）或指引方向。`,
-      `     * 【今日天氣穿搭關卡】：核心目標是根據天氣（寒冷/夏日大熱天/雨天）提出對應穿搭防護。`,
+      `     * 【今日天氣穿搭關卡】：核心目標是根據天氣（寒冷天冷/夏日大熱天/雨天）提出對應穿搭防護。【極重要智慧衣物冷暖推理判定】：`,
+      `       - 當情境為「天冷/寒流/出門選衣服（步驟1）」時：`,
+      `         * 【保暖/冬日衣物 (通過)】：若學生說出具備保暖效果的衣物（如大衣、厚外套、毛衣、羽絨衣/羽絨服、毛線衣、長袖、厚長褲、衛生衣、發熱衣、圍巾、手套、毛帽、暖暖包等），判定通過（isMatch: true）！媽媽/長輩 NPC 親切讚許學生的保暖搭配：『真聰明！穿大衣和毛衣圍巾穿得暖暖的，這樣出門就不會著涼了！』`,
+      `         * 【單薄/夏日/寒冷衣物 (嚴格不通過)】：若學生說出短袖、短褲、吊嘎、背心、薄T恤、拖鞋、涼鞋、短裙、泳衣等不保暖衣物，【一律嚴格判定未通過 (isMatch: false)】！媽媽 NPC 必須以關心語氣溫和阻止與引導：『哎呀！外面寒風刺骨只有十度，穿短袖短褲出門會感冒著涼啦！快去換厚大衣或毛衣穿暖再出門！』`,
+      `         * 若學生點了保暖衣物但夾帶額外要求（如穿大衣但想穿拖鞋/吃冰棒）：判定通過 (isMatch: true)，媽媽以角色回答：『大衣穿暖很棒！但天氣太冷不能穿拖鞋啦，換好布鞋再出門！』`,
       `     * 【校外教學打包關卡】：核心目標是說出物品名稱（雨傘/水壺/毛巾/點心）與攜帶原因。`,
       ``,
       `2. 【關鍵規則 — 符合目標但夾帶額外要求/問題/閒聊時的 NPC 反應】：`,
@@ -1753,8 +1757,8 @@ class SpeechService {
           if (choice.id === "lion" && /獅|獅子|岩石|威風/.test(normalizedCleanText)) isChoiceHit = true;
           if (choice.id === "snake" && /蛇|溫室|玻璃|安靜/.test(normalizedCleanText)) isChoiceHit = true;
           if (choice.id === "rain" && /雨|下雨|雨傘|雨衣|落雨/.test(normalizedCleanText)) isChoiceHit = true;
-          if (choice.id === "hot" && /熱|晴天|太陽|防曬|大熱天|當熱/.test(normalizedCleanText)) isChoiceHit = true;
-          if (choice.id === "cold" && /冷|大衣|圍巾|冬天|寒冷|保暖|當冷/.test(normalizedCleanText)) isChoiceHit = true;
+          if (choice.id === "hot" && (/大熱天|當熱|晴天|太陽|防曬|天氣很熱|好熱|很熱|太熱/.test(normalizedCleanText) || (normalizedCleanText.includes("熱") && !normalizedCleanText.includes("發熱")))) isChoiceHit = true;
+          if (choice.id === "cold" && /冷|大衣|圍巾|毛衣|羽絨|外套|長袖|長褲|發熱衣|衛生衣|保暖|當冷|大衫/.test(normalizedCleanText) && !/短袖|短褲|吊嘎|背心|拖鞋|涼鞋/.test(normalizedCleanText)) isChoiceHit = true;
         }
 
         if (isChoiceHit) {
@@ -1830,9 +1834,21 @@ class SpeechService {
     if (nid === "health_rest" && studentHasPoliteness) isSemanticContextMatch = true;
     if (nid === "bus_arrive" && (/直直|向前|往前|左轉|越倒手|紅綠燈|右手邊|正手邊|目的地/.test(normalizedCleanText))) isSemanticContextMatch = true;
 
+    // 今日天氣與穿搭（步驟1天冷選衣服 / 步驟2寒冷天穿搭）：智慧衣服冷暖判斷
+    let isColdClothesWarning = false;
+    if (nid === "weather_choose_type" || nid === "weather_outfit_cold") {
+      const isWarmClothes = /大衫|大衣|厚外套|外套|毛衣|羽絨|羽絨衣|羽絨服|毛線衣|長袖|長褲|圍巾|發熱衣|衛生衣|保暖|手套|毛帽|暖暖包|厚長褲|穿暖|著暖/.test(normalizedCleanText);
+      const isColdClothes = /短袖|短褲|背心|吊嘎|拖鞋|涼鞋|薄衫|泳衣|短裙|薄外套/.test(normalizedCleanText);
+      if (isColdClothes && !isWarmClothes) {
+        isColdClothesWarning = true;
+      } else if (isWarmClothes) {
+        isSemanticContextMatch = true;
+      }
+    }
+
     // 命中判定規則：命中 >= 1 個實質關鍵詞（排除純稱謂），或符合主題語意，或完整命中目標句
     const isKeywordHit = !askingForRecommendation && (substantiveHitAll.length >= 1 || substantiveHitPrimary.length >= 1);
-    let isMatch = !studentHasWrongQuantity && !askingForRecommendation && (isKeywordHit || isSemanticContextMatch || (targetClean && cleanText.includes(targetClean)));
+    let isMatch = !studentHasWrongQuantity && !askingForRecommendation && !isColdClothesWarning && (isKeywordHit || isSemanticContextMatch || (targetClean && cleanText.includes(targetClean)));
     
     // 若題目要求禮貌道謝但學生未道謝或語氣粗魯，一律判錯
     if (requiresPoliteness && !studentHasPoliteness) {
@@ -1862,6 +1878,11 @@ class SpeechService {
         ? "「我們店裡的招牌是現煮湯粄條跟客家小炒，香噴噴的，你要來一碗哪一樣呢？」"
         : "「𠊎兜店裡个招牌係現煮湯粄條同客家小炒，當香喔，你愛食哪一隻呢？」";
       feedbackMsg = "老闆已為您推薦招牌菜色，請開口點選想吃的餐點喔！";
+    } else if (isColdClothesWarning) {
+      customNpcResponse = isMandarinMode
+        ? "「哎呀！外面寒風刺骨只有十度，穿短袖短褲出門會感冒著涼啦！快去換厚外套或大衣穿暖再出門！」"
+        : "「哎呀！外背風當冷，著短袖會冷著啦！遽遽去換大衫穿暖暖喔！」";
+      feedbackMsg = "天氣寒冷，請選擇大衣、毛衣或圍巾等保暖衣物喔！";
     } else if (nid === "zoo_meet_point" && (hasMissingPersons || !isMatch)) {
       customNpcResponse = isMandarinMode
         ? "「那我們再等一下下，等全部人都到齊、都參觀完了之後再出發喔！」"
