@@ -295,9 +295,9 @@ const SCENARIOS_GRAPH = {
         mandarinStoryPrompt: "走過街上聞一聞好香喔，嘴巴都流口水了，跟著香味走去原來是一個傳統小吃攤。你舔了一舔嘴巴，進到餐廳門口看了一下，決定跟老闆點菜。你說：",
         targetHakka: "老闆，𠊎愛一碗湯粄條。",
         targetMandarin: "老闆，我要一碗湯粄條。",
-        keywords: ["老闆", "愛一碗", "湯粄條"],
-        mandarinKeywords: ["老闆", "我要", "一碗", "湯粄條"],
-        altKeywords: ["愛", "湯粄條", "一碗", "粄條"],
+        keywords: ["湯粄條", "炒粄條", "米苔目", "客家小炒"],
+        mandarinKeywords: ["湯粄條", "炒粄條", "米苔目", "客家小炒", "粄條"],
+        altKeywords: ["湯粄條", "炒粄條", "粄條", "米苔目", "客家小炒", "小炒", "薑絲大腸", "鹹豬肉", "鹹湯圓", "梅干扣肉"],
         npcRole: "小吃店老闆",
         npcAvatar: "👨‍🍳",
         npcSuccessResponse: "「好，我收你五十箍，你去那邊稍坐一下喔，等一下就上菜了！」",
@@ -1385,7 +1385,10 @@ class LLMServiceAdapter {
       `     * 【動物園第 2 關 (驗票)】：核心目標是出示門票並表達禮貌道謝（謝謝/恁仔細）。`,
       `     * 【動物園第 3 關 (問路選擇)】：核心目標是明確詢問想去的展區（大象/獅子/蛇）怎麼走。`,
       `     * 【動物園第 6 關 (出口集合清點人數)】：核心目標是向帶隊老師報告「大家都到齊了/我們都參觀好了準備出發」。【極關鍵審核鐵律】：若學生發言表達「還有人沒到」、「還有人在上廁所」、「少了一個人/少人」、「還沒到齊/還在等某人」等缺人狀況，代表全體尚未齊全，【一律嚴格判定未通過 (isMatch: false)】！帶隊老師必須站在老師角色親切回答：『那我們再等一下下，等全部人都到齊、都參觀完了之後再出發喔！』`,
-      `     * 【客家小吃店第 1 關 (點主食)】：核心目標是明確點出店內合理有的客家主食/菜色（粄條/小炒/擂茶/米苔目/肉粽/鹹豬肉等）。`,
+      `     * 【客家小吃店第 1 關 (點主食)】：核心目標是點出「客家傳統小吃麵店/熱炒店」常態菜單上有的熱食主餐：`,
+      `       - 【店內有賣的菜色 (通過 isMatch: true)】：湯粄條、炒粄條、乾粄條、米苔目、客家小炒、薑絲大腸、鹹豬肉、福菜肉片湯、客家鹹湯圓、梅干扣肉等。`,
+      `       - 【店內沒賣的節慶米食/其他食物 (嚴格未通過 isMatch: false)】：若學生點了紅龜粿、草仔粿、艾草粄、肉粽/粽子、發粄、年糕、牛汶水，或是牛排、漢堡、披薩、壽司等非麵店常態小吃，【一律嚴格判定未通過 (isMatch: false)】！老闆必須站在熱情掌櫃角色親切幽默回絕並引導：『喔！同學，我們是現煮客家小炒麵店，沒有賣紅龜粿/肉粽這種節慶點心啦！要不要來一碗我們招牌的現煮湯粄條或客家小炒呢？』`,
+      `       - 【只說量詞或問推薦 (未通過 isMatch: false)】：若只說『我要一碗』、『老闆有沒有特色菜』但未指明菜名，判定 isMatch: false，老闆熱情推薦招牌菜色。`,
       `     * 【客家小吃店第 2 關 (客製需求)】：核心目標是交代口味偏好（不要放香菜/甜一點/少油少鹽等）。`,
       `     * 【客家小吃店第 3 關 (加點評價)】：核心目標是加點飲品或稱讚美味。`,
       `     * 【健康中心第 1 & 2 關 (說明症狀)】：核心目標是明確描述身體不適病徵（頭痛肚子痛/拉肚子/膝蓋擦傷流血/發熱無力等）。`,
@@ -1818,11 +1821,19 @@ class SpeechService {
     let askingForRecommendation = false;
     const nid = nodeConfig.id || "";
 
+    let unavailableFoodOrdered = null;
     if (nid === "food_step1") {
-      // 若學生只是問推薦或特色
-      if (/推薦|好香|什麼菜|招牌|有什麼好吃的|菜單/.test(normalizedCleanText) && !/粄條|小炒|擂茶|米苔目|肉粽|鹹豬肉|大腸|一碗/.test(normalizedCleanText)) {
+      const validDishes = /湯粄條|炒粄條|乾粄條|粄條|米苔目|客家小炒|小炒|大腸|薑絲大腸|鹹豬肉|福菜|鹹湯圓|梅干扣肉/;
+      const unavailableFestivalFoods = /紅龜粿|草仔粿|艾草粄|肉粽|粽子|發粄|年糕|牛汶水|水粄/;
+      const unavailableWesternFoods = /牛排|漢堡|薯條|披薩|義大利麵|壽司|拉麵|炸雞|熱狗|可樂|珍珠奶茶/;
+
+      if (unavailableFestivalFoods.test(normalizedCleanText)) {
+        unavailableFoodOrdered = normalizedCleanText.match(unavailableFestivalFoods)?.[0] || "節慶點心";
+      } else if (unavailableWesternFoods.test(normalizedCleanText)) {
+        unavailableFoodOrdered = normalizedCleanText.match(unavailableWesternFoods)?.[0] || "這項餐點";
+      } else if (/推薦|好香|什麼菜|招牌|有什麼好吃的|菜單/.test(normalizedCleanText) && !validDishes.test(normalizedCleanText)) {
         askingForRecommendation = true;
-      } else if (/粄條|小炒|擂茶|米苔目|肉粽|鹹豬肉|大腸|湯粄條|炒粄條|愛一碗|我要一碗/.test(normalizedCleanText)) {
+      } else if (validDishes.test(normalizedCleanText)) {
         isSemanticContextMatch = true;
       }
     }
@@ -1847,8 +1858,8 @@ class SpeechService {
     }
 
     // 命中判定規則：命中 >= 1 個實質關鍵詞（排除純稱謂），或符合主題語意，或完整命中目標句
-    const isKeywordHit = !askingForRecommendation && (substantiveHitAll.length >= 1 || substantiveHitPrimary.length >= 1);
-    let isMatch = !studentHasWrongQuantity && !askingForRecommendation && !isColdClothesWarning && (isKeywordHit || isSemanticContextMatch || (targetClean && cleanText.includes(targetClean)));
+    const isKeywordHit = !askingForRecommendation && !unavailableFoodOrdered && (substantiveHitAll.length >= 1 || substantiveHitPrimary.length >= 1);
+    let isMatch = !studentHasWrongQuantity && !askingForRecommendation && !unavailableFoodOrdered && !isColdClothesWarning && (isKeywordHit || isSemanticContextMatch || (targetClean && cleanText.includes(targetClean)));
     
     // 若題目要求禮貌道謝但學生未道謝或語氣粗魯，一律判錯
     if (requiresPoliteness && !studentHasPoliteness) {
@@ -1878,6 +1889,11 @@ class SpeechService {
         ? "「我們店裡的招牌是現煮湯粄條跟客家小炒，香噴噴的，你要來一碗哪一樣呢？」"
         : "「𠊎兜店裡个招牌係現煮湯粄條同客家小炒，當香喔，你愛食哪一隻呢？」";
       feedbackMsg = "老闆已為您推薦招牌菜色，請開口點選想吃的餐點喔！";
+    } else if (unavailableFoodOrdered) {
+      customNpcResponse = isMandarinMode
+        ? `「喔！同學，我們是現煮客家熱炒小吃店，沒有賣${unavailableFoodOrdered}啦！要不要來一碗我們招牌的現煮湯粄條或客家小炒呢？」`
+        : `「喔！同學，𠊎兜係現煮客家小吃店，無賣${unavailableFoodOrdered}啦！愛來一碗招牌湯粄條無？」`;
+      feedbackMsg = `小吃店未販售「${unavailableFoodOrdered}」，請參考菜單點選湯粄條或客家小炒喔！`;
     } else if (isColdClothesWarning) {
       customNpcResponse = isMandarinMode
         ? "「哎呀！外面寒風刺骨只有十度，穿短袖短褲出門會感冒著涼啦！快去換厚外套或大衣穿暖再出門！」"
