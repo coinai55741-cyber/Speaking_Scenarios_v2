@@ -620,10 +620,10 @@ const SCENARIOS_GRAPH = {
         altKeywords: ["直直走", "直直行", "紅綠燈", "兩個紅綠燈", "左轉", "向左轉", "越倒手", "一個紅綠燈", "右手邊", "正手邊", "目的地", "往前", "向前"],
         npcRole: "熱心阿婆",
         npcAvatar: "👵",
-        npcSuccessResponse: "「哎唷～聽你這樣說好清楚喔！向前直直走過兩個紅綠燈左轉，再走一個紅綠燈右手邊就到了，謝謝你呀小朋友！」",
-        mandarinNpcSuccessResponse: "「哎唷～聽你這樣說好清楚喔！往前直直走過兩個紅綠燈左轉，再走一個紅綠燈右手邊就到了，謝謝你呀小朋友！」",
-        npcRetryResponse: "「阿婆年紀大看不懂地圖上的十字路口，小朋友你看著地圖，要怎麼走、過幾個紅綠燈再轉彎呢？再跟阿婆說一次好嗎？」",
-        mandarinNpcRetryResponse: "「阿婆年紀大看不懂地圖上的十字路口，小朋友你看著地圖，要怎麼走、過幾個紅綠燈再轉彎呢？再跟阿婆說一次好嗎？」",
+        npcSuccessResponse: "「哎唷～聽你恁樣講好清楚喔，恁仔細喔小朋友！」",
+        mandarinNpcSuccessResponse: "「哎唷～聽你這樣說好清楚喔，謝謝你呀小朋友！」",
+        npcRetryResponse: "「阿婆笑等講：『欸，𠊎無聽清楚，你再講慢一息、摎𠊎講愛仰般行好無？』」",
+        mandarinNpcRetryResponse: "「阿婆笑著說：『欸，我沒聽清楚，你再講慢一點、跟我說怎麼走好嗎？』」",
         nextNodeId: null
       }
     }
@@ -1416,6 +1416,9 @@ class LLMServiceAdapter {
       `     * 【客家小吃店第 3 關 (加點評價)】：核心目標是加點飲品或稱讚美味。`,
       `     * 【健康中心第 1 & 2 關 (說明症狀)】：核心目標是明確描述身體不適病徵（頭痛肚子痛/拉肚子/膝蓋擦傷流血/發熱無力等）。`,
       `     * 【健康中心第 3 關 (休息道謝)】：核心目標是答應好好休息/多喝水並道謝。`,
+      `     * 【搭車問路第 3 關 (看地圖向阿婆指引路線)】：核心目標是學生看著地圖向阿婆清楚說明路線走法（包含往前直走、過紅綠燈、轉彎或目的地在哪一邊）。`,
+      `       - 【通過時 (isMatch: true)】：熱心阿婆親切稱讚並感謝小朋友（例如：『哎唷～聽你這樣說好清楚喔，謝謝你呀小朋友！』），【注意】：不要把特定路線細節唸出來，直接自然表達感謝即可。`,
+      `       - 【未通過/未清楚指明走法時 (isMatch: false)】：熱心阿婆親切請小朋友看地圖再講慢一點（例如：『阿婆笑著說：「欸，我沒聽清楚，你再講慢一點、跟我說怎麼走好嗎？」』）。`,
       `     * 【今日天氣穿搭關卡】：核心目標是根據天氣（寒冷天冷/夏日大熱天/雨天）提出對應穿搭防護。【極重要智慧天氣情境推理判定】：`,
       `       - 【1. 寒冷冬天 (天冷/寒流/選衣服)】：`,
       `         * 【保暖冬裝 (通過 isMatch: true)】：說出大衣、厚外套、毛衣、羽絨衣、長袖、長褲、發熱衣、圍巾、手套、毛帽等保暖衣物。媽媽/阿公讚許：『真聰明！穿大衣和毛衣圍巾穿得暖暖的，這樣出門就不會著涼了！』`,
@@ -3485,7 +3488,13 @@ class UIController {
           <rect x="152" y="76" width="16" height="2.5" fill="#ffffff"/>
           <rect x="152" y="81" width="16" height="2.5" fill="#ffffff"/>
 
-          <!-- 紅綠燈 (純圖示，無雜字) -->
+          <!-- 十字路口紅綠燈 (雙路口皆有紅綠燈) -->
+          <g transform="translate(172, 66)">
+            <rect x="0" y="0" width="10" height="18" rx="2" fill="#1e293b"/>
+            <circle cx="5" cy="4.5" r="2" fill="#ef4444"/>
+            <circle cx="5" cy="9" r="2" fill="#f59e0b"/>
+            <circle cx="5" cy="13.5" r="2" fill="#22c55e"/>
+          </g>
           <g transform="translate(338, 66)">
             <rect x="0" y="0" width="10" height="18" rx="2" fill="#1e293b"/>
             <circle cx="5" cy="4.5" r="2" fill="#ef4444"/>
@@ -3546,7 +3555,13 @@ class UIController {
           <rect x="152" y="76" width="16" height="2.5" fill="#ffffff"/>
           <rect x="152" y="81" width="16" height="2.5" fill="#ffffff"/>
 
-          <!-- 紅綠燈 (純圖示，無雜字) -->
+          <!-- 十字路口紅綠燈 (雙路口皆有紅綠燈) -->
+          <g transform="translate(172, 66)">
+            <rect x="0" y="0" width="10" height="18" rx="2" fill="#1e293b"/>
+            <circle cx="5" cy="4.5" r="2" fill="#ef4444"/>
+            <circle cx="5" cy="9" r="2" fill="#f59e0b"/>
+            <circle cx="5" cy="13.5" r="2" fill="#22c55e"/>
+          </g>
           <g transform="translate(338, 66)">
             <rect x="0" y="0" width="10" height="18" rx="2" fill="#1e293b"/>
             <circle cx="5" cy="4.5" r="2" fill="#ef4444"/>
@@ -3607,8 +3622,14 @@ class UIController {
           <rect x="317" y="76" width="16" height="2.5" fill="#ffffff"/>
           <rect x="317" y="81" width="16" height="2.5" fill="#ffffff"/>
 
-          <!-- 紅綠燈 (純圖示，無雜字) -->
+          <!-- 十字路口紅綠燈 (雙路口皆有紅綠燈) -->
           <g transform="translate(172, 66)">
+            <rect x="0" y="0" width="10" height="18" rx="2" fill="#1e293b"/>
+            <circle cx="5" cy="4.5" r="2" fill="#ef4444"/>
+            <circle cx="5" cy="9" r="2" fill="#f59e0b"/>
+            <circle cx="5" cy="13.5" r="2" fill="#22c55e"/>
+          </g>
+          <g transform="translate(338, 66)">
             <rect x="0" y="0" width="10" height="18" rx="2" fill="#1e293b"/>
             <circle cx="5" cy="4.5" r="2" fill="#ef4444"/>
             <circle cx="5" cy="9" r="2" fill="#f59e0b"/>
