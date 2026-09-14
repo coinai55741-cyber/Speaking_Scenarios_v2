@@ -20,7 +20,12 @@
     });
 
     if (lessonHint) {
-      lessonHint.textContent = selectedDialect ? "請選擇單元開始。" : "請先選擇腔別，再選單元開始。";
+      const isReadingPage = document.querySelector("#lessonTitle")?.textContent.includes("繪本");
+      if (isReadingPage) {
+        lessonHint.textContent = selectedDialect ? "請選擇繪本開始。" : "請先選擇腔別，再選繪本開始。";
+      } else {
+        lessonHint.textContent = selectedDialect ? "請選擇單元開始。" : "請先選擇腔別，再選單元開始。";
+      }
     }
   }
 
