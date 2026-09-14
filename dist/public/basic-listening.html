@@ -187,6 +187,20 @@
       margin-bottom: 4px;
     }
 
+    .developer-panel .target-sentence .sentence-pinyin {
+      display: inline-block;
+      font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+      font-size: 15px;
+      font-weight: 700;
+      color: #2e7d52;
+      background: #f0fdf4;
+      border: 1px solid #bbf7d0;
+      padding: 2px 8px;
+      border-radius: 6px;
+      margin: 2px 0 6px;
+      letter-spacing: 0.3px;
+    }
+
     .developer-panel .target-sentence small {
       display: block;
       font-size: 13px;
@@ -263,9 +277,14 @@
       margin-top: 5px;
     }
 
-    @media(max-width:1100px) {
+    @media(max-width:960px) {
       body.debug-mode {
         padding-left: 0;
+      }
+      .developer-panel {
+        position: static;
+        width: 100%;
+        height: auto;
       }
     }
 
@@ -424,12 +443,6 @@
       font-size: 40px;
       letter-spacing: .1em;
       line-height: 1.25;
-      display: none; /* 聽打練習：出題時客字隱藏 */
-    }
-
-    body.has-reveal .q .word,
-    .q .word.revealed {
-      display: block; /* 作答完成或揭曉後才顯示客字 */
     }
 
     .q button {
@@ -444,6 +457,52 @@
       font-weight: 700;
       font-size: 13px;
       transition: .18s
+    }
+
+    .peekwrap {
+      margin-top: 8px;
+    }
+
+    .q button.peekbtn {
+      margin-top: 0;
+      font-size: 11.5px;
+      padding: 4px 13px;
+      border-color: rgba(232, 200, 122, .3);
+      opacity: .62;
+      -webkit-user-select: none;
+      user-select: none;
+      touch-action: none;
+    }
+
+    .q button.peekbtn:hover {
+      opacity: 1;
+    }
+
+    .q button.peekbtn.on {
+      background: var(--grain);
+      border-color: var(--grain);
+      color: var(--ink);
+      opacity: 1;
+    }
+
+    .peekbox {
+      height: 30px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: "Noto Serif TC", serif;
+      font-weight: 900;
+      font-size: 22px;
+      letter-spacing: .1em;
+      color: var(--grain);
+      opacity: 0;
+      transition: opacity .12s;
+      -webkit-user-select: none;
+      user-select: none;
+    }
+
+    .peekbox.on {
+      opacity: 1;
     }
 
     .q button:hover {
@@ -471,27 +530,31 @@
       display: flex;
       gap: 8px;
       justify-content: center;
-      margin: 16px 0 0
+      margin: 16px 0 0;
+      align-items: stretch;
     }
 
     .ask input {
       flex: 1;
-      max-width: 320px;
+      max-width: 330px;
+      height: 52px;
       border: 1.5px solid rgba(232, 200, 122, .4);
       background: rgba(253, 251, 245, .94);
       color: var(--ink);
       border-radius: 13px;
-      padding: 12px 15px;
-      font-family: "Noto Serif TC", serif;
+      padding: 10px 16px;
+      line-height: 1.3;
+      font-family: "Noto Sans TC", "GenSekiGothic2TW", "Noto Serif TC", "Microsoft JhengHei", sans-serif;
       font-weight: 700;
       font-size: 22px;
       text-align: center;
-      letter-spacing: .06em
+      letter-spacing: .06em;
+      box-sizing: border-box;
     }
 
     .ask input:focus {
       outline: none;
-      border-color: var(--grain)
+      border-color: var(--grain);
     }
 
     .ask input.bad {
@@ -558,21 +621,21 @@
     /* ── 客語懸浮小鍵盤視窗 (來上客同款：拼音查字、客語聲調符號、全形半形符號) ── */
     .hakka-floating-kb {
       position: fixed;
-      top: 120px;
+      top: 110px;
       right: 28px;
-      width: 440px;
+      width: 500px;
       max-width: calc(100vw - 20px);
-      background: #f1f3f5;
-      color: #333;
+      background: #f4f6f8;
+      color: #222;
       border-radius: 16px;
-      border: 1px solid #d5dbdb;
-      box-shadow: 0 16px 40px rgba(10, 25, 45, 0.35), 0 2px 10px rgba(0, 0, 0, 0.1);
+      border: 1px solid #dce1e6;
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.28), 0 2px 10px rgba(0, 0, 0, 0.08);
       z-index: 1000;
       user-select: none;
-      transition: opacity 0.2s ease, box-shadow 0.2s ease;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
     }
 
+    .hakka-floating-kb.is-minimized .kb-top-section,
     .hakka-floating-kb.is-minimized .kb-body {
       display: none;
     }
@@ -582,16 +645,12 @@
       border-radius: 14px;
     }
 
-    /* 當下方答案結果展開時，懸浮鍵盤自動微透明，不遮擋學生視線；滑過時恢復清晰 */
-    body.has-reveal .hakka-floating-kb:not(:hover) {
-      opacity: 0.65;
-    }
-
     .kb-header {
+      position: relative;
       display: flex;
       align-items: center;
-      justify-content: space-between;
-      padding: 10px 16px 8px;
+      justify-content: center;
+      padding: 14px 16px 10px;
       cursor: grab;
     }
 
@@ -600,26 +659,29 @@
     }
 
     .kb-title {
-      flex: 1;
-      text-align: center;
-      font-size: 15px;
+      font-size: 16px;
       font-weight: 700;
-      color: #333;
+      color: #222;
+      text-align: center;
       letter-spacing: 0.02em;
     }
 
     .kb-close-btn {
-      width: 24px;
-      height: 24px;
+      position: absolute;
+      right: 14px;
+      top: 10px;
+      width: 28px;
+      height: 28px;
       border: 0;
       background: transparent;
-      color: #333;
-      font-size: 18px;
+      color: #222;
+      font-size: 22px;
       font-weight: 700;
       display: grid;
       place-items: center;
       cursor: pointer;
       border-radius: 6px;
+      line-height: 1;
       transition: background 0.15s;
     }
 
@@ -627,14 +689,12 @@
       background: rgba(0, 0, 0, 0.08);
     }
 
-    .kb-body {
-      padding: 4px 14px 14px;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
+    /* 頂部搜尋欄與分隔線 */
+    .kb-top-section {
+      padding: 0 16px 14px;
+      border-bottom: 1px solid #e1e5eb;
     }
 
-    /* 拼音輸入與查詢欄 */
     .kb-search-box {
       position: relative;
     }
@@ -644,9 +704,9 @@
       align-items: center;
       background: #fff;
       border: 2px solid #222;
-      border-radius: 14px;
-      padding: 3px 6px 3px 14px;
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+      border-radius: 12px;
+      padding: 2px 6px 2px 14px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
     }
 
     .kb-search-input {
@@ -657,7 +717,7 @@
       font-weight: 600;
       color: #222;
       background: transparent;
-      padding: 4px 0;
+      padding: 6px 0;
     }
 
     .kb-search-input::placeholder {
@@ -666,54 +726,55 @@
     }
 
     .kb-clear-btn {
-      width: 20px;
-      height: 20px;
+      width: 22px;
+      height: 22px;
       border: 0;
       border-radius: 50%;
-      background: #ccd0d5;
+      background: #bcc3cd;
       color: #fff;
-      font-size: 11px;
+      font-size: 12px;
+      font-weight: 700;
       display: grid;
       place-items: center;
       cursor: pointer;
-      margin: 0 6px;
+      margin: 0 8px;
       transition: background 0.15s;
     }
 
     .kb-clear-btn:hover {
-      background: #a0a6ad;
+      background: #9aa2ad;
     }
 
     .kb-submit-btn {
       border: 0;
-      background: #2f6932;
+      background: #256b36;
       color: #fff;
-      font-size: 14px;
+      font-size: 15px;
       font-weight: 700;
-      border-radius: 10px;
-      padding: 4px 12px;
+      border-radius: 16px;
+      padding: 4px 16px;
       cursor: pointer;
       transition: background 0.15s;
       white-space: nowrap;
     }
 
     .kb-submit-btn:hover {
-      background: #245227;
+      background: #1c5229;
     }
 
     /* 下拉字詞建議選單 (來上客同款) */
     .kb-suggestions {
       position: absolute;
-      top: calc(100% + 2px);
+      top: calc(100% + 4px);
       left: 0;
       right: 0;
       background: #fff;
-      border: 1px solid #dcdcdc;
+      border: 1px solid #d0d5dd;
       border-radius: 10px;
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
+      box-shadow: 0 10px 28px rgba(0, 0, 0, 0.2);
       max-height: 260px;
       overflow-y: auto;
-      z-index: 1010;
+      z-index: 1050;
       padding: 0;
       margin: 0;
       list-style: none;
@@ -724,16 +785,16 @@
     }
 
     .kb-suggestion-item {
-      padding: 10px 16px;
-      font-size: 18px;
+      padding: 10px 18px;
+      font-size: 19px;
       font-weight: 700;
       color: #222;
-      border-bottom: 1px solid #f0f0f0;
+      border-bottom: 1px solid #edf0f2;
       cursor: pointer;
       display: flex;
       align-items: center;
-      justify-content: space-between;
-      transition: background 0.1s;
+      justify-content: flex-start;
+      transition: background 0.12s;
       font-family: "GenSekiGothic2TW", "Noto Serif TC", serif;
     }
 
@@ -741,19 +802,20 @@
       border-bottom: 0;
     }
 
-    .kb-suggestion-item:hover {
-      background: #eef5ee;
-      color: #2f6932;
-    }
-
-    .kb-suggestion-pinyin {
-      font-size: 12px;
-      color: #888;
-      font-family: sans-serif;
-      font-weight: 400;
+    .kb-suggestion-item:hover,
+    .kb-suggestion-item.active {
+      background: #e8f5e9;
+      color: #1b5e20;
     }
 
     /* 各群組卡片 (聲調符號、全形符號、半形符號) */
+    .kb-body {
+      padding: 12px 16px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
     .kb-section {
       display: flex;
       flex-direction: column;
@@ -761,28 +823,31 @@
     }
 
     .kb-section-title {
-      font-size: 12px;
+      font-size: 13px;
       font-weight: 700;
-      color: #555;
+      color: #64748b;
       padding-left: 2px;
     }
 
     .kb-card {
       background: #fff;
-      border-radius: 10px;
-      padding: 8px 10px;
+      border-radius: 12px;
+      padding: 10px 12px;
       display: flex;
-      flex-wrap: wrap;
+      flex-wrap: nowrap;
       gap: 6px;
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
-      min-height: 48px;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+      border: 1px solid #eef1f4;
+      min-height: 52px;
       align-items: center;
+      overflow-x: auto;
     }
 
     .kb-sym-btn {
-      min-width: 34px;
+      flex: 0 0 28px;
+      width: 28px;
       height: 32px;
-      padding: 0 8px;
+      padding: 0;
       border: 1px solid #d5dbdb;
       background: #fff;
       color: #222;
@@ -790,20 +855,26 @@
       font-size: 16px;
       font-weight: 600;
       cursor: pointer;
-      display: grid;
-      place-items: center;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
       transition: all 0.12s;
     }
 
+    #kbToneGroup .kb-sym-btn {
+      flex: 0 0 32px;
+      width: 32px;
+    }
+
     .kb-sym-btn:hover {
-      border-color: #2f6932;
-      background: #f4faf4;
-      color: #2f6932;
+      border-color: #256b36;
+      background: #f0f7f1;
+      color: #256b36;
     }
 
     .kb-sym-btn:active {
-      transform: scale(0.96);
-      background: #e5f2e5;
+      transform: scale(0.95);
+      background: #e1f0e4;
     }
 
     .pal {
@@ -1071,8 +1142,12 @@
 
     <div class="q">
       <p class="lab">聽錄音打出客語字</p>
-      <div class="word" id="qw">⋯</div>
+      <div class="word" id="qw"></div>
       <button id="play">🔊 再聽一擺</button>
+      <div class="peekwrap">
+        <button id="peek" class="peekbtn" type="button">提示（搉著毋好放）</button>
+        <div class="peekbox" id="peekbox"><span id="peekw"></span></div>
+      </div>
     </div>
 
     <div class="ask">
@@ -1103,7 +1178,7 @@
       <div class="kb-title">輔助輸入小鍵盤</div>
       <button type="button" class="kb-close-btn" id="kbCloseBtn" title="關閉">✕</button>
     </div>
-    <div class="kb-body" id="kbBody">
+    <div class="kb-top-section">
       <!-- 拼音查詢與下拉候選字 -->
       <div class="kb-search-box">
         <div class="kb-search-row">
@@ -1113,7 +1188,8 @@
         </div>
         <ul id="kbSuggestions" class="kb-suggestions" hidden></ul>
       </div>
-
+    </div>
+    <div class="kb-body" id="kbBody">
       <!-- 客語聲調符號 (來上客：ˋ ˇ ˆ ˊ ⁺) -->
       <div class="kb-section">
         <div class="kb-section-title">客語聲調符號</div>
@@ -1122,7 +1198,7 @@
           <button type="button" class="kb-sym-btn" data-sym="ˇ">ˇ</button>
           <button type="button" class="kb-sym-btn" data-sym="ˆ">ˆ</button>
           <button type="button" class="kb-sym-btn" data-sym="ˊ">ˊ</button>
-          <button type="button" class="kb-sym-btn" data-sym="⁺">⁺</button>
+          <button type="button" class="kb-sym-btn" data-sym="⁺">+</button>
         </div>
       </div>
 
@@ -1198,6 +1274,59 @@
 
     const RARE = ["𤐰"];          /* 注音打毋出來个字，做成字磚 */
 
+    const PINYIN_MAP = {
+      "伙房屋": "foˋ fongˇ vugˋ",
+      "公廳": "gungˊ tangˊ",
+      "古蹟": "guˋ jidˋ",
+      "正月半": "zangˊ ngied ban",
+      "五月節": "ngˋ ngied jiedˋ",
+      "拜喏": "bai iaˊ",
+      "打拚": "daˋ biang",
+      "儘採": "qinˋ caiˋ",
+      "知人我": "diˊ nginˇ ngoˊ",
+      "鬧熱": "nau ngied",
+      "飯甑": "fan zen",
+      "豆腐": "teu fu",
+      "炒豬腸": "cauˋ zuˊ congˇ",
+      "世大人": "sii tai nginˇ",
+      "添飯": "tiamˊ fan",
+      "挾菜": "giabˋ coi",
+      "嘴恁翹": "zoi anˋ kieu",
+      "挑事": "tiauˊ sii",
+      "定定仔": "tin tin eˋ",
+      "鬥緊": "deu ginˋ",
+      "焙肉": "poi ngiugˋ",
+      "煙腸": "ienˊ congˇ",
+      "包粟": "bauˊ xiugˋ",
+      "茭筍": "gauˊ sunˋ",
+      "蝦公": "haˇ gungˊ",
+      "蒜頭": "son teuˇ",
+      "鹽": "iamˇ",
+      "涼水": "liongˇ suiˋ",
+      "月餅": "ngied biangˋ",
+      "柚仔": "iu eˋ",
+      "底衫仔": "daiˋ samˊ eˋ",
+      "長袖": "congˇ qiu",
+      "外衫": "ngoi samˊ",
+      "羽絨衫": "iˋ iungˇ samˊ",
+      "短褲": "donˋ fu",
+      "頸圍仔": "giangˋ viˇ eˋ",
+      "手落仔": "suˋ labˋ eˋ",
+      "熱𤐰𤐰仔": "ngied fag fag eˋ",
+      "涼爽": "liongˇ songˋ",
+      "冷颼颼仔": "langˊ xiuˇ xiuˇ eˋ",
+      "年三十": "ngienˇ samˊ siib",
+      "阿公婆": "aˊ gungˊ poˇ",
+      "金香": "gimˊ hiongˊ",
+      "牲儀": "senˊ ngiˇ",
+      "粄圓": "banˋ ienˇ",
+      "炒肉": "cauˋ ngiugˋ",
+      "子孫": "ziiˋ sunˊ",
+      "叔伯阿哥": "sugˋ bagˋ aˊ goˊ",
+      "親戚": "qinˊ qidˋ",
+      "擐": "kuan"
+    };
+
     const $ = id => document.getElementById(id);
     let li = 0, list = [], at = 0, right = 0, tries = 0, audio = null, done = false, busy = false;
 
@@ -1245,6 +1374,21 @@
     }
     $("play").onclick = play;
 
+    /* 提示：搉等正顯示客語字，放手隨時囥轉去 */
+    (function () {
+      const b = $("peek"), box = $("peekbox");
+      if (!b || !box) return;
+      const on = e => { if (e) e.preventDefault(); box.classList.add("on"); b.classList.add("on"); };
+      const off = () => { box.classList.remove("on"); b.classList.remove("on"); };
+      ["pointerdown"].forEach(ev => b.addEventListener(ev, on));
+      ["pointerup", "pointerleave", "pointercancel", "blur"].forEach(ev => b.addEventListener(ev, off));
+      addEventListener("pointerup", off);
+      b.addEventListener("contextmenu", e => e.preventDefault());
+      /* 鍵盤乜用得：撳等空白抑係 Enter */
+      b.addEventListener("keydown", e => { if (e.key === " " || e.key === "Enter") { e.preventDefault(); on(); } });
+      b.addEventListener("keyup", e => { if (e.key === " " || e.key === "Enter") { off(); } });
+    })();
+
     function show() {
       done = false; busy = false; tries = 0;
       const q = list[at];
@@ -1252,7 +1396,10 @@
       $("pn").textContent = (at + 1) + " / " + list.length;
       $("ps").textContent = "著 " + right;
       $("pi").style.width = (at / list.length * 100) + "%";
-      $("qw").textContent = q.w;
+      $("qw").textContent = q.c;          /* 題目出華語（看華語、打客語字） */
+      $("peekw").textContent = q.w;       /* 客語字先囥等，搉「提示」正看得著 */
+      $("peekbox").classList.remove("on");
+      $("peek").classList.remove("on");
       $("inp").value = ""; $("inp").disabled = false; $("inp").className = "";
       $("send").disabled = false; $("next").disabled = true;
       $("hint").innerHTML = "";
@@ -1442,6 +1589,7 @@
     <div class="target-sentence">
       <span class="sentence-label">正確客語正字（答案）</span>
       <strong>${q.w || "—"}</strong>
+      <span class="sentence-pinyin">${PINYIN_MAP[q.w] || "—"}</span>
       <small>課本釋義：${q.c || "—"}</small>
     </div>
     <div class="developer-item">
@@ -1576,12 +1724,14 @@
       // ── 來上客 API 拼音查字功能 ──
       let searchTimer = null;
       let lastQuery = "";
+      let selectedSuggestionIndex = -1;
 
       function hideSuggestions() {
         if (suggestionsList) {
           suggestionsList.setAttribute("hidden", "");
           suggestionsList.innerHTML = "";
         }
+        selectedSuggestionIndex = -1;
       }
 
       async function fetchPinyinCandidates(rawQuery) {
@@ -1591,8 +1741,12 @@
           return;
         }
 
+        // 如果前面已有中文字（如「公tangˊ」），自動擷取後方拼音部分送給 API
+        const pinyinMatch = query.match(/[a-zA-Zˋˇˆˊ⁺\-]+$/);
+        const pinyinQuery = pinyinMatch ? pinyinMatch[0] : query;
+
         try {
-          const url = `https://api.iformosa.com.tw/dictionary/3/pinyin-to-text?pinyin=${encodeURIComponent(query)}&dialect=hakka`;
+          const url = `https://api.iformosa.com.tw/dictionary/3/pinyin-to-text?pinyin=${encodeURIComponent(pinyinQuery)}&dialect=hakka`;
           const res = await fetch(url);
           if (!res.ok) throw new Error("API network error");
           const data = await res.json();
@@ -1607,21 +1761,76 @@
         if (!suggestionsList) return;
         const items = (exactList && exactList.length > 0) ? exactList : (fuzzyList || []).slice(0, 30);
         if (!items || items.length === 0) {
-          suggestionsList.setAttribute("hidden", "");
-          suggestionsList.innerHTML = "";
+          hideSuggestions();
           return;
         }
 
-        suggestionsList.innerHTML = items.map(item => {
+        selectedSuggestionIndex = -1;
+        suggestionsList.innerHTML = items.map((item, idx) => {
           const char = item.text || "";
-          const pinyin = item.pinyin_1 || item.pinyin_2 || item.pinyin_3 || "";
-          return `<li class="kb-suggestion-item" data-char="${escapeHtml(char)}">
+          return `<li class="kb-suggestion-item" data-index="${idx}" data-char="${escapeHtml(char)}">
             <span>${escapeHtml(char)}</span>
-            ${pinyin ? `<span class="kb-suggestion-pinyin">${escapeHtml(pinyin)}</span>` : ""}
           </li>`;
         }).join("");
 
         suggestionsList.removeAttribute("hidden");
+      }
+
+      function updateSuggestionHighlight(newIndex) {
+        if (!suggestionsList) return;
+        const items = suggestionsList.querySelectorAll(".kb-suggestion-item");
+        if (!items || items.length === 0) {
+          selectedSuggestionIndex = -1;
+          return;
+        }
+
+        if (newIndex < 0) {
+          newIndex = items.length - 1;
+        } else if (newIndex >= items.length) {
+          newIndex = 0;
+        }
+
+        selectedSuggestionIndex = newIndex;
+        items.forEach((item, idx) => {
+          if (idx === selectedSuggestionIndex) {
+            item.classList.add("active");
+            item.scrollIntoView({ block: "nearest" });
+          } else {
+            item.classList.remove("active");
+          }
+        });
+      }
+
+      // 選中候選字：將字（以及輸入框前面已有的字）送入作答框 #inp，並清空小鍵盤讓使用者能直接打下一個字！
+      function commitSelectedCandidate(chosenChar) {
+        if (!pinyinInput) return;
+        const currentVal = pinyinInput.value;
+        const pinyinMatch = currentVal.match(/[a-zA-Zˋˇˆˊ⁺\-]+$/);
+        let textToInsert = chosenChar;
+        // 如果輸入框前面已有中文字（如「公tangˊ」），把「公」與選中的字一起送入作答框
+        if (pinyinMatch && pinyinMatch.index > 0) {
+          textToInsert = currentVal.substring(0, pinyinMatch.index) + chosenChar;
+        }
+
+        insertAtCursor(mainInput, textToInsert);
+        pinyinInput.value = "";
+        if (clearPinyinBtn) {
+          clearPinyinBtn.setAttribute("hidden", "");
+        }
+        hideSuggestions();
+        pinyinInput.focus();
+      }
+
+      function commitKeyboardToMainInput() {
+        if (!pinyinInput) return;
+        const text = pinyinInput.value;
+        if (!text) return;
+        insertAtCursor(mainInput, text);
+        pinyinInput.value = "";
+        if (clearPinyinBtn) {
+          clearPinyinBtn.setAttribute("hidden", "");
+        }
+        hideSuggestions();
       }
 
       function escapeHtml(str) {
@@ -1642,9 +1851,69 @@
         });
 
         pinyinInput.addEventListener("keydown", (e) => {
-          if (e.key === "Enter") {
+          const isSuggestionsOpen = suggestionsList && !suggestionsList.hasAttribute("hidden") && suggestionsList.children.length > 0;
+
+          // 實體鍵盤聲調智慧轉換（僅在小鍵盤拼音輸入框作用）
+          const toneMap = {
+            "3": "ˇ", // 注音三聲 / 客語上聲
+            "4": "ˋ", // 注音四聲 / 客語去聲
+            "2": "ˊ", // 客語陽平
+            "6": "ˊ", // 注音二聲
+            "5": "ˆ", // 客語陽去
+            "7": "ˆ", // 注音輕聲位
+            "8": "⁺", // 客語陽入
+            "+": "⁺"
+          };
+          if (!e.ctrlKey && !e.altKey && !e.metaKey && toneMap[e.key]) {
             e.preventDefault();
-            fetchPinyinCandidates(pinyinInput.value);
+            const toneSym = toneMap[e.key];
+            const start = pinyinInput.selectionStart ?? pinyinInput.value.length;
+            const end = pinyinInput.selectionEnd ?? pinyinInput.value.length;
+            const val = pinyinInput.value;
+            pinyinInput.value = val.substring(0, start) + toneSym + val.substring(end);
+            pinyinInput.selectionStart = pinyinInput.selectionEnd = start + toneSym.length;
+            if (clearPinyinBtn) clearPinyinBtn.removeAttribute("hidden");
+            clearTimeout(searchTimer);
+            searchTimer = setTimeout(() => {
+              fetchPinyinCandidates(pinyinInput.value);
+            }, 180);
+            return;
+          }
+
+          if (e.key === "ArrowDown") {
+            if (isSuggestionsOpen) {
+              e.preventDefault();
+              updateSuggestionHighlight(selectedSuggestionIndex + 1);
+            }
+          } else if (e.key === "ArrowUp") {
+            if (isSuggestionsOpen) {
+              e.preventDefault();
+              updateSuggestionHighlight(selectedSuggestionIndex - 1);
+            }
+          } else if (e.key === "Escape") {
+            if (isSuggestionsOpen) {
+              e.preventDefault();
+              hideSuggestions();
+            }
+          } else if (e.key === "Enter") {
+            e.preventDefault();
+            if (isSuggestionsOpen) {
+              // 按 Enter 選中候選字：直接送入作答框，並清空小鍵盤
+              const items = suggestionsList.querySelectorAll(".kb-suggestion-item");
+              let chosenText = "";
+              if (selectedSuggestionIndex >= 0 && items[selectedSuggestionIndex]) {
+                chosenText = items[selectedSuggestionIndex].dataset.char;
+              } else if (items.length > 0) {
+                chosenText = items[0].dataset.char;
+              }
+              if (chosenText) {
+                commitSelectedCandidate(chosenText);
+              } else {
+                hideSuggestions();
+              }
+            } else {
+              commitKeyboardToMainInput();
+            }
           }
         });
       }
@@ -1662,42 +1931,43 @@
 
       if (searchPinyinBtn) {
         searchPinyinBtn.addEventListener("click", () => {
-          if (pinyinInput) fetchPinyinCandidates(pinyinInput.value);
+          if (!pinyinInput) return;
+          const isSuggestionsOpen = suggestionsList && !suggestionsList.hasAttribute("hidden") && suggestionsList.children.length > 0;
+          if (!isSuggestionsOpen && pinyinInput.value.trim()) {
+            commitKeyboardToMainInput();
+          } else {
+            fetchPinyinCandidates(pinyinInput.value);
+          }
         });
       }
 
-      // 點選候選字：直接填入作答框 #inp 並清空拼音
+      // 點選候選字：直接送入作答框，並清空小鍵盤供下一字輸入
       if (suggestionsList) {
         suggestionsList.addEventListener("click", (e) => {
           const item = e.target.closest(".kb-suggestion-item");
           if (!item) return;
           const char = item.dataset.char;
           if (char) {
-            insertAtCursor(mainInput, char);
-            if (pinyinInput) {
-              pinyinInput.value = "";
-              if (clearPinyinBtn) clearPinyinBtn.setAttribute("hidden", "");
-            }
-            hideSuggestions();
+            commitSelectedCandidate(char);
           }
         });
       }
 
-      // 點擊符號按鈕 (調號、全形、半形)
+      // 點擊符號按鈕 (調號、全形、半形)：打入小鍵盤的拼音輸入框中
       kb.addEventListener("click", (e) => {
         const btn = e.target.closest(".kb-sym-btn");
         if (!btn) return;
+        e.preventDefault();
         const sym = btn.dataset.sym || btn.textContent.trim();
         if (!sym) return;
 
-        // 如果點的是聲調符號，且拼音輸入框有內容，優先附加到拼音框
-        const isTone = btn.closest("#kbToneGroup");
-        if (isTone && pinyinInput && pinyinInput.value.trim() && document.activeElement === pinyinInput) {
+        // 打入小鍵盤的拼音輸入框中
+        if (pinyinInput) {
           insertAtCursor(pinyinInput, sym);
+          if (clearPinyinBtn) {
+            clearPinyinBtn.removeAttribute("hidden");
+          }
           fetchPinyinCandidates(pinyinInput.value);
-        } else {
-          // 否則直接輸入到學生的主要作答框 #inp
-          insertAtCursor(mainInput, sym);
         }
       });
 

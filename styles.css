@@ -901,6 +901,8 @@ h1 {
 .scenario-art {
   position: relative;
   height: 220px;
+  width: 100%;
+  object-fit: cover;
   overflow: hidden;
 }
 

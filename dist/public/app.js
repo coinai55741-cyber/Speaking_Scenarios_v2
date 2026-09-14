@@ -35,7 +35,22 @@ const scenarios = [
       "最後依照回答完成前往任務。"
     ],
     demoStep: 0
+  },
+  {
+    id: "chain-quest-prototype",
+    title: "連鎖生活任務",
+    artClass: "art-zoo",
+    image: "./assets/zoo_chain.jpg",
+    description: "走入動物園等連鎖生活情境，體驗購票、問路、美食等連貫任務與多分支路線！",
+    href: "https://speaking-scenarios-v2.vercel.app/chain-quest-prototype/",
+    flow: [
+      "學習購票與問候對話。",
+      "根據指引進行地圖移動。",
+      "體驗生活任務連鎖分支。"
+    ],
+    demoStep: 0
   }
+
   /*,
   {
     id: "shopping-food",
@@ -82,9 +97,11 @@ function createScenarioCard(scenario) {
     : scenario.id === "scene-game-1-2"
       ? "./scene-game-1-2.html"
       : `../demo_v1/?step=${scenario.demoStep}`);
+  const isExternal = /^https?:\/\//.test(demoUrl);
+  const targetAttr = isExternal ? ' target="_blank" rel="noopener noreferrer"' : '';
   const actionButton = scenario.disabled
-    ? `<button class="card-link is-disabled" type="button" disabled aria-disabled="true">開始任務</button>` 
-    : `<a class="card-link" href="${demoUrl}">開始任務</a>`;
+    ? `<button class="card-link is-disabled" type="button" disabled aria-disabled="true">開始任務</button>`
+    : `<a class="card-link" href="${demoUrl}"${targetAttr}>開始任務</a>`;
 
   card.innerHTML = `
     <img class="scenario-art ${scenario.artClass}" src="${scenario.image}" alt="" aria-hidden="true">
