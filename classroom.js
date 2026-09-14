@@ -13,7 +13,7 @@
     });
 
     lessonCards.forEach(card => {
-      const isLocked = card.classList.contains("is-locked");
+      const isLocked = card.classList.contains("is-locked") || card.classList.contains("is-disabled") || card.hasAttribute("data-disabled");
       const isOpen = selectedDialect === "sixian" && !isLocked;
       card.disabled = !isOpen;
       card.setAttribute("aria-disabled", String(!isOpen));

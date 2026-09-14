@@ -11,14 +11,16 @@
 </head>
 
 <body>
-  <header class="hero-header" id="top"><nav class="top-nav" aria-label="主要導覽">
+  <header class="hero-header" id="top">
+    <nav class="top-nav" aria-label="主要導覽">
       <a class="brand" href="#top" aria-label="回到首頁">
         <span class="brand-mark">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width: 24px; height: 24px;">
-            <path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/>
-            <path d="M8 14s1.5 2 4 2 4-2 4-2"/>
-            <line x1="9" x2="9.01" y1="9" y2="9"/>
-            <line x1="15" x2="15.01" y1="9" y2="9"/>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"
+            stroke-linejoin="round" style="width: 24px; height: 24px;">
+            <path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z" />
+            <path d="M8 14s1.5 2 4 2 4-2 4-2" />
+            <line x1="9" x2="9.01" y1="9" y2="9" />
+            <line x1="15" x2="15.01" y1="9" y2="9" />
           </svg>
         </span>
         <span>客語生活任務</span>
@@ -70,6 +72,14 @@
             </svg>
             <span>課堂測驗</span>
           </a>
+          <a class="sidebar-link" href="#assessment">
+            <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor"
+              stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="8" r="6" />
+              <path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11" />
+            </svg>
+            <span>分級測驗</span>
+          </a>
           <a class="sidebar-link" href="#situations">
             <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true">
               <path d="m3 10 9-7 9 7" />
@@ -119,7 +129,7 @@
           <img class="mini-art" src="./assets/area-basic-learning2.png" alt="" aria-hidden="true">
           <h3>聽音辨字</h3>
           <p>聆聽道地客語原音，輸入華語文字，透過 AI 翻譯即時比對客語正字。</p>
-          <a class="start-learning-btn" href="./basic-listening.html">進入學習</a>
+          <a class="start-learning-btn" href="./listening-practice.html">進入學習</a>
         </article>
         <article class="learning-card basic-card-three is-disabled" aria-disabled="true">
           <img class="mini-art" src="./assets/area-life-situations.png" alt="" aria-hidden="true">
@@ -159,9 +169,30 @@
       </div>
     </section>
 
-    <section id="situations" class="module-section module-situations" aria-labelledby="situationsTitle">
+    <section id="assessment" class="module-section module-assessment" aria-labelledby="assessmentTitle">
       <div class="section-heading">
         <p class="section-index">3</p>
+        <div>
+          <p class="eyebrow">能力評測</p>
+          <h2 id="assessmentTitle">客語分級測驗
+          </h2>
+          <p>依循「來上客網站」客語能力指標設計，提供漸進式測驗，即時掌握當前客語實力。</p>
+        </div>
+      </div>
+      <div class="learning-grid">
+        <article class="learning-card assessment-card-one">
+          <img class="mini-art" src="./assets/test-card-learning.png" alt="" aria-hidden="true">
+          <h3>分級測驗</h3>
+          <p>模擬客語認證考試題型，含聽、說、讀共三項，對應來上客網站之學習階段，提供學習之參考。</p>
+          <a class="start-learning-btn" href="./breakfast.html">進入測驗</a>
+        </article>
+
+      </div>
+    </section>
+
+    <section id="situations" class="module-section module-situations" aria-labelledby="situationsTitle">
+      <div class="section-heading">
+        <p class="section-index">4</p>
         <div>
           <p class="eyebrow">生活任務</p>
           <h2 id="situationsTitle">情境應用</h2>
@@ -181,16 +212,3 @@
 </body>
 
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-

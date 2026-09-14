@@ -1,7 +1,7 @@
 @font-face {
   font-family: "GenSekiGothic2TW";
   src: url("./assets/fonts/GenSekiGothic2TW-R.otf") format("opentype");
-  font-weight: 400;
+  font-weight: 400 500;
   font-style: normal;
   font-display: swap;
 }
@@ -9,7 +9,7 @@
 @font-face {
   font-family: "GenSekiGothic2TW";
   src: url("./assets/fonts/GenSekiGothic2TW-B.otf") format("opentype");
-  font-weight: 700 900;
+  font-weight: 600 700 900;
   font-style: normal;
   font-display: swap;
 }
@@ -64,6 +64,8 @@
 .word,
 .slot,
 .tile,
-.sq-ans {
-  font-weight: 700 900;
+.sq-ans,
+.lesson-card strong,
+.lesson-card strong[lang="hak"] {
+  font-weight: 800 900;
 }

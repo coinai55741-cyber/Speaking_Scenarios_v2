@@ -1,18 +1,19 @@
 <!doctype html>
 <html lang="zh-Hant">
+
 <head>
   <link rel="stylesheet" href="./hakka-font.css?v=20260907-font4">
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>單元快問快答｜客語生活任務</title>
+  <title>聽音辨字｜客語生活任務</title>
   <link rel="stylesheet" href="./Vocabulary.css?v=20260907-font1">
 </head>
+
 <body>
   <main class="game-shell">
-    <header class="game-topbar">
-      <a class="back-link" href="./index.html#classroom">返回</a>
+    <header class="game-topbar"><a class="back-link" href="./index.html#basic">返回</a>
       <div>
-        <h1>單元快問快答</h1>
+        <h1>聽音辨字</h1>
       </div>
     </header>
 
@@ -36,30 +37,20 @@
             <p id="lessonHint">請選擇單元開始。</p>
           </div>
           <div class="lesson-carousel-wrap">
-            <div class="lesson-carousel" id="lessonCarousel" aria-label="單元卡片">
-              <button class="lesson-card" type="button" data-url="./breakfast.html">
-                <img src="./assets/lesson-card-1-breakfast.png" alt="我要吃早餐">
+            <div class="lesson-carousel " id="lessonCarousel" aria-label="單元卡片">
+              <button class="lesson-card is-locked" type="button" data-lesson="classroom-stage-1"
+                data-url="./basic-listening.html" disabled aria-disabled="true">
+                <img src="./assets/vocabulary-card-primary-scene.png" alt="客語互動場景">
                 <span>學習階段1</span>
-                <strong>我要吃早餐</strong>
-                <small>看圖說詞：看早餐圖片，用客語說出食物名稱。</small>
+                <strong>聽音辨字1</strong>
+                <small>聆聽音檔，輸入客語詞彙，看圖學習對應的單詞。</small>
               </button>
-              <button class="lesson-card" type="button" data-url="./classroom-stage-2.html">
-                <img src="./assets/vocabulary-card-middle-tiles.png" alt="字磚拼拼樂">
+
+              <button class="lesson-card" type="button" data-lesson="field-trip" data-url="./basic-listening.html">
+                <img src="./assets/lesson-card-2-outdoor-learning.png" alt="戶外教學趣">
                 <span>學習階段2</span>
-                <strong>字磚拼拼樂</strong>
-                <small>聽一聽，使用字磚完成詞語挑戰。</small>
-              </button>
-              <button class="lesson-card" type="button" data-url="./Vocabulary-High-1-v2.html">
-                <img src="./assets/vocabulary-card-high-radio.png" alt="客庄廣播電台">
-                <span>學習階段3</span>
-                <strong>客庄廣播電台</strong>
-                <small>聽廣播、找線索，使用字磚完成句子，再開口讀讀看。</small>
-              </button>
-              <button class="lesson-card" type="button" data-url="https://fastidious-malabi-f7c02e.netlify.app/?utm_source=chatgpt.com">
-                <img src="./assets/vocabulary-card-high-newspaper.png" alt="網路世界">
-                <span>學習階段4</span>
-                <strong>網路世界</strong>
-                <small>口說辨識挑戰：聆聽語音問題，錄音說出客語回答。</small>
+                <strong>聽音辨字2</strong>
+                <small>聆聽音檔，輸入客語詞彙，看圖學習對應的單詞。</small>
               </button>
             </div>
           </div>
@@ -70,4 +61,5 @@
 
   <script src="./classroom.js?v=20260909-classroom1"></script>
 </body>
+
 </html>

@@ -36,6 +36,7 @@ const scenarios = [
     ],
     demoStep: 0
   }
+
   /*,
   {
     id: "shopping-food",
@@ -83,7 +84,7 @@ function createScenarioCard(scenario) {
       ? "./scene-game-1-2.html"
       : `../demo_v1/?step=${scenario.demoStep}`);
   const actionButton = scenario.disabled
-    ? `<button class="card-link is-disabled" type="button" disabled aria-disabled="true">開始任務</button>` 
+    ? `<button class="card-link is-disabled" type="button" disabled aria-disabled="true">開始任務</button>`
     : `<a class="card-link" href="${demoUrl}">開始任務</a>`;
 
   card.innerHTML = `

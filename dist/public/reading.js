@@ -148,7 +148,8 @@
     $('cancelBtn').hidden = next !== 'submitting';
     $('audioPreview').hidden = !answers[current].url || ['ready', 'requesting', 'recording', 'stopping'].includes(next);
     $('feedbackPanel').hidden = next !== 'feedback';
-    document.querySelector('[data-dialect="sixian"]').disabled = busy();
+    const sixianBtn = document.querySelector('[data-dialect="sixian"]');
+    if (sixianBtn) sixianBtn.disabled = busy();
     const firstIncomplete = answers.findIndex(answer => !answer.completed);
     $('passageSteps').querySelectorAll('button').forEach((button, index) => {
       button.disabled = busy() || (firstIncomplete !== -1 && index > firstIncomplete);
@@ -548,7 +549,7 @@
     button.addEventListener('click', () => { if (!button.disabled && !busy()) { current = index; render(); } });
     $('passageSteps').append(button);
   });
-  $('introImage').src = lesson.passages[0].image;
+  if ($('introImage')) $('introImage').src = lesson.passages[0].image;
   $('debugToggle').addEventListener('change', updateDeveloperMode);
   $('asrProviderSelect').addEventListener('change', updateDeveloperMode);
   $('recognitionModeSelect').addEventListener('change', updateDeveloperMode);
@@ -559,7 +560,7 @@
     if (useRealtimeAsr() || useMandarinWebSpeech()) realtimeSession?.stop?.();
     clearInterval(timer);
 
-    if (!$('readingIntro').hidden) {
+    if ($('readingIntro') && !$('readingIntro').hidden) {
       $('readingIntro').hidden = true;
       $('readingMission').hidden = false;
       $('readingMission').classList.add('is-entering');
@@ -609,10 +610,124 @@
     if (!$('debugToggle').checked || busy() || !diagnostic().draft.trim()) return;
     diagnostic().tested = true; updateDeveloperMode();
   });
-  $('storyStartBtn').addEventListener('click', () => {
-    $('readingIntro').hidden = true; $('readingMission').hidden = false;
-    $('readingMission').classList.add('is-entering'); render();
+  // 繪本卡片輪播與拖曳控制
+  const carousel = $('lessonCarousel');
+  let isDragging = false, startX = 0, scrollLeft = 0, hasMoved = false;
+
+  if (carousel) {
+    carousel.addEventListener('mousedown', e => {
+      isDragging = true;
+      hasMoved = false;
+      startX = e.pageX - carousel.offsetLeft;
+      scrollLeft = carousel.scrollLeft;
+      carousel.classList.add('is-dragging');
+    });
+
+    window.addEventListener('mousemove', e => {
+      if (!isDragging) return;
+      const x = e.pageX - carousel.offsetLeft;
+      const walk = (x - startX);
+      if (Math.abs(walk) > 5) hasMoved = true;
+      carousel.scrollLeft = scrollLeft - walk;
+    });
+
+    window.addEventListener('mouseup', () => {
+      if (!isDragging) return;
+      isDragging = false;
+      carousel.classList.remove('is-dragging');
+      setTimeout(() => { hasMoved = false; }, 60);
+    });
+
+    // 觸控拖曳支援
+    let touchStartX = 0, touchScrollLeft = 0;
+    carousel.addEventListener('touchstart', e => {
+      if (!e.touches.length) return;
+      hasMoved = false;
+      touchStartX = e.touches[0].pageX - carousel.offsetLeft;
+      touchScrollLeft = carousel.scrollLeft;
+    }, { passive: true });
+
+    carousel.addEventListener('touchmove', e => {
+      if (!e.touches.length) return;
+      const x = e.touches[0].pageX - carousel.offsetLeft;
+      if (Math.abs(x - touchStartX) > 6) hasMoved = true;
+    }, { passive: true });
+
+    // 左右箭頭按鈕
+    $('carouselPrevBtn')?.addEventListener('click', () => {
+      carousel.scrollBy({ left: -340, behavior: 'smooth' });
+    });
+    $('carouselNextBtn')?.addEventListener('click', () => {
+      carousel.scrollBy({ left: 340, behavior: 'smooth' });
+    });
+  }
+
+  function startReadingMission() {
+    if ($('readingIntro')) $('readingIntro').hidden = true;
+    if ($('readingMission')) {
+      $('readingMission').hidden = false;
+      $('readingMission').classList.add('is-entering');
+    }
+    render();
+  }
+
+  $('storyStartCard')?.addEventListener('click', () => {
+    if (hasMoved) return;
+    startReadingMission();
   });
+
+  $('storyStartCard')?.addEventListener('keydown', e => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      startReadingMission();
+    }
+  });
+
+  $('storyStartBtn')?.addEventListener('click', e => {
+    e.stopPropagation();
+    if (hasMoved) return;
+    startReadingMission();
+  });
+
+  // 返回繪本選單按鈕
+  function returnToBooksList() {
+    if (busy()) {
+      if (!window.confirm('目前正在錄音或送出中，確定要離開嗎？')) return;
+      pauseAll();
+      stopTracks();
+      if (recorder?.state === 'recording') recorder.stop();
+      if (useRealtimeAsr() || useMandarinWebSpeech()) realtimeSession?.stop?.();
+      clearInterval(timer);
+    }
+    pauseAll();
+    if ($('readingIntro')) {
+      $('readingMission').hidden = true;
+      $('readingSummary').hidden = true;
+      $('readingIntro').hidden = false;
+      $('storyStartCard')?.focus();
+    } else {
+      window.location.href = './reading.html';
+    }
+  }
+
+  $('backToBooksBtn')?.addEventListener('click', returnToBooksList);
+  $('summaryBackToBooksBtn')?.addEventListener('click', () => {
+    pauseAll();
+    answers.forEach((answer, index) => {
+      release(answer);
+      answers[index] = { blob: null, url: '', transcript: '', completed: false, seconds: 0 };
+    });
+    $('summaryList').replaceChildren();
+    current = 0;
+    if ($('readingIntro')) {
+      $('readingSummary').hidden = true;
+      $('readingIntro').hidden = false;
+      render(false);
+    } else {
+      window.location.href = './reading.html';
+    }
+  });
+
   $('recordBtn').addEventListener('click', () => phase === 'recording' ? stopRecording() : startRecording());
   $('retryBtn').addEventListener('click', () => {
     if (busy()) return;
@@ -638,8 +753,15 @@
   $('restartBtn').addEventListener('click', () => {
     if (!window.confirm('要清除這次錄音，重新開始嗎？')) return;
     pauseAll(); answers.forEach((answer, index) => { release(answer); answers[index] = { blob: null, url: '', transcript: '', completed: false, seconds: 0 }; });
-    $('summaryList').replaceChildren(); current = 0; $('readingSummary').hidden = true; $('readingIntro').hidden = false;
-    $('storyStartBtn').focus(); render(false);
+    $('summaryList').replaceChildren(); current = 0; $('readingSummary').hidden = true;
+    if ($('readingIntro')) {
+      $('readingIntro').hidden = false;
+      $('storyStartCard')?.focus();
+      render(false);
+    } else {
+      $('readingMission').hidden = false;
+      render(false);
+    }
   });
   window.addEventListener('beforeunload', event => {
     if (busy() || answers.some(answer => answer.blob)) { event.preventDefault(); event.returnValue = ''; }
