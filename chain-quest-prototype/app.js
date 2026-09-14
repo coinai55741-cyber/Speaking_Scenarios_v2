@@ -787,141 +787,141 @@ const SCENARIOS_GRAPH = {
     icon: "🌦️",
     bannerImage: "./assets/weather_outfit.jpg",
     objectPosition: "calc(50% + 100px) 50%",
-    objective: "觀察早晨天氣狀況，看提示口說選擇下雨、酷熱或寒冷天氣，用客語說出合適的穿搭與防護提醒。",
-    mandarinObjective: "觀察早晨天氣狀況，看提示口說選擇下雨、酷熱或寒冷天氣，說出合適的穿搭與防護提醒。",
+    objective: "早晨拉開窗簾觀察天氣，向媽媽回報天氣狀況；再走到衣櫃挑選出合適的防護穿搭，最後整裝出門！",
+    mandarinObjective: "早晨拉開窗簾觀察天氣，向媽媽回報天氣狀況；再走到衣櫃挑選出合適的防護穿搭，最後整裝出門！",
     startNodeId: "weather_choose_type",
     nodes: {
       weather_choose_type: {
         id: "weather_choose_type",
-        title: "步驟 1：你今天要穿什麼衣服出門？",
+        title: "步驟 1：拉開窗簾觀察回報天氣",
         nodeType: "選擇",
-        locationTag: "臥室衣櫃前",
-        storyPrompt: "媽媽提醒你，外面真的很冷，要記得多穿衣服。你看了一下衣櫃，準備說出你想穿哪些衣服出門。你說：",
-        mandarinStoryPrompt: "媽媽提醒你，外面真的很冷，要記得多穿衣服。你看了一下衣櫃，準備說出你想穿哪些衣服出門。你說：",
-        targetHakka: "天時當冷，𠊎愛著大衫，圍等圍巾。",
-        targetMandarin: "天氣很冷，我要穿大衣，圍著圍巾。",
-        keywords: ["天時當冷", "大衫", "圍巾"],
-        mandarinKeywords: ["天氣很冷", "穿大衣", "圍巾"],
-        altKeywords: ["大衣", "圍巾", "毛衣", "羽絨衣", "厚外套", "長袖", "長褲", "發熱衣", "衛生衣", "大衫", "保暖", "穿暖", "很冷", "當冷"],
+        locationTag: "臥室窗戶前",
+        storyPrompt: "清晨起床拉開窗簾看天氣，看見外頭烏雲密布、正在下大雨。媽媽在廚房問你：「今天外面天氣看起來怎麼樣呀？」你回答她：",
+        mandarinStoryPrompt: "清晨起床拉開窗簾看天氣，看見外頭烏雲密布、正在下大雨。媽媽在廚房問你：「今天外面天氣看起來怎麼樣呀？」你回答她：",
+        targetHakka: "今晡日落大雨，外背溼漉漉！",
+        targetMandarin: "今天在下大雨，外面濕漉漉！",
+        keywords: ["今晡日", "落大雨", "溼漉漉"],
+        mandarinKeywords: ["今天", "下大雨", "濕漉漉"],
+        altKeywords: ["下雨", "落雨", "下大雨", "落大雨", "陰天", "濕漉漉", "溼漉漉", "雨天"],
         npcRole: "媽媽",
         npcAvatar: "👩",
-        npcSuccessResponse: "「真聰明！穿大衣跟圍巾穿得暖暖的，這樣出門就不會著涼了！」",
-        mandarinNpcSuccessResponse: "「真聰明！穿大衣跟圍巾穿得暖暖的，這樣出門就不會著涼了！」",
-        npcRetryResponse: "「外面只有十度冷颼颼的，穿短袖短褲會感冒啦！快去衣櫃挑厚大衣或毛衣穿暖喔！」",
-        mandarinNpcRetryResponse: "「外面只有十度冷颼颼的，穿短袖短褲會感冒啦！快去衣櫃挑厚大衣或毛衣穿暖喔！」",
+        npcSuccessResponse: "「哎呀真的在下雨呢！那去學校要準備合適的衣服跟雨具喔！」",
+        mandarinNpcSuccessResponse: "「哎呀真的在下雨呢！那去學校要準備合適的衣服跟雨具喔！」",
+        npcRetryResponse: "「媽媽在廚房問：『拉開窗簾看看窗外，今天是什麼天氣呀？』」",
+        mandarinNpcRetryResponse: "「媽媽在廚房問：『拉開窗簾看看窗外，今天是什麼天氣呀？』」",
         choices: [
           {
             id: "rain",
-            title: "🌧️ 陰雨綿綿",
-            sub: "天空飄雨、地面潮濕",
+            title: "🌧️ 陰雨綿綿 (下大雨)",
+            sub: "天空飄雨、地面濕漉漉",
             targetBranchId: "weather_outfit_rain",
-            keywords: ["落雨", "下雨", "雨天", "雨傘", "雨衣", "遮仔"],
-            mandarinKeywords: ["下雨", "雨天", "雨傘", "雨衣", "陰雨", "落雨"],
-            guideResponse: "「無錯！落雨天路滑，著好雨衣、帶好遮仔，出門小心行喔！」",
-            mandarinGuideResponse: "「沒錯！下雨天路滑，穿好雨衣、帶好雨傘，出門小心走喔！」"
+            keywords: ["落大雨", "落雨", "下雨", "下大雨", "溼漉漉", "濕漉漉"],
+            mandarinKeywords: ["下雨", "雨天", "下大雨", "濕漉漉", "陰雨", "落雨"],
+            guideResponse: "「哎呀真的在下雨呢！那去學校要準備合適的衣服跟雨具喔！」",
+            mandarinGuideResponse: "「哎呀真的在下雨呢！那去學校要準備合適的衣服跟雨具喔！」"
           },
           {
             id: "hot",
-            title: "☀️ 炎熱大晴天",
-            sub: "豔陽高照、氣溫偏高",
+            title: "☀️ 炎熱大晴天 (出大太陽)",
+            sub: "豔陽高照、氣溫好熱",
             targetBranchId: "weather_outfit_hot",
-            keywords: ["當熱", "很熱", "大熱天", "晴天", "太陽", "遮陽帽仔", "遮陽帽"],
-            mandarinKeywords: ["很熱", "大熱天", "晴天", "太陽", "遮陽帽", "防曬"],
-            guideResponse: "「大熱天陽光真烈，戴上帽仔、多喝水才不會中暑喔！」",
-            mandarinGuideResponse: "「大熱天太陽真大，戴上帽子、多喝水才不會中暑喔！」"
+            keywords: ["出大日頭", "日頭", "大太陽", "太陽", "當熱", "好熱", "很熱"],
+            mandarinKeywords: ["出大太陽", "大太陽", "太陽", "好熱", "很熱", "大熱天", "晴天"],
+            guideResponse: "「哇，太陽好大好熱呢！去學校要挑選清涼透氣的衣服跟防曬喔！」",
+            mandarinGuideResponse: "「哇，太陽好大好熱呢！去學校要挑選清涼透氣的衣服跟防曬喔！」"
           },
           {
             id: "cold",
-            title: "❄️ 寒冷冬日",
-            sub: "冷氣團來襲、北風呼呼",
+            title: "❄️ 寒冷冬日 (寒流來襲)",
+            sub: "北風呼呼、天氣好冷",
             targetBranchId: "weather_outfit_cold",
-            keywords: ["當冷", "天時當冷", "很冷", "寒冷", "天冷", "冬天", "大衫", "圍巾", "毛衣", "羽絨衣", "厚外套", "長袖", "長褲", "發熱衣", "保暖", "穿暖"],
-            mandarinKeywords: ["天氣很冷", "很冷", "寒冷", "天冷", "冬天", "大衣", "圍巾", "毛衣", "羽絨衣", "外套", "厚外套", "長袖", "長褲", "發熱衣", "保暖", "穿暖"],
-            altKeywords: ["毛衣", "羽絨", "長褲", "長袖", "外套", "手套", "毛帽", "衛生衣", "大衫", "保暖"],
-            guideResponse: "「真聰明！穿大衣跟圍巾穿得暖暖的，這樣出門就不會著涼了！」",
-            mandarinGuideResponse: "「真聰明！穿大衣跟圍巾穿得暖暖的，這樣出門就不會著涼了！」"
+            keywords: ["寒流", "天時當冷", "當冷", "吹大風", "風很大", "很冷", "天冷"],
+            mandarinKeywords: ["寒流", "風很大", "很冷", "天氣很冷", "天冷", "冬天"],
+            altKeywords: ["寒流", "天冷", "很冷", "當冷", "大風", "吹大風", "冷氣團", "冬天"],
+            guideResponse: "「天哪，冷氣團真的來了！去衣櫃拿保暖的厚衣服跟配件穿上喔！」",
+            mandarinGuideResponse: "「天哪，冷氣團真的來了！去衣櫃拿保暖的厚衣服跟配件穿上喔！」"
           }
         ],
         nextNodeId: "weather_outfit_rain"
       },
       weather_outfit_rain: {
         id: "weather_outfit_rain",
-        title: "步驟 2：下雨天穿搭提醒",
+        title: "步驟 2：走到衣櫃挑選防雨穿搭",
         nodeType: "分支",
-        locationTag: "雨具區落地窗前",
-        storyPrompt: "窗外正滴滴答答下著細雨，地上濕漉漉的。你看見媽媽準備出門，轉頭貼心提醒媽媽要備好雨具。你說：",
-        mandarinStoryPrompt: "窗外正滴滴答答下著細雨，地上濕漉漉的。你看見媽媽準備出門，轉頭貼心提醒媽媽要備好雨具。你說：",
-        targetHakka: "今晡日落雨，愛帶遮仔著雨衣。",
-        targetMandarin: "今天下雨，要帶雨傘穿雨衣。",
-        keywords: ["今晡日", "落雨", "遮仔", "雨衣"],
-        mandarinKeywords: ["今天", "下雨", "雨傘", "雨衣"],
-        altKeywords: ["下雨", "雨傘", "雨衣", "遮仔", "媽媽"],
+        locationTag: "臥室衣櫃前（防雨穿搭）",
+        storyPrompt: "知道今天會下大雨後，你走到衣櫃前挑選今天上學要穿戴的防雨裝備。你對媽媽說：",
+        mandarinStoryPrompt: "知道今天會下大雨後，你走到衣櫃前挑選今天上學要穿戴的防雨裝備。你對媽媽說：",
+        targetHakka: "𠊎愛著雨衣，手拿遮仔！",
+        targetMandarin: "我要穿上雨衣，手上帶雨傘！",
+        keywords: ["雨衣", "遮仔"],
+        mandarinKeywords: ["雨衣", "雨傘"],
+        altKeywords: ["下雨", "雨傘", "雨衣", "遮仔", "著雨衣", "帶雨傘", "拿遮仔", "穿雨衣"],
         npcRole: "媽媽",
         npcAvatar: "👩",
-        npcSuccessResponse: "「謝謝寶貝提醒！落雨天路滑，媽媽會著好雨衣、帶好遮仔，出門小心行喔！」",
-        mandarinNpcSuccessResponse: "「謝謝寶貝提醒！下雨天路滑，媽媽會穿好雨衣、帶好雨傘，出門小心走喔！」",
-        npcRetryResponse: "「媽媽看著窗外問：『外頭在下雨呢，出門要提醒媽媽帶什麼雨具才不會淋濕呀？』」",
-        mandarinNpcRetryResponse: "「媽媽看著窗外問：『外頭在下雨呢，出門要提醒媽媽帶什麼雨具才不會淋濕呀？』」",
+        npcSuccessResponse: "「太棒了！穿好雨衣又帶了雨傘，下雨天就不怕淋成落湯雞了！」",
+        mandarinNpcSuccessResponse: "「太棒了！穿好雨衣又帶了雨傘，下雨天就不怕淋成落湯雞了！」",
+        npcRetryResponse: "「媽媽看著你問：『外面在下大雨呢，去學校要穿戴什麼防雨裝備才不會淋濕呀？』」",
+        mandarinNpcRetryResponse: "「媽媽看著你問：『外面在下大雨呢，去學校要穿戴什麼防雨裝備才不會淋濕呀？』」",
         nextNodeId: "weather_done"
       },
       weather_outfit_hot: {
         id: "weather_outfit_hot",
-        title: "步驟 2：大熱天穿搭提醒",
+        title: "步驟 2：走到衣櫃挑選防曬穿搭",
         nodeType: "分支",
-        locationTag: "客廳日曆與陽臺旁",
-        storyPrompt: "七月豔陽高照，外頭大太陽曬得柏油路直冒熱氣。出門前你看見爸爸準備外出，貼心提醒爸爸太陽很大要做好防曬。你說：",
-        mandarinStoryPrompt: "七月豔陽高照，外頭大太陽曬得柏油路直冒熱氣。出門前你看見爸爸準備外出，貼心提醒爸爸太陽很大要做好防曬。你說：",
-        targetHakka: "今晡日當熱，愛戴等遮陽帽仔。",
-        targetMandarin: "今天很熱，要戴著遮陽帽。",
-        keywords: ["今晡日", "當熱", "遮陽帽仔"],
-        mandarinKeywords: ["今天", "很熱", "戴著", "遮陽帽"],
-        altKeywords: ["很熱", "帽子", "遮陽帽", "當熱", "爸爸", "防曬"],
-        npcRole: "爸爸",
-        npcAvatar: "👨",
-        npcSuccessResponse: "「哈哈，謝謝你提醒！大熱天太陽真大，爸爸戴上帽子、多喝水才不會中暑！」",
-        mandarinNpcSuccessResponse: "「哈哈，謝謝你提醒！大熱天太陽真大，爸爸戴上帽子、多喝水才不會中暑！」",
-        npcRetryResponse: "「爸爸指著大太陽笑著問：『外頭太陽好大好熱，出門要提醒爸爸戴什麼防曬呢？』」",
-        mandarinNpcRetryResponse: "「爸爸指著大太陽笑著問：『外頭太陽好大好熱，出門要提醒爸爸戴什麼防曬呢？』」",
+        locationTag: "臥室衣櫃前（防曬穿搭）",
+        storyPrompt: "知道今天出大太陽很熱後，你走到衣櫃前挑選今天上學要穿戴的清涼防曬裝備。你對媽媽說：",
+        mandarinStoryPrompt: "知道今天出大太陽很熱後，你走到衣櫃前挑選今天上學要穿戴的清涼防曬裝備。你對媽媽說：",
+        targetHakka: "𠊎愛著短衫短褲，戴等遮陽帽仔！",
+        targetMandarin: "我要穿短袖短褲，戴著遮陽帽！",
+        keywords: ["短衫", "短褲", "遮陽帽仔"],
+        mandarinKeywords: ["短袖", "短褲", "遮陽帽"],
+        altKeywords: ["很熱", "短袖", "短褲", "薄衫", "帽子", "遮陽帽", "帽仔", "防曬"],
+        npcRole: "媽媽",
+        npcAvatar: "👩",
+        npcSuccessResponse: "「真聰明！穿清涼短袖短褲、戴上遮陽帽，這樣在學校就不怕曬傷中暑了！」",
+        mandarinNpcSuccessResponse: "「真聰明！穿清涼短袖短褲、戴上遮陽帽，這樣在學校就不怕曬傷中暑了！」",
+        npcRetryResponse: "「媽媽看著你問：『今天太陽那麼烈，出門要穿什麼清涼防曬的衣服呀？』」",
+        mandarinNpcRetryResponse: "「媽媽看著你問：『今天太陽那麼烈，出門要穿什麼清涼防曬的衣服呀？』」",
         nextNodeId: "weather_done"
       },
       weather_outfit_cold: {
         id: "weather_outfit_cold",
-        title: "步驟 2：寒冷天穿搭提醒",
+        title: "步驟 2：走到衣櫃挑選保暖穿搭",
         nodeType: "分支",
-        locationTag: "臥室衣櫃前",
-        storyPrompt: "寒流來襲，北風呼呼地吹著，溫度計顯示只有十度。穿戴整齊後，你看著準備出門的阿公身上的衣服，貼心提醒他天冷要多加保暖。你說：",
-        mandarinStoryPrompt: "寒流來襲，北風呼呼地吹著，溫度計顯示只有十度。穿戴整齊後，你看著準備出門的阿公身上的衣服，貼心提醒他天冷要多加保暖。你說：",
-        targetHakka: "天時當冷，愛著大衫圍等圍巾。",
-        targetMandarin: "天氣很冷，要穿大衣圍著圍巾。",
-        keywords: ["天時", "當冷", "大衫", "圍巾"],
-        mandarinKeywords: ["天氣", "很冷", "穿大衣", "圍巾"],
-        altKeywords: ["很冷", "大衣", "圍巾", "當冷", "阿公", "保暖", "穿暖"],
-        npcRole: "阿公",
-        npcAvatar: "👴",
-        npcSuccessResponse: "「喔！恁仔細提醒，乖孫真貼心！阿公會著暖暖、圍巾圍好，出門就毋驚吹風冷著囉！」",
-        mandarinNpcSuccessResponse: "「喔！謝謝你提醒，乖孫真貼心！阿公把大衣穿好、圍巾圍上，出門就不怕吹風著涼了！」",
-        npcRetryResponse: "「阿公搓搓雙手笑著問：『冷氣團來了外面風好冷喔，乖孫要提醒阿公穿什麼保暖才不會著涼呀？』」",
-        mandarinNpcRetryResponse: "「阿公搓搓雙手笑著問：『冷氣團來了外面風好冷喔，乖孫要提醒阿公穿什麼保暖才不會著涼呀？』」",
+        locationTag: "臥室衣櫃前（保暖穿搭）",
+        storyPrompt: "知道今天寒流很冷後，你走到衣櫃前挑選今天上學要穿戴的保暖冬裝。你對媽媽說：",
+        mandarinStoryPrompt: "知道今天寒流很冷後，你走到衣櫃前挑選今天上學要穿戴的保暖冬裝。你對媽媽說：",
+        targetHakka: "𠊎愛著厚大衫，圍等暖暖个圍巾！",
+        targetMandarin: "我要穿上厚大衣，圍著保暖的圍巾！",
+        keywords: ["厚大衫", "大衫", "圍巾"],
+        mandarinKeywords: ["厚大衣", "大衣", "圍巾"],
+        altKeywords: ["很冷", "厚大衫", "大衫", "大衣", "圍巾", "毛衣", "羽絨衣", "厚外套", "保暖", "穿暖", "著暖"],
+        npcRole: "媽媽",
+        npcAvatar: "👩",
+        npcSuccessResponse: "「真貼心！穿厚大衣又圍上毛圍巾，這樣在路上吹風就不會著涼感冒了！」",
+        mandarinNpcSuccessResponse: "「真貼心！穿厚大衣又圍上毛圍巾，這樣在路上吹風就不會著涼感冒了！」",
+        npcRetryResponse: "「媽媽摸摸你的手問：『今天寒流只有十度呢，快去拿厚大衣跟圍巾穿暖喔！』」",
+        mandarinNpcRetryResponse: "「媽媽摸摸你的手問：『今天寒流只有十度呢，快去拿厚大衣跟圍巾穿暖喔！』」",
         nextNodeId: "weather_done"
       },
       weather_done: {
         id: "weather_done",
-        title: "步驟 3：穿搭整齊準備出門",
+        title: "步驟 3：玄關整裝出發",
         nodeType: "集合點",
         locationTag: "玄關大門口",
-        storyPrompt: "提醒完家人並穿戴整齊後，全家人都準備好了。你向大家精神飽滿地說：",
-        mandarinStoryPrompt: "提醒完家人並穿戴整齊後，全家人都準備好了。你向大家精神飽滿地說：",
-        targetHakka: "大家都準備好了，出門行囉！",
-        targetMandarin: "大家都準備好了，出門走囉！",
-        keywords: ["準備好", "出門"],
-        mandarinKeywords: ["大家都", "準備好了", "出門走囉"],
-        altKeywords: ["準備", "出門", "準備好了"],
-        npcRole: "家人",
-        npcAvatar: "👨‍👩‍👧",
-        npcSuccessResponse: "「太棒了！大家都穿戴整齊、裝備齊全，出門平安順心！」",
-        mandarinNpcSuccessResponse: "「太棒了！大家都穿戴整齊、裝備齊全，出門平安順心！」",
-        npcRetryResponse: "「家人在玄關問：『大家都穿戴整齊、準備好出發了嗎？』」",
-        mandarinNpcRetryResponse: "「家人在玄關問：『大家都穿戴整齊、準備好出發了嗎？』」",
+        storyPrompt: "穿戴好合適的衣物裝備後，你站在玄關門口精神飽滿地向媽媽道別準備出發。你說：",
+        mandarinStoryPrompt: "穿戴好合適的衣物裝備後，你站在玄關門口精神飽滿地向媽媽道別準備出發。你說：",
+        targetHakka: "𠊎都準備好了，出門行囉，媽媽再見！",
+        targetMandarin: "我都準備好了，出門走囉，媽媽再見！",
+        keywords: ["準備好", "出門", "再見"],
+        mandarinKeywords: ["準備好了", "出門走囉", "再見"],
+        altKeywords: ["準備", "出門", "準備好了", "再見", "出門行囉"],
+        npcRole: "媽媽",
+        npcAvatar: "👩",
+        npcSuccessResponse: "「太棒了！路上小心走，專心上課，祝你有美好的一天！」",
+        mandarinNpcSuccessResponse: "「太棒了！路上小心走，專心上課，祝你有美好的一天！」",
+        npcRetryResponse: "「媽媽在玄關笑著問：『東西跟衣服都穿戴整齊、準備好出發了嗎？』」",
+        mandarinNpcRetryResponse: "「媽媽在玄關笑著問：『東西跟衣服都穿戴整齊、準備好出發了嗎？』」",
         nextNodeId: null
       }
     }
@@ -938,11 +938,14 @@ const WEATHER_RANDOM_PRESETS = {
     weatherIcon: "🌧️",
     badgeLabel: "🌧️ 今日天氣：陰雨綿綿",
     targetBranchId: "weather_outfit_rain",
-    locationTag: "玄關落地窗前（🌧️ 今日天氣：陰雨綿綿）",
-    storyPrompt: "清晨拉開窗簾看天氣，看見外頭烏雲密布、陰雨綿綿（正在下雨）。請看上方提示，開口提醒媽媽今天的天氣狀況與合適的雨具穿搭！",
-    mandarinStoryPrompt: "清晨拉開窗簾看天氣，看見外頭烏雲密布、陰雨綿綿（正在下雨）。請看上方提示，開口提醒媽媽今天的天氣狀況與合適的雨具穿搭！",
-    targetHakka: "今晡日落雨，愛帶遮仔著雨衣。",
-    targetMandarin: "今天下雨，要帶雨傘穿雨衣。"
+    locationTag: "臥室窗戶前（🌧️ 正在下雨）",
+    storyPrompt: "清晨起床拉開窗簾看天氣，看見外頭烏雲密布、正在下大雨。媽媽在廚房問你：「今天外面天氣看起來怎麼樣呀？」你回答她：",
+    mandarinStoryPrompt: "清晨起床拉開窗簾看天氣，看見外頭烏雲密布、正在下大雨。媽媽在廚房問你：「今天外面天氣看起來怎麼樣呀？」你回答她：",
+    targetHakka: "今晡日落大雨，外背溼漉漉！",
+    targetMandarin: "今天在下大雨，外面濕漉漉！",
+    keywords: ["今晡日", "落大雨", "溼漉漉"],
+    mandarinKeywords: ["今天", "下大雨", "濕漉漉"],
+    altKeywords: ["下雨", "落雨", "下大雨", "落大雨", "陰天", "濕漉漉", "溼漉漉", "雨天"]
   },
   hot: {
     id: "hot",
@@ -950,11 +953,14 @@ const WEATHER_RANDOM_PRESETS = {
     weatherIcon: "☀️",
     badgeLabel: "☀️ 今日天氣：炎熱大晴天",
     targetBranchId: "weather_outfit_hot",
-    locationTag: "玄關落地窗前（☀️ 今日天氣：炎熱大晴天）",
-    storyPrompt: "清晨拉開窗簾看天氣，看見外頭豔陽高照、天氣非常炎熱（大晴天）。請看上方提示，開口提醒爸爸今天的天氣狀況與合適的防曬穿搭！",
-    mandarinStoryPrompt: "清晨拉開窗簾看天氣，看見外頭豔陽高照、天氣非常炎熱（大晴天）。請看上方提示，開口提醒爸爸今天的天氣狀況與合適的防曬穿搭！",
-    targetHakka: "今晡日當熱，愛戴等遮陽帽仔。",
-    targetMandarin: "今天很熱，要戴著遮陽帽。"
+    locationTag: "臥室窗戶前（☀️ 豔陽高照）",
+    storyPrompt: "清晨起床拉開窗簾看天氣，看見外頭豔陽高照、出大太陽。媽媽在廚房問你：「今天外面天氣看起來怎麼樣呀？」你回答她：",
+    mandarinStoryPrompt: "清晨起床拉開窗簾看天氣，看見外頭豔陽高照、出大太陽。媽媽在廚房問你：「今天外面天氣看起來怎麼樣呀？」你回答她：",
+    targetHakka: "今晡日出大日頭，天時當熱！",
+    targetMandarin: "今天出大太陽，天氣好熱喔！",
+    keywords: ["出大日頭", "天時", "當熱"],
+    mandarinKeywords: ["出大太陽", "天氣", "好熱"],
+    altKeywords: ["太陽", "日頭", "大太陽", "出太陽", "大晴天", "晴天", "好熱", "很熱", "當熱", "炎熱"]
   },
   cold: {
     id: "cold",
@@ -962,11 +968,14 @@ const WEATHER_RANDOM_PRESETS = {
     weatherIcon: "❄️",
     badgeLabel: "❄️ 今日天氣：寒冷冬日",
     targetBranchId: "weather_outfit_cold",
-    locationTag: "臥室衣櫃前（❄️ 今日天氣：寒冷冬日）",
-    storyPrompt: "媽媽提醒你，外面真的很冷，要記得多穿衣服。你看了一下衣櫃，準備說出你想穿哪些衣服出門。你說：",
-    mandarinStoryPrompt: "媽媽提醒你，外面真的很冷，要記得多穿衣服。你看了一下衣櫃，準備說出你想穿哪些衣服出門。你說：",
-    targetHakka: "天時當冷，𠊎愛著大衫，圍等圍巾。",
-    targetMandarin: "天氣很冷，我要穿大衣，圍著圍巾。"
+    locationTag: "臥室窗戶前（❄️ 寒流來襲）",
+    storyPrompt: "清晨起床拉開窗簾看天氣，看見外頭北風呼呼吹、寒流來襲。媽媽在廚房問你：「今天外面天氣看起來怎麼樣呀？」你回答她：",
+    mandarinStoryPrompt: "清晨起床拉開窗簾看天氣，看見外頭北風呼呼吹、寒流來襲。媽媽在廚房問你：「今天外面天氣看起來怎麼樣呀？」你回答她：",
+    targetHakka: "今晡日寒流來，天時當冷吹大風！",
+    targetMandarin: "今天寒流來了，外面風很大很冷！",
+    keywords: ["寒流", "天時", "當冷", "吹大風"],
+    mandarinKeywords: ["寒流", "風很大", "很冷"],
+    altKeywords: ["寒流", "天冷", "很冷", "當冷", "大風", "吹大風", "冷氣團", "冬天"]
   }
 };
 
@@ -1461,16 +1470,15 @@ class LLMServiceAdapter {
       `       - 📚 市立圖書館 (306)：往東方走兩個紅綠燈，市立圖書館就在右前方。`,
       `       - 【通過時 (isMatch: true)】：熱心阿婆親切稱讚並感謝小朋友（例如：『哇，這樣聽你說的好清楚喔，謝謝你小朋友！』），【注意】：不要死板把路線全部唸出來，直接自然表達感謝即可。`,
       `       - 【未通過/未清楚指明走法時 (isMatch: false)】：熱心阿婆親切請小朋友看地圖再講慢一點（例如：『阿婆笑著說：「欸，我沒聽清楚，你再講慢一點、跟我說怎麼走好嗎？」』）。`,
-      `     * 【今日天氣穿搭關卡】：核心目標是根據天氣（寒冷天冷/夏日大熱天/雨天）提出對應穿搭防護。【極重要智慧天氣情境推理判定】：`,
-      `       - 【1. 寒冷冬天 (天冷/寒流/選衣服)】：`,
-      `         * 【保暖冬裝 (通過 isMatch: true)】：說出大衣、厚外套、毛衣、羽絨衣、長袖、長褲、發熱衣、圍巾、手套、毛帽等保暖衣物。媽媽/阿公讚許：『真聰明！穿大衣和毛衣圍巾穿得暖暖的，這樣出門就不會著涼了！』`,
-      `         * 【單薄夏裝 (嚴格未通過 isMatch: false)】：說出短袖、短褲、吊嘎、背心、拖鞋、短裙等不保暖衣物。媽媽阻止並引導：『哎呀！外面寒風刺骨只有十度，穿短袖短褲出門會感冒著涼啦！快去換厚大衣或毛衣穿暖再出門！』`,
-      `       - 【2. 炎熱大晴天 (夏天/高溫酷暑)】：`,
-      `         * 【清涼防曬 (通過 isMatch: true)】：說出短袖、短褲、薄衣、遮陽帽、太陽眼鏡、擦防曬、多喝水。爸爸/媽媽讚許：『真細心！戴上遮陽帽、穿輕便短袖，多補充水分才不會中暑喔！』`,
-      `         * 【穿太厚/冬裝 (嚴格未通過 isMatch: false)】：若在大熱天說要穿大衣、羽絨衣、厚外套、毛衣、圍巾等厚重衣服。爸爸/媽媽幽默阻止：『哎呀！外面太陽好大好熱、氣溫三十多度，穿厚大衣和毛衣出門會滿頭大汗中暑啦！快去換清涼短袖、戴上遮陽帽喔！』`,
-      `       - 【3. 陰雨綿綿 (下雨天)】：`,
-      `         * 【防雨裝備 (通過 isMatch: true)】：說出帶雨傘、穿雨衣、穿雨鞋等雨具。媽媽讚許：『太棒了！帶好雨傘、穿好雨衣，出門下雨就不怕淋濕了，路上小心走喔！』`,
-      `         * 【沒帶雨具/只穿普通衣服 (嚴格未通過 isMatch: false)】：若下雨天沒說帶雨傘/雨衣，或說不帶雨具直接出門。媽媽提醒並引導：『看著窗外滴滴答答在下雨呢！不帶雨傘或雨衣出門，衣服和書包馬上就會淋成落湯雞感冒啦！快去玄關拿雨傘或穿上雨衣再出門喔！』`,
+      `     * 【今日天氣與出門穿搭關卡（3 步驟情境探索）】：`,
+      `       - 【第 1 關 (weather_choose_type - 拉開窗簾觀察回報天氣)】：核心目標是拉開窗簾看外面天氣，並向廚房的媽媽清楚回報今天天氣（下大雨溼答答 / 出大太陽好熱 / 寒流來襲吹大風）。`,
+      `         * 【回報正確天氣 (通過 isMatch: true)】：說出當前天氣狀況（如：下大雨、出大太陽很熱、寒流來很冷吹大風）。媽媽在廚房讚許回應並引導去衣櫃挑衣服。`,
+      `         * 【回報錯誤或未觀察天氣 (未通過 isMatch: false)】：若亂說天氣或未提及天氣狀況，媽媽提醒再看清楚窗外。`,
+      `       - 【第 2 關 (weather_outfit_* - 走到衣櫃挑選防護穿搭)】：核心目標是走到衣櫃挑選符合第 1 關天氣的專屬穿搭。`,
+      `         * 【1. 寒冷冬天 (weather_outfit_cold)】：保暖冬裝（厚大衣/羽絨衣/毛衣/圍巾/長袖長褲）通過；單薄夏裝（短袖短褲背心）嚴格未通過，媽媽提醒外面很冷會感冒。`,
+      `         * 【2. 炎熱大晴天 (weather_outfit_hot)】：清涼防曬（短袖/短褲/遮陽帽/多喝水）通過；厚重冬裝（大衣/羽絨衣/毛衣）嚴格未通過，媽媽提醒會中暑。`,
+      `         * 【3. 陰雨綿綿 (weather_outfit_rain)】：防雨裝備（穿雨衣/拿雨傘/穿雨鞋）通過；沒帶雨具（不帶傘不穿雨衣）嚴格未通過，媽媽提醒會淋成落湯雞。`,
+      `       - 【第 3 關 (weather_done - 玄關整裝出發)】：核心目標是在玄關穿好鞋子，向媽媽大聲告知準備好出門並禮貌說再見（例：『我都準備好了，出門走囉，媽媽再見！』）。`,
       `     * 【校外教學打包關卡】：核心目標是說出物品名稱（雨傘/水壺/毛巾/點心）與攜帶原因。`,
       ``,
       `2. 【關鍵規則 — 符合目標但夾帶額外要求/問題/閒聊時的 NPC 反應】：`,
@@ -1917,7 +1925,12 @@ class SpeechService {
     let isHotClothesWarning = false;
     let isRainGearWarning = false;
 
-    if (nid === "weather_choose_type" || nid === "weather_outfit_cold") {
+    if (nid === "weather_choose_type") {
+      const isReportingWeather = /落大雨|落雨|下大雨|下雨|雨天|溼漉漉|濕漉漉|溼答答|出大日頭|日頭|出太陽|太陽|好熱|當熱|熱天|晴天|寒流|當冷|好冷|天冷|吹大風|吹風|大風/.test(normalizedCleanText);
+      if (isReportingWeather) isSemanticContextMatch = true;
+    }
+
+    if (nid === "weather_outfit_cold") {
       const isWarmClothes = /大衫|大衣|厚外套|外套|毛衣|羽絨|羽絨衣|羽絨服|毛線衣|長袖|長褲|圍巾|發熱衣|衛生衣|保暖|手套|毛帽|暖暖包|厚長褲|穿暖|著暖/.test(normalizedCleanText);
       const isColdClothes = /短袖|短褲|背心|吊嘎|拖鞋|涼鞋|薄衫|泳衣|短裙|薄外套/.test(normalizedCleanText);
       if (isColdClothes && !isWarmClothes) {
@@ -1946,6 +1959,10 @@ class SpeechService {
       } else if (hasPositiveRainGear) {
         isSemanticContextMatch = true;
       }
+    }
+
+    if (nid === "weather_done" && /準備|出門|再見|行囉|走囉/.test(normalizedCleanText)) {
+      isSemanticContextMatch = true;
     }
 
     // 命中判定規則：命中 >= 1 個實質關鍵詞（排除純稱謂），或符合主題語意，或完整命中目標句
@@ -2167,6 +2184,9 @@ class GraphStateManager {
       node.mandarinStoryPrompt = preset.mandarinStoryPrompt;
       node.targetHakka = preset.targetHakka;
       node.targetMandarin = preset.targetMandarin;
+      node.keywords = preset.keywords;
+      node.mandarinKeywords = preset.mandarinKeywords;
+      node.altKeywords = preset.altKeywords;
       node.currentWeatherPreset = preset;
     }
   }
