@@ -356,9 +356,9 @@ const SCENARIOS_GRAPH = {
     id: "field_trip_pack",
     title: "校外教學打包",
     icon: "🎒",
-    bannerImage: "./assets/field_trip_pack.jpg",
+    bannerImage: "./assets/field-trip-room-ready.png",
     objectFit: "cover",
-    objectPosition: "46% 50%",
+    objectPosition: "50% 50%",
     objective: "在出發前對照清單，以自由順序將雨傘、水壺、毛巾、點心 4 樣物品用客語裝入背包，並於玄關集合。",
     mandarinObjective: "在出發前對照清單，以自由順序將雨傘、水壺、毛巾、點心 4 樣物品裝入背包，並於玄關集合。",
     startNodeId: "pack_hub",
@@ -367,9 +367,11 @@ const SCENARIOS_GRAPH = {
         id: "pack_hub",
         title: "任務一：背包 4 項整理",
         nodeType: "收集任務",
-        locationTag: "客廳背包整理區",
-        storyPrompt: "明天要校外教學，媽媽提醒你把需要的東西放進背包。請在下方【背包清單】點選物品，說出它的客語名稱與原因！",
-        mandarinStoryPrompt: "明天要校外教學，媽媽提醒你把需要的東西放進背包。請在下方【背包清單】點選物品，說出它的名稱與攜帶原因！",
+        locationTag: "房間背包整理區",
+        image: "./assets/field-trip-room-ready.png",
+        tableImage: "./assets/field-trip-table-items.png",
+        storyPrompt: "明天要校外教學，你看著桌上的水壺、雨傘、毛巾和點心，準備一樣一樣確認並放進背包。請在下方【背包清單】點選物品，說出它的客語名稱與原因！",
+        mandarinStoryPrompt: "明天要校外教學，你看著桌上的水壺、雨傘、毛巾和點心，準備一樣一樣確認並放進背包。請在下方【背包清單】點選物品，說出它的名稱與攜帶原因！",
         npcRole: "媽媽",
         npcAvatar: "👩",
         npcSuccessResponse: "「雨傘、水壺、毛巾、點心都裝齊了，太棒了！我們到玄關集合準備出發！」",
@@ -463,6 +465,7 @@ const SCENARIOS_GRAPH = {
         title: "任務二：完成整理：玄關出發",
         nodeType: "集合點",
         locationTag: "玄關大門口",
+        image: "./assets/field-trip-ready-go.png",
         storyPrompt: "4 樣物品都順利放進背包了！你背起背包走到玄關，精神飽滿地向家人說：",
         mandarinStoryPrompt: "4 樣物品都順利放進背包了！你背起背包走到玄關，精神飽滿地向家人說：",
         targetHakka: "𠊎東西都收好，準備好出發了！",
@@ -488,30 +491,32 @@ const SCENARIOS_GRAPH = {
     id: "bus_directions",
     title: "搭車與街頭問路",
     icon: "🚌",
-    bannerImage: "./assets/bus_directions.jpg",
-    objectPosition: "80% 48%",
-    objective: "看提示口說選擇目的地向站務員確認公車班次，並於下車後聽懂十字路口方向指引。",
-    mandarinObjective: "看提示口說選擇目的地向站務員確認公車班次，並於下車後聽懂十字路口方向指引。",
+    bannerImage: "./assets/bus-ask-passerby.png",
+    objectPosition: "50% 50%",
+    objective: "先向路人詢問想去目的地的公車路線，再向巡邏站務員確認搭乘公車；下車後看著公車站路口地圖，回答也想去同一目的地的阿婆。",
+    mandarinObjective: "先向路人詢問想去目的地的公車路線，再向巡邏站務員確認搭乘公車；下車後看著公車站路口地圖，回答也想去同一目的地的阿婆。",
     startNodeId: "bus_choose_dest",
     nodes: {
       bus_choose_dest: {
         id: "bus_choose_dest",
-        title: "步驟 1：詢問搭車路線",
+        title: "步驟 1：向路人詢問目的地公車路線",
         nodeType: "選擇",
         locationTag: "市區公車站牌",
-        storyPrompt: "你站在熱鬧的市區公車站前，看著站牌。請看上方提示，開口向站務員詢問你想去的目的地路線（如文化園區、學校或圖書館）：",
-        mandarinStoryPrompt: "你站在熱鬧的市區公車站前，看著站牌。請看上方提示，開口向站務員詢問你想去的目的地路線（如文化園區、學校或圖書館）：",
+        image: "./assets/bus-ask-passerby.png",
+        objectPosition: "50% 50%",
+        storyPrompt: "你站在熱鬧的市區公車站前，看著站牌。請看上方提示，開口向路人詢問你想去的目的地公車路線（如文化園區、學校或圖書館）：",
+        mandarinStoryPrompt: "你站在熱鬧的市區公車站前，看著站牌。請看上方提示，開口向路人詢問你想去的目的地公車路線（如文化園區、學校或圖書館）：",
         targetHakka: "請問去文化園區愛坐哪一路公車？",
         targetMandarin: "請問去文化園區要搭哪一路公車？",
         keywords: ["文化園區", "學校", "圖書館"],
         mandarinKeywords: ["文化園區", "學校", "圖書館"],
         altKeywords: ["文化園區", "學校", "圖書館", "公車", "802", "615", "306"],
-        npcRole: "站務人員",
-        npcAvatar: "👮",
+        npcRole: "路人",
+        npcAvatar: "🧍",
         npcSuccessResponse: "「選好目的地後，我會告訴你搭哪一路公車喔！」",
         mandarinNpcSuccessResponse: "「選好目的地後，我會告訴你搭哪一路公車喔！」",
-        npcRetryResponse: "「站務員熱心問：『同學，你要去文化園區、學校還是圖書館呢？告訴我我幫你查公車！』」",
-        mandarinNpcRetryResponse: "「站務員熱心問：『同學，你要去文化園區、學校還是圖書館呢？告訴我我幫你查公車！』」",
+        npcRetryResponse: "「路人熱心問：『同學，你要去文化園區、學校還是圖書館呢？告訴我我幫你看公車路線！』」",
+        mandarinNpcRetryResponse: "「路人熱心問：『同學，你要去文化園區、學校還是圖書館呢？告訴我我幫你看公車路線！』」",
         choices: [
           {
             id: "culture",
@@ -548,9 +553,11 @@ const SCENARIOS_GRAPH = {
       },
       bus_ask_culture: {
         id: "bus_ask_culture",
-        title: "步驟 2：802 站牌確認公車班次",
+        title: "步驟 2：向巡邏站務員確認 802 公車",
         nodeType: "分支",
         locationTag: "802 站牌前",
+        image: "./assets/bus-confirm-attendant.png",
+        objectPosition: "50% 50%",
         storyPrompt: "你來到 802 站牌前，向巡邏站務員禮貌確認去文化園區是不是搭 802 公車。你說：",
         mandarinStoryPrompt: "你來到 802 站牌前，向巡邏站務員禮貌確認去文化園區是不是搭 802 公車。你說：",
         targetHakka: "請問站務員，去文化園區係坐 802 公車無？",
@@ -568,9 +575,11 @@ const SCENARIOS_GRAPH = {
       },
       bus_ask_school: {
         id: "bus_ask_school",
-        title: "步驟 2：615 站牌確認公車班次",
+        title: "步驟 2：向巡邏站務員確認 615 公車",
         nodeType: "分支",
         locationTag: "學校線站牌前",
+        image: "./assets/bus-confirm-attendant.png",
+        objectPosition: "50% 50%",
         storyPrompt: "你來到 615 站牌前，向巡邏站務員禮貌確認去學校是不是搭 615 公車。你說：",
         mandarinStoryPrompt: "你來到 615 站牌前，向巡邏站務員禮貌確認去學校是不是搭 615 公車。你說：",
         targetHakka: "請問站務員，去學校係坐 615 公車無？",
@@ -588,9 +597,11 @@ const SCENARIOS_GRAPH = {
       },
       bus_ask_library: {
         id: "bus_ask_library",
-        title: "步驟 2：306 站牌確認公車班次",
+        title: "步驟 2：向巡邏站務員確認 306 公車",
         nodeType: "分支",
         locationTag: "圖書館線站牌前",
+        image: "./assets/bus-confirm-attendant.png",
+        objectPosition: "50% 50%",
         storyPrompt: "你來到 306 站牌前，向巡邏站務員禮貌確認去圖書館是不是搭 306 公車。你說：",
         mandarinStoryPrompt: "你來到 306 站牌前，向巡邏站務員禮貌確認去圖書館是不是搭 306 公車。你說：",
         targetHakka: "請問站務員，去圖書館係坐 306 公車無？",
@@ -608,16 +619,18 @@ const SCENARIOS_GRAPH = {
       },
       bus_arrive: {
         id: "bus_arrive",
-        title: "步驟 3：看地圖向阿婆指引路線",
+        title: "步驟 3：下車後回答阿婆怎麼走",
         nodeType: "集合點",
-        locationTag: "街頭十字路口地圖前",
-        storyPrompt: "下車後走到十字路口，旁邊的阿婆也想去同一個地方，她問你怎麼走。你看著路口地圖回答她。你說：",
-        mandarinStoryPrompt: "下車後走到十字路口，旁邊的阿婆也想去同一個地方，她問你怎麼走。你看著路口地圖回答她。你說：",
-        targetHakka: "向前直直行，行兩個紅綠燈，越倒手，再行一個紅綠燈，正手邊就係你个目的地。",
-        targetMandarin: "往前直直走，走兩個紅綠燈，然後向左轉，再走一個紅綠燈，右手邊就是你的目的地。",
-        keywords: ["向前直直行", "兩個紅綠燈", "越倒手", "一個紅綠燈", "正手邊"],
-        mandarinKeywords: ["往前直直走", "兩個紅綠燈", "向左轉", "一個紅綠燈", "右手邊"],
-        altKeywords: ["直直走", "直直行", "紅綠燈", "兩個紅綠燈", "左轉", "向左轉", "越倒手", "一個紅綠燈", "右手邊", "正手邊", "目的地", "往前", "向前"],
+        locationTag: "公車站旁十字路口地圖前",
+        image: "./assets/bus-help-grandma.png",
+        objectPosition: "50% 50%",
+        storyPrompt: "下車後，旁邊的阿婆也想去你的目的地，她問你怎麼走。你看著公車站路口地圖回答她。你說：",
+        mandarinStoryPrompt: "下車後，旁邊的阿婆也想去你的目的地，她問你怎麼走。你看著公車站路口地圖回答她。你說：",
+        targetHakka: "文化園區係向北行一個紅綠燈，再向正手邊行一個紅綠燈，文化園區就喺你个倒手前。",
+        targetMandarin: "文化園區是往北方走一個紅綠燈，再往右邊走一個紅綠燈，然後文化園區就在你的左前方。",
+        keywords: ["文化園區", "北方", "一個紅綠燈", "右邊", "左前方"],
+        mandarinKeywords: ["文化園區", "北方", "一個紅綠燈", "右邊", "左前方"],
+        altKeywords: ["文化園區", "文化", "北方", "向北", "往北", "北邊", "直走", "直行", "紅綠燈", "一個紅綠燈", "右邊", "向右", "右轉", "正手", "左前方", "倒手前", "倒手", "左邊"],
         npcRole: "熱心阿婆",
         npcAvatar: "👵",
         npcSuccessResponse: "「哎唷～聽你恁樣講好清楚喔，恁仔細喔小朋友！」",
@@ -636,9 +649,9 @@ const SCENARIOS_GRAPH = {
     id: "health_center",
     title: "健康中心求助",
     icon: "🏥",
-    bannerImage: "./assets/health_center.jpg",
+    bannerImage: "./assets/health-room-empty.png",
     objectFit: "cover",
-    objectPosition: "37.25% 50%",
+    objectPosition: "50% 50%",
     objective: "看提示口說向護理師清楚描述症狀，配合擦藥休息並禮貌道謝。",
     mandarinObjective: "看提示口說向護理師清楚描述症狀，配合擦藥休息並禮貌道謝。",
     startNodeId: "health_choose_symptom",
@@ -648,6 +661,9 @@ const SCENARIOS_GRAPH = {
         title: "步驟 1：向護理師表達不適",
         nodeType: "選擇",
         locationTag: "學校健康中心諮詢桌",
+        image: "./assets/health-room-empty.png",
+        characterSprite: "./assets/health-nurse-concerned-sprite.png",
+        characterSpriteClass: "is-health-nurse-waist",
         storyPrompt: "你走進安靜的健康中心，護理師溫柔地問你哪裡不舒服。請看上方提示，開口說明你的狀況（如頭痛肚子痛、膝蓋擦傷或身體發熱）：",
         mandarinStoryPrompt: "你走進安靜的健康中心，護理師溫柔地問你哪裡不舒服。請看上方提示，開口說明你的狀況（如頭痛肚子痛、膝蓋擦傷或身體發熱）：",
         targetHakka: "護理師，𠊎頭那痛、肚痛。",
@@ -700,6 +716,7 @@ const SCENARIOS_GRAPH = {
         title: "步驟 2：說明頭痛肚子痛",
         nodeType: "分支",
         locationTag: "學校健康中心諮詢桌",
+        image: "./assets/health-boy-head-stomach.png",
         storyPrompt: "你向護理師詳細說明頭暈腦脹與肚子陣陣絞痛的情形。你說：",
         mandarinStoryPrompt: "你向護理師詳細說明頭暈腦脹與肚子陣陣絞痛的情形。你說：",
         targetHakka: "護理師，𠊎頭那痛、肚痛。",
@@ -720,6 +737,7 @@ const SCENARIOS_GRAPH = {
         title: "步驟 2：說明跑步跌倒擦傷",
         nodeType: "分支",
         locationTag: "傷口擦藥床位",
+        image: "./assets/health-boy-knee-scrape.png",
         storyPrompt: "護理師注意到你的膝蓋有紅紅擦傷，你跟護理師解釋剛剛體育課跑步太快跌倒了。你說：",
         mandarinStoryPrompt: "護理師注意到你的膝蓋有紅紅擦傷，你跟護理師解釋剛剛體育課跑步太快跌倒了。你說：",
         targetHakka: "體育課跑太遽，𠊎腳跌倒痛痛。",
@@ -740,6 +758,7 @@ const SCENARIOS_GRAPH = {
         title: "步驟 2：說明身體發熱無力",
         nodeType: "分支",
         locationTag: "量體溫區",
+        image: "./assets/health-boy-fever.png",
         storyPrompt: "你覺得身體熱熱的，全身沒有力氣，向護理師說明。你說：",
         mandarinStoryPrompt: "你覺得身體熱熱的，全身沒有力氣，向護理師說明。你說：",
         targetHakka: "𠊎身體當燒，無麼个力。",
@@ -760,6 +779,7 @@ const SCENARIOS_GRAPH = {
         title: "步驟 3：承諾休息叮嚀與致謝",
         nodeType: "集合點",
         locationTag: "健康中心休息區",
+        image: "./assets/health-rest-bed.png",
         storyPrompt: "護理師細心幫你照護完後，叮嚀你今天不要勉強運動，要多喝溫水好好休息。你答應她並道謝。你說：",
         mandarinStoryPrompt: "護理師細心幫你照護完後，叮嚀你今天不要勉強運動，要多喝溫水好好休息。你答應她並道謝。你說：",
         targetHakka: "𠊎會多啉水、好好歇睏，恁仔細！",
@@ -785,8 +805,8 @@ const SCENARIOS_GRAPH = {
     id: "weather_outfit",
     title: "今日天氣與出門穿搭",
     icon: "🌦️",
-    bannerImage: "./assets/weather_outfit.jpg",
-    objectPosition: "calc(50% + 100px) 50%",
+    bannerImage: "./assets/weather-choose-clothes.png",
+    objectPosition: "50% 30%",
     objective: "早晨拉開窗簾觀察天氣，向媽媽回報天氣狀況；再走到衣櫃挑選出合適的防護穿搭，最後整裝出門！",
     mandarinObjective: "早晨拉開窗簾觀察天氣，向媽媽回報天氣狀況；再走到衣櫃挑選出合適的防護穿搭，最後整裝出門！",
     startNodeId: "weather_choose_type",
@@ -796,6 +816,8 @@ const SCENARIOS_GRAPH = {
         title: "步驟 1：拉開窗簾觀察回報天氣",
         nodeType: "選擇",
         locationTag: "臥室窗戶前",
+        image: "./assets/weather-choose-clothes.png",
+        objectPosition: "50% 30%",
         storyPrompt: "清晨起床拉開窗簾看天氣，看見外頭烏雲密布、正在下大雨。媽媽在廚房問你：「今天外面天氣看起來怎麼樣呀？」你回答她：",
         mandarinStoryPrompt: "清晨起床拉開窗簾看天氣，看見外頭烏雲密布、正在下大雨。媽媽在廚房問你：「今天外面天氣看起來怎麼樣呀？」你回答她：",
         targetHakka: "今晡日落大雨，外背溼漉漉！",
@@ -849,6 +871,8 @@ const SCENARIOS_GRAPH = {
         title: "步驟 2：走到衣櫃挑選防雨穿搭",
         nodeType: "分支",
         locationTag: "臥室衣櫃前（防雨穿搭）",
+        image: "./assets/weather-rain-action.png",
+        objectPosition: "50% 30%",
         storyPrompt: "知道今天會下大雨後，你走到衣櫃前挑選今天上學要穿戴的防雨裝備。你對媽媽說：",
         mandarinStoryPrompt: "知道今天會下大雨後，你走到衣櫃前挑選今天上學要穿戴的防雨裝備。你對媽媽說：",
         targetHakka: "𠊎愛著雨衣，手拿遮仔！",
@@ -869,6 +893,8 @@ const SCENARIOS_GRAPH = {
         title: "步驟 2：走到衣櫃挑選防曬穿搭",
         nodeType: "分支",
         locationTag: "臥室衣櫃前（防曬穿搭）",
+        image: "./assets/weather-hot-action.png",
+        objectPosition: "50% 30%",
         storyPrompt: "知道今天出大太陽很熱後，你走到衣櫃前挑選今天上學要穿戴的清涼防曬裝備。你對媽媽說：",
         mandarinStoryPrompt: "知道今天出大太陽很熱後，你走到衣櫃前挑選今天上學要穿戴的清涼防曬裝備。你對媽媽說：",
         targetHakka: "𠊎愛著短衫短褲，戴等遮陽帽仔！",
@@ -889,6 +915,8 @@ const SCENARIOS_GRAPH = {
         title: "步驟 2：走到衣櫃挑選保暖穿搭",
         nodeType: "分支",
         locationTag: "臥室衣櫃前（保暖穿搭）",
+        image: "./assets/weather-cold-action.png",
+        objectPosition: "50% 30%",
         storyPrompt: "知道今天寒流很冷後，你走到衣櫃前挑選今天上學要穿戴的保暖冬裝。你對媽媽說：",
         mandarinStoryPrompt: "知道今天寒流很冷後，你走到衣櫃前挑選今天上學要穿戴的保暖冬裝。你對媽媽說：",
         targetHakka: "𠊎愛著厚大衫，圍等暖暖个圍巾！",
@@ -909,6 +937,7 @@ const SCENARIOS_GRAPH = {
         title: "步驟 3：玄關整裝出發",
         nodeType: "集合點",
         locationTag: "玄關大門口",
+        objectPosition: "50% 30%",
         storyPrompt: "穿戴好合適的衣物裝備後，你站在玄關門口精神飽滿地向媽媽道別準備出發。你說：",
         mandarinStoryPrompt: "穿戴好合適的衣物裝備後，你站在玄關門口精神飽滿地向媽媽道別準備出發。你說：",
         targetHakka: "𠊎都準備好了，出門行囉，媽媽再見！",
@@ -938,6 +967,7 @@ const WEATHER_RANDOM_PRESETS = {
     weatherIcon: "🌧️",
     badgeLabel: "🌧️ 今日天氣：陰雨綿綿",
     targetBranchId: "weather_outfit_rain",
+    image: "./assets/weather-observe-rain.png",
     locationTag: "臥室窗戶前（🌧️ 正在下雨）",
     storyPrompt: "清晨起床拉開窗簾看天氣，看見外頭烏雲密布、正在下大雨。媽媽在廚房問你：「今天外面天氣看起來怎麼樣呀？」你回答她：",
     mandarinStoryPrompt: "清晨起床拉開窗簾看天氣，看見外頭烏雲密布、正在下大雨。媽媽在廚房問你：「今天外面天氣看起來怎麼樣呀？」你回答她：",
@@ -953,6 +983,7 @@ const WEATHER_RANDOM_PRESETS = {
     weatherIcon: "☀️",
     badgeLabel: "☀️ 今日天氣：炎熱大晴天",
     targetBranchId: "weather_outfit_hot",
+    image: "./assets/weather-observe-hot.png",
     locationTag: "臥室窗戶前（☀️ 豔陽高照）",
     storyPrompt: "清晨起床拉開窗簾看天氣，看見外頭豔陽高照、出大太陽。媽媽在廚房問你：「今天外面天氣看起來怎麼樣呀？」你回答她：",
     mandarinStoryPrompt: "清晨起床拉開窗簾看天氣，看見外頭豔陽高照、出大太陽。媽媽在廚房問你：「今天外面天氣看起來怎麼樣呀？」你回答她：",
@@ -968,6 +999,7 @@ const WEATHER_RANDOM_PRESETS = {
     weatherIcon: "❄️",
     badgeLabel: "❄️ 今日天氣：寒冷冬日",
     targetBranchId: "weather_outfit_cold",
+    image: "./assets/weather-observe-cold.png",
     locationTag: "臥室窗戶前（❄️ 寒流來襲）",
     storyPrompt: "清晨起床拉開窗簾看天氣，看見外頭北風呼呼吹、寒流來襲。媽媽在廚房問你：「今天外面天氣看起來怎麼樣呀？」你回答她：",
     mandarinStoryPrompt: "清晨起床拉開窗簾看天氣，看見外頭北風呼呼吹、寒流來襲。媽媽在廚房問你：「今天外面天氣看起來怎麼樣呀？」你回答她：",
@@ -2188,6 +2220,19 @@ class GraphStateManager {
       node.mandarinKeywords = preset.mandarinKeywords;
       node.altKeywords = preset.altKeywords;
       node.currentWeatherPreset = preset;
+      node.image = preset.image;
+      node.nextNodeId = preset.targetBranchId;
+      weatherScenario.bannerImage = preset.image;
+    }
+    this.selectedTargetBranchId = preset.targetBranchId;
+    this.selectedChoiceId = key;
+
+    // 若當前節點已在步驟 2 分支，同步切換至對應天氣之分支節點
+    if (this.currentNodeId && this.currentNodeId.startsWith("weather_outfit_")) {
+      this.currentNodeId = preset.targetBranchId;
+      if (!this.pathHistory.includes(preset.targetBranchId)) {
+        this.pathHistory.push(preset.targetBranchId);
+      }
     }
   }
 
@@ -2212,6 +2257,29 @@ class GraphStateManager {
         altKeywords: routeInfo.altKeywords
       };
     }
+    if (node && node.id === "weather_done") {
+      const branchId = this.selectedTargetBranchId || "weather_outfit_rain";
+      const weatherPrompts = {
+        weather_outfit_rain: {
+          storyPrompt: "穿戴好雨衣與雨傘等防雨裝備後，你站在玄關門口精神飽滿地向媽媽道別準備出發。你說：",
+          mandarinStoryPrompt: "穿戴好雨衣與雨傘等防雨裝備後，你站在玄關門口精神飽滿地向媽媽道別準備出發。你說："
+        },
+        weather_outfit_hot: {
+          storyPrompt: "穿戴好短袖短褲與遮陽帽等防曬裝備後，你站在玄關門口精神飽滿地向媽媽道別準備出發。你說：",
+          mandarinStoryPrompt: "穿戴好短袖短褲與遮陽帽等防曬裝備後，你站在玄關門口精神飽滿地向媽媽道別準備出發。你說："
+        },
+        weather_outfit_cold: {
+          storyPrompt: "穿戴好厚大衣與圍巾等保暖裝備後，你站在玄關門口精神飽滿地向媽媽道別準備出發。你說：",
+          mandarinStoryPrompt: "穿戴好厚大衣與圍巾等保暖裝備後，你站在玄關門口精神飽滿地向媽媽道別準備出發。你說："
+        }
+      };
+      const info = weatherPrompts[branchId] || weatherPrompts.weather_outfit_rain;
+      return {
+        ...node,
+        storyPrompt: info.storyPrompt,
+        mandarinStoryPrompt: info.mandarinStoryPrompt
+      };
+    }
     return node;
   }
 
@@ -2226,8 +2294,11 @@ class GraphStateManager {
         this.initRandomWeather();
       }
       this.currentNodeId = scenario.startNodeId;
-      this.selectedChoiceId = null;
-      this.selectedTargetBranchId = null;
+      const initialBranch = (scenarioId === "weather_outfit" && this.randomWeatherKey)
+        ? (WEATHER_RANDOM_PRESETS[this.randomWeatherKey]?.targetBranchId || "weather_outfit_rain")
+        : null;
+      this.selectedChoiceId = (scenarioId === "weather_outfit" && this.randomWeatherKey) ? this.randomWeatherKey : null;
+      this.selectedTargetBranchId = initialBranch;
       this.collectedItems.clear();
       this.activePackItemIndex = 0;
       this.completedNodes.clear();
@@ -2640,6 +2711,7 @@ class UIController {
 
       // 插畫展演看板
       scenarioBannerImg: byId("scenarioBannerImg"),
+      scenarioCharacterSprite: byId("scenarioCharacterSprite"),
       showcaseBadge: byId("showcaseBadge"),
       showcaseTitle: byId("showcaseTitle"),
       showcaseLocTag: byId("showcaseLocTag"),
@@ -3270,10 +3342,44 @@ class UIController {
     if (this.els.statusDot) this.els.statusDot.className = "status-dot";
 
     // 情境看板
-    if (this.els.scenarioBannerImg && scenario.bannerImage) {
-      this.els.scenarioBannerImg.src = scenario.bannerImage;
-      this.els.scenarioBannerImg.style.objectFit = scenario.objectFit || "cover";
-      this.els.scenarioBannerImg.style.objectPosition = scenario.objectPosition || "50% 50%";
+    let bannerSrc = node.image || node.bannerImage || scenario.bannerImage;
+    if (scenario.id === "weather_outfit") {
+      const currentPreset = WEATHER_RANDOM_PRESETS[this.state.randomWeatherKey] || WEATHER_RANDOM_PRESETS.rain;
+      if (node.id === "weather_choose_type") {
+        bannerSrc = currentPreset.image || "./assets/weather-observe-rain.png";
+      } else if (node.id === "weather_done") {
+        const branchId = this.state.selectedTargetBranchId || currentPreset.targetBranchId;
+        const branchNode = scenario.nodes[branchId];
+        if (branchNode && branchNode.image) {
+          bannerSrc = branchNode.image;
+        }
+      }
+    } else if (scenario.id === "health_center" && node.id === "health_rest") {
+      const branchId = this.state.selectedTargetBranchId || "health_symptom_head";
+      const healthRestImages = {
+        health_symptom_head: "./assets/health-action-warm-water.png",
+        health_symptom_scratch: "./assets/health-action-bandage.png",
+        health_symptom_fever: "./assets/health-rest-bed.png"
+      };
+      bannerSrc = healthRestImages[branchId] || node.image || scenario.bannerImage;
+    }
+    if (this.els.scenarioBannerImg && bannerSrc) {
+      this.els.scenarioBannerImg.src = bannerSrc;
+      this.els.scenarioBannerImg.style.objectFit = node.objectFit || scenario.objectFit || "cover";
+      this.els.scenarioBannerImg.style.objectPosition = node.objectPosition || scenario.objectPosition || "50% 50%";
+    }
+    if (this.els.scenarioCharacterSprite) {
+      this.els.scenarioCharacterSprite.className = "showcase-character-sprite";
+      if (node.characterSprite) {
+        this.els.scenarioCharacterSprite.src = node.characterSprite;
+        if (node.characterSpriteClass) {
+          this.els.scenarioCharacterSprite.classList.add(node.characterSpriteClass);
+        }
+        this.els.scenarioCharacterSprite.hidden = false;
+      } else {
+        this.els.scenarioCharacterSprite.hidden = true;
+        this.els.scenarioCharacterSprite.removeAttribute("src");
+      }
     }
     if (this.els.showcaseTitle) this.els.showcaseTitle.textContent = scenario.title;
     if (this.els.showcaseLocTag) this.els.showcaseLocTag.textContent = `📍 ${node.locationTag}`;
@@ -3320,50 +3426,83 @@ class UIController {
   renderStepTracker(scenario, currentNode) {
     if (!this.els.stepTracker) return;
 
-    // 根據已選擇的分支動態計算呈現的步驟清單
+    // 根據已完成進度逐關顯示任務清單，避免一開始就露出後續關卡。
     const visibleSteps = [];
+    const isDone = (id) => this.state.completedNodes.has(id);
+    const isHere = (id) => currentNode.id === id;
+    const isDoneOrHere = (id) => isDone(id) || isHere(id);
+    const isAnyDoneOrHere = (ids) => ids.some(id => isDoneOrHere(id));
+    const pickBranchId = (ids, fallbackId) => {
+      if (ids.includes(this.state.selectedTargetBranchId)) return this.state.selectedTargetBranchId;
+      if (ids.includes(currentNode.id)) return currentNode.id;
+      const completedBranch = ids.find(id => isDone(id));
+      return completedBranch || fallbackId;
+    };
 
     if (scenario.id === "zoo_chain") {
       visibleSteps.push({ id: "zoo_start", title: "第一關：購票入園" });
-      visibleSteps.push({ id: "zoo_gate", title: "第二關：驗票進場" });
-      visibleSteps.push({ id: "zoo_choose_animal", title: "第三關：園區問路找展區" });
-
-      // 當選擇完分支後，才動態加入地圖尋路與對應動物展區
-      if (this.state.selectedTargetBranchId || this.state.completedNodes.has("zoo_choose_animal")) {
+      const zooBranches = ["zoo_elephant", "zoo_lion", "zoo_snake"];
+      const zooBranchId = pickBranchId(zooBranches, "zoo_elephant");
+      const hasZooBranchProgress = isAnyDoneOrHere(zooBranches);
+      if (isDone("zoo_start") || isAnyDoneOrHere(["zoo_gate", "zoo_choose_animal", "zoo_map_nav", "zoo_meet_point"]) || hasZooBranchProgress) {
+        visibleSteps.push({ id: "zoo_gate", title: "第二關：驗票進場" });
+      }
+      if (isDone("zoo_gate") || isAnyDoneOrHere(["zoo_choose_animal", "zoo_map_nav", "zoo_meet_point"]) || hasZooBranchProgress) {
+        visibleSteps.push({ id: "zoo_choose_animal", title: "第三關：園區問路找展區" });
+      }
+      if (isDone("zoo_choose_animal") || isAnyDoneOrHere(["zoo_map_nav", "zoo_meet_point"]) || hasZooBranchProgress) {
         visibleSteps.push({ id: "zoo_map_nav", title: "第四關：園區步道尋路移動" });
-        const branchId = this.state.selectedTargetBranchId || "zoo_elephant";
-        const branchTitle = scenario.nodes[branchId] ? scenario.nodes[branchId].title : "第五關：展區互動";
-        visibleSteps.push({ id: branchId, title: branchTitle });
+      }
+      if (isDone("zoo_map_nav") || isHere("zoo_meet_point") || hasZooBranchProgress) {
+        const branchTitle = scenario.nodes[zooBranchId] ? scenario.nodes[zooBranchId].title : "第五關：展區互動";
+        visibleSteps.push({ id: zooBranchId, title: branchTitle });
+      }
+      if (isDone(zooBranchId) || isHere("zoo_meet_point")) {
         visibleSteps.push({ id: "zoo_meet_point", title: "第六關：展區出口集合" });
       }
     } else if (scenario.id === "hakka_food") {
       visibleSteps.push({ id: "food_step1", title: "步驟 1：點傳統主食" });
-      visibleSteps.push({ id: "food_step2", title: "步驟 2：客製化飲食需求" });
-      visibleSteps.push({ id: "food_step3", title: "步驟 3：加點飲品與評價" });
+      if (isDone("food_step1") || isAnyDoneOrHere(["food_step2", "food_step3"])) {
+        visibleSteps.push({ id: "food_step2", title: "步驟 2：客製化飲食需求" });
+      }
+      if (isDone("food_step2") || isHere("food_step3")) {
+        visibleSteps.push({ id: "food_step3", title: "步驟 3：加點飲品與評價" });
+      }
     } else if (scenario.id === "field_trip_pack") {
       visibleSteps.push({ id: "pack_hub", title: "任務一：背包 4 項整理" });
-      if (this.state.completedNodes.has("pack_hub") || currentNode.id === "pack_done") {
+      const packItems = scenario.nodes.pack_hub?.items || [];
+      const isPackReady = packItems.length > 0 && this.state.collectedItems.size >= packItems.length;
+      if (isPackReady || currentNode.id === "pack_done") {
         visibleSteps.push({ id: "pack_done", title: "任務二：完成整理：玄關出發" });
       }
     } else if (scenario.id === "bus_directions") {
-      visibleSteps.push({ id: "bus_choose_dest", title: "步驟 1：詢問搭車路線" });
-      if (this.state.selectedTargetBranchId || this.state.completedNodes.has("bus_choose_dest")) {
-        const branchId = this.state.selectedTargetBranchId || "bus_ask_culture";
+      visibleSteps.push({ id: "bus_choose_dest", title: "步驟 1：向路人詢問公車路線" });
+      const busBranches = ["bus_ask_culture", "bus_ask_school", "bus_ask_library"];
+      const branchId = pickBranchId(busBranches, "bus_ask_culture");
+      if (isDone("bus_choose_dest") || isAnyDoneOrHere([...busBranches, "bus_arrive"])) {
         visibleSteps.push({ id: branchId, title: scenario.nodes[branchId]?.title || "步驟 2：站牌確認公車班次" });
-        visibleSteps.push({ id: "bus_arrive", title: "步驟 3：下車路口方向指引" });
+      }
+      if (isDone(branchId) || isHere("bus_arrive")) {
+        visibleSteps.push({ id: "bus_arrive", title: "步驟 3：回答阿婆怎麼走" });
       }
     } else if (scenario.id === "health_center") {
       visibleSteps.push({ id: "health_choose_symptom", title: "步驟 1：向護理師表達不適" });
-      if (this.state.selectedTargetBranchId || this.state.completedNodes.has("health_choose_symptom")) {
-        const branchId = this.state.selectedTargetBranchId || "health_symptom_head";
+      const healthBranches = ["health_symptom_head", "health_symptom_scratch", "health_symptom_fever"];
+      const branchId = pickBranchId(healthBranches, "health_symptom_head");
+      if (isDone("health_choose_symptom") || isAnyDoneOrHere([...healthBranches, "health_rest"])) {
         visibleSteps.push({ id: branchId, title: scenario.nodes[branchId]?.title || "步驟 2：說明不適狀況" });
+      }
+      if (isDone(branchId) || isHere("health_rest")) {
         visibleSteps.push({ id: "health_rest", title: "步驟 3：承諾休息與致謝" });
       }
     } else if (scenario.id === "weather_outfit") {
       visibleSteps.push({ id: "weather_choose_type", title: "步驟 1：選擇今日天氣提醒" });
-      if (this.state.selectedTargetBranchId || this.state.completedNodes.has("weather_choose_type")) {
-        const branchId = this.state.selectedTargetBranchId || "weather_outfit_rain";
+      const weatherBranches = ["weather_outfit_rain", "weather_outfit_hot", "weather_outfit_cold"];
+      const branchId = pickBranchId(weatherBranches, "weather_outfit_rain");
+      if (isDone("weather_choose_type") || isAnyDoneOrHere([...weatherBranches, "weather_done"])) {
         visibleSteps.push({ id: branchId, title: scenario.nodes[branchId]?.title || "步驟 2：天氣穿搭提醒" });
+      }
+      if (isDone(branchId) || isHere("weather_done")) {
         visibleSteps.push({ id: "weather_done", title: "步驟 3：穿搭整齊準備出門" });
       }
     }
@@ -3378,11 +3517,12 @@ class UIController {
       let stateClass = "";
       if (this.state.completedNodes.has(s.id)) stateClass = "is-completed";
       else if (s.id === currentNode.id) stateClass = "is-active";
+      const displayTitle = this.formatStepTitle(s.title, idx);
 
       return `
-        <div class="step-item ${stateClass}" data-node-id="${s.id}" role="button" tabindex="0" title="點擊切換至 ${s.title}">
+        <div class="step-item ${stateClass}" data-node-id="${s.id}" role="button" tabindex="0" title="點擊切換至 ${displayTitle}">
           <span class="step-bullet">${this.state.completedNodes.has(s.id) ? "✓" : idx + 1}</span>
-          <span class="step-name">${s.title}</span>
+          <span class="step-name">${displayTitle}</span>
         </div>
       `;
     }).join("");
@@ -3396,6 +3536,17 @@ class UIController {
         }
       });
     });
+  }
+
+  formatStepTitle(title, index) {
+    const cleanTitle = String(title || "")
+      .replace(/^(第一|第二|第三|第四|第五|第六|第七|第八|第九|第十)關[:：]\s*/, "")
+      .replace(/^第\s*\d+\s*關\s*\/\s*共\s*\d+\s*關\s*/, "")
+      .replace(/^步驟\s*\d+\s*[:：]\s*/, "")
+      .replace(/^任務[一二三四五六七八九十]\s*[:：]\s*/, "")
+      .replace(/^關卡\s*\d+\s*[:：]\s*/, "")
+      .trim();
+    return `關卡 ${index + 1}：${cleanTitle}`;
   }
 
   // 2. 渲染分支選擇節點 (純口說 + 靜態提詞卡片，不可點擊)
@@ -3548,24 +3699,15 @@ class UIController {
         <span>🎒 背包清單（可自由點選順序）</span>
         <span class="backpack-count">已收集 ${this.state.collectedItems.size} / ${node.items.length} 項</span>
       </div>
-      <div class="backpack-grid">
-        ${node.items.map((it, idx) => {
-          const isCollected = this.state.collectedItems.has(it.id);
-          const isActive = idx === this.state.activePackItemIndex;
-          return `
-            <div class="backpack-item ${isActive ? 'is-active' : ''} ${isCollected ? 'is-collected' : ''}" data-item-index="${idx}">
-              <div class="backpack-item-icon">${it.icon}</div>
-              <div class="backpack-item-label">${it.name}</div>
-              <div class="backpack-item-status">${isCollected ? '✓ 已放入' : (isActive ? '● 整理中' : '未放入')}</div>
-            </div>
-          `;
-        }).join("")}
+      <div class="pack-table-stage" aria-label="桌上打包物品互動圖">
+        <img src="${node.tableImage || './assets/field-trip-table-items.png'}" alt="桌上的水壺、雨傘、毛巾和點心" class="pack-table-img">
+        <canvas class="pack-mask-canvas" width="1086" height="1448" aria-label="可直接點選桌上的物品"></canvas>
       </div>
       ${isAllCollected ? `
         <div class="backpack-next-action">
           <div class="backpack-next-hint">🎉 4 樣物品已全數打包齊全！</div>
           <button id="btnPackGoNext" type="button" class="btn-pack-go-next">
-            <span>🎒 前往下一關（任務二：玄關出發）</span>
+            <span>🎒 前往下一關（關卡 2：玄關出發）</span>
             <span>➔</span>
           </button>
         </div>
@@ -3574,18 +3716,18 @@ class UIController {
 
     const narrativeBody = document.querySelector(".narrative-card") || document.querySelector(".stage-dialogue-col");
     narrativeBody.appendChild(backpackPanel);
-
-    // 綁定背包格子點擊切換
-    backpackPanel.querySelectorAll(".backpack-item").forEach(item => {
-      item.addEventListener("click", () => {
-        const itemIdx = parseInt(item.dataset.itemIndex, 10);
-        if (!isNaN(itemIdx)) {
+    const maskCanvas = backpackPanel.querySelector(".pack-mask-canvas");
+    this.renderPackMaskCanvas(node, maskCanvas);
+    if (maskCanvas) {
+      maskCanvas.addEventListener("click", (event) => {
+        const itemIdx = this.resolvePackCanvasItemIndex(event, maskCanvas, node);
+        if (itemIdx >= 0) {
           SoundFX.select();
           this.state.activePackItemIndex = itemIdx;
           this.render();
         }
       });
-    });
+    }
 
     // 綁定前往下一關按鈕
     if (isAllCollected) {
@@ -3599,6 +3741,89 @@ class UIController {
     }
 
     this.renderSpeechNodeControls(activeItem);
+  }
+
+  renderPackMaskCanvas(node, canvas) {
+    if (!canvas || !node || !node.items) return;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    const zones = this.getPackItemZones();
+
+    node.items.forEach((item, index) => {
+      const zone = zones[item.id];
+      if (!zone) return;
+      const isActive = index === this.state.activePackItemIndex;
+      const isCollected = this.state.collectedItems.has(item.id);
+
+      ctx.save();
+      ctx.shadowColor = isCollected ? "rgba(39, 174, 96, 0.65)" : (isActive ? "rgba(255, 24, 24, 0.65)" : "rgba(15, 23, 42, 0.28)");
+      ctx.shadowBlur = isActive || isCollected ? 18 : 8;
+      ctx.beginPath();
+      ctx.arc(zone.center.x, zone.center.y, zone.radius, 0, Math.PI * 2);
+      ctx.fillStyle = isCollected ? "rgba(39, 174, 96, 0.96)" : (isActive ? "rgba(255, 24, 24, 0.96)" : "rgba(255, 24, 24, 0.82)");
+      ctx.strokeStyle = "#fff";
+      ctx.lineWidth = isActive || isCollected ? 10 : 7;
+      ctx.fill();
+      ctx.stroke();
+
+      ctx.shadowBlur = 0;
+      ctx.fillStyle = "#fff";
+      ctx.font = `900 ${zone.radius}px system-ui, sans-serif`;
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      if (isCollected) {
+        ctx.lineWidth = 9;
+        ctx.lineCap = "round";
+        ctx.strokeStyle = "#fff";
+        ctx.beginPath();
+        ctx.moveTo(zone.center.x - zone.radius * 0.44, zone.center.y);
+        ctx.lineTo(zone.center.x - zone.radius * 0.12, zone.center.y + zone.radius * 0.34);
+        ctx.lineTo(zone.center.x + zone.radius * 0.5, zone.center.y - zone.radius * 0.38);
+        ctx.stroke();
+      } else if (isActive) {
+        ctx.fillText("●", zone.center.x, zone.center.y + 1);
+      } else {
+        ctx.fillText("•", zone.center.x, zone.center.y + 1);
+      }
+      ctx.restore();
+    });
+  }
+
+  getPackItemZones() {
+    return {
+      bottle: {
+        center: { x: 245, y: 437 },
+        radius: 48
+      },
+      umbrella: {
+        center: { x: 725, y: 546 },
+        radius: 52
+      },
+      towel: {
+        center: { x: 292, y: 925 },
+        radius: 52
+      },
+      snack: {
+        center: { x: 865, y: 1065 },
+        radius: 52
+      }
+    };
+  }
+
+  resolvePackCanvasItemIndex(event, canvas, node) {
+    const rect = canvas.getBoundingClientRect();
+    const x = (event.clientX - rect.left) * (canvas.width / rect.width);
+    const y = (event.clientY - rect.top) * (canvas.height / rect.height);
+    const zones = this.getPackItemZones();
+    return node.items.findIndex((item) => {
+      const zone = zones[item.id];
+      if (!zone) return false;
+      const dx = x - zone.center.x;
+      const dy = y - zone.center.y;
+      return Math.hypot(dx, dy) <= zone.radius * 1.35;
+    });
   }
 
   // 5. 渲染一般口說主線/分支/集合點節點
@@ -4032,6 +4257,10 @@ class UIController {
             this.state.selectedChoiceId = choiceId;
             this.state.selectedTargetBranchId = targetBranch;
             if (zoneCode) this.state.targetZoneCode = zoneCode;
+
+            if (scenario.id === "weather_outfit" && WEATHER_RANDOM_PRESETS[choiceId]) {
+              this.state.applyRandomWeather(choiceId);
+            }
 
             if (currentNode.nodeType === "選擇") {
               this.state.markCurrentNodeCompleted();

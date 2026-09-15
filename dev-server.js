@@ -37,6 +37,18 @@ try {
   judgeHandler = mod.default || mod;
 } catch (e) {}
 
+let recognizeHandler = null;
+try {
+  const mod = require("./api/speech/recognize.js");
+  recognizeHandler = mod.default || mod;
+} catch (e) {}
+
+let scoreHandler = null;
+try {
+  const mod = require("./api/score.js");
+  scoreHandler = mod.default || mod;
+} catch (e) {}
+
 const server = http.createServer((req, res) => {
   const urlObj = new URL(req.url, `http://localhost:${PORT}`);
   const pathname = decodeURIComponent(urlObj.pathname);
@@ -50,6 +62,12 @@ const server = http.createServer((req, res) => {
   }
   if (pathname === "/api/judge" || pathname === "/judge") {
     if (judgeHandler) return judgeHandler(req, res);
+  }
+  if (pathname === "/api/score" || pathname === "/score") {
+    if (scoreHandler) return scoreHandler(req, res);
+  }
+  if (pathname === "/api/speech/recognize" || pathname === "/recognize") {
+    if (recognizeHandler) return recognizeHandler(req, res);
   }
 
   // 靜態檔案路由：支援根目錄與 dist/public 雙向自動尋找最新修改之檔案
