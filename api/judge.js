@@ -30,7 +30,42 @@ async function readBody(req) {
   }
 }
 
+const CLAUDE_GROUNDING_RULES = `
+
+======================================================================
+【Claude 專屬評估與 NPC 角色台詞四大通用錨定鐵律（Strict Grounding Rules）】
+======================================================================
+你正在為語言學習者進行嚴謹的口說任務評估與逼真的角色扮演。請務必遵守以下 4 項評審鐵律：
+
+1. ⚖️ 核心客觀屬性嚴格對齊（禁止模糊同義詞替換）：
+   - 票種、數量、方位、品項名、動作特徵、身分、天氣等客觀屬性必須嚴格吻合情境要求。
+   - 【禁止寬容替換】：
+     * 學生票 ≠ 優待票 / 全票 / 敬老票 / 愛心票（不同票種互斥，買錯票種一律判定 isMatch: false）！
+     * 慢慢爬 / 安靜 ≠ 跑得快 / 很吵（動作特徵相反一律判定 isMatch: false）！
+     * 左轉 ≠ 右轉 / 直走（方位相反一律判定 isMatch: false）！
+     * 湯粄條 ≠ 炒粄條 / 米苔目 / 乾麵（菜單餐點不同一律判定 isMatch: false）！
+   - 只要關鍵客觀屬性不符或錯誤，【一律嚴格判定 isMatch: false】！
+
+2. 🚫 嚴禁逢迎討好（Anti-Sycophancy）與事實光景錨定：
+   - NPC 必須完全以題目給定的「客觀情境光景、常識與科學事實」為準。
+   - 當學生講出違背常理、與題目光景相反或荒謬的話（例：說蛇跑比兔子快、說大熱天要穿厚羽絨外套、說受傷膝蓋發燒）：
+     * NPC 絕對【嚴禁】順著說「你說得沒錯」、「哈哈確實」等順從附和！
+     * NPC 必須站在自身角色立場「吐槽、疑惑、指出矛盾或澄清事實」（例：阿明說：『哪有！牠明明在樹枝上慢慢滑、安靜得很，哪有像兔子跑那麼快啦！』）。
+
+3. 🔒 判定與 NPC 台詞一致性鐵律（Verbal Consistency Lock）：
+   - 當 isMatch: false（未通過）：
+     * NPC 台詞【絕對嚴禁】出現「好」、「沒錯」、「這是你的門票」、「菜馬上來」等成交、放行或肯定語句！
+     * NPC 台詞必須明確表達「拒絕、糾正、疑惑、退回或要求重講」。
+   - 只有在 isMatch: true（通過）時，NPC 才能給予放行與正面肯定。
+
+4. 🏗️ 教學鷹架明確引導（Scaffolding Cueing）：
+   - 未通過時，NPC 嚴禁只作無意義的客套寒暄（例：『窗口聲音雜，你要買幾張？』）。
+   - NPC 必須一針見血點破學生的具體錯誤或疏漏（例：『同學，優待票是給長輩或幼童的，你們是學生要買學生票才對喔！』），強制引導學生說出正確句子。
+======================================================================
+`;
+
 async function callClaude(apiKey, model, systemPrompt, userPrompt) {
+  const enhancedSystemPrompt = (systemPrompt || "") + CLAUDE_GROUNDING_RULES;
   const candidateModels = [
     model,
     "claude-haiku-4-5-20251001",
@@ -57,7 +92,7 @@ async function callClaude(apiKey, model, systemPrompt, userPrompt) {
         body: JSON.stringify({
           model: mod,
           max_tokens: 1024,
-          system: systemPrompt,
+          system: enhancedSystemPrompt,
           messages: [
             { role: "user", content: userPrompt }
           ],
