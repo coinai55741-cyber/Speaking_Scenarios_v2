@@ -69,6 +69,11 @@ const CLAUDE_GROUNDING_RULES = `
      * 正確範例（售票員）：『同學，我看你們一共三個人一起來、大家都穿著學生制服，要買三張學生票才對喔！請重新說一次。』
      * 正確範例（同學阿明）：『哪有啦！你看牠明明在樹枝上慢慢滑，哪有像兔子跑那麼快啦！』
      * 正確範例（媽媽）：『媽媽看外面出大太陽熱得很，穿羽絨外套出門會中暑啦！快去換短袖！』
+
+6. ☂️ 校外教學雨傘（遮仔）雙重功能生活常識錨定：
+   - 雨傘（遮仔）在日常生活與戶外活動中兼具「防下雨（淋濕/落雨）」與「防曬遮陽（出大太陽/防中暑/遮日頭）」雙重功能！
+   - 當學生說明帶雨傘的原因是「防下雨」或「遮陽/防曬/大太陽」任一項或兩者皆提（例：『我要帶雨傘因為太陽很大要遮陽』、『我要帶雨傘下雨可以用』），均屬 100% 正確合理的生活常識，【一律必須判定 isMatch: true】！
+   - NPC 媽媽【嚴禁】說出「雨傘只能下雨用不能遮陽」等違背常識的反駁；媽媽應欣然肯定與讚許（例：『真細心！帶雨傘大太陽可以遮陽、下雨也不怕淋濕，放進書包側邊吧！』）。
 ======================================================================
 `;
 
@@ -294,8 +299,27 @@ module.exports = async function handler(req, res) {
       llmResponseContent = openAiData.choices?.[0]?.message?.content || "";
     }
 
-    const cleanJson = llmResponseContent.replace(/```json/g, "").replace(/```/g, "").trim();
-    const parsed = JSON.parse(cleanJson);
+    function extractJson(text) {
+      if (!text || typeof text !== "string") return null;
+      let clean = text.trim().replace(/^```(?:json)?\s*/i, "").replace(/\s*```$/i, "").trim();
+      try {
+        return JSON.parse(clean);
+      } catch (e) {
+        const start = clean.indexOf("{");
+        const end = clean.lastIndexOf("}");
+        if (start !== -1 && end !== -1 && end > start) {
+          try {
+            return JSON.parse(clean.slice(start, end + 1));
+          } catch (e2) {}
+        }
+      }
+      return null;
+    }
+
+    const parsed = extractJson(llmResponseContent);
+    if (!parsed) {
+      throw new Error(`無法解析 LLM 回傳之 JSON 內容: ${llmResponseContent.slice(0, 200)}`);
+    }
 
     json(res, 200, {
       ok: true,
