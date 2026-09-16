@@ -3769,17 +3769,12 @@ class UIController {
     const history = this.state.chatHistory || [];
 
     if (history.length === 0) {
-      const currentNode = this.state.getCurrentNode();
-      const npcAvatar = currentNode?.npcAvatar || "🧑‍💼";
-      const npcRole = currentNode?.npcRole || "NPC";
-      streamEl.innerHTML = `
-        <div class="chat-empty-hint">
-          <span>💬</span>
-          <span>點擊下方麥克風或開口說話，展開與【${npcRole}】的生活對話！</span>
-        </div>
-      `;
+      streamEl.hidden = true;
+      streamEl.innerHTML = "";
       return;
     }
+
+    streamEl.hidden = false;
 
     const escapeHtmlSafe = (str) => {
       if (!str) return "";
