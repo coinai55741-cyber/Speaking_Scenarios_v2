@@ -792,7 +792,7 @@ html, body {
 .showcase-img-container {
   flex: 1;
   min-height: 0;
-  background: #0f172a;
+  background: var(--bg-surface);
   position: relative;
   display: flex;
   justify-content: center;
@@ -804,7 +804,8 @@ html, body {
 .showcase-img {
   width: 100%;
   height: 100%;
-  object-fit: cover; /* 滿版填滿直式容器 */
+  object-fit: contain; /* 完整顯示直式圖，避免角色被裁切 */
+  object-position: 50% 50%;
   display: block;
   transition: object-position 0.45s cubic-bezier(0.16, 1, 0.3, 1), transform 0.3s ease;
 }
@@ -829,7 +830,7 @@ html, body {
 .showcase-character-sprite.is-health-nurse-waist {
   height: 222%;
   max-width: 158%;
-  bottom: -106%;
+  bottom: -78%;
 }
 
 .showcase-img:hover {
@@ -995,6 +996,19 @@ html, body {
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.03);
 }
 
+
+.speech-hint-card.is-image-only {
+  justify-content: center;
+  padding: 4px;
+  min-height: 104px;
+}
+
+.speech-hint-image {
+  width: 100%;
+  height: 112px;
+  object-fit: contain;
+  display: block;
+}
 .speech-hint-icon {
   font-size: 22px;
   line-height: 1;
@@ -1937,3 +1951,8 @@ html, body {
   height: auto;
   max-height: 160px;
 }
+
+
+
+
+

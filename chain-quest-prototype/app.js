@@ -75,8 +75,9 @@ const SCENARIOS_GRAPH = {
     id: "zoo_chain",
     title: "動物園連鎖任務",
     icon: "🦁",
-    bannerImage: "./assets/zoo_chain.jpg",
-    objectPosition: "calc(32% + 100px) 42%",
+    bannerImage: "./assets/zoo-ticket-booth.png",
+    objectFit: "cover",
+    objectPosition: "50% 50%",
     objective: "體驗購票、驗票、口說問路並依照指引在 Canvas 地圖操縱小人走入展區，完成對話並於出口集合。",
     mandarinObjective: "體驗購票、驗票、口說問路並依照指引在 Canvas 地圖操縱角色走入展區，完成對話並於出口集合。",
     startNodeId: "zoo_start",
@@ -84,6 +85,7 @@ const SCENARIOS_GRAPH = {
       zoo_start: {
         id: "zoo_start",
         title: "第一關：購票入園",
+        image: "./assets/zoo-ticket-booth.png",
         nodeType: "主線",
         locationTag: "動物園大門售票處",
         storyPrompt: "今天天氣晴朗，你跟同學一起來到動物園門口。輪到你上前時，你準備跟售票員買學生票。你說：",
@@ -104,6 +106,7 @@ const SCENARIOS_GRAPH = {
       zoo_gate: {
         id: "zoo_gate",
         title: "第二關：驗票進場",
+        image: "./assets/zoo-gate-entry.png",
         nodeType: "主線",
         locationTag: "入園驗票閘門",
         storyPrompt: "你拿著門票走到閘門前，志工奶奶準備幫你驗票，你也想向她道謝。你說：",
@@ -124,6 +127,7 @@ const SCENARIOS_GRAPH = {
       zoo_choose_animal: {
         id: "zoo_choose_animal",
         title: "第三關：園區問路找展區",
+        image: "./assets/zoo-ask-directions.png",
         nodeType: "選擇",
         locationTag: "園區路口導覽站",
         storyPrompt: "進到園區後，你們想先看一種動物。請看上方提示，開口向導覽員詢問你想去的展區（例如大象、獅子或蛇）：",
@@ -144,6 +148,7 @@ const SCENARIOS_GRAPH = {
             id: "elephant",
             title: "🐘 大象展區",
             sub: "左上方水池旁",
+            hintImage: "./assets/zoo-icon-elephant-pool.png",
             targetBranchId: "zoo_elephant",
             zoneCode: "A",
             keywords: ["大象", "象", "水池", "鼻仔"],
@@ -155,6 +160,7 @@ const SCENARIOS_GRAPH = {
             id: "lion",
             title: "🦁 獅子展區",
             sub: "正上方岩石區",
+            hintImage: "./assets/zoo-icon-lion-rock.png",
             targetBranchId: "zoo_lion",
             zoneCode: "B",
             keywords: ["獅子", "獅仔", "獅", "岩石", "威風"],
@@ -166,6 +172,7 @@ const SCENARIOS_GRAPH = {
             id: "snake",
             title: "🐍 蛇展區",
             sub: "右上方溫室玻璃屋",
+            hintImage: "./assets/zoo-icon-snake-greenhouse.png",
             targetBranchId: "zoo_snake",
             zoneCode: "C",
             keywords: ["蛇", "蛇仔", "溫室", "玻璃", "安靜"],
@@ -193,6 +200,7 @@ const SCENARIOS_GRAPH = {
       zoo_elephant: {
         id: "zoo_elephant",
         title: "第五關：大象展區互動",
+        image: "./assets/zoo-exhibit-elephant.png",
         nodeType: "分支",
         locationTag: "大象展區水池旁",
         storyPrompt: "你看到大象用長鼻子吸水沖在背上洗澡，覺得很可愛，想跟身邊的同學分享。你說：",
@@ -213,6 +221,7 @@ const SCENARIOS_GRAPH = {
       zoo_lion: {
         id: "zoo_lion",
         title: "第五關：獅子展區互動",
+        image: "./assets/zoo-exhibit-lion.png",
         nodeType: "分支",
         locationTag: "獅子展區岩石旁",
         storyPrompt: "你看到獅子趴在石頭上休息，鬃毛看起來很威風，想跟身邊的同學分享。你說：",
@@ -233,6 +242,7 @@ const SCENARIOS_GRAPH = {
       zoo_snake: {
         id: "zoo_snake",
         title: "第五關：蛇展區互動",
+        image: "./assets/zoo-exhibit-snake.png",
         nodeType: "分支",
         locationTag: "蛇展區玻璃窗前",
         storyPrompt: "你看到蛇慢慢爬過樹枝，動作很安靜，想跟身邊的同學分享。你說：",
@@ -253,6 +263,7 @@ const SCENARIOS_GRAPH = {
       zoo_meet_point: {
         id: "zoo_meet_point",
         title: "第六關：展區出口集合",
+        image: "./assets/zoo-complete-badge.png",
         nodeType: "集合點",
         locationTag: "園區出口集合點",
         storyPrompt: "參觀完動物展區後，大家走到【⭐ 出口集合點】集合，老師正在清點人數。你向老師報告大家都到齊了：",
@@ -280,19 +291,22 @@ const SCENARIOS_GRAPH = {
     id: "hakka_food",
     title: "客家美食點餐",
     icon: "🍜",
-    bannerImage: "./assets/hakka_food.jpg",
+    bannerImage: "./assets/food-counter-order.png",
+    objectFit: "cover",
     objectPosition: "50% 50%",
-    objective: "走入客家傳統餐館，學習點粄條主食、客製化飲食需求與加點飲品評價。",
-    mandarinObjective: "走入傳統餐館，體驗點粄條主食、客製化飲食需求與加點飲品評價。",
+    objective: "在熱鬧的客家小吃店，向老闆點餐、確認客製化需求，最後到收銀機前結帳並說出評價。菜單與客製化選項可由 UI 或 LLM 替換。",
+    mandarinObjective: "在熱鬧的傳統小吃店，向老闆點餐、確認客製化需求，最後到收銀機前結帳並說出評價。菜單與客製化選項可由 UI 或 LLM 替換。",
     startNodeId: "food_step1",
     nodes: {
       food_step1: {
         id: "food_step1",
-        title: "步驟 1：點傳統主食",
+        title: "步驟 1：向老闆點一份餐點",
         nodeType: "主線",
         locationTag: "客家小吃店櫃檯",
-        storyPrompt: "我走過街上聞一聞好香喔，我的嘴巴都流口水了，跟著香味走去原來是一個客家小吃攤。你舔了一舔嘴巴，進到餐廳門口看了一下，決定跟老闆點菜。你說：",
-        mandarinStoryPrompt: "走過街上聞一聞好香喔，嘴巴都流口水了，跟著香味走去原來是一個傳統小吃攤。你舔了一舔嘴巴，進到餐廳門口看了一下，決定跟老闆點菜。你說：",
+        image: "./assets/food-counter-order.png",
+        objectPosition: "50% 50%",
+        storyPrompt: "你走進一間熱鬧的客家小吃店，穿客家服飾的男老闆站在櫃檯後招呼你。你看著可替換菜單，準備點一份餐點。你說：",
+        mandarinStoryPrompt: "你走進一間熱鬧的傳統小吃店，男老闆站在櫃檯後招呼你。你看著可替換菜單，準備點一份餐點。你說：",
         targetHakka: "老闆，𠊎愛一碗湯粄條。",
         targetMandarin: "老闆，我要一碗湯粄條。",
         keywords: ["湯粄條", "炒粄條", "米苔目", "客家小炒"],
@@ -308,42 +322,46 @@ const SCENARIOS_GRAPH = {
       },
       food_step2: {
         id: "food_step2",
-        title: "步驟 2：客製化飲食需求",
+        title: "步驟 2：確認客製化需求",
         nodeType: "主線",
-        locationTag: "出餐備料區",
-        storyPrompt: "你想起自己平常不喜歡吃香菜，而且喜歡湯頭稍微甘甜一點。你走到廚房窗口前，親切地交代掌廚的阿姨。你說：",
-        mandarinStoryPrompt: "你想起自己平常不喜歡吃香菜，而且喜歡湯頭稍微甘甜一點。你走到廚房窗口前，親切地交代掌廚的阿姨。你說：",
+        locationTag: "客家小吃店餐桌旁",
+        image: "./assets/food-custom-request.png",
+        objectPosition: "50% 50%",
+        storyPrompt: "老闆端著托盤過來，親切地向你確認餐點有沒有特別需求。你想起自己不喜歡吃香菜，也想調整口味。你說：",
+        mandarinStoryPrompt: "老闆端著托盤過來，親切地向你確認餐點有沒有特別需求。你想起自己不喜歡吃香菜，也想調整口味。你說：",
         targetHakka: "毋好放香菜，甜一點。",
         targetMandarin: "不要放香菜，甜一點。",
         keywords: ["毋好放", "香菜"],
         mandarinKeywords: ["不要放", "香菜", "甜一點"],
         altKeywords: ["毋好", "香菜", "甜一點"],
-        npcRole: "廚房阿姨",
-        npcAvatar: "👩‍🍳",
-        npcSuccessResponse: "「沒問題！阿姨記下來了，不放香菜，幫你煮得甘甜甘甜！」",
-        mandarinNpcSuccessResponse: "「沒問題！阿姨記下來了，不放香菜，幫你煮得甘甜甘甜！」",
-        npcRetryResponse: "「阿姨拿著杓子問：『同學，你的粄條口味上有什麼特別交代嗎？比如不要放香菜還是要甜一點？』」",
-        mandarinNpcRetryResponse: "「阿姨拿著杓子問：『同學，你的粄條口味上有什麼特別交代嗎？比如不要放香菜還是要甜一點？』」",
+        npcRole: "小吃店老闆",
+        npcAvatar: "👨‍🍳",
+        npcSuccessResponse: "「沒問題！老闆記下來了，不放香菜，幫你煮得甘甜甘甜！」",
+        mandarinNpcSuccessResponse: "「沒問題！老闆記下來了，不放香菜，幫你煮得甘甜甘甜！」",
+        npcRetryResponse: "「老闆拿著托盤問：『同學，你的餐點口味上有什麼特別交代嗎？比如不要放香菜還是要甜一點？』」",
+        mandarinNpcRetryResponse: "「老闆拿著托盤問：『同學，你的餐點口味上有什麼特別交代嗎？比如不要放香菜還是要甜一點？』」",
         nextNodeId: "food_step3"
       },
       food_step3: {
         id: "food_step3",
-        title: "步驟 3：加點飲品與評價",
+        title: "步驟 3：結帳時說出評價",
         nodeType: "集合點",
-        locationTag: "小吃店用餐餐桌",
-        storyPrompt: "熱騰騰的粄條和客家小炒端上桌了，每一口都香氣四溢。你吃得津津有味，想順便加點一杯傳統客家擂茶解渴，順便稱讚老闆手藝。你說：",
-        mandarinStoryPrompt: "熱騰騰的粄條和客家小炒端上桌了，每一口都香氣四溢。你吃得津津有味，想順便加點一杯傳統擂茶解渴，順便稱讚老闆手藝。你說：",
+        locationTag: "小吃店收銀櫃檯",
+        image: "./assets/food-review.png",
+        objectPosition: "50% 50%",
+        storyPrompt: "吃飽後，你來到收銀機前拿出錢包準備結帳。老闆娘手拿帳單，親切問你今天吃得如何。你可以說喜歡或不喜歡。你說：",
+        mandarinStoryPrompt: "吃飽後，你來到收銀機前拿出錢包準備結帳。老闆娘手拿帳單，親切問你今天吃得如何。你可以說喜歡或不喜歡。你說：",
         targetHakka: "再加一杯擂茶，這道客家小炒當好食！",
         targetMandarin: "再加一杯擂茶，這道客家小炒真好吃！",
         keywords: ["擂茶", "客家小炒", "當好食"],
         mandarinKeywords: ["擂茶", "客家小炒", "好吃", "真好吃"],
         altKeywords: ["擂茶", "好食", "客家小炒"],
-        npcRole: "服務生",
-        npcAvatar: "🧑‍💼",
-        npcSuccessResponse: "「多謝你喜歡！冰涼濃郁的現磨擂茶馬上送上來，請慢用喔！」",
-        mandarinNpcSuccessResponse: "「多謝你喜歡！冰涼濃郁的現磨擂茶馬上送上來，請慢用喔！」",
-        npcRetryResponse: "「服務生親切問：『吃得還滿意嗎？需要再加點一杯冰涼濃郁的現磨擂茶解解渴嗎？』」",
-        mandarinNpcRetryResponse: "「服務生親切問：『吃得還滿意嗎？需要再加點一杯冰涼濃郁的現磨擂茶解解渴嗎？』」",
+        npcRole: "老闆娘",
+        npcAvatar: "👩‍🍳",
+        npcSuccessResponse: "「多謝你講出感覺！歡迎下次再來，老闆娘會幫你記得喜歡的口味。」",
+        mandarinNpcSuccessResponse: "「謝謝你說出感覺！歡迎下次再來，老闆娘會幫你記得喜歡的口味。」",
+        npcRetryResponse: "「老闆娘拿著帳單親切問：『吃得還滿意嗎？你可以說這道料理當好食，也可以說當不好食。』」",
+        mandarinNpcRetryResponse: "「老闆娘拿著帳單親切問：『吃得還滿意嗎？你可以說這道料理很好吃，也可以說不好吃。』」",
         nextNodeId: null
       }
     }
@@ -492,6 +510,7 @@ const SCENARIOS_GRAPH = {
     title: "搭車與街頭問路",
     icon: "🚌",
     bannerImage: "./assets/bus-ask-passerby.png",
+    objectFit: "cover",
     objectPosition: "50% 50%",
     objective: "先向路人詢問想去目的地的公車路線，再向巡邏站務員確認搭乘公車；下車後看著公車站路口地圖，回答也想去同一目的地的阿婆。",
     mandarinObjective: "先向路人詢問想去目的地的公車路線，再向巡邏站務員確認搭乘公車；下車後看著公車站路口地圖，回答也想去同一目的地的阿婆。",
@@ -662,7 +681,7 @@ const SCENARIOS_GRAPH = {
         nodeType: "選擇",
         locationTag: "學校健康中心諮詢桌",
         image: "./assets/health-room-empty.png",
-        characterSprite: "./assets/health-nurse-concerned-sprite.png",
+        characterSprite: "./assets/health-nurse-concerned-sprite.png?v=20260916-nurse-uniform",
         characterSpriteClass: "is-health-nurse-waist",
         storyPrompt: "你走進安靜的健康中心，護理師溫柔地問你哪裡不舒服。請看上方提示，開口說明你的狀況（如頭痛肚子痛、膝蓋擦傷或身體發熱）：",
         mandarinStoryPrompt: "你走進安靜的健康中心，護理師溫柔地問你哪裡不舒服。請看上方提示，開口說明你的狀況（如頭痛肚子痛、膝蓋擦傷或身體發熱）：",
@@ -806,6 +825,7 @@ const SCENARIOS_GRAPH = {
     title: "今日天氣與出門穿搭",
     icon: "🌦️",
     bannerImage: "./assets/weather-choose-clothes.png",
+    objectFit: "cover",
     objectPosition: "50% 30%",
     objective: "早晨拉開窗簾觀察天氣，向媽媽回報天氣狀況；再走到衣櫃挑選出合適的防護穿搭，最後整裝出門！",
     mandarinObjective: "早晨拉開窗簾觀察天氣，向媽媽回報天氣狀況；再走到衣櫃挑選出合適的防護穿搭，最後整裝出門！",
@@ -1944,7 +1964,7 @@ class SpeechService {
         isSemanticContextMatch = true;
       }
     }
-    if (nid === "food_step2" && /香菜|毋好|不要|甜|少油|少鹽|口味|阿姨/.test(normalizedCleanText)) isSemanticContextMatch = true;
+    if (nid === "food_step2" && /香菜|毋好|不要|甜|少油|少鹽|口味|老闆|阿姨/.test(normalizedCleanText)) isSemanticContextMatch = true;
     if (nid === "food_step3" && /擂茶|小炒|好吃|好食|好喝|再來|加點|美味/.test(normalizedCleanText)) isSemanticContextMatch = true;
     if (nid === "health_symptom_head" && /頭|肚|拉|痛|暈|不舒服|肚屎|頭那/.test(normalizedCleanText)) isSemanticContextMatch = true;
     if (nid === "health_symptom_scratch" && /擦傷|跌倒|膝蓋|流血|破皮|跑太快|腳痛|體育課/.test(normalizedCleanText)) isSemanticContextMatch = true;
@@ -2192,7 +2212,7 @@ class GraphStateManager {
 
     // 地圖導航狀態
     this.playerPos = { x: 200, y: 220 }; // 起點在入口大門
-    this.targetZoneCode = "A"; // A: 大象, B: 獅子, C: 蛇, D: 出口集合
+    this.targetZoneCode = "A"; // A: 大象, B: 獅子, C: 蛇
 
     // 今日天氣隨機狀態 (下雨 rain | 炎熱 hot | 寒冷 cold)
     this.randomWeatherKey = "rain";
@@ -2337,15 +2357,18 @@ class ZooMapEngine {
     this.ctx = canvas ? canvas.getContext("2d") : null;
     this.onArrival = onArrivalCallback;
     this.onToast = onToastCallback;
+    this.logicalWidth = 400;
+    this.logicalHeight = 250;
+    this.dpr = Math.max(1, Math.min(3, window.devicePixelRatio || 1));
+    this.setupCanvasResolution();
 
-    // 園區關鍵地標座標 (寬 400, 高 250) - 展區以問號呈現，讓學生依導覽員口說指引自行尋路
+    // 園區關鍵地標座標 (邏輯寬 400, 高 250) - 展區以問號呈現，讓學生依導覽員口說指引自行尋路
     this.zones = {
       GATE: { x: 200, y: 220, label: "大門入口", icon: "🚪", color: "#64748b" },
       FORK: { x: 200, y: 130, label: "十字分岔", icon: "🚏", color: "#3b82f6" },
       A: { x: 65, y: 55, label: "展區 A", code: "A", icon: "❓", radius: 36, color: "#10b981", fullLabel: "🐘 大象展區" },
       B: { x: 200, y: 45, label: "展區 B", code: "B", icon: "❓", radius: 36, color: "#f59e0b", fullLabel: "🦁 獅子展區" },
-      C: { x: 335, y: 55, label: "展區 C", code: "C", icon: "❓", radius: 36, color: "#8b5cf6", fullLabel: "🐍 蛇展區" },
-      D: { x: 340, y: 215, label: "⭐ 出口集合點", code: "D", icon: "🚩", radius: 32, color: "#ef4444", fullLabel: "🚩 出口集合點" }
+      C: { x: 335, y: 55, label: "展區 C", code: "C", icon: "❓", radius: 36, color: "#8b5cf6", fullLabel: "🐍 蛇展區" }
     };
 
     this.player = { x: 200, y: 220, targetX: 200, targetY: 220, speed: 4 };
@@ -2354,6 +2377,22 @@ class ZooMapEngine {
     this.hasTriggeredArrival = false;
 
     this.initEvents();
+  }
+
+  setupCanvasResolution() {
+    if (!this.canvas || !this.ctx) return;
+    const rect = this.canvas.getBoundingClientRect();
+    const cssWidth = Math.max(1, Math.round(rect.width || this.logicalWidth));
+    const cssHeight = Math.max(1, Math.round(rect.height || this.logicalHeight));
+    const pixelWidth = Math.round(cssWidth * this.dpr);
+    const pixelHeight = Math.round(cssHeight * this.dpr);
+    if (this.canvas.width !== pixelWidth || this.canvas.height !== pixelHeight) {
+      this.canvas.width = pixelWidth;
+      this.canvas.height = pixelHeight;
+    }
+    this.canvas.style.width = "100%";
+    this.canvas.style.height = "100%";
+    this.ctx.setTransform(pixelWidth / this.logicalWidth, 0, 0, pixelHeight / this.logicalHeight, 0, 0);
   }
 
   setTarget(zoneCode) {
@@ -2384,7 +2423,7 @@ class ZooMapEngine {
   }
 
   getCurrentZone() {
-    for (const code of ["A", "B", "C", "D"]) {
+    for (const code of ["A", "B", "C"]) {
       const zone = this.zones[code];
       const dist = Math.hypot(this.player.x - zone.x, this.player.y - zone.y);
       if (dist <= zone.radius + 10) return zone;
@@ -2398,8 +2437,8 @@ class ZooMapEngine {
     // 點擊/觸控地圖任意位置行走
     const handlePointer = (e) => {
       const rect = this.canvas.getBoundingClientRect();
-      const scaleX = this.canvas.width / rect.width;
-      const scaleY = this.canvas.height / rect.height;
+      const scaleX = this.logicalWidth / rect.width;
+      const scaleY = this.logicalHeight / rect.height;
       const clickX = (e.clientX - rect.left) * scaleX;
       const clickY = (e.clientY - rect.top) * scaleY;
       this.walkTo(clickX, clickY);
@@ -2461,8 +2500,9 @@ class ZooMapEngine {
   draw() {
     if (!this.ctx) return;
     const ctx = this.ctx;
-    const w = this.canvas.width;
-    const h = this.canvas.height;
+    this.setupCanvasResolution();
+    const w = this.logicalWidth;
+    const h = this.logicalHeight;
 
     // 1. 草地背景
     ctx.fillStyle = "#81c784";
@@ -2486,9 +2526,6 @@ class ZooMapEngine {
     ctx.moveTo(200, 130);
     // 分岔 -> C: 蛇 (335, 55)
     ctx.lineTo(335, 55);
-    // 側步道 -> D: 出口集合 (340, 215)
-    ctx.moveTo(200, 130);
-    ctx.quadraticCurveTo(320, 140, 340, 215);
     ctx.stroke();
 
     // 步道邊線
@@ -2500,9 +2537,8 @@ class ZooMapEngine {
     this.drawDecorations(ctx);
 
     // 4. 繪製地標展區目標
-    ["A", "B", "C", "D"].forEach((code) => {
+    ["A", "B", "C"].forEach((code) => {
       const zone = this.zones[code];
-      const isExit = code === "D";
 
       // 展區圓形地基
       ctx.beginPath();
@@ -2510,16 +2546,16 @@ class ZooMapEngine {
       ctx.fillStyle = "#ffffff";
       ctx.fill();
       ctx.lineWidth = 2.5;
-      ctx.strokeStyle = isExit ? "#ef4444" : "#6366f1";
+      ctx.strokeStyle = "#6366f1";
       ctx.stroke();
 
-      // 圖示 (A, B, C 均為 ❓，D 為 🚩)
+      // 圖示 (A, B, C 均為 ❓)
       ctx.font = "20px sans-serif";
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
       ctx.fillText(zone.icon, zone.x, zone.y - 4);
 
-      // 地標文字 (展區 A / 展區 B / 展區 C / 出口集合)
+      // 地標文字 (展區 A / 展區 B / 展區 C)
       ctx.font = "bold 11px sans-serif";
       ctx.fillStyle = "#334155";
       ctx.fillText(zone.label, zone.x, zone.y + 18);
@@ -3461,12 +3497,12 @@ class UIController {
         visibleSteps.push({ id: "zoo_meet_point", title: "第六關：展區出口集合" });
       }
     } else if (scenario.id === "hakka_food") {
-      visibleSteps.push({ id: "food_step1", title: "步驟 1：點傳統主食" });
+      visibleSteps.push({ id: "food_step1", title: "步驟 1：向老闆點一份餐點" });
       if (isDone("food_step1") || isAnyDoneOrHere(["food_step2", "food_step3"])) {
-        visibleSteps.push({ id: "food_step2", title: "步驟 2：客製化飲食需求" });
+        visibleSteps.push({ id: "food_step2", title: "步驟 2：確認客製化需求" });
       }
       if (isDone("food_step2") || isHere("food_step3")) {
-        visibleSteps.push({ id: "food_step3", title: "步驟 3：加點飲品與評價" });
+        visibleSteps.push({ id: "food_step3", title: "步驟 3：結帳時說出評價" });
       }
     } else if (scenario.id === "field_trip_pack") {
       visibleSteps.push({ id: "pack_hub", title: "任務一：背包 4 項整理" });
@@ -3568,7 +3604,11 @@ class UIController {
       if (this.els.speechHintTip) {
         this.els.speechHintTip.textContent = `提示有以下 ${node.choices.length} 個選項，請開口說出你想去或想說的內容：`;
       }
-      this.els.speechHintCards.innerHTML = node.choices.map(c => `
+      this.els.speechHintCards.innerHTML = node.choices.map(c => c.hintImage ? `
+        <div class="speech-hint-card is-image-only" aria-label="${c.title}">
+          <img class="speech-hint-image" src="${c.hintImage}" alt="${c.title}">
+        </div>
+      ` : `
         <div class="speech-hint-card">
           <div class="speech-hint-icon">${c.title.split(" ")[0]}</div>
           <div class="speech-hint-info">
@@ -4388,3 +4428,10 @@ document.addEventListener("DOMContentLoaded", () => {
   const stateManager = new GraphStateManager();
   window.app = new UIController(stateManager);
 });
+
+
+
+
+
+
+
