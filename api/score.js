@@ -86,9 +86,9 @@ async function handler(req, res) {
   }
 
   const query = parseQuery(req);
-  const pinyin = query.pinyin || "";
+  const pinyin = (query.pinyin || "").replace(/[\uff0c\u3002\uff01\uff1f,.!?;:()\[\]「」『』"'\\]/g, " ").replace(/\s+/g, " ").trim();
   const accentId = query.accentId || "1"; // 預設四縣腔
-  const text = query.text || "";
+  const text = (query.text || "").replace(/[\uff0c\u3002\uff01\uff1f,.!?;:()\[\]「」『』"'\\]/g, "").trim();
 
   if (!pinyin) {
     return sendJson(res, 400, { error: "缺少 pinyin 參數（正確答案的客語拼音數字調字串）" });
