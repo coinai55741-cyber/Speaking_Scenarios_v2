@@ -2206,33 +2206,17 @@ class SpeechService {
 // ==========================================
 class GraphStateManager {
   constructor() {
+    // 純記憶體情境暫存：分頁切換時保持進度，按 F5 重新整理即 100% 清空重來
     this.scenarioSessions = {};
-    try {
-      const savedSessions = sessionStorage.getItem("chainQuest_scenarioSessions");
-      if (savedSessions) {
-        this.scenarioSessions = JSON.parse(savedSessions);
-      }
-    } catch (e) {}
 
     let initialScenarioId = "zoo_chain";
-    try {
-      const savedScenarioId = localStorage.getItem("chainQuest_activeScenario");
-      if (savedScenarioId && SCENARIOS_GRAPH[savedScenarioId]) {
-        initialScenarioId = savedScenarioId;
-      }
-    } catch (e) {}
-
     this.currentScenarioId = initialScenarioId;
     this.isRecognizing = false;
     this.isDevMode = false;
     this.speechMode = "hakka"; // "hakka" (客委會客語 ASR) | "mandarin" (瀏覽器內建華語 Web Speech)
     this.activeRecognitionInstance = null;
 
-    if (this.scenarioSessions && this.scenarioSessions[initialScenarioId]) {
-      this.loadScenarioSession(initialScenarioId);
-    } else {
-      this.initFreshScenario(initialScenarioId);
-    }
+    this.initFreshScenario(initialScenarioId);
   }
 
   initFreshScenario(scenarioId) {
@@ -2278,9 +2262,6 @@ class GraphStateManager {
       nodeInteractions: this.nodeInteractions ? { ...this.nodeInteractions } : {},
       chatHistory: Array.isArray(this.chatHistory) ? [...this.chatHistory] : []
     };
-    try {
-      sessionStorage.setItem("chainQuest_scenarioSessions", JSON.stringify(this.scenarioSessions));
-    } catch (e) {}
   }
 
   loadScenarioSession(scenarioId) {
@@ -2314,9 +2295,6 @@ class GraphStateManager {
   resetScenarioSession(scenarioId) {
     if (this.scenarioSessions && this.scenarioSessions[scenarioId]) {
       delete this.scenarioSessions[scenarioId];
-      try {
-        sessionStorage.setItem("chainQuest_scenarioSessions", JSON.stringify(this.scenarioSessions));
-      } catch (e) {}
     }
     this.initFreshScenario(scenarioId);
   }
