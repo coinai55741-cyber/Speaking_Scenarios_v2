@@ -33,11 +33,14 @@ async function readBody(req) {
 async function callGemini(apiKey, models, systemPrompt, userPrompt) {
   const errors = [];
   for (const model of models) {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 12000);
     try {
       const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
       const geminiRes = await fetch(geminiUrl, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        signal: controller.signal,
         body: JSON.stringify({
           contents: [
             {
@@ -51,6 +54,7 @@ async function callGemini(apiKey, models, systemPrompt, userPrompt) {
           }
         })
       });
+      clearTimeout(timeoutId);
 
       if (geminiRes.ok) {
         const geminiData = await geminiRes.json();
@@ -63,6 +67,7 @@ async function callGemini(apiKey, models, systemPrompt, userPrompt) {
         errors.push(`[${model}] HTTP ${geminiRes.status}: ${errBody.slice(0, 150)}`);
       }
     } catch (err) {
+      clearTimeout(timeoutId);
       errors.push(`[${model}] err: ${err.message}`);
     }
   }
