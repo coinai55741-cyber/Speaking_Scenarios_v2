@@ -30,15 +30,15 @@ async function readBody(req) {
   }
 }
 
-const SYSTEM_GROUNDING_RULES = `
+const CLAUDE_GROUNDING_RULES = `
 
 ======================================================================
-【LLM-as-a-Judge 評估與 NPC 角色台詞通用錨定鐵律（Strict Grounding Rules）】
+【Claude 專屬評估與 NPC 角色台詞四大通用錨定鐵律（Strict Grounding Rules）】
 ======================================================================
-你正在為語言學習者進行嚴謹的口說任務評估與逼真自然的情境角色扮演。請務必遵守以下評審鐵律：
+你正在為語言學習者進行嚴謹的口說任務評估與逼真的角色扮演。請務必遵守以下 4 項評審鐵律：
 
 1. ⚖️ 核心客觀屬性嚴格對齊（禁止模糊同義詞替換）：
-   - 票種、數量、方位、品項名、動作特徵、身分等客觀屬性必須嚴格吻合情境要求。
+   - 票種、數量、方位、品項名、動作特徵、身分、天氣等客觀屬性必須嚴格吻合情境要求。
    - 【禁止寬容替換】：
      * 學生票 ≠ 優待票 / 全票 / 敬老票 / 愛心票（不同票種互斥，買錯票種一律判定 isMatch: false）！
      * 慢慢爬 / 安靜 ≠ 跑得快 / 很吵（動作特徵相反一律判定 isMatch: false）！
@@ -58,12 +58,10 @@ const SYSTEM_GROUNDING_RULES = `
      * NPC 台詞必須明確表達「拒絕、糾正、疑惑、退回或要求重講」。
    - 只有在 isMatch: true（通過）時，NPC 才能給予放行與正面肯定。
 
-4. 🚫【嚴禁 NPC 直白洩題或命令背誦特定台詞（No Verbatim Dictation / No Recitation Orders）】：
-   - NPC 絕對【嚴禁】在台詞中直接命令學生說出特定句型！
-   - 【絕對禁止出現的生硬句型】：
-     * ❌ 嚴禁：『請說：...』、『你跟我說「...」』、『你大聲說「...」好嗎？』、『請你唸出...』、『你照著說...』！
-   - 【必須以生活情境啟發引導】：
-     * NPC 應透過生活觀察、反問或引導來啟發學生（例：媽媽：『外面真的好冷！那風吹得大不大呀？樹枝都被吹得晃來晃去了呢！』），保持日常家庭與生活沉浸感。
+4. 🏗️ 教學鷹架明確引導（Scaffolding Cueing）：
+   - 未通過時，NPC 嚴禁只作無意義的客套寒暄（例：『窗口聲音雜，你要買幾張？』）。
+   - NPC 必須一針見血點破學生的具體錯誤或疏漏（例：『同學，優待票是給長輩或幼童的，你們是學生要買學生票才對喔！』），強制引導學生說出正確句子。
+   - 【避免死板命令背誦】：NPC 引導時應透過生活觀察與角色人設點破錯誤，避免像考官一樣直接命令學生照著背誦特定字句（例：媽媽不要說『你大聲跟我說「風很大很冷」好嗎？』，而應自然點破：『外面真的好冷！那風吹得大不大呀？樹枝都被吹得一直晃呢！』）。
 
 5. 🎭 100% 沉浸式角色扮演（嚴禁打破第四面牆／嚴禁提及「題目/系統/測驗/答案」）：
    - NPC 的台詞（dynamicNpcResponse）必須 100% 融入情境現場，嚴禁以 AI、系統或出題考官口吻說話！
@@ -130,7 +128,7 @@ const SYSTEM_GROUNDING_RULES = `
 `;
 
 async function callClaude(apiKey, model, systemPrompt, userPrompt) {
-  const enhancedSystemPrompt = (systemPrompt || "") + SYSTEM_GROUNDING_RULES;
+  const enhancedSystemPrompt = (systemPrompt || "") + CLAUDE_GROUNDING_RULES;
   const candidateModels = [
     model,
     "claude-haiku-4-5-20251001",
@@ -185,7 +183,7 @@ async function callClaude(apiKey, model, systemPrompt, userPrompt) {
 }
 
 async function callGemini(apiKey, models, systemPrompt, userPrompt) {
-  const enhancedSystemPrompt = (systemPrompt || "") + SYSTEM_GROUNDING_RULES;
+  const enhancedSystemPrompt = (systemPrompt || "") + CLAUDE_GROUNDING_RULES;
   const errors = [];
   for (const model of models) {
     const controller = new AbortController();
@@ -335,7 +333,7 @@ module.exports = async function handler(req, res) {
         body: JSON.stringify({
           model: primaryModel,
           messages: [
-            { role: "system", content: (systemPrompt || "") + SYSTEM_GROUNDING_RULES },
+            { role: "system", content: (systemPrompt || "") + CLAUDE_GROUNDING_RULES },
             { role: "user", content: userPrompt }
           ],
           response_format: { type: "json_object" },
