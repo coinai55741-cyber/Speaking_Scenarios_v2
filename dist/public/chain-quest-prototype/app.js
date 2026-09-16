@@ -702,33 +702,33 @@ const SCENARIOS_GRAPH = {
         choices: [
           {
             id: "head_stomach",
-            title: "🤕 頭痛肚子痛",
-            sub: "頭暈、肚子陣陣疼痛",
+            title: "🤕 身體不舒服",
+            sub: "向護理師說明身體不太舒服想求助",
             targetBranchId: "health_symptom_head",
-            keywords: ["頭那痛", "肚痛", "頭痛", "肚子痛", "頭暈"],
-            mandarinKeywords: ["頭痛", "肚子痛", "頭暈", "肚痛", "肚子"],
-            guideResponse: "「小朋友辛苦了，阿姨幫你量體溫，倒一杯溫開水給你喝喔。」",
-            mandarinGuideResponse: "「小朋友辛苦了，阿姨幫你量體溫，倒一杯溫開水給你喝喔。」"
+            keywords: ["身體", "無爽快", "不舒服", "看一過"],
+            mandarinKeywords: ["身體", "不舒服", "不太舒服", "看一下", "難受"],
+            guideResponse: "「同學怎麼啦？別緊張先在椅子上坐好，詳細告訴阿姨是哪裡不舒服呢？」",
+            mandarinGuideResponse: "「同學怎麼啦？別緊張先在椅子上坐好，詳細告訴阿姨是哪裡不舒服呢？」"
           },
           {
             id: "scratch",
-            title: "🩹 膝蓋擦傷",
-            sub: "操場跑步跌倒受傷破皮",
+            title: "🩹 跌倒受傷了",
+            sub: "向護理師說明剛剛受傷了想擦藥",
             targetBranchId: "health_symptom_scratch",
-            keywords: ["擦傷", "受傷", "跌倒", "膝蓋", "跑太遽", "腳痛", "流血", "痛痛"],
-            mandarinKeywords: ["擦傷", "受傷", "跌倒", "膝蓋", "流血", "破皮", "跑太快", "腳痛"],
-            guideResponse: "「不要緊喔！阿姨幫你用生理食鹽水清洗傷口、擦藥膏喔！」",
-            mandarinGuideResponse: "「不要緊喔！阿姨幫你用生理食鹽水清洗傷口、擦藥膏喔！」"
+            keywords: ["受傷", "跌倒", "痛痛", "擦藥"],
+            mandarinKeywords: ["受傷", "跌倒", "受傷了", "破皮", "擦藥"],
+            guideResponse: "「哎呀受傷啦！快過來坐好，告訴阿姨剛才是怎麼跌倒、哪裡受傷了？」",
+            mandarinGuideResponse: "「哎呀受傷啦！快過來坐好，告訴阿姨剛才是怎麼跌倒、哪裡受傷了？」"
           },
           {
             id: "fever",
-            title: "🤒 身體發熱",
-            sub: "全身熱熱的、沒有力氣",
+            title: "🌡️ 好像發燒了",
+            sub: "向護理師說明全身熱熱的想量體溫",
             targetBranchId: "health_symptom_fever",
-            keywords: ["身體當燒", "發熱", "發燒", "當燒", "無麼个力", "無力", "燒"],
-            mandarinKeywords: ["身體很熱", "發熱", "發燒", "身體熱", "沒有力氣", "無力", "很熱"],
-            guideResponse: "「阿姨先幫你量耳溫，稍微有一點發燒，等一下幫你聯絡家長與導師。」",
-            mandarinGuideResponse: "「阿姨先幫你量耳溫，稍微有一點發燒，等一下幫你聯絡家長與導師。」"
+            keywords: ["身體當燒", "量體溫", "發燒", "發熱"],
+            mandarinKeywords: ["量體溫", "發燒", "發熱", "身體很熱", "想量體溫"],
+            guideResponse: "「哎呀摸起來有點燙！先坐好，告訴阿姨是頭很燙還是全身沒力氣呢？」",
+            mandarinGuideResponse: "「哎呀摸起來有點燙！先坐好，告訴阿姨是頭很燙還是全身沒力氣呢？」"
           }
         ],
         nextNodeId: "health_symptom_head"
@@ -739,8 +739,8 @@ const SCENARIOS_GRAPH = {
         nodeType: "分支",
         locationTag: "學校健康中心諮詢桌",
         image: "./assets/health-boy-head-stomach.png",
-        storyPrompt: "你向護理師詳細說明頭暈腦脹與肚子陣陣絞痛的情形。你說：",
-        mandarinStoryPrompt: "你向護理師詳細說明頭暈腦脹與肚子陣陣絞痛的情形。你說：",
+        storyPrompt: "護理師請你在椅子上坐好後，你詳細向護理師說明頭暈腦脹與肚子陣陣絞痛的情形。你說：",
+        mandarinStoryPrompt: "護理師請你在椅子上坐好後，你詳細向護理師說明頭暈腦脹與肚子陣陣絞痛的情形。你說：",
         targetHakka: "𠊎頭那暈暈、肚肚一直陣陣痛。",
         targetMandarin: "我頭很暈、肚子一直陣陣在痛。",
         keywords: ["頭那暈", "肚肚", "痛", "陣陣痛"],
@@ -748,8 +748,8 @@ const SCENARIOS_GRAPH = {
         altKeywords: ["頭暈", "頭痛", "肚子痛", "肚子", "絞痛", "陣陣痛", "肚肚", "頭那暈"],
         npcRole: "護理師",
         npcAvatar: "👩‍⚕️",
-        npcSuccessResponse: "「好的，你先坐著休息，阿姨幫你量體溫、倒一杯溫開水給你喝喔。」",
-        mandarinNpcSuccessResponse: "「好的，你先坐著休息，阿姨幫你量體溫、倒一杯溫開水給你喝喔。」",
+        npcSuccessResponse: "「阿姨知道了！先喝杯溫開水，阿姨幫你量耳溫，深呼吸放輕鬆喔。」",
+        mandarinNpcSuccessResponse: "「阿姨知道了！先喝杯溫開水，阿姨幫你量耳溫，深呼吸放輕鬆喔。」",
         npcRetryResponse: "「護理師輕聲問：『是頭暈腦脹還是肚子陣陣在痛呢？慢慢跟阿姨說清楚喔。』」",
         mandarinNpcRetryResponse: "「護理師輕聲問：『是頭暈腦脹還是肚子陣陣在痛呢？慢慢跟阿姨說清楚喔。』」",
         nextNodeId: "health_rest"
@@ -760,8 +760,8 @@ const SCENARIOS_GRAPH = {
         nodeType: "分支",
         locationTag: "傷口擦藥床位",
         image: "./assets/health-boy-knee-scrape.png",
-        storyPrompt: "護理師注意到你的膝蓋有紅紅擦傷，你向護理師解釋剛剛體育課跑步太快跌倒受傷了。你說：",
-        mandarinStoryPrompt: "護理師注意到你的膝蓋有紅紅擦傷，你向護理師解釋剛剛體育課跑步太快跌倒受傷了。你說：",
+        storyPrompt: "護理師請你在椅子上坐好後，你向護理師說明剛剛體育課跑步太快跌倒受傷、膝蓋擦傷流血。你說：",
+        mandarinStoryPrompt: "護理師請你在椅子上坐好後，你向護理師說明剛剛體育課跑步太快跌倒受傷、膝蓋擦傷流血。你說：",
         targetHakka: "體育課跑太遽跌倒，腳膝頭擦傷流血痛痛。",
         targetMandarin: "體育課跑太快跌倒受傷，膝蓋流血破皮很痛。",
         keywords: ["體育課", "跑太遽", "跌倒", "腳膝頭", "擦傷", "流血", "受傷"],
@@ -781,8 +781,8 @@ const SCENARIOS_GRAPH = {
         nodeType: "分支",
         locationTag: "量體溫區",
         image: "./assets/health-boy-fever.png",
-        storyPrompt: "你覺得身體熱熱的，全身沒有力氣，向護理師說明。你說：",
-        mandarinStoryPrompt: "你覺得身體熱熱的，全身沒有力氣，向護理師說明。你說：",
+        storyPrompt: "護理師請你在椅子上坐好後，你向護理師詳細說明頭昏腦脹、全身發熱無力的情形。你說：",
+        mandarinStoryPrompt: "護理師請你在椅子上坐好後，你向護理師詳細說明頭昏腦脹、全身發熱無力的情形。你說：",
         targetHakka: "𠊎身體當燒，全身無麼个力。",
         targetMandarin: "我身體熱熱的，全身都沒有力氣。",
         keywords: ["身體", "當燒", "全身", "無力"],
@@ -790,8 +790,8 @@ const SCENARIOS_GRAPH = {
         altKeywords: ["發熱", "發燒", "很熱", "身體熱", "沒力", "全身無力", "當燒", "身體"],
         npcRole: "護理師",
         npcAvatar: "👩‍⚕️",
-        npcSuccessResponse: "「阿姨先幫你量耳溫，稍微有一點發燒，先在病床上躺著休息一節課喔。」",
-        mandarinNpcSuccessResponse: "「阿姨先幫你量耳溫，稍微有一點發燒，先在病床上躺著休息一節課喔。」",
+        npcSuccessResponse: "「阿姨先幫你量耳溫，稍微有一點發燒，先在椅子上喝溫水休息一節課喔。」",
+        mandarinNpcSuccessResponse: "「阿姨先幫你量耳溫，稍微有一點發燒，先在椅子上喝溫水休息一節課喔。」",
         npcRetryResponse: "「護理師摸摸你的額頭：『額頭稍微有點溫溫的，身體還有哪裡覺得熱熱沒力氣嗎？』」",
         mandarinNpcRetryResponse: "「護理師摸摸你的額頭：『額頭稍微有點溫溫的，身體還有哪裡覺得熱熱沒力氣嗎？』」",
         nextNodeId: "health_rest"
@@ -1561,9 +1561,9 @@ class LLMServiceAdapter {
   }
 
   /**
-   * 建構 User Prompt (注入客語原文/華語意圖與分支清單)
+   * 建構 User Prompt (注入客語原文/華語意圖、先前對話歷程與分支清單)
    */
-  static buildUserPrompt(hakkaTranscript, mandarinTranscript, nodeConfig, isMandarin = false) {
+  static buildUserPrompt(hakkaTranscript, mandarinTranscript, nodeConfig, isMandarin = false, dialogueHistoryText = "") {
     let choicesText = "";
     if (nodeConfig?.choices) {
       if (isMandarin) {
@@ -1577,16 +1577,20 @@ class LLMServiceAdapter {
       ? nodeConfig.choices.flatMap(c => isMandarin ? (c.mandarinKeywords || c.keywords || []) : (c.keywords || []))
       : (isMandarin ? (nodeConfig?.mandarinKeywords || nodeConfig?.keywords || []) : (nodeConfig?.keywords || []));
 
+    const historySection = dialogueHistoryText ? `${dialogueHistoryText}\n` : "";
+
     return [
-      `【學生實際語音輸入】：「${(isMandarin ? mandarinTranscript : (hakkaTranscript || mandarinTranscript)) || "（無輸入）"}」`,
+      historySection,
+      `【學生本關實際語音輸入】：「${(isMandarin ? mandarinTranscript : (hakkaTranscript || mandarinTranscript)) || "（無輸入）"}」`,
       isMandarin ? "" : `【客轉華語意譯】：「${mandarinTranscript || hakkaTranscript || "（無輸入）"}」`,
       `【本關目標句參考】：${(isMandarin ? nodeConfig?.targetMandarin : nodeConfig?.targetHakka) || "無固定句"}`,
       `【本關核心概念詞】：${coreKwList.join(", ") || "無"}`,
       `${choicesText}`,
       ``,
-      `請依據系統指令的「通關任務目標與引導邏輯」評估：`,
-      `1. 若學生發言已實質達成核心目標（就算後面接續了打折、閒聊等題外話），請回傳 isMatch: true，並由 NPC 站在角色立場同時回應核心任務與額外問題！`,
-      `2. 若學生尚未達成目標（例如只問推薦/閒聊/未點菜/張數錯誤/點了沒賣的東西），請回傳 isMatch: false，並由 NPC 根據學生說的話自然引導（嚴禁直接給答案提示句）！`,
+      `請依據系統指令的「通關任務目標與引導邏輯」與「先前對話歷程」評估：`,
+      `1. 多輪記憶防重複：請完全知曉先前對話歷程。若學生在前面關卡已表達過的事實（如第一關已說身體不舒服），在本關無需重複贅述。NPC 應自然接續，絕不可要求學生把上一關說過的話再講一遍！`,
+      `2. 若學生發言已實質達成核心目標（就算後面接續了打折、閒聊等題外話），請回傳 isMatch: true，並由 NPC 站在角色立場同時回應核心任務與額外問題！`,
+      `3. 若學生尚未達成目標（例如只問推薦/閒聊/未點菜/張數錯誤/點了沒賣的東西），請回傳 isMatch: false，並由 NPC 根據學生說的話自然引導（嚴禁直接給答案提示句）！`,
       ``,
       `請嚴格依照以下 JSON 結構回傳：`,
       `{`,
@@ -1702,10 +1706,10 @@ class LLMServiceAdapter {
   /**
    * 執行 LLM 評估 (整合 Vercel /api/judge、前端直連 Google Gemini 3.6 Flash 與本地安全網三軌備援)
    */
-  static async evaluate({ hakkaTranscript, mandarinTranscript, nodeConfig, scenario, speechMode = "hakka" }) {
+  static async evaluate({ hakkaTranscript, mandarinTranscript, nodeConfig, scenario, speechMode = "hakka", dialogueHistoryText = "" }) {
     const isMandarin = speechMode === "mandarin" || (!hakkaTranscript && !!mandarinTranscript);
     const systemPrompt = this.buildSystemPrompt(nodeConfig, scenario, isMandarin);
-    const userPrompt = this.buildUserPrompt(hakkaTranscript, mandarinTranscript, nodeConfig, isMandarin);
+    const userPrompt = this.buildUserPrompt(hakkaTranscript, mandarinTranscript, nodeConfig, isMandarin, dialogueHistoryText);
 
     // 通道 1: 優先透過後端 /api/judge 呼叫 (支援本地代理與 Vercel 雲端雙軌備援)
     const endpointsToTry = [
@@ -2244,6 +2248,7 @@ class GraphStateManager {
     this.playerPos = { x: 200, y: 220 }; // 起點在入口大門
     this.targetZoneCode = "A"; // A: 大象, B: 獅子, C: 蛇
     this.nodeInteractions = {};
+    this.chatHistory = []; // 💬 LINE 連續對話歷史記錄
     this.randomWeatherKey = "rain";
 
     if (scenarioId === "weather_outfit") {
@@ -2270,7 +2275,8 @@ class GraphStateManager {
       playerPos: this.playerPos ? { ...this.playerPos } : { x: 200, y: 220 },
       targetZoneCode: this.targetZoneCode || "A",
       randomWeatherKey: this.randomWeatherKey || "rain",
-      nodeInteractions: this.nodeInteractions ? { ...this.nodeInteractions } : {}
+      nodeInteractions: this.nodeInteractions ? { ...this.nodeInteractions } : {},
+      chatHistory: Array.isArray(this.chatHistory) ? [...this.chatHistory] : []
     };
     try {
       sessionStorage.setItem("chainQuest_scenarioSessions", JSON.stringify(this.scenarioSessions));
@@ -2293,6 +2299,7 @@ class GraphStateManager {
       this.targetZoneCode = session.targetZoneCode || "A";
       this.randomWeatherKey = session.randomWeatherKey || "rain";
       this.nodeInteractions = session.nodeInteractions ? { ...session.nodeInteractions } : {};
+      this.chatHistory = Array.isArray(session.chatHistory) ? [...session.chatHistory] : [];
 
       if (scenarioId === "weather_outfit" && this.randomWeatherKey) {
         this.applyRandomWeather(this.randomWeatherKey);
@@ -2312,6 +2319,36 @@ class GraphStateManager {
       } catch (e) {}
     }
     this.initFreshScenario(scenarioId);
+  }
+
+  addChatMessage({ stageId, stageTitle, sender, speakerName, avatar, text, isMatch = true }) {
+    if (!this.chatHistory) this.chatHistory = [];
+    const now = new Date();
+    const timeStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+    const msg = {
+      id: "msg_" + Date.now() + "_" + Math.random().toString(36).substring(2, 7),
+      stageId: stageId || this.currentNodeId,
+      stageTitle: stageTitle || (this.getCurrentNode()?.title || "當前關卡"),
+      sender: sender || "user", // "user" | "npc"
+      speakerName: speakerName || (sender === "user" ? "你" : "NPC"),
+      avatar: avatar || (sender === "user" ? "🧒" : "👵"),
+      text: text || "",
+      isMatch: isMatch !== undefined ? isMatch : true,
+      time: timeStr
+    };
+    this.chatHistory.push(msg);
+    this.saveCurrentScenarioSession();
+    return msg;
+  }
+
+  getScenarioChatHistoryText() {
+    if (!this.chatHistory || this.chatHistory.length === 0) return "";
+    const lines = ["【本情境先前對話歷程（學生已說過的內容與 NPC 回應紀錄）】："];
+    this.chatHistory.forEach((msg) => {
+      const roleStr = msg.sender === "user" ? "學生" : msg.speakerName;
+      lines.push(`- [${msg.stageTitle}] ${roleStr}: ${msg.text}`);
+    });
+    return lines.join("\n");
   }
 
   saveCurrentNodeInteraction(record) {
@@ -2869,6 +2906,7 @@ class UIController {
       currentStepTag: byId("currentStepTag"),
       sceneLocationTag: byId("sceneLocationTag"),
       storyPrompt: byId("storyPrompt"),
+      chatDialogueStream: byId("chatDialogueStream"),
 
       // 靜態提詞卡片容器 (不可點擊，僅提示口說選項)
       speechHintSection: byId("speechHintSection"),
@@ -3306,11 +3344,14 @@ class UIController {
 
     // 步驟 3: LLM 邊界意圖判定與 NPC 生成
     this.updatePipelineStep(3, "running", "LLM 評估中...");
+    const dialogueHistoryText = this.state.getScenarioChatHistoryText();
     const evalResult = await LLMServiceAdapter.evaluate({
       hakkaTranscript: isMandarinMode ? "" : userText,
       mandarinTranscript: mandarinText,
       nodeConfig,
-      scenario
+      scenario,
+      speechMode: this.state.speechMode,
+      dialogueHistoryText
     });
     this.updatePipelineStep(3, evalResult.isMatch ? "success" : "fail", evalResult);
 
@@ -3322,12 +3363,14 @@ class UIController {
     if (this.els.npcAvatar) this.els.npcAvatar.textContent = nodeConfig.npcAvatar || "👵";
     if (this.els.npcRoleName) this.els.npcRoleName.textContent = nodeConfig.npcRole || "NPC";
 
+    let dynamicReply = "";
+
     if (evalResult.isMatch) {
       SoundFX.success();
       if (this.els.statusDot) this.els.statusDot.className = "status-dot is-success";
 
       const currentNode = this.state.getCurrentNode();
-      let dynamicReply = evalResult.dynamicNpcResponse || nodeConfig.mandarinNpcSuccessResponse || nodeConfig.npcSuccessResponse;
+      dynamicReply = evalResult.dynamicNpcResponse || nodeConfig.mandarinNpcSuccessResponse || nodeConfig.npcSuccessResponse;
 
       // 若為「選擇節點」
       if (currentNode.nodeType === "選擇") {
@@ -3411,14 +3454,37 @@ class UIController {
       SoundFX.error();
       if (this.els.statusDot) this.els.statusDot.className = "status-dot is-error";
       if (this.els.nextStepBtn) this.els.nextStepBtn.hidden = true;
+      dynamicReply = evalResult.dynamicNpcResponse || (isMandarinMode ? (nodeConfig.mandarinNpcRetryResponse || nodeConfig.npcRetryResponse) : nodeConfig.npcRetryResponse);
       if (this.els.npcDialogText) {
-        this.els.npcDialogText.textContent = evalResult.dynamicNpcResponse || (isMandarinMode ? (nodeConfig.mandarinNpcRetryResponse || nodeConfig.npcRetryResponse) : nodeConfig.npcRetryResponse);
+        this.els.npcDialogText.textContent = dynamicReply;
       }
       if (this.els.statusTip) {
         this.els.statusTip.textContent = isMandarinMode ? "⚠️ 華語語意未達標，請依照提示再試一次。" : "⚠️ 發音或關鍵字未命中，請參考提示再試一次。";
       }
       if (this.els.npcResponseSection) this.els.npcResponseSection.hidden = false;
     }
+
+    // 💬 同步寫入 LINE 連續對話歷程
+    const stageTitle = nodeConfig.title || this.state.getCurrentNode()?.title || "當前關卡";
+    this.state.addChatMessage({
+      stageId: this.state.currentNodeId,
+      stageTitle: stageTitle,
+      sender: "user",
+      speakerName: "你",
+      avatar: "🧒",
+      text: userText,
+      isMatch: evalResult.isMatch
+    });
+    this.state.addChatMessage({
+      stageId: this.state.currentNodeId,
+      stageTitle: stageTitle,
+      sender: "npc",
+      speakerName: nodeConfig.npcRole || "NPC",
+      avatar: nodeConfig.npcAvatar || "👵",
+      text: dynamicReply,
+      isMatch: evalResult.isMatch
+    });
+    this.renderChatStream();
 
     // 儲存此節點之互動記錄 (供分頁切換暫存與回溯)
     const interactionRecord = {
@@ -3685,12 +3751,91 @@ class UIController {
       this.restoreSavedInteraction(savedInteraction, node);
     }
 
+    // 渲染 LINE 連續對話流
+    this.renderChatStream();
+
     // 渲染開發者面板與分支切換器
     this.renderDevSidebar(node, savedInteraction ? {
       transcript: savedInteraction.userText,
       mandarinText: savedInteraction.mandarinText,
       evalResult: savedInteraction.evalResult
     } : null);
+  }
+
+  // 渲染 LINE 連續對話歷史流 (展示本情境所有多輪對話歷程)
+  renderChatStream() {
+    if (!this.els.chatDialogueStream) return;
+    const streamEl = this.els.chatDialogueStream;
+    const history = this.state.chatHistory || [];
+
+    if (history.length === 0) {
+      const currentNode = this.state.getCurrentNode();
+      const npcAvatar = currentNode?.npcAvatar || "🧑‍💼";
+      const npcRole = currentNode?.npcRole || "NPC";
+      streamEl.innerHTML = `
+        <div class="chat-empty-hint">
+          <span>💬</span>
+          <span>點擊下方麥克風或開口說話，展開與【${npcRole}】的生活對話！</span>
+        </div>
+      `;
+      return;
+    }
+
+    const escapeHtmlSafe = (str) => {
+      if (!str) return "";
+      return String(str)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    };
+
+    let html = "";
+    let lastStageTitle = "";
+
+    history.forEach((msg) => {
+      if (msg.stageTitle && msg.stageTitle !== lastStageTitle) {
+        lastStageTitle = msg.stageTitle;
+        html += `
+          <div class="chat-stage-divider">
+            <span class="chat-stage-pill">📍 ${escapeHtmlSafe(msg.stageTitle)}</span>
+          </div>
+        `;
+      }
+
+      const isUser = msg.sender === "user";
+      const bubbleClass = isUser
+        ? "user-bubble"
+        : (msg.isMatch ? "npc-bubble is-success" : "npc-bubble is-retry");
+
+      const statusBadge = isUser
+        ? (msg.isMatch
+            ? `<span class="chat-bubble-status is-pass">✓ 通過</span>`
+            : `<span class="chat-bubble-status is-fail">⚠️ 需調整</span>`)
+        : "";
+
+      html += `
+        <div class="chat-msg-row ${isUser ? 'is-user' : 'is-npc'}">
+          <div class="chat-avatar">${msg.avatar || (isUser ? '🧒' : '👵')}</div>
+          <div class="chat-bubble-wrap">
+            <div class="chat-meta">
+              <span class="chat-sender-name">${escapeHtmlSafe(msg.speakerName || (isUser ? '你' : 'NPC'))}</span>
+              <span class="chat-time">${msg.time || ''}</span>
+            </div>
+            <div class="chat-bubble ${bubbleClass}">
+              ${escapeHtmlSafe(msg.text || '')}
+            </div>
+            ${statusBadge}
+          </div>
+        </div>
+      `;
+    });
+
+    streamEl.innerHTML = html;
+    setTimeout(() => {
+      streamEl.scrollTop = streamEl.scrollHeight;
+    }, 40);
   }
 
   restoreSavedInteraction(savedInteraction, node) {
