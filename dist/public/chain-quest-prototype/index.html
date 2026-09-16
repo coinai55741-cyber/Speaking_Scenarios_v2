@@ -169,6 +169,13 @@
         </nav>
 
         <div class="header-right-actions">
+          <!-- 💬 對話歷史紀錄抽屜按鈕 (附帶即時對話則數徽章) -->
+          <button id="openHistoryDrawerBtn" class="btn-history-drawer" type="button" title="查看本情境對話歷程紀錄" aria-label="查看對話紀錄">
+            <span class="history-btn-icon">💬</span>
+            <span class="history-btn-label">對話紀錄</span>
+            <span class="history-count-badge" id="historyCountBadge" hidden>0</span>
+          </button>
+
           <!-- 重設本分頁暫存進度按鈕 (開源 Feather/Lucide rotate-ccw 圖示，純圖示無文字) -->
           <button id="resetCurrentScenarioBtn" class="btn-scenario-reset" type="button" title="重設本分頁進度（回到第一關）" aria-label="重設本分頁進度">
             <svg class="scenario-reset-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
@@ -363,11 +370,6 @@
                 </div>
               </div>
 
-              <!-- 💬 LINE 連續對話歷史流 (位於下方，記錄情境對話歷程) -->
-              <div class="chat-dialogue-stream" id="chatDialogueStream">
-                <!-- 動態注入多輪對話氣泡與關卡分隔線 -->
-              </div>
-
               <!-- NPC 角色回應對話卡（講完話或選完後展開） -->
               <div class="npc-response-section" id="npcResponseSection" hidden>
                 <div class="npc-response-card">
@@ -419,7 +421,33 @@
     </div>
   </div>
 
-  <script src="./app.js?v=20260916-nurse2"></script>
+  <!-- 💬 方案 C：對話歷史紀錄滑出抽屜 (Slide-over Drawer) -->
+  <div class="history-drawer-backdrop" id="historyDrawerBackdrop" hidden></div>
+  <aside class="history-drawer" id="historyDrawer" aria-label="對話歷史歷程" hidden>
+    <div class="history-drawer-header">
+      <div class="history-drawer-title-row">
+        <span class="drawer-header-icon">💬</span>
+        <div>
+          <h3 class="drawer-title" id="historyDrawerTitle">本情境對話歷程</h3>
+          <p class="drawer-sub" id="historyDrawerSub">動物園連鎖任務</p>
+        </div>
+      </div>
+      <button id="closeHistoryDrawerBtn" class="btn-drawer-close" type="button" title="關閉對話紀錄 (ESC)" aria-label="關閉">✕</button>
+    </div>
+
+    <div class="history-drawer-body">
+      <div class="chat-dialogue-stream" id="chatDialogueStream">
+        <!-- 動態注入多輪對話氣泡與關卡分隔標籤 -->
+      </div>
+    </div>
+
+    <div class="history-drawer-footer">
+      <span class="history-summary-text" id="historySummaryText">共 0 則對話紀錄</span>
+      <button id="clearHistoryDrawerBtn" class="btn-drawer-clear" type="button" title="清除本情境對話記憶">🔄 清除本情境紀錄</button>
+    </div>
+  </aside>
+
+  <script src="./app.js?v=20260916-drawer"></script>
 </body>
 </html>
 

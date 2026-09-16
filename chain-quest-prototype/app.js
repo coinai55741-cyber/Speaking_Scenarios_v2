@@ -2884,6 +2884,17 @@ class UIController {
       currentStepTag: byId("currentStepTag"),
       sceneLocationTag: byId("sceneLocationTag"),
       storyPrompt: byId("storyPrompt"),
+
+      // 方案 C：對話歷史抽屜面板元件
+      openHistoryDrawerBtn: byId("openHistoryDrawerBtn"),
+      historyCountBadge: byId("historyCountBadge"),
+      historyDrawer: byId("historyDrawer"),
+      historyDrawerBackdrop: byId("historyDrawerBackdrop"),
+      closeHistoryDrawerBtn: byId("closeHistoryDrawerBtn"),
+      clearHistoryDrawerBtn: byId("clearHistoryDrawerBtn"),
+      historyDrawerTitle: byId("historyDrawerTitle"),
+      historyDrawerSub: byId("historyDrawerSub"),
+      historySummaryText: byId("historySummaryText"),
       chatDialogueStream: byId("chatDialogueStream"),
 
       // 靜態提詞卡片容器 (不可點擊，僅提示口說選項)
@@ -3032,6 +3043,29 @@ class UIController {
     if (this.els.closeDevDockBtn) {
       this.els.closeDevDockBtn.addEventListener("click", () => this.setDevMode(false));
     }
+
+    // 2.3 方案 C：對話歷史抽屜開關事件
+    if (this.els.openHistoryDrawerBtn) {
+      this.els.openHistoryDrawerBtn.addEventListener("click", () => this.toggleHistoryDrawer(true));
+    }
+    if (this.els.closeHistoryDrawerBtn) {
+      this.els.closeHistoryDrawerBtn.addEventListener("click", () => this.toggleHistoryDrawer(false));
+    }
+    if (this.els.historyDrawerBackdrop) {
+      this.els.historyDrawerBackdrop.addEventListener("click", () => this.toggleHistoryDrawer(false));
+    }
+    if (this.els.clearHistoryDrawerBtn) {
+      this.els.clearHistoryDrawerBtn.addEventListener("click", () => {
+        SoundFX.select();
+        this.state.resetScenarioSession(this.state.currentScenarioId);
+        this.render();
+      });
+    }
+    window.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && this.isHistoryDrawerOpen) {
+        this.toggleHistoryDrawer(false);
+      }
+    });
 
     // 2.5 頂部單一分頁進度重置按鈕 (只重置當前分頁暫存，回到第一關)
     if (this.els.resetCurrentScenarioBtn) {
@@ -3740,19 +3774,77 @@ class UIController {
     } : null);
   }
 
-  // 渲染 LINE 連續對話歷史流 (展示本情境所有多輪對話歷程)
-  renderChatStream() {
-    if (!this.els.chatDialogueStream) return;
-    const streamEl = this.els.chatDialogueStream;
-    const history = this.state.chatHistory || [];
+  // 方案 C：切換對話歷史抽屜開關
+  toggleHistoryDrawer(isOpen) {
+    this.isHistoryDrawerOpen = isOpen;
+    SoundFX.select();
+    if (this.els.historyDrawerBackdrop) {
+      this.els.historyDrawerBackdrop.hidden = !isOpen;
+      if (isOpen) {
+        requestAnimationFrame(() => {
+          this.els.historyDrawerBackdrop?.classList.add("is-open");
+        });
+      } else {
+        this.els.historyDrawerBackdrop.classList.remove("is-open");
+      }
+    }
+    if (this.els.historyDrawer) {
+      this.els.historyDrawer.hidden = !isOpen;
+      if (isOpen) {
+        requestAnimationFrame(() => {
+          this.els.historyDrawer?.classList.add("is-open");
+        });
+      } else {
+        this.els.historyDrawer.classList.remove("is-open");
+      }
+    }
+    if (isOpen) {
+      this.renderChatStream();
+    }
+  }
 
-    if (history.length === 0) {
-      streamEl.hidden = true;
-      streamEl.innerHTML = "";
-      return;
+  // 渲染 LINE 連續對話歷史流 (方案 C：抽屜內部渲染與徽章同步)
+  renderChatStream() {
+    const history = this.state.chatHistory || [];
+    const scenario = this.state.getScenario();
+
+    // 1. 即時更新頂部按鈕的對話則數徽章
+    if (this.els.historyCountBadge) {
+      if (history.length > 0) {
+        this.els.historyCountBadge.hidden = false;
+        this.els.historyCountBadge.textContent = String(history.length);
+      } else {
+        this.els.historyCountBadge.hidden = true;
+        this.els.historyCountBadge.textContent = "0";
+      }
     }
 
-    streamEl.hidden = false;
+    // 2. 即時更新抽屜標題與統計
+    if (this.els.historyDrawerSub && scenario) {
+      this.els.historyDrawerSub.textContent = `${scenario.icon || ""} ${scenario.title || "生活任務"}`;
+    }
+    if (this.els.historySummaryText) {
+      const turns = Math.ceil(history.length / 2);
+      this.els.historySummaryText.textContent = `共 ${history.length} 則對話紀錄（${turns} 輪互動）`;
+    }
+
+    if (!this.els.chatDialogueStream) return;
+    const streamEl = this.els.chatDialogueStream;
+
+    // 3. 若無對話紀錄，顯示親切引導圖文
+    if (history.length === 0) {
+      const currentNode = this.state.getCurrentNode();
+      const npcAvatar = currentNode?.npcAvatar || "🧑‍💼";
+      const npcRole = currentNode?.npcRole || "NPC";
+      streamEl.innerHTML = `
+        <div class="chat-empty-hint" style="flex-direction:column;text-align:center;padding:32px 16px;">
+          <span style="font-size:36px;margin-bottom:8px;">💬</span>
+          <strong style="color:#475569;font-size:14px;">本情境尚未開始對話</strong>
+          <p style="margin-top:6px;line-height:1.6;font-size:12px;color:#94a3b8;">在主畫面點擊麥克風開口說話後，<br>這裡將完整記錄您與【${npcRole}】${npcAvatar} 的所有對話歷程！</p>
+        </div>
+      `;
+      return;
+    }
 
     const escapeHtmlSafe = (str) => {
       if (!str) return "";
