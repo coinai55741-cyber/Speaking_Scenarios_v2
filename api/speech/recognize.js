@@ -18,17 +18,15 @@ function isAllowedOrigin(req) {
   const origin = requestOrigin(req);
   if (!origin) return true;
   const allowed = allowedOrigins();
-  return allowed.length ? allowed.includes(origin) : false;
+  return allowed.length ? allowed.includes(origin) : true;
 }
 
 function json(req, res, statusCode, payload) {
   const origin = requestOrigin(req);
-  if (origin && isAllowedOrigin(req)) {
-    res.setHeader("Access-Control-Allow-Origin", origin);
-    res.setHeader("Vary", "Origin");
-  }
+  res.setHeader("Access-Control-Allow-Origin", origin || "*");
+  res.setHeader("Vary", "Origin");
   res.setHeader("Access-Control-Allow-Methods", "POST,OPTIONS");
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type,Authorization");
   res.setHeader("Content-Type", "application/json; charset=utf-8");
   res.statusCode = statusCode;
   res.end(JSON.stringify(payload));

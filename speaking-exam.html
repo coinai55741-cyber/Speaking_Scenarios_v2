@@ -291,9 +291,8 @@ const pendingQuestions = [
 
 function getBackendApiUrl(path) {
   if (window.SPEECH_API_BASE_URL) return `${window.SPEECH_API_BASE_URL.replace(/\/+$/, '')}${path}`;
-  if (location.hostname.endsWith('github.io')) return `https://speaking-scenarios-v2.vercel.app${path}`;
   if (location.hostname.endsWith('vercel.app')) return `${location.origin}${path}`;
-  return path;
+  return `https://speaking-scenarios-v2.vercel.app${path}`;
 }
 const SCORING_API_PATH = '/api/score';
 const JUDGE_API_PATH = '/api/judge';
