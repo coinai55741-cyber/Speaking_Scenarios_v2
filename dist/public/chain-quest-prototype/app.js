@@ -2199,6 +2199,14 @@ class SpeechService {
 // ==========================================
 class GraphStateManager {
   constructor() {
+    this.scenarioSessions = {};
+    try {
+      const savedSessions = sessionStorage.getItem("chainQuest_scenarioSessions");
+      if (savedSessions) {
+        this.scenarioSessions = JSON.parse(savedSessions);
+      }
+    } catch (e) {}
+
     let initialScenarioId = "zoo_chain";
     try {
       const savedScenarioId = localStorage.getItem("chainQuest_activeScenario");
@@ -2208,26 +2216,117 @@ class GraphStateManager {
     } catch (e) {}
 
     this.currentScenarioId = initialScenarioId;
-    const initialScenario = SCENARIOS_GRAPH[initialScenarioId] || SCENARIOS_GRAPH.zoo_chain;
-    this.currentNodeId = initialScenario.startNodeId;
+    this.isRecognizing = false;
+    this.isDevMode = false;
+    this.speechMode = "hakka"; // "hakka" (客委會客語 ASR) | "mandarin" (瀏覽器內建華語 Web Speech)
+    this.activeRecognitionInstance = null;
+
+    if (this.scenarioSessions && this.scenarioSessions[initialScenarioId]) {
+      this.loadScenarioSession(initialScenarioId);
+    } else {
+      this.initFreshScenario(initialScenarioId);
+    }
+  }
+
+  initFreshScenario(scenarioId) {
+    this.currentScenarioId = scenarioId;
+    const scenario = SCENARIOS_GRAPH[scenarioId] || SCENARIOS_GRAPH.zoo_chain;
+    this.currentNodeId = scenario.startNodeId;
     this.selectedChoiceId = null; // 紀錄使用者在選擇節點挑選的分支
     this.selectedTargetBranchId = null;
     this.collectedItems = new Set(); // 用於背包自由收集任務
     this.activePackItemIndex = null; // 預設不選取到物件
     this.completedNodes = new Set();
     this.pathHistory = [this.currentNodeId];
-    this.isRecognizing = false;
-    this.isDevMode = false;
-    this.speechMode = "hakka"; // "hakka" (客委會客語 ASR) | "mandarin" (瀏覽器內建華語 Web Speech)
-    this.activeRecognitionInstance = null;
-
-    // 地圖導航狀態
     this.playerPos = { x: 200, y: 220 }; // 起點在入口大門
     this.targetZoneCode = "A"; // A: 大象, B: 獅子, C: 蛇
-
-    // 今日天氣隨機狀態 (下雨 rain | 炎熱 hot | 寒冷 cold)
+    this.nodeInteractions = {};
     this.randomWeatherKey = "rain";
-    this.initRandomWeather();
+
+    if (scenarioId === "weather_outfit") {
+      this.initRandomWeather();
+      const initialBranch = this.randomWeatherKey
+        ? (WEATHER_RANDOM_PRESETS[this.randomWeatherKey]?.targetBranchId || "weather_outfit_rain")
+        : null;
+      this.selectedChoiceId = this.randomWeatherKey || null;
+      this.selectedTargetBranchId = initialBranch;
+    }
+  }
+
+  saveCurrentScenarioSession() {
+    if (!this.currentScenarioId) return;
+    if (!this.scenarioSessions) this.scenarioSessions = {};
+    this.scenarioSessions[this.currentScenarioId] = {
+      currentNodeId: this.currentNodeId,
+      selectedChoiceId: this.selectedChoiceId,
+      selectedTargetBranchId: this.selectedTargetBranchId,
+      collectedItems: Array.from(this.collectedItems || []),
+      activePackItemIndex: this.activePackItemIndex,
+      completedNodes: Array.from(this.completedNodes || []),
+      pathHistory: [...(this.pathHistory || [this.currentNodeId])],
+      playerPos: this.playerPos ? { ...this.playerPos } : { x: 200, y: 220 },
+      targetZoneCode: this.targetZoneCode || "A",
+      randomWeatherKey: this.randomWeatherKey || "rain",
+      nodeInteractions: this.nodeInteractions ? { ...this.nodeInteractions } : {}
+    };
+    try {
+      sessionStorage.setItem("chainQuest_scenarioSessions", JSON.stringify(this.scenarioSessions));
+    } catch (e) {}
+  }
+
+  loadScenarioSession(scenarioId) {
+    if (!this.scenarioSessions) this.scenarioSessions = {};
+    const session = this.scenarioSessions[scenarioId];
+    if (session) {
+      this.currentScenarioId = scenarioId;
+      this.currentNodeId = session.currentNodeId;
+      this.selectedChoiceId = session.selectedChoiceId;
+      this.selectedTargetBranchId = session.selectedTargetBranchId;
+      this.collectedItems = new Set(session.collectedItems || []);
+      this.activePackItemIndex = session.activePackItemIndex ?? null;
+      this.completedNodes = new Set(session.completedNodes || []);
+      this.pathHistory = Array.isArray(session.pathHistory) ? [...session.pathHistory] : [this.currentNodeId];
+      this.playerPos = session.playerPos ? { ...session.playerPos } : { x: 200, y: 220 };
+      this.targetZoneCode = session.targetZoneCode || "A";
+      this.randomWeatherKey = session.randomWeatherKey || "rain";
+      this.nodeInteractions = session.nodeInteractions ? { ...session.nodeInteractions } : {};
+
+      if (scenarioId === "weather_outfit" && this.randomWeatherKey) {
+        this.applyRandomWeather(this.randomWeatherKey);
+        this.currentNodeId = session.currentNodeId;
+        this.selectedTargetBranchId = session.selectedTargetBranchId;
+      }
+      return true;
+    }
+    return false;
+  }
+
+  resetScenarioSession(scenarioId) {
+    if (this.scenarioSessions && this.scenarioSessions[scenarioId]) {
+      delete this.scenarioSessions[scenarioId];
+      try {
+        sessionStorage.setItem("chainQuest_scenarioSessions", JSON.stringify(this.scenarioSessions));
+      } catch (e) {}
+    }
+    this.initFreshScenario(scenarioId);
+  }
+
+  saveCurrentNodeInteraction(record) {
+    if (!this.nodeInteractions) this.nodeInteractions = {};
+    this.nodeInteractions[this.currentNodeId] = record;
+    this.saveCurrentScenarioSession();
+  }
+
+  getCurrentNodeInteraction() {
+    if (!this.nodeInteractions) return null;
+    return this.nodeInteractions[this.currentNodeId] || null;
+  }
+
+  clearCurrentNodeInteraction() {
+    if (this.nodeInteractions && this.nodeInteractions[this.currentNodeId]) {
+      delete this.nodeInteractions[this.currentNodeId];
+      this.saveCurrentScenarioSession();
+    }
   }
 
   initRandomWeather() {
@@ -2316,26 +2415,20 @@ class GraphStateManager {
 
   setScenario(scenarioId) {
     if (SCENARIOS_GRAPH[scenarioId]) {
+      // 1. 切換前先暫存當前情境所有關卡進度與回答記錄
+      this.saveCurrentScenarioSession();
+
       this.currentScenarioId = scenarioId;
       try {
         localStorage.setItem("chainQuest_activeScenario", scenarioId);
       } catch (e) {}
-      const scenario = SCENARIOS_GRAPH[scenarioId];
-      if (scenarioId === "weather_outfit") {
-        this.initRandomWeather();
+
+      // 2. 如果目標情境有暫存 session，載入它；否則初始化新情境
+      if (this.scenarioSessions && this.scenarioSessions[scenarioId]) {
+        this.loadScenarioSession(scenarioId);
+      } else {
+        this.initFreshScenario(scenarioId);
       }
-      this.currentNodeId = scenario.startNodeId;
-      const initialBranch = (scenarioId === "weather_outfit" && this.randomWeatherKey)
-        ? (WEATHER_RANDOM_PRESETS[this.randomWeatherKey]?.targetBranchId || "weather_outfit_rain")
-        : null;
-      this.selectedChoiceId = (scenarioId === "weather_outfit" && this.randomWeatherKey) ? this.randomWeatherKey : null;
-      this.selectedTargetBranchId = initialBranch;
-      this.collectedItems.clear();
-      this.activePackItemIndex = null;
-      this.completedNodes.clear();
-      this.pathHistory = [this.currentNodeId];
-      this.playerPos = { x: 200, y: 220 };
-      this.targetZoneCode = "A";
     }
   }
 
@@ -2346,11 +2439,13 @@ class GraphStateManager {
       if (!this.pathHistory.includes(nodeId)) {
         this.pathHistory.push(nodeId);
       }
+      this.saveCurrentScenarioSession();
     }
   }
 
   markCurrentNodeCompleted() {
     this.completedNodes.add(this.currentNodeId);
+    this.saveCurrentScenarioSession();
   }
 
   isScenarioCompleted() {
@@ -2985,7 +3080,7 @@ class UIController {
     // 11. 結算畫面按鈕
     if (this.els.replayScenarioBtn) {
       this.els.replayScenarioBtn.addEventListener("click", () => {
-        this.state.setScenario(this.state.currentScenarioId);
+        this.state.resetScenarioSession(this.state.currentScenarioId);
         this.render();
       });
     }
@@ -3310,6 +3405,38 @@ class UIController {
       if (this.els.npcResponseSection) this.els.npcResponseSection.hidden = false;
     }
 
+    // 儲存此節點之互動記錄 (供分頁切換暫存與回溯)
+    const interactionRecord = {
+      nodeId: this.state.currentNodeId,
+      userText,
+      mandarinText,
+      isMatch: evalResult.isMatch,
+      dynamicReply: this.els.npcDialogText ? this.els.npcDialogText.textContent : "",
+      npcRole: nodeConfig.npcRole || "NPC",
+      npcAvatar: nodeConfig.npcAvatar || "👵",
+      statusTipText: this.els.statusTip ? this.els.statusTip.textContent : "",
+      statusDotClass: this.els.statusDot ? this.els.statusDot.className : "",
+      showNextStepBtn: this.els.nextStepBtn ? !this.els.nextStepBtn.hidden : false,
+      nextStepBtnText: this.els.nextStepBtnText ? this.els.nextStepBtnText.textContent : "繼續前進 ➔",
+      evalResult,
+      pipelineState: {
+        step1: {
+          status: this.els.pipeAsrBadge ? this.els.pipeAsrBadge.className.replace(/.*badge-/, "") : "success",
+          text: this.els.pipeAsrText ? this.els.pipeAsrText.textContent : asrDisplay
+        },
+        step2: {
+          status: this.els.pipeMtBadge ? this.els.pipeMtBadge.className.replace(/.*badge-/, "") : "success",
+          text: this.els.pipeMtText ? this.els.pipeMtText.textContent : mandarinText,
+          extraInfo: hitTerms
+        },
+        step3: {
+          status: evalResult.isMatch ? "success" : "fail",
+          data: evalResult
+        }
+      }
+    };
+    this.state.saveCurrentNodeInteraction(interactionRecord);
+
     // 更新開發者側邊欄
     this.renderDevSidebar(nodeConfig, {
       transcript: userText,
@@ -3536,8 +3663,68 @@ class UIController {
       this.renderSpeechNode(node);
     }
 
+    // 恢復暫存的互動記錄 (學生發音、NPC回應、流水線卡片、按鈕狀態)
+    const savedInteraction = this.state.getCurrentNodeInteraction();
+    if (savedInteraction) {
+      this.restoreSavedInteraction(savedInteraction, node);
+    }
+
     // 渲染開發者面板與分支切換器
-    this.renderDevSidebar(node, null);
+    this.renderDevSidebar(node, savedInteraction ? {
+      transcript: savedInteraction.userText,
+      mandarinText: savedInteraction.mandarinText,
+      evalResult: savedInteraction.evalResult
+    } : null);
+  }
+
+  restoreSavedInteraction(savedInteraction, node) {
+    if (!savedInteraction) return;
+
+    // 1. 學生語音氣泡
+    if (this.els.studentSpeechBubble) {
+      this.els.studentSpeechBubble.hidden = false;
+    }
+    if (this.els.studentTranscriptText) {
+      this.els.studentTranscriptText.textContent = `「${savedInteraction.userText || ""}」`;
+    }
+
+    // 2. NPC 回應區塊
+    if (this.els.npcResponseSection) {
+      this.els.npcResponseSection.hidden = false;
+    }
+    if (this.els.npcAvatar) {
+      this.els.npcAvatar.textContent = savedInteraction.npcAvatar || node.npcAvatar || "👵";
+    }
+    if (this.els.npcRoleName) {
+      this.els.npcRoleName.textContent = savedInteraction.npcRole || node.npcRole || "NPC";
+    }
+    if (this.els.npcDialogText) {
+      this.els.npcDialogText.textContent = savedInteraction.dynamicReply || "";
+    }
+
+    // 3. 狀態燈與提示語
+    if (this.els.statusDot) {
+      this.els.statusDot.className = savedInteraction.statusDotClass || (savedInteraction.isMatch ? "status-dot is-success" : "status-dot is-error");
+    }
+    if (this.els.statusTip && savedInteraction.statusTipText) {
+      this.els.statusTip.textContent = savedInteraction.statusTipText;
+    }
+
+    // 4. 前進下一關按鈕
+    if (this.els.nextStepBtn && savedInteraction.showNextStepBtn !== undefined) {
+      this.els.nextStepBtn.hidden = !savedInteraction.showNextStepBtn;
+    }
+    if (this.els.nextStepBtnText && savedInteraction.nextStepBtnText) {
+      this.els.nextStepBtnText.textContent = savedInteraction.nextStepBtnText;
+    }
+
+    // 5. 流水線步驟卡片
+    if (savedInteraction.pipelineState) {
+      const ps = savedInteraction.pipelineState;
+      if (ps.step1) this.updatePipelineStep(1, ps.step1.status, ps.step1.text);
+      if (ps.step2) this.updatePipelineStep(2, ps.step2.status, ps.step2.text, ps.step2.extraInfo);
+      if (ps.step3) this.updatePipelineStep(3, ps.step3.status, ps.step3.data);
+    }
   }
 
   cleanupDynamicSections() {
