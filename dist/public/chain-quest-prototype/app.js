@@ -905,8 +905,8 @@ const SCENARIOS_GRAPH = {
         altKeywords: ["下雨", "雨傘", "雨衣", "遮仔", "著雨衣", "帶雨傘", "拿遮仔", "穿雨衣"],
         npcRole: "媽媽",
         npcAvatar: "👩",
-        npcSuccessResponse: "「太棒了！穿好雨衣又帶了雨傘，下雨天就不怕淋成落湯雞了！」",
-        mandarinNpcSuccessResponse: "「太棒了！穿好雨衣又帶了雨傘，下雨天就不怕淋成落湯雞了！」",
+        npcSuccessResponse: "「太棒了！穿好雨衣又帶了雨傘，下雨天就不怕淋成落湯雞了！快去玄關穿鞋子，準備出門上學囉！」",
+        mandarinNpcSuccessResponse: "「太棒了！穿好雨衣又帶了雨傘，下雨天就不怕淋成落湯雞了！快去玄關穿鞋子，準備出門上學囉！」",
         npcRetryResponse: "「媽媽看著你問：『外面在下大雨呢，去學校要穿戴什麼防雨裝備才不會淋濕呀？』」",
         mandarinNpcRetryResponse: "「媽媽看著你問：『外面在下大雨呢，去學校要穿戴什麼防雨裝備才不會淋濕呀？』」",
         nextNodeId: "weather_done"
@@ -927,8 +927,8 @@ const SCENARIOS_GRAPH = {
         altKeywords: ["很熱", "短袖", "短褲", "薄衫", "帽子", "遮陽帽", "帽仔", "防曬"],
         npcRole: "媽媽",
         npcAvatar: "👩",
-        npcSuccessResponse: "「真聰明！穿清涼短袖短褲、戴上遮陽帽，這樣在學校就不怕曬傷中暑了！」",
-        mandarinNpcSuccessResponse: "「真聰明！穿清涼短袖短褲、戴上遮陽帽，這樣在學校就不怕曬傷中暑了！」",
+        npcSuccessResponse: "「真聰明！穿清涼短袖短褲、戴上遮陽帽，這樣在學校就不怕曬傷中暑了！快去玄關穿鞋子，準備出門上學囉！」",
+        mandarinNpcSuccessResponse: "「真聰明！穿清涼短袖短褲、戴上遮陽帽，這樣在學校就不怕曬傷中暑了！快去玄關穿鞋子，準備出門上學囉！」",
         npcRetryResponse: "「媽媽看著你問：『今天太陽那麼烈，出門要穿什麼清涼防曬的衣服呀？』」",
         mandarinNpcRetryResponse: "「媽媽看著你問：『今天太陽那麼烈，出門要穿什麼清涼防曬的衣服呀？』」",
         nextNodeId: "weather_done"
@@ -949,8 +949,8 @@ const SCENARIOS_GRAPH = {
         altKeywords: ["很冷", "厚大衫", "大衫", "大衣", "圍巾", "毛衣", "羽絨衣", "厚外套", "保暖", "穿暖", "著暖"],
         npcRole: "媽媽",
         npcAvatar: "👩",
-        npcSuccessResponse: "「真貼心！穿厚大衣又圍上毛圍巾，這樣在路上吹風就不會著涼感冒了！」",
-        mandarinNpcSuccessResponse: "「真貼心！穿厚大衣又圍上毛圍巾，這樣在路上吹風就不會著涼感冒了！」",
+        npcSuccessResponse: "「真貼心！穿厚大衣又圍上毛圍巾，這樣在路上吹風就不會著涼感冒了！快去玄關穿鞋子，準備出門上學囉！」",
+        mandarinNpcSuccessResponse: "「真貼心！穿厚大衣又圍上毛圍巾，這樣在路上吹風就不會著涼感冒了！快去玄關穿鞋子，準備出門上學囉！」",
         npcRetryResponse: "「媽媽摸摸你的手問：『今天寒流只有十度呢，快去拿厚大衣跟圍巾穿暖喔！』」",
         mandarinNpcRetryResponse: "「媽媽摸摸你的手問：『今天寒流只有十度呢，快去拿厚大衣跟圍巾穿暖喔！』」",
         nextNodeId: "weather_done"
@@ -961,8 +961,8 @@ const SCENARIOS_GRAPH = {
         nodeType: "集合點",
         locationTag: "玄關大門口",
         objectPosition: "50% 30%",
-        storyPrompt: "穿戴好合適的衣物裝備後，你站在玄關門口精神飽滿地向媽媽道別準備出發。你說：",
-        mandarinStoryPrompt: "穿戴好合適的衣物裝備後，你站在玄關門口精神飽滿地向媽媽道別準備出發。你說：",
+        storyPrompt: "穿戴好合適的衣物裝備後，你站在玄關門口精神飽滿地向媽媽道別準備出門上學。你說：",
+        mandarinStoryPrompt: "穿戴好合適的衣物裝備後，你站在玄關門口精神飽滿地向媽媽道別準備出門上學。你說：",
         targetHakka: "𠊎都準備好了，出門行囉，媽媽再見！",
         targetMandarin: "我都準備好了，出門走囉，媽媽再見！",
         keywords: ["準備好", "出門", "再見"],
@@ -970,10 +970,10 @@ const SCENARIOS_GRAPH = {
         altKeywords: ["準備", "出門", "準備好了", "再見", "出門行囉"],
         npcRole: "媽媽",
         npcAvatar: "👩",
-        npcSuccessResponse: "「太棒了！路上小心走，專心上課，祝你有美好的一天！」",
-        mandarinNpcSuccessResponse: "「太棒了！路上小心走，專心上課，祝你有美好的一天！」",
-        npcRetryResponse: "「媽媽在玄關笑著問：『東西跟衣服都穿戴整齊、準備好出發了嗎？』」",
-        mandarinNpcRetryResponse: "「媽媽在玄關笑著問：『東西跟衣服都穿戴整齊、準備好出發了嗎？』」",
+        npcSuccessResponse: "「太棒了！路上小心看車、專心上課，媽媽在家等你放學喔！」",
+        mandarinNpcSuccessResponse: "「太棒了！路上小心看車、專心上課，媽媽在家等你放學喔！」",
+        npcRetryResponse: "「媽媽在玄關笑著問：『衣服跟鞋子都穿好了嗎？出門上學前記得跟媽媽說聲再見喔！』」",
+        mandarinNpcRetryResponse: "「媽媽在玄關笑著問：『衣服跟鞋子都穿好了嗎？出門上學前記得跟媽媽說聲再見喔！』」",
         nextNodeId: null
       }
     }
@@ -2414,16 +2414,16 @@ class GraphStateManager {
       const branchId = this.selectedTargetBranchId || "weather_outfit_rain";
       const weatherPrompts = {
         weather_outfit_rain: {
-          storyPrompt: "穿戴好雨衣與雨傘等防雨裝備後，你站在玄關門口精神飽滿地向媽媽道別準備出發。你說：",
-          mandarinStoryPrompt: "穿戴好雨衣與雨傘等防雨裝備後，你站在玄關門口精神飽滿地向媽媽道別準備出發。你說："
+          storyPrompt: "穿戴好雨衣與雨傘等防雨裝備後，你站在玄關門口精神飽滿地向媽媽道別準備出門上學。你說：",
+          mandarinStoryPrompt: "穿戴好雨衣與雨傘等防雨裝備後，你站在玄關門口精神飽滿地向媽媽道別準備出門上學。你說："
         },
         weather_outfit_hot: {
-          storyPrompt: "穿戴好短袖短褲與遮陽帽等防曬裝備後，你站在玄關門口精神飽滿地向媽媽道別準備出發。你說：",
-          mandarinStoryPrompt: "穿戴好短袖短褲與遮陽帽等防曬裝備後，你站在玄關門口精神飽滿地向媽媽道別準備出發。你說："
+          storyPrompt: "穿戴好短袖短褲與遮陽帽等防曬裝備後，你站在玄關門口精神飽滿地向媽媽道別準備出門上學。你說：",
+          mandarinStoryPrompt: "穿戴好短袖短褲與遮陽帽等防曬裝備後，你站在玄關門口精神飽滿地向媽媽道別準備出門上學。你說："
         },
         weather_outfit_cold: {
-          storyPrompt: "穿戴好厚大衣與圍巾等保暖裝備後，你站在玄關門口精神飽滿地向媽媽道別準備出發。你說：",
-          mandarinStoryPrompt: "穿戴好厚大衣與圍巾等保暖裝備後，你站在玄關門口精神飽滿地向媽媽道別準備出發。你說："
+          storyPrompt: "穿戴好厚大衣與圍巾等保暖裝備後，你站在玄關門口精神飽滿地向媽媽道別準備出門上學。你說：",
+          mandarinStoryPrompt: "穿戴好厚大衣與圍巾等保暖裝備後，你站在玄關門口精神飽滿地向媽媽道別準備出門上學。你說："
         }
       };
       const info = weatherPrompts[branchId] || weatherPrompts.weather_outfit_rain;
