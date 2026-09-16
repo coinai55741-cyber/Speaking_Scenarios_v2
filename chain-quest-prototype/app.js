@@ -3246,9 +3246,42 @@ class UIController {
           this.els.npcDialogText.textContent = dynamicReply;
         }
         if (this.els.statusTip) {
-          this.els.statusTip.textContent = isAllCollected ? "🎉 4 樣背包物品全數裝入完成！請點選下方【前往下一關】！" : "✓ 本項物品已成功放入背包！請切換其他物品繼續整理。";
+          this.els.statusTip.textContent = isAllCollected ? "🎉 4 樣背包物品全數裝入完成！請點選下方【前往下一關】！" : `✓【${nodeConfig.name || "物品"}】已成功放入背包！請點選桌上其他物品繼續整理。`;
         }
-        this.render();
+
+        // 刷新桌上物品 Canvas 的勾選狀態與計數
+        const maskCanvas = document.querySelector(".pack-mask-canvas");
+        if (maskCanvas) this.renderPackMaskCanvas(currentNode, maskCanvas);
+        const packCount = document.querySelector(".backpack-count");
+        if (packCount) packCount.textContent = `已收集 ${this.state.collectedItems.size} / ${totalItems} 項`;
+
+        // 收集任務中，若尚未全收集則隱藏單步前進按鈕，引導點選桌上物品
+        if (this.els.nextStepBtn) {
+          this.els.nextStepBtn.hidden = !isAllCollected;
+        }
+
+        if (isAllCollected) {
+          const existingAction = document.querySelector(".backpack-next-action");
+          if (!existingAction) {
+            const backpackPanel = document.querySelector(".backpack-panel");
+            if (backpackPanel) {
+              const actionDiv = document.createElement("div");
+              actionDiv.className = "backpack-next-action";
+              actionDiv.innerHTML = `
+                <div class="backpack-next-hint">🎉 4 樣物品已全數打包齊全！</div>
+                <button id="btnPackGoNext" type="button" class="btn-pack-go-next">
+                  <span>🎒 前往下一關（關卡 2：玄關出發）</span>
+                  <span>➔</span>
+                </button>
+              `;
+              backpackPanel.appendChild(actionDiv);
+              actionDiv.querySelector("#btnPackGoNext")?.addEventListener("click", () => {
+                SoundFX.success();
+                this.advanceToNextNode();
+              });
+            }
+          }
+        }
       }
       // 一般主線/分支/集合點
       else {
@@ -3258,6 +3291,7 @@ class UIController {
         }
         if (this.els.statusTip) this.els.statusTip.textContent = isMandarinMode ? "✓ [華語模式] 辨識通過！請點擊【繼續前進】。" : "✓ 辨識成功！請點擊【繼續前進】。";
         if (this.els.nextStepBtnText) this.els.nextStepBtnText.textContent = "繼續前進 ➔";
+        if (this.els.nextStepBtn) this.els.nextStepBtn.hidden = false;
       }
       if (this.els.npcResponseSection) this.els.npcResponseSection.hidden = false;
     } else {
