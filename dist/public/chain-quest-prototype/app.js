@@ -880,9 +880,9 @@ const SCENARIOS_GRAPH = {
             title: "❄️ 寒冷冬日 (寒流來襲)",
             sub: "北風呼呼、天氣好冷",
             targetBranchId: "weather_outfit_cold",
-            keywords: ["寒流", "天時當冷", "當冷", "吹大風", "風很大", "很冷", "天冷"],
-            mandarinKeywords: ["寒流", "風很大", "很冷", "天氣很冷", "天冷", "冬天"],
-            altKeywords: ["寒流", "天冷", "很冷", "當冷", "大風", "吹大風", "冷氣團", "冬天"],
+            keywords: ["寒流", "天時當冷", "當冷", "吹大風", "風很大", "很冷", "天冷", "風冷", "好冷"],
+            mandarinKeywords: ["寒流", "風很大", "很冷", "天氣很冷", "天冷", "冬天", "好冷", "風好大", "風很冷", "風看起來好冷", "外面很冷", "外面的風", "冷風"],
+            altKeywords: ["寒流", "天冷", "很冷", "當冷", "大風", "吹大風", "冷氣團", "冬天", "好冷", "風好大", "風吹", "外面的風", "看起來好冷", "很冷喔", "好冷喔", "風很冷"],
             guideResponse: "「天哪，冷氣團真的來了！去衣櫃拿保暖的厚衣服跟配件穿上喔！」",
             mandarinGuideResponse: "「天哪，冷氣團真的來了！去衣櫃拿保暖的厚衣服跟配件穿上喔！」"
           }
@@ -1551,11 +1551,11 @@ class LLMServiceAdapter {
       `       - 例5【保健室護理師】（學生：『護理師我頭好痛肚子也一直拉，下午可以不用上課嗎？』）：護理師回應：『辛苦了！你先在椅子上坐著休息，阿姨幫你量體溫、倒杯溫開水，如果還是很不舒服阿姨再幫你聯絡導師喔！』`,
       `       - 例6【家人/長輩】（學生：『今天下雨我要帶雨傘，但我可以帶電動玩具去學校嗎？』）：長輩回應：『帶雨傘很細心！但是玩具要留在家裡喔，專心上課，出門小心別淋濕！』`,
       ``,
-      `3. 【未達成目標時的引導規則（一直跟他耗）】：`,
+      `3. 【未達成目標時的自然生活化引導規則（嚴禁死板唸稿）】：`,
       `   - 若學生發言「尚未達成核心任務」（例如只問打折卻沒說買幾張票、只問推薦卻沒點菜、點了小吃店沒賣的紅龜粿或牛排）：`,
       `     * 【判定】：isMatch: false。`,
       `     * 【NPC 對話 (dynamicNpcResponse)】：NPC 根據學生說的話做出真實生動的情境引導與回絕，引導他完成本關目標！`,
-      `     * 嚴禁在 NPC 對話中直接說『你要說：...』或『請說：...』等直接洩漏答案的提示句！`,
+      `     * 🚫【嚴禁命令背誦特定台詞】：NPC 絕對【嚴禁】在對話中直接命令學生說出特定句型（例：【絕對嚴禁】說『請說：...』、『你跟我說「...」』、『你大聲說「...」好嗎？』、『請你唸出...』）！NPC 應透過自然的生活觀察與親切提問來啟發學生，保持真實日常感。`,
       `4. 輸出規範：請嚴格回傳標準 JSON 格式。`
     ].join("\n");
   }
@@ -1589,8 +1589,8 @@ class LLMServiceAdapter {
       ``,
       `請依據系統指令的「通關任務目標與引導邏輯」與「先前對話歷程」評估：`,
       `1. 多輪記憶防重複：請完全知曉先前對話歷程。若學生在前面關卡已表達過的事實（如第一關已說身體不舒服），在本關無需重複贅述。NPC 應自然接續，絕不可要求學生把上一關說過的話再講一遍！`,
-      `2. 若學生發言已實質達成核心目標（就算後面接續了打折、閒聊等題外話），請回傳 isMatch: true，並由 NPC 站在角色立場同時回應核心任務與額外問題！`,
-      `3. 若學生尚未達成目標（例如只問推薦/閒聊/未點菜/張數錯誤/點了沒賣的東西），請回傳 isMatch: false，並由 NPC 根據學生說的話自然引導（嚴禁直接給答案提示句）！`,
+      `2. 語意等價與生活化判定：只要學生的意思實質達成核心目標（如回報天氣說「外面的風看起來好冷」、「風吹得好大好冷」），即回傳 isMatch: true！NPC 以親切簡潔的口語（1~2句）自然回應，絕不囉嗦重複提問。`,
+      `3. 若學生尚未達成目標（例如只問推薦/閒聊/未點菜/張數錯誤/點了沒賣的東西），請回傳 isMatch: false，並由 NPC 根據學生說的話自然引導（嚴禁直接給答案提示句，嚴禁要求學生唸出特定字句）！`,
       ``,
       `請嚴格依照以下 JSON 結構回傳：`,
       `{`,
@@ -1601,7 +1601,7 @@ class LLMServiceAdapter {
       `  "hitKeywords": ["命中之概念詞"],`,
       `  "missingKeywords": ["缺漏之概念詞"],`,
       `  "feedback": "教學引導短評",`,
-      `  "dynamicNpcResponse": "NPC 角色針對學生發言的情境回覆對話（20-35字）"`,
+      `  "dynamicNpcResponse": "NPC 角色針對學生發言的情境回覆對話（20-35字，親切自然生活口語）"`,
       `}`
     ].filter(Boolean).join("\n");
   }
@@ -3833,14 +3833,15 @@ class UIController {
 
     // 3. 若無對話紀錄，顯示親切引導圖文
     if (history.length === 0) {
-      const currentNode = this.state.getCurrentNode();
-      const npcAvatar = currentNode?.npcAvatar || "🧑‍💼";
-      const npcRole = currentNode?.npcRole || "NPC";
+      const scenarioTitle = scenario?.title || "本情境";
       streamEl.innerHTML = `
-        <div class="chat-empty-hint" style="flex-direction:column;text-align:center;padding:32px 16px;">
-          <span style="font-size:36px;margin-bottom:8px;">💬</span>
-          <strong style="color:#475569;font-size:14px;">本情境尚未開始對話</strong>
-          <p style="margin-top:6px;line-height:1.6;font-size:12px;color:#94a3b8;">在主畫面點擊麥克風開口說話後，<br>這裡將完整記錄您與【${npcRole}】${npcAvatar} 的所有對話歷程！</p>
+        <div class="chat-empty-hint" style="flex-direction:column;text-align:center;padding:36px 18px;">
+          <span style="font-size:38px;margin-bottom:10px;">💬</span>
+          <strong style="color:#334155;font-size:14.5px;">【${scenarioTitle}】尚未開始對話</strong>
+          <p style="margin-top:8px;line-height:1.65;font-size:12px;color:#64748b;">
+            只要在主畫面開口說話，無論第 1 關、第 2 關或後續關卡，<br>
+            所有角色的發言與回覆都會<strong>依時間順序完整記錄在此視窗中</strong>！
+          </p>
         </div>
       `;
       return;

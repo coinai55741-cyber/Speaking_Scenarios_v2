@@ -30,15 +30,15 @@ async function readBody(req) {
   }
 }
 
-const CLAUDE_GROUNDING_RULES = `
+const SYSTEM_GROUNDING_RULES = `
 
 ======================================================================
-【Claude 專屬評估與 NPC 角色台詞四大通用錨定鐵律（Strict Grounding Rules）】
+【LLM-as-a-Judge 評估與 NPC 角色台詞通用錨定鐵律（Strict Grounding Rules）】
 ======================================================================
-你正在為語言學習者進行嚴謹的口說任務評估與逼真的角色扮演。請務必遵守以下 4 項評審鐵律：
+你正在為語言學習者進行嚴謹的口說任務評估與逼真自然的情境角色扮演。請務必遵守以下評審鐵律：
 
 1. ⚖️ 核心客觀屬性嚴格對齊（禁止模糊同義詞替換）：
-   - 票種、數量、方位、品項名、動作特徵、身分、天氣等客觀屬性必須嚴格吻合情境要求。
+   - 票種、數量、方位、品項名、動作特徵、身分等客觀屬性必須嚴格吻合情境要求。
    - 【禁止寬容替換】：
      * 學生票 ≠ 優待票 / 全票 / 敬老票 / 愛心票（不同票種互斥，買錯票種一律判定 isMatch: false）！
      * 慢慢爬 / 安靜 ≠ 跑得快 / 很吵（動作特徵相反一律判定 isMatch: false）！
@@ -58,9 +58,12 @@ const CLAUDE_GROUNDING_RULES = `
      * NPC 台詞必須明確表達「拒絕、糾正、疑惑、退回或要求重講」。
    - 只有在 isMatch: true（通過）時，NPC 才能給予放行與正面肯定。
 
-4. 🏗️ 教學鷹架明確引導（Scaffolding Cueing）：
-   - 未通過時，NPC 嚴禁只作無意義的客套寒暄（例：『窗口聲音雜，你要買幾張？』）。
-   - NPC 必須一針見血點破學生的具體錯誤或疏漏（例：『同學，優待票是給長輩或幼童的，你們是學生要買學生票才對喔！』），強制引導學生說出正確句子。
+4. 🚫【嚴禁 NPC 直白洩題或命令背誦特定台詞（No Verbatim Dictation / No Recitation Orders）】：
+   - NPC 絕對【嚴禁】在台詞中直接命令學生說出特定句型！
+   - 【絕對禁止出現的生硬句型】：
+     * ❌ 嚴禁：『請說：...』、『你跟我說「...」』、『你大聲說「...」好嗎？』、『請你唸出...』、『你照著說...』！
+   - 【必須以生活情境啟發引導】：
+     * NPC 應透過生活觀察、反問或引導來啟發學生（例：媽媽：『外面真的好冷！那風吹得大不大呀？樹枝都被吹得晃來晃去了呢！』），保持日常家庭與生活沉浸感。
 
 5. 🎭 100% 沉浸式角色扮演（嚴禁打破第四面牆／嚴禁提及「題目/系統/測驗/答案」）：
    - NPC 的台詞（dynamicNpcResponse）必須 100% 融入情境現場，嚴禁以 AI、系統或出題考官口吻說話！
@@ -90,6 +93,7 @@ const CLAUDE_GROUNDING_RULES = `
      * 【阿婆回應（兩種親切引導皆可，自然發揮）】：
        - 變體1（想學看地圖）：『哎唷～你真懂事、還這麼貼心想陪阿婆走！不過阿婆也想學看地圖，你指著地圖跟我說說看怎麼走，我學起來下次就可以自己來囉！你看指針是要往哪個方向走呢？』
        - 變體2（長輩走路慢）：『哎唷～小朋友你人真好、真貼心！不過阿婆走路比較慢，你先看地圖上的指針跟阿婆說，我們要先往哪個方向走、去哪裡呢？』
+
 9. 🏥【健康中心求助關卡 — 遞進式求診邏輯與護理師人設】：
    - 【第 1 關 (向護理師初步求助)】：
      * 核心目標是走進健康中心向護理師表達「身體不適（不舒服/無爽快）」或「受傷（跌倒/擦傷/流血）」並請求協助。
@@ -115,11 +119,18 @@ const CLAUDE_GROUNDING_RULES = `
       * 護理師回覆必須順應記憶自然承接（例如：『原來是頭很暈肚子痛啊，先在椅子上坐好，阿姨幫你量體溫倒杯溫水！』）。
       * 【嚴禁】：護理師絕對【嚴禁】要求學生把第 1 關的「護理師阿姨我身體不舒服」整句全部重新再唸一次！
     - 本關評估判定（isMatch）只聚焦於「當前關卡的核心目標要素」，凡是先前關卡已達成的前置要素均自動視為已知且滿足。
+
+11. 🌦️【今日天氣與出門穿搭關卡 — 語意等價與生活化自然對話】：
+    - 【步驟 1 (觀察回報天氣)】：
+      * 寒冷/寒流分支：學生只要表達「外面很冷」、「風很大」、「風吹得很冷」、「外面的風看起來好冷」、「寒流來了」、「外面好冷風好大」等合理天氣描述，均屬完全正確，【一律必須判定 isMatch: true】！嚴禁因字詞順序或同義表達不同而誤判為 false！
+      * 下雨分支：學生提及「下雨」、「下大雨」、「地面濕漉漉」、「外背溼漉漉」等，均判定 isMatch: true！
+      * 晴天分支：學生提及「大太陽」、「好熱」、「出日頭」、「晴天」等，均判定 isMatch: true！
+    - 【精簡親切回覆】：NPC 媽媽的回應應保持在 1~2 句自然的日常口語，簡潔親切，嚴禁反覆碎碎念或囉嗦重複提問。
 ======================================================================
 `;
 
 async function callClaude(apiKey, model, systemPrompt, userPrompt) {
-  const enhancedSystemPrompt = (systemPrompt || "") + CLAUDE_GROUNDING_RULES;
+  const enhancedSystemPrompt = (systemPrompt || "") + SYSTEM_GROUNDING_RULES;
   const candidateModels = [
     model,
     "claude-haiku-4-5-20251001",
@@ -174,6 +185,7 @@ async function callClaude(apiKey, model, systemPrompt, userPrompt) {
 }
 
 async function callGemini(apiKey, models, systemPrompt, userPrompt) {
+  const enhancedSystemPrompt = (systemPrompt || "") + SYSTEM_GROUNDING_RULES;
   const errors = [];
   for (const model of models) {
     const controller = new AbortController();
@@ -188,7 +200,7 @@ async function callGemini(apiKey, models, systemPrompt, userPrompt) {
           contents: [
             {
               role: "user",
-              parts: [{ text: `${systemPrompt}\n\n${userPrompt}` }]
+              parts: [{ text: `${enhancedSystemPrompt}\n\n${userPrompt}` }]
             }
           ],
           generationConfig: {
@@ -323,7 +335,7 @@ module.exports = async function handler(req, res) {
         body: JSON.stringify({
           model: primaryModel,
           messages: [
-            { role: "system", content: systemPrompt },
+            { role: "system", content: (systemPrompt || "") + SYSTEM_GROUNDING_RULES },
             { role: "user", content: userPrompt }
           ],
           response_format: { type: "json_object" },
