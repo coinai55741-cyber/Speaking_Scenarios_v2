@@ -388,8 +388,8 @@ const SCENARIOS_GRAPH = {
         locationTag: "房間背包整理區",
         image: "./assets/field-trip-room-ready.png",
         tableImage: "./assets/field-trip-table-items.png",
-        storyPrompt: "明天要校外教學，你看著桌上的水壺、雨傘、毛巾和點心，準備一樣一樣確認並放進背包。請在下方【背包清單】點選物品，說出它的客語名稱與原因！",
-        mandarinStoryPrompt: "明天要校外教學，你看著桌上的水壺、雨傘、毛巾和點心，準備一樣一樣確認並放進背包。請在下方【背包清單】點選物品，說出它的名稱與攜帶原因！",
+        storyPrompt: "期待已久的戶外教學就是今天！出門前，媽媽再次叮嚀要仔細檢查清單，確認需要的物品都好好裝進背包裡。讓我們看著桌上的物品，一樣一樣清點確認吧！",
+        mandarinStoryPrompt: "期待已久的戶外教學就是今天！出門前，媽媽再次叮嚀要仔細檢查清單，確認需要的物品都好好裝進背包裡。讓我們看著桌上的物品，一樣一樣清點確認吧！",
         npcRole: "媽媽",
         npcAvatar: "👩",
         npcSuccessResponse: "「雨傘、水壺、毛巾、點心都裝齊了，太棒了！我們到玄關集合準備出發！」",
@@ -2202,7 +2202,7 @@ class GraphStateManager {
     this.selectedChoiceId = null; // 紀錄使用者在選擇節點挑選的分支
     this.selectedTargetBranchId = null;
     this.collectedItems = new Set(); // 用於背包自由收集任務
-    this.activePackItemIndex = 0; // 目前正在練習哪一個背包物品
+    this.activePackItemIndex = null; // 預設不選取到物件
     this.completedNodes = new Set();
     this.pathHistory = [this.currentNodeId];
     this.isRecognizing = false;
@@ -2320,7 +2320,7 @@ class GraphStateManager {
       this.selectedChoiceId = (scenarioId === "weather_outfit" && this.randomWeatherKey) ? this.randomWeatherKey : null;
       this.selectedTargetBranchId = initialBranch;
       this.collectedItems.clear();
-      this.activePackItemIndex = 0;
+      this.activePackItemIndex = null;
       this.completedNodes.clear();
       this.pathHistory = [this.currentNodeId];
       this.playerPos = { x: 200, y: 220 };
@@ -3090,7 +3090,10 @@ class UIController {
   getActiveSpeechNodeConfig() {
     const node = this.state.getCurrentNode();
     if (node.nodeType === "收集任務" && node.items) {
-      return node.items[this.state.activePackItemIndex] || node.items[0];
+      if (this.state.activePackItemIndex !== null && this.state.activePackItemIndex !== undefined && this.state.activePackItemIndex >= 0) {
+        return node.items[this.state.activePackItemIndex] || node;
+      }
+      return node;
     }
     return node;
   }
@@ -3712,22 +3715,36 @@ class UIController {
   // 4. 渲染 4 格背包非線性收集節點
   renderBackpackCollectionNode(node) {
     const isMandarin = this.state.speechMode === "mandarin";
-    const activeItem = node.items[this.state.activePackItemIndex] || node.items[0];
+    const hasActiveItem = this.state.activePackItemIndex !== null && this.state.activePackItemIndex !== undefined && this.state.activePackItemIndex >= 0 && this.state.activePackItemIndex < (node.items || []).length;
+    const activeItem = hasActiveItem ? node.items[this.state.activePackItemIndex] : null;
     const totalItems = (node.items || []).length;
     const isAllCollected = this.state.collectedItems.size >= totalItems;
 
     if (this.els.storyPrompt) {
-      this.els.storyPrompt.textContent = isMandarin ? (activeItem.mandarinStoryPrompt || activeItem.storyPrompt) : activeItem.storyPrompt;
+      if (activeItem) {
+        this.els.storyPrompt.textContent = isMandarin ? (activeItem.mandarinStoryPrompt || activeItem.storyPrompt) : activeItem.storyPrompt;
+      } else {
+        this.els.storyPrompt.textContent = isMandarin ? (node.mandarinStoryPrompt || node.storyPrompt) : node.storyPrompt;
+      }
     }
-    if (this.els.speechActionSection) this.els.speechActionSection.hidden = false;
+    if (this.els.sceneLocationTag) {
+      this.els.sceneLocationTag.textContent = activeItem ? (activeItem.locationTag || node.locationTag) : node.locationTag;
+    }
     if (this.els.speechHintSection) this.els.speechHintSection.hidden = true;
+    if (this.els.speechActionSection) {
+      this.els.speechActionSection.hidden = !activeItem || isAllCollected;
+    }
     if (this.els.statusTip) {
       if (isAllCollected) {
         this.els.statusTip.textContent = isMandarin
           ? "🎉 4 樣物品已全數打包齊全！請點擊背包下方【前往下一關】！"
           : "🎉 4 樣物品已全數打包齊全！請點擊背包下方【前往下一關】！";
-      } else {
+      } else if (activeItem) {
         this.els.statusTip.textContent = isMandarin ? `正在整理【${activeItem.name}】，請點擊下方按鈕以華語回答。` : `正在整理【${activeItem.name}】，請點擊下方按鈕以客語回答。`;
+      } else {
+        this.els.statusTip.textContent = isMandarin
+          ? "請在下方點選桌上的物品（水壺、雨傘、毛巾、點心）開始整理！"
+          : "請在下方點選桌頂个東西（水壺、遮仔、毛巾、點心）開始整理！";
       }
     }
 
@@ -3780,7 +3797,9 @@ class UIController {
       }
     }
 
-    this.renderSpeechNodeControls(activeItem);
+    if (activeItem) {
+      this.renderSpeechNodeControls(activeItem);
+    }
   }
 
   renderPackMaskCanvas(node, canvas) {
