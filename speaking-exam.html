@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>模擬客語能力口說測驗</title>
 <script src="https://cdn.tailwindcss.com"></script>
+<script src="./speech-api-config.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@600;700;900&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
@@ -288,8 +289,15 @@ const pendingQuestions = [
   }
 ];
 
-const SCORING_API_BASE = '';
+function getBackendApiUrl(path) {
+  if (window.SPEECH_API_BASE_URL) return `${window.SPEECH_API_BASE_URL.replace(/\/+$/, '')}${path}`;
+  if (location.hostname.endsWith('github.io')) return `https://speaking-scenarios-v2.vercel.app${path}`;
+  if (location.hostname.endsWith('vercel.app')) return `${location.origin}${path}`;
+  return path;
+}
 const SCORING_API_PATH = '/api/score';
+const JUDGE_API_PATH = '/api/judge';
+const RECOGNIZE_API_PATH = '/api/speech/recognize';
 
 // ==================== 測驗狀態機 ====================
 const state = {
@@ -543,33 +551,42 @@ async function convertBlobTo16kMonoWav(blob){
 // ==================== ASR 語音辨識與 Gemini AI 考官 API ====================
 async function callSpeechRecognizeApi(wavBlob, accent){
   try {
-    const reader = new FileReader();
-    const base64Promise = new Promise((resolve, reject) => {
-      reader.onloadend = () => {
-        const base64data = reader.result.split(',')[1];
-        resolve(base64data);
-      };
-      reader.onerror = reject;
-    });
-    reader.readAsDataURL(wavBlob);
-    const audioBase64 = await base64Promise;
+    const dialectMap = { '海陸': 'hailu', '四縣': 'sixian', '大埔': 'dabu', '饒平': 'raoping', '詔安': 'zhaoan' };
+    const dialect = dialectMap[accent] || 'sixian';
 
-    const accentMap = { '海陸': 'hailu', '四縣': 'sixian' };
-    const res = await fetch('/api/speech/recognize', {
+    const formData = new FormData();
+    formData.append('audio', wavBlob, 'recording.wav');
+    formData.append('provider_id', 'hakka_api_hak');
+    formData.append('provider', 'hakka_api');
+    formData.append('language', 'hak');
+    formData.append('dialect', dialect);
+    formData.append('recognizer', `hakka-${dialect}`);
+    formData.append('scene_id', 'speaking_exam');
+
+    const apiUrl = getBackendApiUrl(RECOGNIZE_API_PATH);
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 35000);
+
+    const res = await fetch(apiUrl, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        audio: audioBase64,
-        accent: accentMap[accent] || 'sixian'
-      })
+      body: formData,
+      signal: controller.signal
     });
+    clearTimeout(timeoutId);
 
     if (res.ok){
       const data = await res.json();
+      const norm = window.SPEECH_API?.normalizeResponse?.(data, {
+        provider: 'hakka_api',
+        dialect: dialect
+      });
+      if (norm && norm.text) return norm.text.trim();
       if (data && data.text) return data.text.trim();
+    } else {
+      console.warn(`ASR 辨識 API 回應狀態（HTTP ${res.status}）`);
     }
   } catch(e) {
-    console.warn('ASR 辨識未回傳或發生錯誤：', e);
+    console.warn('ASR 語音辨識服務呼叫異常（將由 AI 考官或擬真評估接手）：', e.message || e);
   }
   return '';
 }
@@ -605,7 +622,7 @@ ${q.target ? `參考指標/情境提示：${q.target}` : ''}
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 25000);
 
-    const res = await fetch('/api/judge', {
+    const res = await fetch(getBackendApiUrl(JUDGE_API_PATH), {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ systemPrompt, userPrompt }),
@@ -657,7 +674,7 @@ ${q.target ? `參考指標/情境提示：${q.target}` : ''}
 }
 
 async function callScoringApi(wavBlob, pinyin, accentId, text){
-  const url = `${SCORING_API_BASE}${SCORING_API_PATH}?pinyin=${encodeURIComponent(pinyin || '')}&accentId=${encodeURIComponent(accentId || '1')}&text=${encodeURIComponent(text || '')}`;
+  const url = `${getBackendApiUrl(SCORING_API_PATH)}?pinyin=${encodeURIComponent(pinyin || '')}&accentId=${encodeURIComponent(accentId || '1')}&text=${encodeURIComponent(text || '')}`;
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), 58000);
   try{
