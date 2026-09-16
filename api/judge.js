@@ -30,6 +30,60 @@ async function readBody(req) {
   }
 }
 
+async function callClaude(apiKey, model, systemPrompt, userPrompt) {
+  const candidateModels = [
+    model,
+    "claude-haiku-4-5-20251001",
+    "claude-sonnet-4-5-20250929",
+    "claude-sonnet-4-6",
+    "claude-3-5-haiku-20241022",
+    "claude-3-5-sonnet-20241022"
+  ].filter((v, i, a) => a.indexOf(v) === i && v);
+
+  const errors = [];
+  for (const mod of candidateModels) {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 12000);
+    try {
+      const claudeUrl = "https://api.anthropic.com/v1/messages";
+      const claudeRes = await fetch(claudeUrl, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-api-key": apiKey,
+          "anthropic-version": "2023-06-01"
+        },
+        signal: controller.signal,
+        body: JSON.stringify({
+          model: mod,
+          max_tokens: 1024,
+          system: systemPrompt,
+          messages: [
+            { role: "user", content: userPrompt }
+          ],
+          temperature: 0.2
+        })
+      });
+      clearTimeout(timeoutId);
+
+      if (claudeRes.ok) {
+        const claudeData = await claudeRes.json();
+        const text = claudeData.content?.[0]?.text || "";
+        if (text) {
+          return { text, modelUsed: mod };
+        }
+      } else {
+        const errBody = await claudeRes.text();
+        errors.push(`[${mod}] HTTP ${claudeRes.status}: ${errBody.slice(0, 150)}`);
+      }
+    } catch (err) {
+      clearTimeout(timeoutId);
+      errors.push(`[${mod}] err: ${err.message}`);
+    }
+  }
+  throw new Error(errors.join(" | ") || "All Claude candidate models failed.");
+}
+
 async function callGemini(apiKey, models, systemPrompt, userPrompt) {
   const errors = [];
   for (const model of models) {
@@ -130,8 +184,8 @@ module.exports = async function handler(req, res) {
     const body = await readBody(req);
     const { systemPrompt, userPrompt } = body;
 
-    const apiKey = process.env.LLM_API_KEY || process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY || process.env.OPENAI_API_KEY || "";
-    const primaryModel = process.env.LLM_MODEL || "gemini-3.6-flash";
+    const apiKey = process.env.ANTHROPIC_API_KEY || process.env.CLAUDE_API_KEY || process.env.LLM_API_KEY || process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY || process.env.OPENAI_API_KEY || "";
+    const primaryModel = process.env.LLM_MODEL || "claude-haiku-4-5-20251001";
     const endpoint = process.env.LLM_ENDPOINT || "";
 
     if (!apiKey) {
@@ -142,10 +196,15 @@ module.exports = async function handler(req, res) {
     let llmResponseContent = "";
     let modelUsed = primaryModel;
 
-    // 判斷是否為 Gemini API (以 AQ. 或 AIza 開頭，或 endpoint 包含 googleapis)
-    const isGemini = apiKey.startsWith("AQ.") || apiKey.startsWith("AIza") || endpoint.includes("googleapis.com");
+    // 判斷模型提供者 (Claude / Gemini / OpenAI)
+    const isClaude = apiKey.startsWith("sk-ant-") || endpoint.includes("anthropic.com") || primaryModel.toLowerCase().includes("claude");
+    const isGemini = !isClaude && (apiKey.startsWith("AQ.") || apiKey.startsWith("AIza") || endpoint.includes("googleapis.com") || primaryModel.toLowerCase().includes("gemini"));
 
-    if (isGemini) {
+    if (isClaude) {
+      const result = await callClaude(apiKey, primaryModel, systemPrompt, userPrompt);
+      llmResponseContent = result.text;
+      modelUsed = result.modelUsed;
+    } else if (isGemini) {
       const candidateModels = [
         "gemini-3.5-flash",
         "gemini-3.6-flash",
