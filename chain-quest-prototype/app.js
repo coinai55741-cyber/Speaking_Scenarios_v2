@@ -12,12 +12,15 @@
 class SoundFX {
   static init() {
     if (!this.ctx) {
-      const AudioContext = window.AudioContext || window.webkitAudioContext;
-      if (AudioContext) this.ctx = new AudioContext();
+      const AudioCtx = window.AudioContext || window.webkitAudioContext;
+      if (AudioCtx) this.ctx = new AudioCtx();
+    }
+    if (this.ctx && this.ctx.state === "suspended") {
+      this.ctx.resume();
     }
   }
 
-  static playTone(freq, type = "sine", duration = 0.15, gainVal = 0.1) {
+  static playTone(freq, type = "sine", duration = 0.15, gainVal = 0.15) {
     try {
       this.init();
       if (!this.ctx) return;
@@ -38,18 +41,18 @@ class SoundFX {
   }
 
   static success() {
-    this.playTone(523.25, "sine", 0.1, 0.15); // C5
-    setTimeout(() => this.playTone(659.25, "sine", 0.1, 0.15), 90); // E5
-    setTimeout(() => this.playTone(783.99, "sine", 0.25, 0.2), 180); // G5
+    this.playTone(523.25, "sine", 0.12, 0.2); // C5
+    setTimeout(() => this.playTone(659.25, "sine", 0.12, 0.22), 100); // E5
+    setTimeout(() => this.playTone(783.99, "sine", 0.28, 0.25), 200); // G5
   }
 
   static error() {
-    this.playTone(220, "triangle", 0.15, 0.2);
-    setTimeout(() => this.playTone(180, "triangle", 0.25, 0.2), 120);
+    this.playTone(240, "triangle", 0.18, 0.22);
+    setTimeout(() => this.playTone(190, "triangle", 0.28, 0.22), 130);
   }
 
   static select() {
-    this.playTone(440, "sine", 0.08, 0.08);
+    this.playTone(440, "sine", 0.08, 0.1);
   }
 
   static step() {
@@ -3344,6 +3347,7 @@ class UIController {
           this.els.statusTip.textContent = isMandarinMode ? `✓ [華語模式] 成功選定【${choiceTitle}】！請點擊【繼續前進】。` : `✓ 已辨識你的選擇【${choiceTitle}】！請點擊【繼續前進】。`;
         }
         if (this.els.nextStepBtnText) this.els.nextStepBtnText.textContent = "繼續前進 ➔";
+        if (this.els.nextStepBtn) this.els.nextStepBtn.hidden = false;
       }
       // 若為「收集任務」（教學打包）
       else if (currentNode.nodeType === "收集任務") {
@@ -3406,6 +3410,7 @@ class UIController {
     } else {
       SoundFX.error();
       if (this.els.statusDot) this.els.statusDot.className = "status-dot is-error";
+      if (this.els.nextStepBtn) this.els.nextStepBtn.hidden = true;
       if (this.els.npcDialogText) {
         this.els.npcDialogText.textContent = evalResult.dynamicNpcResponse || (isMandarinMode ? (nodeConfig.mandarinNpcRetryResponse || nodeConfig.npcRetryResponse) : nodeConfig.npcRetryResponse);
       }
@@ -3588,6 +3593,7 @@ class UIController {
     // 重設面板狀態
     if (this.els.scenarioCompletedCard) this.els.scenarioCompletedCard.hidden = true;
     if (this.els.narrativeCard) this.els.narrativeCard.hidden = false;
+    if (this.els.nextStepBtn) this.els.nextStepBtn.hidden = true;
     if (this.els.studentSpeechBubble) {
       this.els.studentSpeechBubble.hidden = true;
       if (this.els.studentTranscriptText) this.els.studentTranscriptText.textContent = "";
