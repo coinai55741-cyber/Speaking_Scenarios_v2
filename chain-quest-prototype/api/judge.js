@@ -143,11 +143,13 @@ module.exports = async function handler(req, res) {
 
     if (isGemini) {
       const candidateModels = [
-        primaryModel,
+        "gemini-3.5-flash",
+        "gemini-3.5-flash-preview",
         "gemini-3.6-flash",
         "gemini-2.0-flash",
-        "gemini-1.5-flash"
-      ].filter((v, i, a) => a.indexOf(v) === i);
+        "gemini-1.5-flash",
+        primaryModel
+      ].filter((v, i, a) => a.indexOf(v) === i && v);
 
       const result = await callGemini(apiKey, candidateModels, systemPrompt, userPrompt);
       llmResponseContent = result.text;
