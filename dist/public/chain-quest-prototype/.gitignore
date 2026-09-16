@@ -1,0 +1,10 @@
+# 環境變數與機密憑證排除（絕不上傳至 Git）
+.env
+.env.local
+.env.*.local
+
+# 系統與編輯器暫存
+.DS_Store
+Thumbs.db
+node_modules/
+.vercel
