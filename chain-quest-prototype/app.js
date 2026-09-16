@@ -3206,17 +3206,16 @@ class UIController {
     if (this.els.studentSpeechBubble) this.els.studentSpeechBubble.hidden = false;
     if (this.els.studentTranscriptText) this.els.studentTranscriptText.textContent = `「${userText}」`;
 
-    // 呈現 NPC 回應
-    if (this.els.npcResponseSection) this.els.npcResponseSection.hidden = false;
-    if (this.els.npcAvatar) this.els.npcAvatar.textContent = nodeConfig.npcAvatar;
-    if (this.els.npcRoleName) this.els.npcRoleName.textContent = nodeConfig.npcRole;
+    // 更新並呈現新節點之 NPC 角色與回應
+    if (this.els.npcAvatar) this.els.npcAvatar.textContent = nodeConfig.npcAvatar || "👵";
+    if (this.els.npcRoleName) this.els.npcRoleName.textContent = nodeConfig.npcRole || "NPC";
 
     if (evalResult.isMatch) {
       SoundFX.success();
       if (this.els.statusDot) this.els.statusDot.className = "status-dot is-success";
 
       const currentNode = this.state.getCurrentNode();
-      let dynamicReply = evalResult.dynamicNpcResponse || nodeConfig.npcSuccessResponse;
+      let dynamicReply = evalResult.dynamicNpcResponse || nodeConfig.mandarinNpcSuccessResponse || nodeConfig.npcSuccessResponse;
 
       // 若為「選擇節點」
       if (currentNode.nodeType === "選擇") {
@@ -3260,15 +3259,17 @@ class UIController {
         if (this.els.statusTip) this.els.statusTip.textContent = isMandarinMode ? "✓ [華語模式] 辨識通過！請點擊【繼續前進】。" : "✓ 辨識成功！請點擊【繼續前進】。";
         if (this.els.nextStepBtnText) this.els.nextStepBtnText.textContent = "繼續前進 ➔";
       }
+      if (this.els.npcResponseSection) this.els.npcResponseSection.hidden = false;
     } else {
       SoundFX.error();
       if (this.els.statusDot) this.els.statusDot.className = "status-dot is-error";
       if (this.els.npcDialogText) {
-        this.els.npcDialogText.textContent = evalResult.dynamicNpcResponse || nodeConfig.npcRetryResponse;
+        this.els.npcDialogText.textContent = evalResult.dynamicNpcResponse || (isMandarinMode ? (nodeConfig.mandarinNpcRetryResponse || nodeConfig.npcRetryResponse) : nodeConfig.npcRetryResponse);
       }
       if (this.els.statusTip) {
         this.els.statusTip.textContent = isMandarinMode ? "⚠️ 華語語意未達標，請依照提示再試一次。" : "⚠️ 發音或關鍵字未命中，請參考提示再試一次。";
       }
+      if (this.els.npcResponseSection) this.els.npcResponseSection.hidden = false;
     }
 
     // 更新開發者側邊欄
@@ -3412,8 +3413,16 @@ class UIController {
     // 重設面板狀態
     if (this.els.scenarioCompletedCard) this.els.scenarioCompletedCard.hidden = true;
     if (this.els.narrativeCard) this.els.narrativeCard.hidden = false;
-    if (this.els.studentSpeechBubble) this.els.studentSpeechBubble.hidden = true;
-    if (this.els.npcResponseSection) this.els.npcResponseSection.hidden = true;
+    if (this.els.studentSpeechBubble) {
+      this.els.studentSpeechBubble.hidden = true;
+      if (this.els.studentTranscriptText) this.els.studentTranscriptText.textContent = "";
+    }
+    if (this.els.npcResponseSection) {
+      this.els.npcResponseSection.hidden = true;
+      if (this.els.npcDialogText) this.els.npcDialogText.textContent = "";
+      if (this.els.npcAvatar) this.els.npcAvatar.textContent = node.npcAvatar || "👵";
+      if (this.els.npcRoleName) this.els.npcRoleName.textContent = node.npcRole || "NPC";
+    }
     if (this.els.statusDot) this.els.statusDot.className = "status-dot";
 
     // 情境看板
@@ -4262,6 +4271,10 @@ class UIController {
       if (this.els.recordBtnIcon) this.els.recordBtnIcon.textContent = "⏹️";
       if (this.els.recordBtnText) this.els.recordBtnText.textContent = "⏹️ 錄音中...（再按一次結束送出）";
       if (this.els.statusDot) this.els.statusDot.className = "status-dot is-recording";
+      if (this.els.npcResponseSection) {
+        this.els.npcResponseSection.hidden = true;
+        if (this.els.npcDialogText) this.els.npcDialogText.textContent = "";
+      }
       if (this.els.statusTip) {
         this.els.statusTip.textContent = this.state.speechMode === "mandarin" ? "🔴 正在聆聽華語發音中...說完請再點擊一次按鈕送出！" : "🔴 正在聆聽客語發音中...說完請再點擊一次按鈕送出！";
       }
