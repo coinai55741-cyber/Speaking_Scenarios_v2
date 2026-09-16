@@ -388,8 +388,8 @@ const SCENARIOS_GRAPH = {
         locationTag: "房間背包整理區",
         image: "./assets/field-trip-room-ready.png",
         tableImage: "./assets/field-trip-table-items.png",
-        storyPrompt: "今晡日係校外教學，阿姆過交代愛再檢查一擺愛用个東西有好好裝入背包無。一樣一樣來確認罷！",
-        mandarinStoryPrompt: "今天是戶外教學，媽媽再次交代要再檢查一下所需物品有沒有好好裝進背包。一樣一樣地確認吧！",
+        storyPrompt: "期待已久的戶外教學就是今天！出門前，媽媽再次叮嚀要仔細檢查清單，確認需要的物品都好好裝進背包裡。讓我們看著桌上的物品，一樣一樣清點確認吧！",
+        mandarinStoryPrompt: "期待已久的戶外教學就是今天！出門前，媽媽再次叮嚀要仔細檢查清單，確認需要的物品都好好裝進背包裡。讓我們看著桌上的物品，一樣一樣清點確認吧！",
         npcRole: "媽媽",
         npcAvatar: "👩",
         npcSuccessResponse: "「雨傘、水壺、毛巾、點心都裝齊了，太棒了！我們到玄關集合準備出發！」",
@@ -1723,7 +1723,7 @@ class LLMServiceAdapter {
             matchedChoice,
             matchedChoiceId: matchedChoice ? matchedChoice.id : (data.matchedChoiceId || null),
             isFromAPI: true,
-            provider: "gemini-3.6-flash (後端轉發)"
+            provider: (data.modelUsed || "Claude") + " (後端轉發)"
           };
         }
       } else if (res.status === 429) {
@@ -2810,6 +2810,7 @@ class UIController {
       devCustomInputBtn: byId("devCustomInputBtn"),
       toggleLlmBtn: byId("toggleLlmBtn"),
       llmViewer: byId("llmViewer"),
+      devLlmStatusTag: byId("devLlmStatusTag"),
       toggleJsonBtn: byId("toggleJsonBtn"),
       jsonViewer: byId("jsonViewer"),
 
@@ -2998,6 +2999,31 @@ class UIController {
         if (e.key === "ArrowRight") { this.mapEngine.moveBy(stepDist, 0); e.preventDefault(); }
       }
     });
+
+    // 啟動時自動偵測後端 LLM 服務與模型
+    this.detectLlmService();
+  }
+
+  async detectLlmService() {
+    try {
+      const targetEndpoint = LLMServiceAdapter.config.apiEndpoint || "/api/judge";
+      const res = await fetch(targetEndpoint, { method: "GET" });
+      if (res.ok) {
+        const data = await res.json();
+        if (data && data.model) {
+          const provider = data.provider || "Claude";
+          if (this.els.devLlmStatusTag) {
+            this.els.devLlmStatusTag.textContent = `${provider} (${data.model})`;
+            this.els.devLlmStatusTag.style.background = "#dcfce7";
+            this.els.devLlmStatusTag.style.color = "#15803d";
+          }
+          return;
+        }
+      }
+    } catch (e) {}
+    if (this.els.devLlmStatusTag) {
+      this.els.devLlmStatusTag.textContent = "Claude (/api/judge)";
+    }
   }
 
   setDevMode(isOpen) {
@@ -3291,9 +3317,12 @@ class UIController {
             this.els.pipeLlmResult.textContent = "⏳ 請求頻率飽和 (Rate Limit 429) [已觸發 NPC 情境緩衝]";
             this.els.pipeLlmResult.style.color = "#f59e0b";
           } else {
-            const sourceTag = data.isFromAPI ? ` [☁️ ${data.provider || 'Gemini 3.6 Flash'}]` : " [🛡️ 本地安全網]";
+            const sourceTag = data.isFromAPI ? ` [☁️ ${data.provider || data.modelUsed || 'Claude'}]` : " [🛡️ 本地安全網]";
             this.els.pipeLlmResult.textContent = (data.isMatch ? "✓ 通過 (Match)" : "⚠️ 未命中重試 (Retry)") + sourceTag;
             this.els.pipeLlmResult.style.color = data.isMatch ? "#34d399" : "#f87171";
+            if (data.isFromAPI && (data.modelUsed || data.provider) && this.els.devLlmStatusTag) {
+              this.els.devLlmStatusTag.textContent = `${data.provider || 'Claude'} (${data.modelUsed || '/api/judge'})`;
+            }
           }
         }
         if (this.els.pipeLlmIntent) {

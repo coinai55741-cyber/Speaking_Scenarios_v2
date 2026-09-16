@@ -1723,7 +1723,7 @@ class LLMServiceAdapter {
             matchedChoice,
             matchedChoiceId: matchedChoice ? matchedChoice.id : (data.matchedChoiceId || null),
             isFromAPI: true,
-            provider: "gemini-3.6-flash (後端轉發)"
+            provider: (data.modelUsed || "Claude") + " (後端轉發)"
           };
         }
       } else if (res.status === 429) {
@@ -2810,6 +2810,7 @@ class UIController {
       devCustomInputBtn: byId("devCustomInputBtn"),
       toggleLlmBtn: byId("toggleLlmBtn"),
       llmViewer: byId("llmViewer"),
+      devLlmStatusTag: byId("devLlmStatusTag"),
       toggleJsonBtn: byId("toggleJsonBtn"),
       jsonViewer: byId("jsonViewer"),
 
@@ -2998,6 +2999,31 @@ class UIController {
         if (e.key === "ArrowRight") { this.mapEngine.moveBy(stepDist, 0); e.preventDefault(); }
       }
     });
+
+    // 啟動時自動偵測後端 LLM 服務與模型
+    this.detectLlmService();
+  }
+
+  async detectLlmService() {
+    try {
+      const targetEndpoint = LLMServiceAdapter.config.apiEndpoint || "/api/judge";
+      const res = await fetch(targetEndpoint, { method: "GET" });
+      if (res.ok) {
+        const data = await res.json();
+        if (data && data.model) {
+          const provider = data.provider || "Claude";
+          if (this.els.devLlmStatusTag) {
+            this.els.devLlmStatusTag.textContent = `${provider} (${data.model})`;
+            this.els.devLlmStatusTag.style.background = "#dcfce7";
+            this.els.devLlmStatusTag.style.color = "#15803d";
+          }
+          return;
+        }
+      }
+    } catch (e) {}
+    if (this.els.devLlmStatusTag) {
+      this.els.devLlmStatusTag.textContent = "Claude (/api/judge)";
+    }
   }
 
   setDevMode(isOpen) {
@@ -3291,9 +3317,12 @@ class UIController {
             this.els.pipeLlmResult.textContent = "⏳ 請求頻率飽和 (Rate Limit 429) [已觸發 NPC 情境緩衝]";
             this.els.pipeLlmResult.style.color = "#f59e0b";
           } else {
-            const sourceTag = data.isFromAPI ? ` [☁️ ${data.provider || 'Gemini 3.6 Flash'}]` : " [🛡️ 本地安全網]";
+            const sourceTag = data.isFromAPI ? ` [☁️ ${data.provider || data.modelUsed || 'Claude'}]` : " [🛡️ 本地安全網]";
             this.els.pipeLlmResult.textContent = (data.isMatch ? "✓ 通過 (Match)" : "⚠️ 未命中重試 (Retry)") + sourceTag;
             this.els.pipeLlmResult.style.color = data.isMatch ? "#34d399" : "#f87171";
+            if (data.isFromAPI && (data.modelUsed || data.provider) && this.els.devLlmStatusTag) {
+              this.els.devLlmStatusTag.textContent = `${data.provider || 'Claude'} (${data.modelUsed || '/api/judge'})`;
+            }
           }
         }
         if (this.els.pipeLlmIntent) {

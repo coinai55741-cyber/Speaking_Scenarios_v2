@@ -167,9 +167,17 @@ module.exports = async function handler(req, res) {
   }
 
   if (req.method === "GET") {
+    const apiKey = process.env.ANTHROPIC_API_KEY || process.env.CLAUDE_API_KEY || process.env.LLM_API_KEY || process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY || process.env.OPENAI_API_KEY || "";
+    const primaryModel = process.env.LLM_MODEL || (apiKey.startsWith("sk-ant-") ? "claude-haiku-4-5-20251001" : "gemini-3.6-flash");
+    const isClaude = apiKey.startsWith("sk-ant-") || primaryModel.toLowerCase().includes("claude");
+    const isGemini = !isClaude && (apiKey.startsWith("AQ.") || apiKey.startsWith("AIza") || primaryModel.toLowerCase().includes("gemini"));
+    const providerName = isClaude ? "Claude" : (isGemini ? "Google Gemini" : "OpenAI");
+
     json(res, 200, {
       ok: true,
       service: "llm-judge-proxy",
+      provider: providerName,
+      model: primaryModel,
       description: "客語情境口說任務 LLM-as-a-Judge 後端評估轉發服務。"
     });
     return;
