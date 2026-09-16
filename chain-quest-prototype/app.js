@@ -529,7 +529,7 @@ const SCENARIOS_GRAPH = {
         targetMandarin: "請問去文化園區要搭哪一路公車？",
         keywords: ["文化園區", "學校", "圖書館"],
         mandarinKeywords: ["文化園區", "學校", "圖書館"],
-        altKeywords: ["文化園區", "學校", "圖書館", "公車", "802", "615", "306"],
+        altKeywords: ["文化園區", "學校", "圖書館", "公車"],
         npcRole: "路人",
         npcAvatar: "🧍",
         npcSuccessResponse: "「選好目的地後，我會告訴你搭哪一路公車喔！」",
@@ -540,30 +540,30 @@ const SCENARIOS_GRAPH = {
           {
             id: "culture",
             title: "🏛️ 文化園區",
-            sub: "搭乘 802 路公車",
+            sub: "想去文化園區",
             targetBranchId: "bus_ask_culture",
-            keywords: ["文化園區", "文化", "園區", "802"],
-            mandarinKeywords: ["文化園區", "文化", "園區", "802", "802路"],
+            keywords: ["文化園區", "文化", "園區"],
+            mandarinKeywords: ["文化園區", "文化", "園區"],
             guideResponse: "「去文化園區要搭 802 路公車喔！大約再過三分鐘就會進站了，準備好悠遊卡喔！」",
             mandarinGuideResponse: "「去文化園區要搭 802 路公車喔！大約再過三分鐘就會進站了，準備好悠遊卡喔！」"
           },
           {
             id: "school",
             title: "🏫 學校正門",
-            sub: "搭乘 615 路公車",
+            sub: "想去學校正門",
             targetBranchId: "bus_ask_school",
-            keywords: ["學校", "正門", "學校正門", "615"],
-            mandarinKeywords: ["學校", "學校正門", "正門", "615", "615路"],
+            keywords: ["學校", "正門", "學校正門"],
+            mandarinKeywords: ["學校", "學校正門", "正門"],
             guideResponse: "「去學校可以搭 615 路公車，請在右側站牌等候喔！」",
             mandarinGuideResponse: "「去學校可以搭 615 路公車，請在右側站牌等候喔！」"
           },
           {
             id: "library",
             title: "📚 市立圖書館",
-            sub: "搭乘 306 路公車",
+            sub: "想去市立圖書館",
             targetBranchId: "bus_ask_library",
-            keywords: ["圖書館", "市立圖書館", "306"],
-            mandarinKeywords: ["圖書館", "市立圖書館", "306", "306路"],
+            keywords: ["圖書館", "市立圖書館"],
+            mandarinKeywords: ["圖書館", "市立圖書館"],
             guideResponse: "「去圖書館請搭 306 路公車，很快就到了喔！」",
             mandarinGuideResponse: "「去圖書館請搭 306 路公車，很快就到了喔！」"
           }
