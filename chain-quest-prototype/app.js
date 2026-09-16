@@ -1431,12 +1431,12 @@ class HakkaToMandarinAdapter {
 class LLMServiceAdapter {
   static config = {
     provider: "vercel_api", // 支援後端 /api/judge 與 Vercel 雲端評估
-    model: "gemini-3.6-flash",
-    apiEndpoint: (typeof location !== "undefined" && (location.hostname.endsWith("github.io") || location.protocol === "file:"))
+    model: "claude-haiku-4-5-20251001",
+    apiEndpoint: (typeof location !== "undefined" && (location.hostname.endsWith("github.io") || location.protocol === "file:" || (location.port && location.port !== "3000")))
       ? "https://speaking-scenarios-v2.vercel.app/api/judge"
       : "/api/judge",
     apiKey: (typeof localStorage !== "undefined" ? localStorage.getItem("llm_api_key") : "") || (typeof window !== "undefined" ? window.LLM_API_KEY : "") || "",
-    timeout: 8000
+    timeout: 12000
   };
 
   /**
@@ -1700,49 +1700,56 @@ class LLMServiceAdapter {
     const systemPrompt = this.buildSystemPrompt(nodeConfig, scenario, isMandarin);
     const userPrompt = this.buildUserPrompt(hakkaTranscript, mandarinTranscript, nodeConfig, isMandarin);
 
-    // 通道 1: 優先透過後端 /api/judge 呼叫
-    try {
-      const controller = new AbortController();
-      const timer = setTimeout(() => controller.abort(), 6000);
-      const targetEndpoint = this.config.apiEndpoint || "/api/judge";
+    // 通道 1: 優先透過後端 /api/judge 呼叫 (支援本地代理與 Vercel 雲端雙軌備援)
+    const endpointsToTry = [
+      this.config.apiEndpoint || "/api/judge",
+      "/api/judge",
+      "https://speaking-scenarios-v2.vercel.app/api/judge"
+    ].filter((v, i, a) => a.indexOf(v) === i && v);
 
-      const res = await fetch(targetEndpoint, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ systemPrompt, userPrompt, hakkaTranscript, mandarinTranscript, isMandarin }),
-        signal: controller.signal
-      });
-      clearTimeout(timer);
+    for (const targetEndpoint of endpointsToTry) {
+      try {
+        const controller = new AbortController();
+        const timer = setTimeout(() => controller.abort(), 12000);
 
-      if (res.ok) {
-        const data = await res.json();
-        if (data.ok && data.isMatch !== undefined) {
-          const matchedChoice = this.resolveMatchedChoice(nodeConfig, data, hakkaTranscript, mandarinTranscript, isMandarin);
+        const res = await fetch(targetEndpoint, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ systemPrompt, userPrompt, hakkaTranscript, mandarinTranscript, isMandarin }),
+          signal: controller.signal
+        });
+        clearTimeout(timer);
+
+        if (res.ok) {
+          const data = await res.json();
+          if (data.ok && data.isMatch !== undefined) {
+            const matchedChoice = this.resolveMatchedChoice(nodeConfig, data, hakkaTranscript, mandarinTranscript, isMandarin);
+            return {
+              ...data,
+              matchedChoice,
+              matchedChoiceId: matchedChoice ? matchedChoice.id : (data.matchedChoiceId || null),
+              isFromAPI: true,
+              provider: (data.modelUsed || "Claude") + " (後端轉發)"
+            };
+          }
+        } else if (res.status === 429) {
+          const rateLimitReply = this.getRateLimitNpcResponse(nodeConfig.npcRole, isMandarin);
           return {
-            ...data,
-            matchedChoice,
-            matchedChoiceId: matchedChoice ? matchedChoice.id : (data.matchedChoiceId || null),
-            isFromAPI: true,
-            provider: (data.modelUsed || "Claude") + " (後端轉發)"
+            isMatch: false,
+            isRateLimited: true,
+            intent: "請求頻率超額 (Rate Limit)",
+            matchedChoice: null,
+            matchedChoiceId: null,
+            semanticAccuracy: 0,
+            hitKeywords: [],
+            missingKeywords: [],
+            feedback: "連線整理中（429 頻率冷卻），請稍候 5 秒再試一次。",
+            dynamicNpcResponse: rateLimitReply
           };
         }
-      } else if (res.status === 429) {
-        const rateLimitReply = this.getRateLimitNpcResponse(nodeConfig.npcRole, isMandarin);
-        return {
-          isMatch: false,
-          isRateLimited: true,
-          intent: "請求頻率超額 (Rate Limit)",
-          matchedChoice: null,
-          matchedChoiceId: null,
-          semanticAccuracy: 0,
-          hitKeywords: [],
-          missingKeywords: [],
-          feedback: "連線整理中（429 頻率冷卻），請稍候 5 秒再試一次。",
-          dynamicNpcResponse: rateLimitReply
-        };
+      } catch (err) {
+        // 當前 endpoint 失敗，繼續嘗試備用端點
       }
-    } catch (err) {
-      // 若後端未啟動或為靜態檔案預覽，自動無縫切換至通道 2 直連 Google Gemini 雲端 API
     }
 
     // 通道 2: 前端直連 Google Gemini 3.6 Flash 雲端實時運算 (保證 100% 真實 LLM 邊界推理與角色扮演)
