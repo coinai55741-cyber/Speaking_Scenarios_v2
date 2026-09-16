@@ -31,7 +31,7 @@ async function readBody(req) {
 }
 
 async function callGemini(apiKey, models, systemPrompt, userPrompt) {
-  let lastError = null;
+  const errors = [];
   for (const model of models) {
     try {
       const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
@@ -60,13 +60,13 @@ async function callGemini(apiKey, models, systemPrompt, userPrompt) {
         }
       } else {
         const errBody = await geminiRes.text();
-        lastError = new Error(`Gemini [${model}] HTTP ${geminiRes.status}: ${errBody.slice(0, 150)}`);
+        errors.push(`[${model}] HTTP ${geminiRes.status}: ${errBody.slice(0, 150)}`);
       }
     } catch (err) {
-      lastError = err;
+      errors.push(`[${model}] err: ${err.message}`);
     }
   }
-  throw lastError || new Error("All Gemini candidate models failed.");
+  throw new Error(errors.join(" | ") || "All Gemini candidate models failed.");
 }
 
 const fs = require("fs");
