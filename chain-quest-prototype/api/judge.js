@@ -227,9 +227,9 @@ module.exports = async function handler(req, res) {
     const body = await readBody(req);
     const { systemPrompt, userPrompt } = body;
 
-    const apiKey = process.env.ANTHROPIC_API_KEY || process.env.CLAUDE_API_KEY || process.env.LLM_API_KEY || process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY || process.env.OPENAI_API_KEY || "";
-    const primaryModel = process.env.LLM_MODEL || "claude-haiku-4-5-20251001";
-    const endpoint = process.env.LLM_ENDPOINT || "";
+    const apiKey = (process.env.ANTHROPIC_API_KEY || process.env.CLAUDE_API_KEY || process.env.LLM_API_KEY || process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY || process.env.OPENAI_API_KEY || "").trim();
+    const primaryModel = (process.env.LLM_MODEL || (apiKey.startsWith("sk-ant-") ? "claude-haiku-4-5-20251001" : "gemini-3.6-flash")).trim();
+    const endpoint = (process.env.LLM_ENDPOINT || "").trim();
 
     if (!apiKey) {
       json(res, 503, { error: "後端尚未設定 LLM_API_KEY 環境變數。" });
