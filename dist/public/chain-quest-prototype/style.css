@@ -535,6 +535,49 @@ html, body {
 
 .tab-icon { font-size: 14px; }
 
+.header-right-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+/* Single Scenario Reset Button */
+.btn-scenario-reset {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  background: #f0f4ee;
+  border: 1.5px solid #d5e4cf;
+  border-radius: 50%;
+  color: #4b6354;
+  cursor: pointer;
+  padding: 0;
+  flex-shrink: 0;
+  transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.btn-scenario-reset:hover {
+  background: #e1ede0;
+  border-color: #2d8a56;
+  color: #2d8a56;
+  transform: rotate(-60deg);
+  box-shadow: 0 2px 8px rgba(45, 138, 86, 0.2);
+}
+
+.btn-scenario-reset:active {
+  transform: rotate(-180deg) scale(0.92);
+  background: #d4e7d1;
+}
+
+.btn-scenario-reset .scenario-reset-icon {
+  width: 16px;
+  height: 16px;
+  display: block;
+}
+
 /* Dev Toggle */
 .dev-mode-toggle {
   display: inline-flex;

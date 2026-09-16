@@ -2838,6 +2838,7 @@ class UIController {
     this.els = {
       // 導覽標籤與開關
       navTabs: document.querySelectorAll(".nav-tab"),
+      resetCurrentScenarioBtn: byId("resetCurrentScenarioBtn"),
       debugToggle: byId("debugToggle"),
       closeDevDockBtn: byId("closeDevDockBtn"),
       devDockSidebar: byId("devDockSidebar"),
@@ -3011,6 +3012,15 @@ class UIController {
     }
     if (this.els.closeDevDockBtn) {
       this.els.closeDevDockBtn.addEventListener("click", () => this.setDevMode(false));
+    }
+
+    // 2.5 頂部單一分頁進度重置按鈕 (只重置當前分頁暫存，回到第一關)
+    if (this.els.resetCurrentScenarioBtn) {
+      this.els.resetCurrentScenarioBtn.addEventListener("click", () => {
+        SoundFX.select();
+        this.state.resetScenarioSession(this.state.currentScenarioId);
+        this.render();
+      });
     }
 
     // 3. 頂部標籤切換情境

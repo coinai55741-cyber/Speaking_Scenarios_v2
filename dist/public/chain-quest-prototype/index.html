@@ -168,12 +168,22 @@
           </button>
         </nav>
 
-        <!-- 開發者模式切換開關 -->
-        <label class="dev-mode-toggle" title="切換顯示左側內部顯示與即時比對面板">
-          <input id="debugToggle" type="checkbox">
-          <span class="toggle-slider"></span>
-          <span class="toggle-label">開發者模式</span>
-        </label>
+        <div class="header-right-actions">
+          <!-- 重設本分頁暫存進度按鈕 (開源 Feather/Lucide rotate-ccw 圖示，純圖示無文字) -->
+          <button id="resetCurrentScenarioBtn" class="btn-scenario-reset" type="button" title="重設本分頁進度（回到第一關）" aria-label="重設本分頁進度">
+            <svg class="scenario-reset-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L2 9"/>
+              <path d="M8 9H2V3"/>
+            </svg>
+          </button>
+
+          <!-- 開發者模式切換開關 -->
+          <label class="dev-mode-toggle" title="切換顯示左側內部顯示與即時比對面板">
+            <input id="debugToggle" type="checkbox">
+            <span class="toggle-slider"></span>
+            <span class="toggle-label">開發者模式</span>
+          </label>
+        </div>
       </header>
 
       <!-- 主情境舞台（滿版高度零滾動） -->
