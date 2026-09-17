@@ -97,36 +97,37 @@ const ExamSoundFX = {
       return null;
     }
   },
-  // 清脆「叮一聲」(Chime) - 考場開始作答/朗讀提示
+  // 清脆金屬「叮——」(Crystal Chime) - 考場開始作答/朗讀提示
   chime() {
     try {
       const ctx = this.getCtx();
       if (!ctx || ctx.state === 'closed') return;
       const now = ctx.currentTime;
-      // 主頻 (D6 約 1175Hz)
-      const osc1 = ctx.createOscillator();
-      const gain1 = ctx.createGain();
-      osc1.type = 'sine';
-      osc1.frequency.setValueAtTime(1174.66, now);
-      osc1.frequency.exponentialRampToValueAtTime(880, now + 0.85);
-      gain1.gain.setValueAtTime(0.4, now);
-      gain1.gain.exponentialRampToValueAtTime(0.001, now + 0.9);
-      osc1.connect(gain1);
-      gain1.connect(ctx.destination);
-      osc1.start(now);
-      osc1.stop(now + 0.95);
 
-      // 高八度泛音 (D7 2349Hz) 增加清脆金屬質感
-      const osc2 = ctx.createOscillator();
-      const gain2 = ctx.createGain();
-      osc2.type = 'sine';
-      osc2.frequency.setValueAtTime(2349.32, now);
-      gain2.gain.setValueAtTime(0.15, now);
-      gain2.gain.exponentialRampToValueAtTime(0.001, now + 0.55);
-      osc2.connect(gain2);
-      gain2.connect(ctx.destination);
-      osc2.start(now);
-      osc2.stop(now + 0.6);
+      // 雙頻晶亮金屬鐘聲 (恆定音高，清脆共鳴，絕無音調下滑洩氣感)
+      // 主音：High C (C7 2093Hz) + 泛音 (E7 2637Hz / G7 3135Hz)
+      const frequencies = [2093.00, 2637.02, 3135.96, 4186.01];
+      const gains = [0.35, 0.20, 0.12, 0.08];
+      const decays = [1.2, 0.9, 0.7, 0.5];
+
+      frequencies.forEach((freq, idx) => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(freq, now); // 恆定純淨音高
+
+        // 瞬間擊槌啟動 (Attack: 3ms) + 自然金屬共鳴淡出 (Decay)
+        gain.gain.setValueAtTime(0.0001, now);
+        gain.gain.exponentialRampToValueAtTime(gains[idx], now + 0.005);
+        gain.gain.exponentialRampToValueAtTime(0.0001, now + decays[idx]);
+
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+
+        osc.start(now);
+        osc.stop(now + decays[idx] + 0.05);
+      });
     } catch(e) {
       console.warn('播放叮聲音效失敗:', e);
     }
@@ -137,19 +138,21 @@ const ExamSoundFX = {
       const ctx = this.getCtx();
       if (!ctx || ctx.state === 'closed') return;
       for (let i = 0; i < count; i++) {
-        const offset = i * 0.3;
+        const offset = i * 0.22;
         const now = ctx.currentTime + offset;
-        const osc = ctx.createOscillator();
-        const gain = ctx.createGain();
-        osc.type = 'triangle';
-        osc.frequency.setValueAtTime(880, now);
-        osc.frequency.setValueAtTime(987.77, now + 0.08);
-        gain.gain.setValueAtTime(0.3, now);
-        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.28);
-        osc.connect(gain);
-        gain.connect(ctx.destination);
-        osc.start(now);
-        osc.stop(now + 0.3);
+        [1760, 2200].forEach((freq, idx) => {
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(freq, now);
+          gain.gain.setValueAtTime(0.0001, now);
+          gain.gain.exponentialRampToValueAtTime(idx === 0 ? 0.3 : 0.15, now + 0.004);
+          gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.35);
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          osc.start(now);
+          osc.stop(now + 0.4);
+        });
       }
     } catch(e) {
       console.warn('播放鈴聲音效失敗:', e);
