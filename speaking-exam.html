@@ -345,13 +345,42 @@ function releaseMicStream(){
     mediaStream = null;
   }
 }
+
+let currentPreviewAudio = null;
+let isPreviewPlaying = false;
+
+function stopPreviewAudio(){
+  if (currentPreviewAudio){
+    try { currentPreviewAudio.pause(); currentPreviewAudio.currentTime = 0; } catch(e){}
+    currentPreviewAudio = null;
+  }
+  isPreviewPlaying = false;
+}
+
+let currentQuestionAudio = null;
+let isAudioPlaying = false;
+
+function stopQuestionAudio(){
+  if (currentQuestionAudio){
+    try {
+      currentQuestionAudio.pause();
+      currentQuestionAudio.currentTime = 0;
+    } catch(e){}
+    currentQuestionAudio = null;
+  }
+  isAudioPlaying = false;
+}
+
 function resetRecording(){
+  clearPrepTimer();
+  clearRecordLimitTimer();
+  stopQuestionAudio();
+  stopPreviewAudio();
+
   if (mediaRecorder && mediaRecorder.state === 'recording'){
     try{ mediaRecorder.stop(); }catch(e){}
   }
   if (recordTimerHandle){ clearInterval(recordTimerHandle); recordTimerHandle = null; }
-  clearPrepTimer();
-  clearRecordLimitTimer();
   if (recordedBlobUrl){ try{ URL.revokeObjectURL(recordedBlobUrl); }catch(e){} recordedBlobUrl = null; }
   recordedChunks = [];
   recordedWavBlob = null;
@@ -376,6 +405,11 @@ function toggleExamMode(checked){
 }
 
 function beginRecordingWithStream(stream){
+  // 1. 強制清除前置審題計時器與音檔播放，防止背景計時器衝突導致頁面重整
+  clearPrepTimer();
+  stopQuestionAudio();
+  stopPreviewAudio();
+
   recordedChunks = [];
   try{
     let options = {};
@@ -396,7 +430,8 @@ function beginRecordingWithStream(stream){
     if (recordTimerHandle){ clearInterval(recordTimerHandle); recordTimerHandle = null; }
     clearRecordLimitTimer();
     if (recordedChunks.length > 0) {
-      const rawBlob = new Blob(recordedChunks, { type: mediaRecorder?.mimeType || 'audio/webm' });
+      const mime = mediaRecorder?.mimeType || 'audio/webm';
+      const rawBlob = new Blob(recordedChunks, { type: mime });
       if (recordedBlobUrl){ try{ URL.revokeObjectURL(recordedBlobUrl); }catch(e){} }
       recordedBlobUrl = URL.createObjectURL(rawBlob);
       recordedWavBlob = rawBlob;
@@ -417,11 +452,12 @@ function beginRecordingWithStream(stream){
       updateTimerText();
     }, 1000);
 
-    // 若設定了作答時間上限，啟動作答倒數
+    // 作答時間上限計時（若為考試模式或題目有秒數限制）
     const q = examQuestions[state.pos];
-    if (state.isExamMode && q && q.recordLimitSeconds > 0){
-      state.recordLimitTotalSeconds = q.recordLimitSeconds;
-      state.recordLimitSecondsLeft = q.recordLimitSeconds;
+    const limit = (q && q.recordLimitSeconds > 0) ? q.recordLimitSeconds : (state.isExamMode ? 20 : 0);
+    if (limit > 0){
+      state.recordLimitTotalSeconds = limit;
+      state.recordLimitSecondsLeft = limit;
       clearRecordLimitTimer();
       recordLimitTimerHandle = setInterval(() => {
         state.recordLimitSecondsLeft -= 1;
@@ -444,6 +480,14 @@ function beginRecordingWithStream(stream){
 }
 
 function startRecording(){
+  if (state.isTransitioning) return;
+  // 提前按錄音時，立即中斷審題倒數與題目播放
+  clearPrepTimer();
+  stopQuestionAudio();
+  stopPreviewAudio();
+
+  if (mediaRecorder && mediaRecorder.state === 'recording') return;
+
   if (!mediaSupported()){ recordingStatus = 'unsupported'; render(); return; }
   if (micStreamIsLive()){ beginRecordingWithStream(mediaStream); return; }
   navigator.mediaDevices.getUserMedia({ audio: true }).then(stream => {
@@ -472,30 +516,50 @@ function stopRecording(){
 }
 
 function playMyRecording(){
-  if (!recordedBlobUrl) return;
+  if (!recordedBlobUrl) {
+    console.warn('目前無可試聽的錄音檔');
+    return;
+  }
+  stopPreviewAudio();
+  stopQuestionAudio();
   try {
     const a = new Audio(recordedBlobUrl);
-    a.play().catch(e => console.warn('試聽作答播放失敗:', e));
-  } catch(e){}
-}
-let currentQuestionAudio = null;
-let isAudioPlaying = false;
+    currentPreviewAudio = a;
+    isPreviewPlaying = true;
+    render();
 
-function stopQuestionAudio(){
-  if (currentQuestionAudio){
-    try {
-      currentQuestionAudio.pause();
-      currentQuestionAudio.currentTime = 0;
-    } catch(e){}
-    currentQuestionAudio = null;
+    a.addEventListener('ended', () => {
+      isPreviewPlaying = false;
+      currentPreviewAudio = null;
+      render();
+    });
+    a.addEventListener('pause', () => {
+      isPreviewPlaying = false;
+      render();
+    });
+    a.addEventListener('error', (err) => {
+      console.warn('試聽作答播放錯誤:', err);
+      isPreviewPlaying = false;
+      currentPreviewAudio = null;
+      render();
+    });
+    a.play().catch(e => {
+      console.warn('試聽作答播放失敗:', e);
+      isPreviewPlaying = false;
+      render();
+    });
+  } catch(e){
+    console.warn('試聽作答建立失敗:', e);
+    isPreviewPlaying = false;
+    render();
   }
-  isAudioPlaying = false;
 }
 
 // 播放題目語音
 function playQuestionAudio(dataUri){
   if (!dataUri) return;
   stopQuestionAudio();
+  stopPreviewAudio();
   try{
     const audio = new Audio(dataUri);
     currentQuestionAudio = audio;
@@ -1213,8 +1277,8 @@ function renderQuestion(){
     controls = `
     <div class="flex flex-col items-center gap-3 fade-in py-2">
       <div class="flex items-center gap-3">
-        <button type="button" onclick="playMyRecording()" class="play-btn rounded-full px-5 py-2.5 font-bold text-[13.5px] flex items-center gap-2 shadow-sm">
-          <span>▶</span> 試聽我的作答
+        <button type="button" onclick="playMyRecording()" class="play-btn rounded-full px-5 py-2.5 font-bold text-[13.5px] flex items-center gap-2 shadow-sm cursor-pointer hover:scale-105 active:scale-95 transition-transform">
+          <span>${isPreviewPlaying ? '⏸️ 正在播放作答…' : '▶ 試聽我的作答'}</span>
         </button>
         <button type="button" onclick="startRecording()" class="btn-ghost rounded-full px-4 py-2 font-medium text-[13px] border-stone-300 text-stone-600 hover:bg-stone-100">
           <span>↺</span> 重新錄音
