@@ -48,14 +48,22 @@ function unwrapTaskPayload(payload) {
 
 function findFirstText(value) {
   if (value == null) return "";
-  if (typeof value === "string") return value.trim();
-  if (Array.isArray(value)) return value.map(findFirstText).join("").trim();
-  if (typeof value === "object") {
-    for (const key of ["text", "transcript", "sentence", "content", "subtitle", "result"]) {
-      const found = findFirstText(value[key]);
-      if (found) return found;
+  if (typeof value === "string") {
+    const s = value.trim();
+    if (s.includes("ECS0101") || s.includes("音檔長度過短") || s.includes("dialect=") || s.includes("recognizer=") || s.includes("speaking-scenarios") || s.includes("userrecording.wav")) {
+      return "";
     }
-    return Object.values(value).map(findFirstText).join("").trim();
+    return s;
+  }
+  if (Array.isArray(value)) return value.map(findFirstText).filter(Boolean).join("").trim();
+  if (typeof value === "object") {
+    for (const key of ["text", "transcript", "sentence", "content", "subtitle"]) {
+      if (value[key]) {
+        const found = findFirstText(value[key]);
+        if (found) return found;
+      }
+    }
+    return "";
   }
   return "";
 }
