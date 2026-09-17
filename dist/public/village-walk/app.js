@@ -1,7 +1,29 @@
 (()=>{
  const img=document.getElementById('screen'), hs=document.getElementById('hotspots'), game=document.getElementById('game');
  const A={birds:new Audio('audio/birds.mp3'),walk:new Audio('audio/walk.mp3'),click:new Audio('audio/click.mp3'),next:new Audio('audio/next.mp3'),record:new Audio('audio/record.mp3'),success:new Audio('audio/success.mp3'),finish:new Audio('audio/finish.mp3')};
- A.birds.loop=true; A.birds.volume=.16; A.walk.volume=.35;
+ 
+ let bgmVolume = 0.5;
+ let sfxVolume = 0.5;
+ A.birds.loop=true; A.birds.volume=bgmVolume * 0.32; A.walk.volume=sfxVolume;
+
+ const bgmSlider = document.getElementById('bgmVol');
+ const bgmVal = document.getElementById('bgmVal');
+ const sfxSlider = document.getElementById('sfxVol');
+ const sfxVal = document.getElementById('sfxVal');
+
+ if (bgmSlider) {
+   bgmSlider.oninput = (e) => {
+     bgmVolume = Number(e.target.value) / 100;
+     A.birds.volume = bgmVolume * 0.32;
+     if (bgmVal) bgmVal.textContent = `${e.target.value}%`;
+   };
+ }
+ if (sfxSlider) {
+   sfxSlider.oninput = (e) => {
+     sfxVolume = Number(e.target.value) / 100;
+     if (sfxVal) sfxVal.textContent = `${e.target.value}%`;
+   };
+ }
  const hints={2:'看看巷子通往哪裡，再觀察沿途有哪些客莊景物。',4:'觀察道路的轉彎位置，以及建築所在的位置。',6:'仔細看看屋頂的形狀、外觀與建築特色。',8:'仔細看看牆面、屋頂與門窗使用了哪些材料。',10:'觀察人物的動作，以及桌面和周圍環境。',12:'仔細觀察這些手工用品的外形、材料與用途。',14:'觀察居民正在做什麼，再想想你最想了解哪一件事。',16:'看看周圍有哪些傳統物件，再觀察它們與生活環境的關係。',18:'回想前面走過的地方，以及你看到的人、建築、物件和生活情境。',20:'回想整趟走讀經驗，再整理自己最想分享的內容。'};
  // 每一頁都使用自己的按鍵座標；不共用固定熱區，避免點到圖片上不存在的區域。
  const controls={
@@ -29,8 +51,8 @@
  22:{replay:[32.6,79.8,16.2,7.8],done:[50.2,79.8,16.8,7.8]}
  };
  let page=1, recording=false, busy=false, recorder=null, stream=null, hintOpen=false;
- const play=(a)=>{try{a.currentTime=0;a.play().catch(()=>{})}catch(e){}};
- const birds=()=>{if(!recording&&(page===1||[2,4,6,8,10,12,14,16,18,20].includes(page))){A.birds.play().catch(()=>{})}else A.birds.pause()};
+ const play=(a)=>{try{if(a){a.volume=sfxVolume;a.currentTime=0;a.play().catch(()=>{})}}catch(e){}};
+ const birds=()=>{if(!recording&&(page===1||[2,4,6,8,10,12,14,16,18,20].includes(page))){A.birds.volume=bgmVolume*0.32;A.birds.play().catch(()=>{})}else A.birds.pause()};
  const stopBirds=()=>{A.birds.pause();A.birds.currentTime=0};
  function closeHint(){hintOpen=false;const c=document.getElementById('hintCard');if(c)c.remove()}
  function go(n){recording=false;busy=false;cleanupMic();closeHint();page=Math.max(1,Math.min(22,n));img.src=`images/${String(page).padStart(2,'0')}.jpg`;render();setTimeout(birds,100)}

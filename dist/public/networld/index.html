@@ -1,4 +1,16 @@
 <!doctype html><html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>網路世界｜口說辨識挑戰</title><link rel="stylesheet" href="style.css"></head><body>
 <a class="back-link" href="../classroom.html">← 返回單元選單</a>
+<div class="audio-panel">
+  <div class="vol-control">
+    <span class="vol-label">🎵 背景音樂</span>
+    <input type="range" id="bgmVol" min="0" max="100" value="50" class="vol-slider" title="調整背景音樂音量">
+    <span id="bgmVal" class="vol-text">50%</span>
+  </div>
+  <div class="vol-control">
+    <span class="vol-label">🔊 遊戲音效</span>
+    <input type="range" id="sfxVol" min="0" max="100" value="50" class="vol-slider" title="調整遊戲音效音量">
+    <span id="sfxVal" class="vol-text">50%</span>
+  </div>
+</div>
 <main id="app"><div class="stage"><img id="screen" alt="網路世界遊戲畫面"><div id="hotspots"></div></div><div class="bar"><button id="back">上一頁</button><button id="sound">♫ 音樂：開</button><span id="status">1 / 18</span><button id="next">下一頁</button></div><p class="hint">Demo：依畫面按鈕操作；答題前可錄音，錄音停止後進入答題完成頁。</p></main>
 <audio id="bgm" src="assets/audio/bgm.mp3" loop></audio><script src="app.js"></script></body></html>

@@ -1,1 +1,14 @@
-<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>客莊走讀・口說挑戰</title><link rel="stylesheet" href="style.css"></head><body><a class="back-link" href="../classroom.html">← 返回單元選單</a><main id="game"><img id="screen" src="images/01.jpg" alt="客莊走讀・口說挑戰遊戲介面" draggable="false"><div id="hotspots"></div></main><script src="app.js"></script></body></html>
+<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>客莊走讀・口說挑戰</title><link rel="stylesheet" href="style.css"></head><body><a class="back-link" href="../classroom.html">← 返回單元選單</a>
+<div class="audio-panel">
+  <div class="vol-control">
+    <span class="vol-label">🕊️ 鳥鳴背景</span>
+    <input type="range" id="bgmVol" min="0" max="100" value="50" class="vol-slider" title="調整背景鳥鳴音量">
+    <span id="bgmVal" class="vol-text">50%</span>
+  </div>
+  <div class="vol-control">
+    <span class="vol-label">🔊 操作音效</span>
+    <input type="range" id="sfxVol" min="0" max="100" value="50" class="vol-slider" title="調整操作音效音量">
+    <span id="sfxVal" class="vol-text">50%</span>
+  </div>
+</div>
+<main id="game"><img id="screen" src="images/01.jpg" alt="客莊走讀・口說挑戰遊戲介面" draggable="false"><div id="hotspots"></div></main><script src="app.js"></script></body></html>
