@@ -22,3 +22,19 @@
 .ai-play-btn{align-self:flex-start;background:#33517A;color:#fff;border:0;border-radius:999px;padding:4px 12px;font-size:12px;font-weight:700;cursor:pointer;margin-top:2px;transition:0.2s}
 .ai-play-btn:hover{background:#1f3a5f}
 @media(max-width:850px){.ai-eval-card{width:48%;bottom:12%;font-size:11.5px}}
+
+.eval-spinner{display:inline-block;animation:spin 1.5s linear infinite}
+@keyframes spin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}
+
+/* 全題目成績單彈窗 */
+.report-modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,0.65);backdrop-filter:blur(6px);z-index:2000;display:flex;align-items:center;justify-content:center;padding:20px;animation:slideUp 0.25s ease-out}
+.report-modal{width:min(760px,95vw);max-height:86vh;background:#fff;border-radius:20px;box-shadow:0 20px 50px rgba(0,0,0,0.35);display:flex;flex-direction:column;overflow:hidden}
+.report-header{padding:16px 20px;background:#1F3A5F;color:#fff;display:flex;justify-content:space-between;align-items:center}
+.report-title{font-size:18px;font-weight:900;letter-spacing:0.04em}
+.report-close{background:rgba(255,255,255,0.2);border:0;color:#fff;font-size:20px;width:32px;height:32px;border-radius:50%;cursor:pointer}
+.report-body{padding:18px 20px;overflow-y:auto;display:flex;flex-direction:column;gap:14px;background:#f8fafc}
+.report-item{border:1.5px solid #e2e8f0;border-radius:14px;padding:14px;background:#fff;box-shadow:0 2px 6px rgba(0,0,0,0.04)}
+.report-item-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;border-bottom:1px solid #f1f5f9;padding-bottom:6px}
+.report-item-title{font-weight:800;color:#1e293b;font-size:14.5px}
+.report-item-score{font-weight:900;color:#1b7340;background:#dcfce7;padding:3px 10px;border-radius:999px;font-size:13px}
+.report-summary-bar{background:#e0f2fe;color:#0369a1;padding:10px 16px;border-radius:12px;font-weight:800;font-size:15px;display:flex;justify-content:space-between;align-items:center;margin-bottom:4px}

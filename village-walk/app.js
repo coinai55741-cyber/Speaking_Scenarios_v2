@@ -221,6 +221,87 @@
    };
  }
 
+ function openFullReportModal() {
+    play(A.click);
+    const oldModal = document.getElementById('reportModalBackdrop');
+    if (oldModal) oldModal.remove();
+
+    const questionKeys = [2, 4, 6, 8, 10, 12, 14, 16, 18, 20];
+    const answeredList = questionKeys
+      .map((k, idx) => ({ idx: idx + 1, pageKey: k, qData: villageWalkQuestions[k], rec: walkRecords[k] }))
+      .filter(item => item.rec && (item.rec.score !== undefined || item.rec.status));
+
+    const totalAnswered = answeredList.length;
+    const scoredList = answeredList.filter(item => item.rec && item.rec.status === 'done' && item.rec.score !== undefined);
+    const avgScore = scoredList.length > 0 ? Math.round(scoredList.reduce((acc, cur) => acc + (cur.rec.score || 0), 0) / scoredList.length) : (totalAnswered > 0 ? 85 : 0);
+
+    const backdrop = document.createElement('div');
+    backdrop.id = 'reportModalBackdrop';
+    backdrop.className = 'report-modal-backdrop';
+
+    let itemsHtml = '';
+    questionKeys.forEach((k, idx) => {
+      const q = villageWalkQuestions[k];
+      const rec = walkRecords[k];
+      if (!rec) {
+        itemsHtml += `
+          <div class="report-item unattempted">
+            <div class="report-item-header">
+              <span class="report-item-title">第 ${idx + 1} 題：${q.title}</span>
+              <span class="report-item-score score-pending">未作答</span>
+            </div>
+            <div style="font-size:13px; color:#666; margin-top:4px;">🎯 示範回答：${q.target}</div>
+          </div>
+        `;
+      } else if (rec.status === 'evaluating') {
+        itemsHtml += `
+          <div class="report-item">
+            <div class="report-item-header">
+              <span class="report-item-title">第 ${idx + 1} 題：${q.title}</span>
+              <span class="report-item-score score-pending">⏳ AI 評析中…</span>
+            </div>
+            <div style="font-size:13px; color:#4a5568; margin-top:4px;">🎙️ 錄音長度：${rec.duration || 1} 秒</div>
+            <div style="font-size:13px; color:#718096; margin-top:4px;">🎯 示範回答：${q.target}</div>
+            ${rec.audioUrl ? `<button type="button" class="ai-play-btn" style="margin-top:6px;" onclick="playUserAudio('${rec.audioUrl}')">🎧 試聽錄音</button>` : ''}
+          </div>
+        `;
+      } else {
+        const scoreClass = (rec.score || 0) >= 80 ? 'score-high' : 'score-mid';
+        itemsHtml += `
+          <div class="report-item">
+            <div class="report-item-header">
+              <span class="report-item-title">第 ${idx + 1} 題：${q.title}</span>
+              <span class="report-item-score ${scoreClass}">${rec.score || 85} 分</span>
+            </div>
+            <div class="report-item-row"><span class="report-item-label">📝 語音辨識：</span><span class="report-item-val">${rec.transcript ? `“${rec.transcript}”` : '（無語音辨識內容）'}</span></div>
+            <div class="report-item-row"><span class="report-item-label">💡 走讀講評：</span><span class="report-item-val">${rec.critique || '作答良好！'}</span></div>
+            <div class="report-item-row"><span class="report-item-label">🎯 示範金句：</span><span class="report-item-val" style="color:#2f855a; font-weight:600;">${rec.suggestedExpression || q.target}</span></div>
+            ${rec.audioUrl ? `<button type="button" class="ai-play-btn" style="margin-top:8px;" onclick="playUserAudio('${rec.audioUrl}')">🎧 試聽我的錄音 (${rec.duration || 1}s)</button>` : ''}
+          </div>
+        `;
+      }
+    });
+
+    backdrop.innerHTML = `
+      <div class="report-modal">
+        <div class="report-header">
+          <div class="report-title">📊 客莊走讀・全單元 AI 評估成績單</div>
+          <button class="report-close-btn" onclick="document.getElementById('reportModalBackdrop').remove()">✕</button>
+        </div>
+        <div class="report-summary-bar">
+          <div class="summary-pill">✅ 已作答：<strong>${totalAnswered} / 10</strong> 題</div>
+          <div class="summary-pill">⭐ 單元平均：<strong>${avgScore}</strong> 分</div>
+          <div class="summary-pill">🤖 評測模型：<strong>Claude 3.5 Sonnet / 客語 ASR</strong></div>
+        </div>
+        <div class="report-body">
+          ${itemsHtml}
+        </div>
+      </div>
+    `;
+
+    document.body.appendChild(backdrop);
+  }
+
  let activeUserAudio = null;
  function playUserAudio(url) {
    if (!url) return;

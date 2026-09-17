@@ -215,6 +215,81 @@ function playUserAudio(url) {
   a.play().catch(e => console.warn('播放錄音失敗:', e));
 }
 
+function openFullReportModal() {
+  const existing = document.querySelector('.report-modal-backdrop');
+  if (existing) existing.remove();
+
+  const backdrop = document.createElement('div');
+  backdrop.className = 'report-modal-backdrop';
+
+  let totalScore = 0;
+  let count = 0;
+  let itemsHtml = '';
+
+  for (const p of [2, 4, 6, 8, 10, 12, 14, 16]) {
+    const q = networldQuestions[p];
+    const rec = examRecords[p];
+    if (rec && rec.status === 'done') {
+      totalScore += rec.score || 0;
+      count++;
+      itemsHtml += `
+        <div class="report-item">
+          <div class="report-item-header">
+            <span class="report-item-title">${q.title}</span>
+            <span class="report-item-score">${rec.score} 分</span>
+          </div>
+          <div class="ai-row" style="margin-bottom:4px;">
+            <span class="ai-label">📝 學生轉譯：</span>
+            <span class="ai-text">${rec.transcript ? `「${rec.transcript}」` : '（錄音已接收）'}</span>
+          </div>
+          <div class="ai-row" style="margin-bottom:4px;">
+            <span class="ai-label">💡 考官講評：</span>
+            <span class="ai-critique">${rec.critique}</span>
+          </div>
+          <div class="ai-row">
+            <span class="ai-label">💬 標準示範：</span>
+            <span class="ai-target">${rec.suggestedExpression || q.target}</span>
+          </div>
+          ${rec.audioUrl ? `<button type="button" class="ai-play-btn" onclick="playUserAudio('${rec.audioUrl}')">🎧 試聽錄音</button>` : ''}
+        </div>
+      `;
+    } else {
+      itemsHtml += `
+        <div class="report-item" style="opacity:0.75;">
+          <div class="report-item-header">
+            <span class="report-item-title">${q.title}</span>
+            <span class="report-item-score" style="background:#f1f5f9;color:#64748b;">未完成/評估中</span>
+          </div>
+          <div class="ai-row">
+            <span class="ai-label">💬 標準示範：</span>
+            <span class="ai-target">${q.target}</span>
+          </div>
+        </div>
+      `;
+    }
+  }
+
+  const avgScore = count > 0 ? Math.round(totalScore / count) : 0;
+
+  backdrop.innerHTML = `
+    <div class="report-modal">
+      <div class="report-header">
+        <span class="report-title">📊 網路世界・AI 考官口說評估成績單</span>
+        <button type="button" class="report-close" onclick="this.closest('.report-modal-backdrop').remove()">✕</button>
+      </div>
+      <div class="report-body">
+        <div class="report-summary-bar">
+          <span>完成題數：${count} / 8 題</span>
+          <span>平均成績：<strong style="font-size:18px; color:#0284c7;">${avgScore} 分</strong></span>
+        </div>
+        ${itemsHtml}
+      </div>
+    </div>
+  `;
+
+  document.body.appendChild(backdrop);
+}
+
 function show(n) {
   page = Math.max(1, Math.min(18, n));
   img.src = `assets/images/screen-${String(page).padStart(2, '0')}.jpg`;
@@ -226,6 +301,15 @@ function show(n) {
   if (oldCard) oldCard.remove();
 
   if (page === 18) {
+    let repBtn = document.createElement('button');
+    repBtn.className = 'restart';
+    repBtn.style.bottom = '11.5%';
+    repBtn.style.background = '#1F3A5F';
+    repBtn.style.fontSize = 'clamp(14px,1.5vw,22px)';
+    repBtn.textContent = '📊 查看全單元 AI 成績單';
+    repBtn.onclick = () => openFullReportModal();
+    hs.appendChild(repBtn);
+
     let b = document.createElement('button');
     b.className = 'restart';
     b.textContent = '重新挑戰';
@@ -234,7 +318,7 @@ function show(n) {
 
     let ret = document.createElement('button');
     ret.className = 'restart';
-    ret.style.bottom = '1.8%';
+    ret.style.bottom = '1.2%';
     ret.style.background = '#2f946f';
     ret.style.fontSize = 'clamp(14px,1.5vw,22px)';
     ret.textContent = '返回選單';
@@ -271,26 +355,39 @@ function show(n) {
     if (qData && rec) {
       const card = document.createElement('div');
       card.className = 'ai-eval-card';
-      const isHigh = (rec.score || 0) >= 80;
-      card.innerHTML = `
-        <div class="ai-eval-header">
-          <div class="ai-badge">🤖 AI 考官即時評析</div>
-          <div class="ai-score-badge ${isHigh ? '' : 'medium'}">${rec.score || 80} 分</div>
-        </div>
-        <div class="ai-row">
-          <span class="ai-label">📝 你的作答轉譯：</span>
-          <span class="ai-text">${rec.transcript ? `「${rec.transcript}」` : '（錄音已完成接收）'}</span>
-        </div>
-        <div class="ai-row">
-          <span class="ai-label">💡 考官講評：</span>
-          <span class="ai-critique">${rec.critique || '作答表現良好！'}</span>
-        </div>
-        <div class="ai-row">
-          <span class="ai-label">💬 客語示範金句：</span>
-          <span class="ai-target">${rec.suggestedExpression || qData.target}</span>
-        </div>
-        ${rec.audioUrl ? `<button type="button" class="ai-play-btn" onclick="playUserAudio('${rec.audioUrl}')">🎧 試聽我的錄音 (${rec.duration}s)</button>` : ''}
-      `;
+      if (rec.status === 'evaluating') {
+        card.innerHTML = `
+          <div class="ai-eval-header">
+            <div class="ai-badge"><span class="eval-spinner">⏳</span> AI 考官即時評析中…</div>
+            <div class="ai-score-badge medium">評估中</div>
+          </div>
+          <div class="ai-row" style="text-align:center; padding:10px 0;">
+            <span style="font-size:13px; color:#1e3a5f; font-weight:600;">客語語音辨識與 AI 考官講評產生中…<br><small style="opacity:0.75;">（約需 2~3 秒，可在此稍候或繼續前往下一題）</small></span>
+          </div>
+          ${rec.audioUrl ? `<button type="button" class="ai-play-btn" onclick="playUserAudio('${rec.audioUrl}')">🎧 試聽我的錄音 (${rec.duration}s)</button>` : ''}
+        `;
+      } else {
+        const isHigh = (rec.score || 0) >= 80;
+        card.innerHTML = `
+          <div class="ai-eval-header">
+            <div class="ai-badge">🤖 AI 考官即時評析</div>
+            <div class="ai-score-badge ${isHigh ? '' : 'medium'}">${rec.score || 80} 分</div>
+          </div>
+          <div class="ai-row">
+            <span class="ai-label">📝 你的作答轉譯：</span>
+            <span class="ai-text">${rec.transcript ? `「${rec.transcript}」` : '（錄音已完成接收）'}</span>
+          </div>
+          <div class="ai-row">
+            <span class="ai-label">💡 考官講評：</span>
+            <span class="ai-critique">${rec.critique || '作答表現良好！'}</span>
+          </div>
+          <div class="ai-row">
+            <span class="ai-label">💬 客語示範金句：</span>
+            <span class="ai-target">${rec.suggestedExpression || qData.target}</span>
+          </div>
+          ${rec.audioUrl ? `<button type="button" class="ai-play-btn" onclick="playUserAudio('${rec.audioUrl}')">🎧 試聽我的錄音 (${rec.duration}s)</button>` : ''}
+        `;
+      }
       document.querySelector('.stage').appendChild(card);
     }
   }
@@ -337,28 +434,40 @@ async function recordToggle() {
 
     play('confirm');
 
-    // 立即切換到答題結果頁，同時背景非同步評審
+    // 先存入 evaluating 狀態，讓結果頁即使立刻翻到也能看到載入中動畫與錄音試聽
+    examRecords[currentQuestionPage] = {
+      status: 'evaluating',
+      audioUrl: audioUrl,
+      duration: finalDuration,
+      score: 0,
+      transcript: '',
+      critique: '',
+      suggestedExpression: ''
+    };
+
+    // 立即切換到答題結果頁
     show(page + 1);
     setTimeout(() => { play('correct'); }, 300);
 
-    // 背景呼叫真實 ASR + AI 評審
+    // 背景非同步呼叫真實 ASR + AI 評審（不論使用者是否翻頁，資料都會完整儲存）
     if (audioBlob && qData) {
-      const transcript = await callSpeechRecognizeApi(audioBlob);
-      const judgeRes = await callJudgeApi(qData, transcript, finalDuration);
+      callSpeechRecognizeApi(audioBlob).then(async (transcript) => {
+        const judgeRes = await callJudgeApi(qData, transcript, finalDuration);
+        examRecords[currentQuestionPage] = {
+          status: 'done',
+          score: judgeRes.score,
+          critique: judgeRes.critique,
+          suggestedExpression: judgeRes.suggestedExpression,
+          transcript: transcript,
+          audioUrl: audioUrl,
+          duration: finalDuration
+        };
 
-      examRecords[currentQuestionPage] = {
-        score: judgeRes.score,
-        critique: judgeRes.critique,
-        suggestedExpression: judgeRes.suggestedExpression,
-        transcript: transcript,
-        audioUrl: audioUrl,
-        duration: finalDuration
-      };
-
-      // 若使用者仍停留在該結果頁，刷新 AI 卡片
-      if (page === currentQuestionPage + 1) {
-        show(page);
-      }
+        // 若使用者仍停留在該結果頁，刷新 AI 卡片
+        if (page === currentQuestionPage + 1) {
+          show(page);
+        }
+      });
     }
   }
 }
