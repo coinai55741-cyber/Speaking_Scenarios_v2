@@ -437,6 +437,122 @@ function show(n) {
       document.querySelector('.stage').appendChild(card);
     }
   }
+  updateDeveloperPanel();
+}
+
+let selectedAsrProvider = 'hakka_api_hak';
+let browserRecognition = null;
+let browserTranscript = '';
+
+// 更新開發者面板資訊
+function updateDeveloperPanel() {
+  const targetQ = (page % 2 === 0) ? page : (page > 1 && page < 18 ? page - 1 : 2);
+  const qData = networldQuestions[targetQ];
+  const rec = examRecords[targetQ];
+
+  const debugTargetText = document.getElementById('debugTargetText');
+  const debugQuestionTitle = document.getElementById('debugQuestionTitle');
+  const debugScoreBox = document.getElementById('debugScoreBox');
+
+  if (debugTargetText && qData) debugTargetText.textContent = qData.target;
+  if (debugQuestionTitle && qData) debugQuestionTitle.textContent = qData.title;
+
+  if (debugScoreBox) {
+    if (!rec) {
+      debugScoreBox.innerHTML = '尚未作答';
+    } else if (rec.status === 'evaluating') {
+      debugScoreBox.innerHTML = '⏳ AI 考官評估中…';
+    } else {
+      debugScoreBox.innerHTML = `<strong>${rec.score || 0} 分</strong>（${rec.transcript ? `轉譯：「${rec.transcript}」` : '無文字'}）`;
+    }
+  }
+}
+
+// 綁定開發者面板事件
+const debugToggle = document.getElementById('debugToggle');
+const developerPanel = document.getElementById('developerPanel');
+const devCloseBtn = document.getElementById('devCloseBtn');
+const asrProviderSelect = document.getElementById('asrProviderSelect');
+const asrProviderNote = document.getElementById('asrProviderNote');
+const answerInput = document.getElementById('answerInput');
+const debugManualEvalBtn = document.getElementById('debugManualEvalBtn');
+const asrStatusText = document.getElementById('asrStatusText');
+
+if (debugToggle && developerPanel) {
+  debugToggle.onchange = () => {
+    developerPanel.hidden = !debugToggle.checked;
+    updateDeveloperPanel();
+  };
+}
+if (devCloseBtn && debugToggle && developerPanel) {
+  devCloseBtn.onclick = () => {
+    debugToggle.checked = false;
+    developerPanel.hidden = true;
+  };
+}
+if (asrProviderSelect) {
+  asrProviderSelect.onchange = (e) => {
+    selectedAsrProvider = e.target.value;
+    if (asrProviderNote) {
+      if (selectedAsrProvider === 'browser_mandarin') {
+        asrProviderNote.textContent = '已切換至「華語(瀏覽器生)」：將使用瀏覽器 Web Speech API 進行即時華語語音辨識。';
+      } else {
+        asrProviderNote.textContent = '已切換至「客委會辨識API」：將調用客家委員會四縣腔 ASR 進行客語語音辨識。';
+      }
+    }
+  };
+}
+
+if (debugManualEvalBtn) {
+  debugManualEvalBtn.onclick = async () => {
+    const text = (answerInput ? answerInput.value : '').trim();
+    if (!text) {
+      alert('請先在輸入框輸入欲測試的作答文字！');
+      return;
+    }
+    const targetQ = (page % 2 === 0) ? page : (page > 1 && page < 18 ? page - 1 : 2);
+    const qData = networldQuestions[targetQ];
+    if (!qData) return;
+
+    if (asrStatusText) asrStatusText.textContent = '⚡ 手動評估中…';
+
+    examRecords[targetQ] = {
+      status: 'evaluating',
+      audioUrl: null,
+      duration: 3,
+      score: 0,
+      transcript: text,
+      relevance: '',
+      vocabulary: '',
+      grammar: '',
+      critique: '',
+      suggestedExpression: ''
+    };
+
+    if (page === targetQ) {
+      show(targetQ + 1);
+    } else {
+      show(page);
+    }
+
+    const judgeRes = await callJudgeApi(qData, text, 3);
+    examRecords[targetQ] = {
+      status: 'done',
+      score: judgeRes.score,
+      relevance: judgeRes.relevance,
+      vocabulary: judgeRes.vocabulary,
+      grammar: judgeRes.grammar,
+      critique: judgeRes.critique,
+      suggestedExpression: judgeRes.suggestedExpression,
+      transcript: text,
+      audioUrl: null,
+      duration: 3
+    };
+
+    if (asrStatusText) asrStatusText.textContent = '✅ 評分完成';
+    show(page);
+    updateDeveloperPanel();
+  };
 }
 
 async function recordToggle() {
@@ -456,13 +572,49 @@ async function recordToggle() {
       if (recordTimerHandle) clearInterval(recordTimerHandle);
       recordTimerHandle = setInterval(() => { recordDuration += 1; }, 1000);
       document.querySelector('.hint').textContent = '🎙️ 錄音中…再次點擊右下角麥克風按鈕即可停止並送出 AI 評分！';
+
+      if (asrStatusText) asrStatusText.textContent = '🎙️ 錄音中…';
+
+      // 若選擇華語(瀏覽器生)，啟動 Web Speech API
+      if (selectedAsrProvider === 'browser_mandarin') {
+        const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+        if (SR) {
+          try {
+            browserRecognition = new SR();
+            browserRecognition.lang = 'zh-TW';
+            browserRecognition.continuous = true;
+            browserRecognition.interimResults = true;
+            browserTranscript = '';
+            browserRecognition.onresult = (e) => {
+              let str = '';
+              for (let i = 0; i < e.results.length; ++i) {
+                str += e.results[i][0].transcript;
+              }
+              browserTranscript = str;
+              if (asrStatusText) asrStatusText.textContent = `即時辨識：${str}`;
+              if (answerInput) answerInput.value = str;
+            };
+            browserRecognition.onerror = (e) => {
+              console.warn('Web Speech 辨識提醒:', e);
+            };
+            browserRecognition.start();
+          } catch(err) {
+            console.warn('無法啟動 Web Speech:', err);
+          }
+        }
+      }
     } catch (e) {
       alert('請允許瀏覽器使用麥克風後再試一次。');
     }
   } else {
     recording = false;
     if (recordTimerHandle) { clearInterval(recordTimerHandle); recordTimerHandle = null; }
-    document.querySelector('.hint').textContent = '⚡ 正在進行客語語音辨識與 AI 考官評分…';
+    document.querySelector('.hint').textContent = '⚡ 正在進行語音辨識與 AI 考官評分…';
+
+    if (browserRecognition) {
+      try { browserRecognition.stop(); } catch(e){}
+      browserRecognition = null;
+    }
 
     const stoppedPromise = new Promise((resolve) => {
       recorder.onstop = () => {
@@ -498,29 +650,37 @@ async function recordToggle() {
     show(page + 1);
     setTimeout(() => { play('correct'); }, 300);
 
-    // 背景非同步呼叫真實 ASR + AI 評審（不論使用者是否翻頁，資料都會完整儲存）
-    if (audioBlob && qData) {
-      callSpeechRecognizeApi(audioBlob).then(async (transcript) => {
-        const judgeRes = await callJudgeApi(qData, transcript, finalDuration);
-        examRecords[currentQuestionPage] = {
-          status: 'done',
-          score: judgeRes.score,
-          relevance: judgeRes.relevance,
-          vocabulary: judgeRes.vocabulary,
-          grammar: judgeRes.grammar,
-          critique: judgeRes.critique,
-          suggestedExpression: judgeRes.suggestedExpression,
-          transcript: transcript,
-          audioUrl: audioUrl,
-          duration: finalDuration
-        };
+    // 背景非同步辨識與評審
+    (async () => {
+      let transcript = '';
+      if (selectedAsrProvider === 'browser_mandarin') {
+        transcript = browserTranscript || '';
+      } else if (audioBlob) {
+        transcript = await callSpeechRecognizeApi(audioBlob);
+      }
 
-        // 若使用者仍停留在該結果頁或已在結算頁，即時刷新畫面
-        if (page === currentQuestionPage + 1 || page === 18) {
-          show(page);
-        }
-      });
-    }
+      if (asrStatusText) asrStatusText.textContent = `✅ 辨識完成：${transcript || '（無文字）'}`;
+      if (answerInput) answerInput.value = transcript;
+
+      const judgeRes = await callJudgeApi(qData, transcript, finalDuration);
+      examRecords[currentQuestionPage] = {
+        status: 'done',
+        score: judgeRes.score,
+        relevance: judgeRes.relevance,
+        vocabulary: judgeRes.vocabulary,
+        grammar: judgeRes.grammar,
+        critique: judgeRes.critique,
+        suggestedExpression: judgeRes.suggestedExpression,
+        transcript: transcript,
+        audioUrl: audioUrl,
+        duration: finalDuration
+      };
+
+      if (page === currentQuestionPage + 1 || page === 18) {
+        show(page);
+      }
+      updateDeveloperPanel();
+    })();
   }
 }
 
@@ -546,3 +706,4 @@ document.addEventListener('pointerdown', () => {
 }, { once: true });
 
 show(1);
+

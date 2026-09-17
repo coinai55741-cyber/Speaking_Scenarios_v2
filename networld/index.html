@@ -1,5 +1,11 @@
 <!doctype html><html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>網路世界｜口說辨識挑戰</title><link rel="stylesheet" href="style.css"></head><body>
-<a class="back-link" href="../classroom.html">← 返回單元選單</a>
+<div class="top-nav">
+  <a class="back-link" href="../classroom.html">← 返回單元選單</a>
+  <label class="mode-toggle" title="開啟內部檢視與辨識 API 切換">
+    <input id="debugToggle" type="checkbox">
+    <span>開發者模式</span>
+  </label>
+</div>
 <div class="audio-panel">
   <div class="vol-control">
     <span class="vol-label">🎵 背景音樂</span>
@@ -13,4 +19,45 @@
   </div>
 </div>
 <main id="app"><div class="stage"><img id="screen" alt="網路世界遊戲畫面"><div id="hotspots"></div></div><div class="bar"><button id="back">上一頁</button><button id="sound">♫ 音樂：開</button><span id="status">1 / 18</span><button id="next">下一頁</button></div><p class="hint">Demo：依畫面按鈕操作；答題前可錄音，錄音停止後進入答題完成頁。</p></main>
+
+<!-- 內部檢視 / 開發者面板 -->
+<aside id="developerPanel" class="developer-panel" hidden>
+  <div class="developer-panel-header">
+    <h2>🛠️ 開發者模式</h2>
+    <button type="button" class="dev-close-btn" id="devCloseBtn">✕</button>
+  </div>
+
+  <div class="developer-item target-sentence">
+    <span class="sentence-label">目前題目目標</span>
+    <strong id="debugTargetText">小晴當在用電腦看網路新聞。</strong>
+    <small id="debugQuestionTitle">第 1 題：看圖說一說</small>
+  </div>
+
+  <div class="developer-item">
+    <label class="developer-label" for="asrProviderSelect">🎙️ 辨識 API 下拉選單</label>
+    <select id="asrProviderSelect" class="developer-select">
+      <option value="hakka_api_hak" selected>1. 客委會辨識API</option>
+      <option value="browser_mandarin">2. 華語(瀏覽器生)</option>
+    </select>
+    <p id="asrProviderNote" class="developer-note">預設使用客委會客語 ASR。切換至「華語(瀏覽器生)」時，將調用 Web Speech API 進行即時華語語音辨識。</p>
+  </div>
+
+  <div class="developer-item">
+    <span class="developer-label">即時辨識狀態</span>
+    <strong id="asrStatusText">待命（尚未錄音）</strong>
+  </div>
+
+  <div class="answer-box">
+    <label for="answerInput">📝 辨識文字 / 模擬手動輸入</label>
+    <textarea id="answerInput" rows="3" placeholder="錄音辨識後會顯示在此處，亦可手動輸入文字點測試"></textarea>
+    <button id="debugManualEvalBtn" class="developer-btn" type="button">⚡ 模擬送出 AI 評估</button>
+  </div>
+
+  <div class="developer-item">
+    <span class="developer-label">當前題目評分狀態</span>
+    <div id="debugScoreBox" class="debug-score-box">尚未作答</div>
+  </div>
+</aside>
+
 <audio id="bgm" src="assets/audio/bgm.mp3" loop></audio><script src="app.js"></script></body></html>
+

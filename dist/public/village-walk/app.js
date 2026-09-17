@@ -376,135 +376,321 @@
    game.appendChild(board);
  }
 
- const play=(a)=>{try{if(a){a.volume=sfxVolume;a.currentTime=0;a.play().catch(()=>{})}}catch(e){}};
- const birds=()=>{if(!recording&&(page===1||[2,4,6,8,10,12,14,16,18,20].includes(page))){A.birds.volume=bgmVolume*0.32;A.birds.play().catch(()=>{})}else A.birds.pause()};
- const stopBirds=()=>{A.birds.pause();A.birds.currentTime=0};
- function closeHint(){hintOpen=false;const c=document.getElementById('hintCard');if(c)c.remove()}
- function go(n){recording=false;busy=false;cleanupMic();closeHint();page=Math.max(1,Math.min(22,n));img.src=`images/${String(page).padStart(2,'0')}.jpg`;render();setTimeout(birds,100)}
- function hit(box,fn,label){if(!box)return;const [x,y,w,h]=box;const b=document.createElement('button');b.className='hit';b.style.cssText=`left:${x}%;top:${y}%;width:${w}%;height:${h}%`;b.setAttribute('aria-label',label);b.onclick=fn;hs.appendChild(b)}
- function toggleHint(){play(A.click);if(hintOpen){closeHint();return}const text=hints[page];if(!text)return;hintOpen=true;const c=document.createElement('div');c.id='hintCard';c.className='hint-card';c.setAttribute('role','status');c.innerHTML=`<div class="hint-title">💡 觀察提示</div><div class="hint-text">${text}</div>`;game.appendChild(c)}
- function transition(n){closeHint();play(A.next);setTimeout(()=>{play(A.walk);go(n)},250)}
- function cleanupMic(){if(stream){stream.getTracks().forEach(t=>t.stop());stream=null}if(recordTimerHandle){clearInterval(recordTimerHandle);recordTimerHandle=null}recorder=null}
- 
- async function startRecording(){
-   if(busy||recording)return;
-   closeHint();
-   stopBirds();
-   play(A.record);
-   try{
-     stream=await navigator.mediaDevices.getUserMedia({audio:true});
-     recorder=new MediaRecorder(stream);
-     chunks=[];
-     recordDuration=0;
-     recorder.ondataavailable=e=>{if(e.data&&e.data.size>0)chunks.push(e.data);};
-     recorder.start(250);
-     recording=true;
-     if(recordTimerHandle) clearInterval(recordTimerHandle);
-     recordTimerHandle=setInterval(()=>{recordDuration+=1;},1000);
-   }catch(e){
-     recording=true;
-   }
- }
+  let selectedAsrProvider = 'hakka_api_hak';
+  let browserRecognition = null;
+  let browserTranscript = '';
 
- async function stopAndRecognize(){
-   if(busy||!recording)return;
-   busy=true;
-   recording=false;
-   const currentQuestionPage = page;
-   const qData = villageWalkQuestions[currentQuestionPage];
+  function updateDeveloperPanel() {
+    const targetQ = (page % 2 === 0) ? page : (page > 1 && page < 22 ? page - 1 : 2);
+    const qData = villageWalkQuestions[targetQ];
+    const rec = walkRecords[targetQ];
 
-   const stoppedPromise = new Promise((resolve) => {
-     if (recorder && recorder.state !== 'inactive') {
-       recorder.onstop = () => {
-         const blob = chunks.length > 0 ? new Blob(chunks, { type: recorder.mimeType || 'audio/webm' }) : null;
-         resolve(blob);
-       };
-       try { recorder.requestData(); recorder.stop(); } catch(e){ resolve(null); }
-     } else {
-       resolve(null);
-     }
-   });
+    const debugTargetText = document.getElementById('debugTargetText');
+    const debugQuestionTitle = document.getElementById('debugQuestionTitle');
+    const debugScoreBox = document.getElementById('debugScoreBox');
 
-   const audioBlob = await stoppedPromise;
-   const audioUrl = audioBlob ? URL.createObjectURL(audioBlob) : null;
-   const finalDuration = Math.max(1, recordDuration);
-   cleanupMic();
+    if (debugTargetText && qData) debugTargetText.textContent = qData.target;
+    if (debugQuestionTitle && qData) debugQuestionTitle.textContent = qData.title;
 
-   setTimeout(()=>{
-     play(A.success);
-     go(page+1);
-   },350);
-
-   // 背景呼叫真實 ASR + AI 評審
-   if (audioBlob && qData) {
-     const transcript = await callSpeechRecognizeApi(audioBlob);
-     const judgeRes = await callJudgeApi(qData, transcript, finalDuration);
-
-     walkRecords[currentQuestionPage] = {
-       score: judgeRes.score,
-       critique: judgeRes.critique,
-       suggestedExpression: judgeRes.suggestedExpression,
-       transcript: transcript,
-       audioUrl: audioUrl,
-       duration: finalDuration
-     };
-
-     if (page === currentQuestionPage + 1) {
-       render();
-     }
-   }
- }
-
- function recordToggle(){if(recording)stopAndRecognize();else startRecording()}
-
- function render(){
-  hs.innerHTML='';
-  closeHint();
-  const oldCard = document.querySelector('.ai-eval-card');
-  if (oldCard) oldCard.remove();
-
-  const c=controls[page]||{};
-  if(page===1){hit(c.start,()=>{play(A.click);transition(2)},'開始挑戰');return}
-  if(page>=2&&page<=20&&page%2===0){hit(c.hint,toggleHint,'觀察提示');hit(c.record,recordToggle,'開始錄音／停止錄音並送出辨識');return}
-  if(page>=3&&page<=21&&page%2===1){
-    hit(c.retry,()=>{play(A.click);go(page-1)},'重新錄音');
-    if(page===21)hit(c.finish,()=>transition(22),'完成挑戰');
-    else hit(c.next,()=>transition(page+1),'下一題');
-
-    // 渲染 AI 評估回饋卡片
-    const prevQuestionPage = page - 1;
-    const qData = villageWalkQuestions[prevQuestionPage];
-    const rec = walkRecords[prevQuestionPage];
-
-    if (qData && rec) {
-      const card = document.createElement('div');
-      card.className = 'ai-eval-card';
-      const isHigh = (rec.score || 0) >= 80;
-      card.innerHTML = `
-        <div class="ai-eval-header">
-          <div class="ai-badge">🤖 AI 考官即時講評</div>
-          <div class="ai-score-badge ${isHigh ? '' : 'medium'}">${rec.score || 85} 分</div>
-        </div>
-        <div class="ai-row">
-          <span class="ai-label">📝 你的作答轉譯：</span>
-          <span class="ai-text">${rec.transcript ? `「${rec.transcript}」` : '（錄音已完成接收）'}</span>
-        </div>
-        <div class="ai-row">
-          <span class="ai-label">💡 走讀講評：</span>
-          <span class="ai-critique">${rec.critique || '觀察入微，客語表達流暢！'}</span>
-        </div>
-        <div class="ai-row">
-          <span class="ai-label">💬 客莊示範金句：</span>
-          <span class="ai-target">${rec.suggestedExpression || qData.target}</span>
-        </div>
-        ${rec.audioUrl ? `<button type="button" class="ai-play-btn" onclick="playUserAudio('${rec.audioUrl}')">🎧 試聽錄音 (${rec.duration}s)</button>` : ''}
-      `;
-      game.appendChild(card);
+    if (debugScoreBox) {
+      if (!rec) {
+        debugScoreBox.innerHTML = '尚未作答';
+      } else if (rec.status === 'evaluating') {
+        debugScoreBox.innerHTML = '⏳ AI 考官評估中…';
+      } else {
+        debugScoreBox.innerHTML = `<strong>${rec.score || 0} 分</strong>（${rec.transcript ? `轉譯：「${rec.transcript}」` : '無文字'}）`;
+      }
     }
-    return;
   }
-  if(page===22){play(A.finish);hit(c.replay,()=>{play(A.click);go(1)},'再玩一次');hit(c.done,()=>{play(A.click);setTimeout(()=>{location.href='../classroom.html';},400);},'完成')}
- }
- document.addEventListener('visibilitychange',()=>{if(document.hidden)A.birds.pause();else birds()});
- render();
+
+  const debugToggle = document.getElementById('debugToggle');
+  const developerPanel = document.getElementById('developerPanel');
+  const devCloseBtn = document.getElementById('devCloseBtn');
+  const asrProviderSelect = document.getElementById('asrProviderSelect');
+  const asrProviderNote = document.getElementById('asrProviderNote');
+  const answerInput = document.getElementById('answerInput');
+  const debugManualEvalBtn = document.getElementById('debugManualEvalBtn');
+  const asrStatusText = document.getElementById('asrStatusText');
+
+  if (debugToggle && developerPanel) {
+    debugToggle.onchange = () => {
+      developerPanel.hidden = !debugToggle.checked;
+      updateDeveloperPanel();
+    };
+  }
+  if (devCloseBtn && debugToggle && developerPanel) {
+    devCloseBtn.onclick = () => {
+      debugToggle.checked = false;
+      developerPanel.hidden = true;
+    };
+  }
+  if (asrProviderSelect) {
+    asrProviderSelect.onchange = (e) => {
+      selectedAsrProvider = e.target.value;
+      if (asrProviderNote) {
+        if (selectedAsrProvider === 'browser_mandarin') {
+          asrProviderNote.textContent = '已切換至「華語(瀏覽器生)」：將使用瀏覽器 Web Speech API 進行即時華語語音辨識。';
+        } else {
+          asrProviderNote.textContent = '已切換至「客委會辨識API」：將調用客家委員會四縣腔 ASR 進行客語語音辨識。';
+        }
+      }
+    };
+  }
+
+  if (debugManualEvalBtn) {
+    debugManualEvalBtn.onclick = async () => {
+      const text = (answerInput ? answerInput.value : '').trim();
+      if (!text) {
+        alert('請先在輸入框輸入欲測試的作答文字！');
+        return;
+      }
+      const targetQ = (page % 2 === 0) ? page : (page > 1 && page < 22 ? page - 1 : 2);
+      const qData = villageWalkQuestions[targetQ];
+      if (!qData) return;
+
+      if (asrStatusText) asrStatusText.textContent = '⚡ 手動評估中…';
+
+      walkRecords[targetQ] = {
+        status: 'evaluating',
+        audioUrl: null,
+        duration: 3,
+        score: 0,
+        transcript: text,
+        relevance: '',
+        vocabulary: '',
+        grammar: '',
+        critique: '',
+        suggestedExpression: ''
+      };
+
+      if (page === targetQ) {
+        go(targetQ + 1);
+      } else {
+        render();
+      }
+
+      const judgeRes = await callJudgeApi(qData, text, 3);
+      walkRecords[targetQ] = {
+        status: 'done',
+        score: judgeRes.score,
+        relevance: judgeRes.relevance,
+        vocabulary: judgeRes.vocabulary,
+        grammar: judgeRes.grammar,
+        critique: judgeRes.critique,
+        suggestedExpression: judgeRes.suggestedExpression,
+        transcript: text,
+        audioUrl: null,
+        duration: 3
+      };
+
+      if (asrStatusText) asrStatusText.textContent = '✅ 評分完成';
+      render();
+      updateDeveloperPanel();
+    };
+  }
+
+  async function startRecording(){
+    if(busy||recording)return;
+    closeHint();
+    stopBirds();
+    play(A.record);
+    try{
+      stream=await navigator.mediaDevices.getUserMedia({audio:true});
+      recorder=new MediaRecorder(stream);
+      chunks=[];
+      recordDuration=0;
+      recorder.ondataavailable=e=>{if(e.data&&e.data.size>0)chunks.push(e.data);};
+      recorder.start(250);
+      recording=true;
+      if(recordTimerHandle) clearInterval(recordTimerHandle);
+      recordTimerHandle=setInterval(()=>{recordDuration+=1;},1000);
+
+      if (asrStatusText) asrStatusText.textContent = '🎙️ 錄音中…';
+
+      // 若選擇華語(瀏覽器生)，啟動 Web Speech API
+      if (selectedAsrProvider === 'browser_mandarin') {
+        const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+        if (SR) {
+          try {
+            browserRecognition = new SR();
+            browserRecognition.lang = 'zh-TW';
+            browserRecognition.continuous = true;
+            browserRecognition.interimResults = true;
+            browserTranscript = '';
+            browserRecognition.onresult = (e) => {
+              let str = '';
+              for (let i = 0; i < e.results.length; ++i) {
+                str += e.results[i][0].transcript;
+              }
+              browserTranscript = str;
+              if (asrStatusText) asrStatusText.textContent = `即時辨識：${str}`;
+              if (answerInput) answerInput.value = str;
+            };
+            browserRecognition.onerror = (e) => {
+              console.warn('Web Speech 辨識提醒:', e);
+            };
+            browserRecognition.start();
+          } catch(err) {
+            console.warn('無法啟動 Web Speech:', err);
+          }
+        }
+      }
+    }catch(e){
+      recording=true;
+    }
+  }
+
+  async function stopAndRecognize(){
+    if(busy||!recording)return;
+    busy=true;
+    recording=false;
+    const currentQuestionPage = page;
+    const qData = villageWalkQuestions[currentQuestionPage];
+
+    if (browserRecognition) {
+      try { browserRecognition.stop(); } catch(e){}
+      browserRecognition = null;
+    }
+
+    const stoppedPromise = new Promise((resolve) => {
+      if (recorder && recorder.state !== 'inactive') {
+        recorder.onstop = () => {
+          const blob = chunks.length > 0 ? new Blob(chunks, { type: recorder.mimeType || 'audio/webm' }) : null;
+          resolve(blob);
+        };
+        try { recorder.requestData(); recorder.stop(); } catch(e){ resolve(null); }
+      } else {
+        resolve(null);
+      }
+    });
+
+    const audioBlob = await stoppedPromise;
+    const audioUrl = audioBlob ? URL.createObjectURL(audioBlob) : null;
+    const finalDuration = Math.max(1, recordDuration);
+    cleanupMic();
+
+    // 先存入 evaluating 狀態
+    walkRecords[currentQuestionPage] = {
+      status: 'evaluating',
+      audioUrl: audioUrl,
+      duration: finalDuration,
+      score: 0,
+      transcript: '',
+      relevance: '',
+      vocabulary: '',
+      grammar: '',
+      critique: '',
+      suggestedExpression: ''
+    };
+
+    setTimeout(()=>{
+      play(A.success);
+      go(page+1);
+    },350);
+
+    // 背景非同步辨識與評審
+    (async () => {
+      let transcript = '';
+      if (selectedAsrProvider === 'browser_mandarin') {
+        transcript = browserTranscript || '';
+      } else if (audioBlob) {
+        transcript = await callSpeechRecognizeApi(audioBlob);
+      }
+
+      if (asrStatusText) asrStatusText.textContent = `✅ 辨識完成：${transcript || '（無文字）'}`;
+      if (answerInput) answerInput.value = transcript;
+
+      const judgeRes = await callJudgeApi(qData, transcript, finalDuration);
+      walkRecords[currentQuestionPage] = {
+        status: 'done',
+        score: judgeRes.score,
+        relevance: judgeRes.relevance,
+        vocabulary: judgeRes.vocabulary,
+        grammar: judgeRes.grammar,
+        critique: judgeRes.critique,
+        suggestedExpression: judgeRes.suggestedExpression,
+        transcript: transcript,
+        audioUrl: audioUrl,
+        duration: finalDuration
+      };
+
+      if (page === currentQuestionPage + 1 || page === 22) {
+        render();
+      }
+      updateDeveloperPanel();
+    })();
+  }
+
+  function recordToggle(){if(recording)stopAndRecognize();else startRecording()}
+
+  function render(){
+   hs.innerHTML='';
+   closeHint();
+   const oldCard = document.querySelector('.ai-eval-card');
+   if (oldCard) oldCard.remove();
+   const oldBoard = document.querySelector('.stage-result-board');
+   if (oldBoard) oldBoard.remove();
+
+   const c=controls[page]||{};
+   if(page===1){hit(c.start,()=>{play(A.click);transition(2)},'開始挑戰');updateDeveloperPanel();return}
+   if(page>=2&&page<=20&&page%2===0){hit(c.hint,toggleHint,'觀察提示');hit(c.record,recordToggle,'開始錄音／停止錄音並送出辨識');updateDeveloperPanel();return}
+   if(page>=3&&page<=21&&page%2===1){
+     hit(c.retry,()=>{play(A.click);go(page-1)},'重新錄音');
+     if(page===21)hit(c.finish,()=>transition(22),'完成挑戰');
+     else hit(c.next,()=>transition(page+1),'下一題');
+
+     // 渲染 AI 評估回饋卡片
+     const prevQuestionPage = page - 1;
+     const qData = villageWalkQuestions[prevQuestionPage];
+     const rec = walkRecords[prevQuestionPage];
+
+     if (qData && rec) {
+       const card = document.createElement('div');
+       card.className = 'ai-eval-card';
+       if (rec.status === 'evaluating') {
+         card.innerHTML = `
+           <div class="ai-eval-header">
+             <div class="ai-badge"><span class="eval-spinner">⏳</span> AI 考官即時講評中…</div>
+             <div class="ai-score-badge medium">評估中</div>
+           </div>
+           <div class="ai-row" style="text-align:center; padding:10px 0;">
+             <span style="font-size:13px; color:#1e3a5f; font-weight:600;">語音辨識與 AI 走讀講評產生中…<br><small style="opacity:0.75;">（約需 2~3 秒，可在此稍候或直接點「下一題」繼續挑戰）</small></span>
+           </div>
+           ${rec.audioUrl ? `<button type="button" class="ai-play-btn" onclick="playUserAudio('${rec.audioUrl}')">🎧 試聽我的錄音 (${rec.duration}s)</button>` : ''}
+         `;
+       } else {
+         const isHigh = (rec.score || 0) >= 80;
+         card.innerHTML = `
+           <div class="ai-eval-header">
+             <div class="ai-badge">🤖 AI 考官即時講評</div>
+             <div class="ai-score-badge ${isHigh ? '' : 'medium'}">${rec.score || 85} 分</div>
+           </div>
+           <div class="ai-row">
+             <span class="ai-label">📝 你的作答轉譯：</span>
+             <span class="ai-text">${rec.transcript ? `「${rec.transcript}」` : '（錄音已完成接收）'}</span>
+           </div>
+           <div class="ai-row">
+             <span class="ai-label">💡 走讀講評：</span>
+             <span class="ai-critique">${rec.critique || '觀察入微，口語表達流暢！'}</span>
+           </div>
+           <div class="ai-row">
+             <span class="ai-label">💬 客莊示範金句：</span>
+             <span class="ai-target">${rec.suggestedExpression || qData.target}</span>
+           </div>
+           ${rec.audioUrl ? `<button type="button" class="ai-play-btn" onclick="playUserAudio('${rec.audioUrl}')">🎧 試聽我的錄音 (${rec.duration}s)</button>` : ''}
+         `;
+       }
+       game.appendChild(card);
+     }
+     updateDeveloperPanel();
+     return;
+   }
+   if(page===22){
+     play(A.finish);
+     renderFinalResultBoard();
+     updateDeveloperPanel();
+   }
+  }
+  document.addEventListener('visibilitychange',()=>{if(document.hidden)A.birds.pause();else birds()});
+  render();
 })();
