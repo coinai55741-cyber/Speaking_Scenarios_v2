@@ -173,9 +173,35 @@ const CLAUDE_GROUNDING_RULES = `
 ======================================================================
 `;
 
+const EXAM_GROUNDING_RULES = `
+
+======================================================================
+【客語能力認證口說測驗 — 半開放式與開放式題型評審鐵律（Exam Grounding Rules）】
+======================================================================
+你正在為客家委員會「客語能力認證」口說測驗之考生作答進行專業評審。請特別依據各題目的「華語語意與核心意涵」進行靈活而精準的評判：
+
+1. 🎯 半開放式題目語意為本（Semantic Alignment）：
+   - 【看圖表達】：重點在於考生是否擷取出圖表/課表的核心事實（例如：星期一/拜一、第7,8節/兩節課）。只要關鍵事實正確，客語表達流暢自然，即判定高度切題（切題度給予高分）。
+   - 【口語表達】（例如：父親被氣到吃不下飯要道歉）：核心在於考生是否成功傳達「向長輩真誠道歉/認錯（如：對毋住、失禮、知錯了）」以及「安撫長輩心情/勸其用餐（如：請你毋好氣、遽遽來食飯）」的生活交際意圖。只要達到此語意溝通目的，即使句型用詞多樣，均屬優良表現。
+   - 【華語轉換客語】：重點在於將華語句子自然轉譯為道地客語口說（如：快點->遽遽/煞手、趕不上->趕毋切、香腸->煙腸、外面->外背等）。避免生硬逐字直譯，獎勵道地客語語彙與正確語序。
+
+2. 🗣️ 客語口語道地性與寬容度：
+   - 鼓勵自然道地的客語表達。若考生有部分非關鍵字詞使用國語同音字或常見口語習慣，評語中可委婉給予標準客語示範（suggestedExpression），但不應過度扣分。
+   - 考官評語（relevance, vocabulary, grammar, critique）必須專業、具體且富含建設性，明確指出考生作答的客語亮點與精進方向。
+======================================================================
+`;
+
+function getEnhancedSystemPrompt(systemPrompt) {
+  let prompt = systemPrompt || "";
+  const isNpcQuest = prompt.includes("NPC") || prompt.includes("情境關卡") || prompt.includes("isMatch") || prompt.includes("角色扮演");
+  const isExamJudge = prompt.includes("客語能力認證") || prompt.includes("評審委員") || prompt.includes("口說測驗");
+  if (isNpcQuest) prompt += CLAUDE_GROUNDING_RULES;
+  if (isExamJudge) prompt += EXAM_GROUNDING_RULES;
+  return prompt;
+}
+
 async function callClaude(apiKey, model, systemPrompt, userPrompt) {
-  const isNpcQuest = systemPrompt && (systemPrompt.includes("NPC") || systemPrompt.includes("情境關卡") || systemPrompt.includes("isMatch") || systemPrompt.includes("角色扮演"));
-  const enhancedSystemPrompt = isNpcQuest ? ((systemPrompt || "") + CLAUDE_GROUNDING_RULES) : (systemPrompt || "");
+  const enhancedSystemPrompt = getEnhancedSystemPrompt(systemPrompt);
   const candidateModels = [
     model,
     "claude-haiku-4-5-20251001",
@@ -230,8 +256,7 @@ async function callClaude(apiKey, model, systemPrompt, userPrompt) {
 }
 
 async function callGemini(apiKey, models, systemPrompt, userPrompt) {
-  const isNpcQuest = systemPrompt && (systemPrompt.includes("NPC") || systemPrompt.includes("情境關卡") || systemPrompt.includes("isMatch") || systemPrompt.includes("角色扮演"));
-  const enhancedSystemPrompt = isNpcQuest ? ((systemPrompt || "") + CLAUDE_GROUNDING_RULES) : (systemPrompt || "");
+  const enhancedSystemPrompt = getEnhancedSystemPrompt(systemPrompt);
   const errors = [];
   for (const model of models) {
     const controller = new AbortController();
@@ -372,8 +397,7 @@ module.exports = async function handler(req, res) {
     } else {
       // 標準 OpenAI 格式
       const openaiEndpoint = endpoint || "https://api.openai.com/v1/chat/completions";
-      const isNpcQuest = systemPrompt && (systemPrompt.includes("NPC") || systemPrompt.includes("情境關卡") || systemPrompt.includes("isMatch") || systemPrompt.includes("角色扮演"));
-      const enhancedSystemPrompt = isNpcQuest ? ((systemPrompt || "") + CLAUDE_GROUNDING_RULES) : (systemPrompt || "");
+      const enhancedSystemPrompt = getEnhancedSystemPrompt(systemPrompt);
       const openAiRes = await fetch(openaiEndpoint, {
         method: "POST",
         headers: {
