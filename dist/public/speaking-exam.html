@@ -808,7 +808,6 @@ ${q.target ? `參考指標/標準示範：${q.target}` : ''}
     isFromAPI: true
   };
 }
-}
 
 async function callScoringApi(wavBlob, pinyin, accentId, text){
   const url = `${getBackendApiUrl(SCORING_API_PATH)}?pinyin=${encodeURIComponent(pinyin || '')}&accentId=${encodeURIComponent(accentId || '1')}&text=${encodeURIComponent(text || '')}`;
