@@ -7,3 +7,19 @@
 @media(max-width:700px){.audio-panel{right:12px;top:12px;padding:4px 10px;gap:8px}.vol-label{font-size:11px}.vol-slider{width:55px}}
 html,body{margin:0;width:100%;height:100%;background:#111;overflow:hidden}body{display:grid;place-items:center}#game{position:relative;width:min(100vw,177.78vh);aspect-ratio:16/9;max-height:100vh}#screen{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;user-select:none;-webkit-user-select:none}#hotspots{position:absolute;inset:0}.hit{position:absolute;background:transparent;border:0;padding:0;cursor:pointer}.hit:focus{outline:none}
 .hint-card{position:absolute;left:4.2%;top:47.5%;width:29%;box-sizing:border-box;padding:1.2% 1.4%;background:rgba(255,253,244,.97);border:2px solid rgba(48,111,105,.72);border-radius:14px;box-shadow:0 6px 18px rgba(0,0,0,.18);z-index:5;pointer-events:none;color:#244d49;font-family:"Noto Sans TC","Microsoft JhengHei",sans-serif;line-height:1.45}.hint-title{font-weight:800;font-size:clamp(13px,1.45vw,24px);margin-bottom:.45em}.hint-text{font-weight:600;font-size:clamp(12px,1.2vw,20px);color:#334b48}@media(max-width:600px){.hint-card{left:3.8%;top:48%;width:31%;padding:1.1%}.hint-title{font-size:12px}.hint-text{font-size:10px}}
+
+/* AI 考官即時評析卡片 */
+.ai-eval-card{position:absolute;left:4.2%;top:38%;width:30%;max-height:54%;background:rgba(255,253,244,0.97);backdrop-filter:blur(10px);border:2px solid #2f946f;border-radius:16px;box-shadow:0 10px 28px rgba(0,0,0,0.25);padding:12px 14px;z-index:20;display:flex;flex-direction:column;gap:6px;font-family:"Noto Sans TC","Microsoft JhengHei",sans-serif;animation:fadePop 0.3s ease-out;overflow-y:auto}
+@keyframes fadePop{from{opacity:0;transform:scale(0.96)}to{opacity:1;transform:scale(1)}}
+.ai-eval-header{display:flex;justify-content:space-between;align-items:center;border-bottom:1.5px solid #d2e8dd;padding-bottom:5px}
+.ai-badge{font-weight:800;font-size:13.5px;color:#1f5a43;display:flex;align-items:center;gap:4px}
+.ai-score-badge{font-size:15px;font-weight:900;padding:2px 8px;border-radius:999px;background:#e8f7ee;color:#1b7340;border:1px solid #94d6aa}
+.ai-score-badge.medium{background:#fff8e6;color:#b37400;border-color:#ffd480}
+.ai-row{display:flex;flex-direction:column;gap:1.5px;font-size:12px;line-height:1.4}
+.ai-label{font-weight:800;color:#244d49}
+.ai-text{color:#1e3a5f;background:#f0f5fb;padding:4px 7px;border-radius:6px;font-weight:600}
+.ai-critique{color:#334b48;font-weight:500;line-height:1.4}
+.ai-target{color:#13623f;background:#e9f5ed;padding:4px 7px;border-radius:6px;font-weight:700}
+.ai-play-btn{align-self:flex-start;background:#244d49;color:#fff;border:0;border-radius:999px;padding:3px 10px;font-size:11.5px;font-weight:700;cursor:pointer;margin-top:2px;transition:0.2s}
+.ai-play-btn:hover{background:#183633}
+@media(max-width:800px){.ai-eval-card{width:36%;top:32%;font-size:11px}}
