@@ -184,6 +184,9 @@
 請輸出嚴格符合以下格式之 JSON 物件：
 {
   "score": 88,
+  "relevance": "切題度具體評語（20-40字）",
+  "vocabulary": "客語詞彙運用評語（20-40字）",
+  "grammar": "語法完整度評語（20-40字）",
   "critique": "考官綜合點評，指出優點與待加強之處（40-70字）",
   "suggestedExpression": "標準道地客語示範講法"
 }`;
@@ -206,6 +209,9 @@
        const data = await res.json();
        return {
          score: Math.min(100, Math.max(60, Math.round(Number(data.score) || 85))),
+         relevance: data.relevance || '切合走讀情境與任務要求。',
+         vocabulary: data.vocabulary || '客語詞彙運用適當。',
+         grammar: data.grammar || '語意通順完整。',
          critique: data.critique || '觀察仔細，客語表達自然通順！',
          suggestedExpression: data.suggestedExpression || q.target
        };
@@ -216,91 +222,13 @@
 
    return {
      score: 85,
+     relevance: '基本符合情境要求。',
+     vocabulary: '客莊詞彙有發揮空間。',
+     grammar: '語法基本通順。',
      critique: '已完成客莊口說走讀表達，詞彙運用與發音清晰度表現良好！',
      suggestedExpression: q.target
    };
  }
-
- function openFullReportModal() {
-    play(A.click);
-    const oldModal = document.getElementById('reportModalBackdrop');
-    if (oldModal) oldModal.remove();
-
-    const questionKeys = [2, 4, 6, 8, 10, 12, 14, 16, 18, 20];
-    const answeredList = questionKeys
-      .map((k, idx) => ({ idx: idx + 1, pageKey: k, qData: villageWalkQuestions[k], rec: walkRecords[k] }))
-      .filter(item => item.rec && (item.rec.score !== undefined || item.rec.status));
-
-    const totalAnswered = answeredList.length;
-    const scoredList = answeredList.filter(item => item.rec && item.rec.status === 'done' && item.rec.score !== undefined);
-    const avgScore = scoredList.length > 0 ? Math.round(scoredList.reduce((acc, cur) => acc + (cur.rec.score || 0), 0) / scoredList.length) : (totalAnswered > 0 ? 85 : 0);
-
-    const backdrop = document.createElement('div');
-    backdrop.id = 'reportModalBackdrop';
-    backdrop.className = 'report-modal-backdrop';
-
-    let itemsHtml = '';
-    questionKeys.forEach((k, idx) => {
-      const q = villageWalkQuestions[k];
-      const rec = walkRecords[k];
-      if (!rec) {
-        itemsHtml += `
-          <div class="report-item unattempted">
-            <div class="report-item-header">
-              <span class="report-item-title">第 ${idx + 1} 題：${q.title}</span>
-              <span class="report-item-score score-pending">未作答</span>
-            </div>
-            <div style="font-size:13px; color:#666; margin-top:4px;">🎯 示範回答：${q.target}</div>
-          </div>
-        `;
-      } else if (rec.status === 'evaluating') {
-        itemsHtml += `
-          <div class="report-item">
-            <div class="report-item-header">
-              <span class="report-item-title">第 ${idx + 1} 題：${q.title}</span>
-              <span class="report-item-score score-pending">⏳ AI 評析中…</span>
-            </div>
-            <div style="font-size:13px; color:#4a5568; margin-top:4px;">🎙️ 錄音長度：${rec.duration || 1} 秒</div>
-            <div style="font-size:13px; color:#718096; margin-top:4px;">🎯 示範回答：${q.target}</div>
-            ${rec.audioUrl ? `<button type="button" class="ai-play-btn" style="margin-top:6px;" onclick="playUserAudio('${rec.audioUrl}')">🎧 試聽錄音</button>` : ''}
-          </div>
-        `;
-      } else {
-        const scoreClass = (rec.score || 0) >= 80 ? 'score-high' : 'score-mid';
-        itemsHtml += `
-          <div class="report-item">
-            <div class="report-item-header">
-              <span class="report-item-title">第 ${idx + 1} 題：${q.title}</span>
-              <span class="report-item-score ${scoreClass}">${rec.score || 85} 分</span>
-            </div>
-            <div class="report-item-row"><span class="report-item-label">📝 語音辨識：</span><span class="report-item-val">${rec.transcript ? `“${rec.transcript}”` : '（無語音辨識內容）'}</span></div>
-            <div class="report-item-row"><span class="report-item-label">💡 走讀講評：</span><span class="report-item-val">${rec.critique || '作答良好！'}</span></div>
-            <div class="report-item-row"><span class="report-item-label">🎯 示範金句：</span><span class="report-item-val" style="color:#2f855a; font-weight:600;">${rec.suggestedExpression || q.target}</span></div>
-            ${rec.audioUrl ? `<button type="button" class="ai-play-btn" style="margin-top:8px;" onclick="playUserAudio('${rec.audioUrl}')">🎧 試聽我的錄音 (${rec.duration || 1}s)</button>` : ''}
-          </div>
-        `;
-      }
-    });
-
-    backdrop.innerHTML = `
-      <div class="report-modal">
-        <div class="report-header">
-          <div class="report-title">📊 客莊走讀・全單元 AI 評估成績單</div>
-          <button class="report-close-btn" onclick="document.getElementById('reportModalBackdrop').remove()">✕</button>
-        </div>
-        <div class="report-summary-bar">
-          <div class="summary-pill">✅ 已作答：<strong>${totalAnswered} / 10</strong> 題</div>
-          <div class="summary-pill">⭐ 單元平均：<strong>${avgScore}</strong> 分</div>
-          <div class="summary-pill">🤖 評測模型：<strong>Claude 3.5 Sonnet / 客語 ASR</strong></div>
-        </div>
-        <div class="report-body">
-          ${itemsHtml}
-        </div>
-      </div>
-    `;
-
-    document.body.appendChild(backdrop);
-  }
 
  let activeUserAudio = null;
  function playUserAudio(url) {
@@ -312,6 +240,140 @@
    activeUserAudio = a;
    a.volume = sfxVolume;
    a.play().catch(e => console.warn('播放錄音失敗:', e));
+ }
+
+ function renderFinalResultBoard() {
+   const questionKeys = [2, 4, 6, 8, 10, 12, 14, 16, 18, 20];
+   const attemptedList = questionKeys.map(k => walkRecords[k]).filter(Boolean);
+   const doneList = attemptedList.filter(r => r.status === 'done' && r.score !== undefined);
+   const pendingCount = attemptedList.filter(r => r.status === 'evaluating').length;
+   const isAllDone = pendingCount === 0;
+
+   const totalScore = doneList.reduce((acc, cur) => acc + (cur.score || 0), 0);
+   const avgScore = doneList.length > 0 ? Math.round(totalScore / doneList.length) : (attemptedList.length > 0 ? 85 : 0);
+
+   let itemsHtml = '';
+   questionKeys.forEach((k, idx) => {
+     const q = villageWalkQuestions[k];
+     const rec = walkRecords[k];
+
+     if (!rec) {
+       itemsHtml += `
+         <div class="result-card" style="opacity:0.7; background:#f8fafc;">
+           <div class="result-card-header">
+             <span class="result-card-title">第 ${idx + 1} 題：${q.title}</span>
+             <span class="result-card-score score-pending">未作答</span>
+           </div>
+           <div class="result-card-q"><span style="font-weight:700;color:#64748b;">題目：</span>${q.question}</div>
+           <div class="result-target-box">
+             <strong>🎯 客莊示範金句：</strong>${q.target}
+           </div>
+         </div>
+       `;
+     } else if (rec.status === 'evaluating') {
+       itemsHtml += `
+         <div class="result-card">
+           <div class="result-card-header">
+             <span class="result-card-title">第 ${idx + 1} 題：${q.title}</span>
+             <span class="result-card-score score-pending">⏳ AI 評估中…</span>
+           </div>
+           <div class="result-card-q"><span style="font-weight:700;color:#64748b;">題目：</span>${q.question}</div>
+           <div class="result-evaluating-box">
+             <span class="eval-spinner">⏳</span>
+             <span>正在背景並行進行客語語音辨識與 AI 考官講評，評分完成時將自動即時更新…（錄音時長：${rec.duration || 1} 秒）</span>
+           </div>
+           <div class="result-target-box">
+             <strong>🎯 客莊示範金句：</strong>${q.target}
+           </div>
+           ${rec.audioUrl ? `
+             <div class="result-card-footer">
+               <button type="button" class="ai-play-btn" onclick="playUserAudio('${rec.audioUrl}')">🎧 試聽我的錄音 (${rec.duration || 1}s)</button>
+             </div>
+           ` : ''}
+         </div>
+       `;
+     } else {
+       const isHigh = (rec.score || 0) >= 80;
+       itemsHtml += `
+         <div class="result-card">
+           <div class="result-card-header">
+             <span class="result-card-title">第 ${idx + 1} 題：${q.title}</span>
+             <span class="result-card-score ${isHigh ? 'score-high' : 'score-mid'}">${rec.score || 85} 分</span>
+           </div>
+           <div class="result-card-q"><span style="font-weight:700;color:#64748b;">題目：</span>${q.question}</div>
+           
+           <div class="result-card-transcript">
+             <span>🗣️ <strong>作答語音轉譯：</strong>${rec.transcript ? `“${rec.transcript}”` : '（錄音已完成接收）'}</span>
+           </div>
+
+           <div class="result-dimensions">
+             <div class="dim-box dim-relevance">
+               <span class="dim-title">🎯 切題程度</span>
+               <span class="dim-text">${rec.relevance || '切合情境與任務要求'}</span>
+             </div>
+             <div class="dim-box dim-vocab">
+               <span class="dim-title">🗣️ 客莊詞彙道地度</span>
+               <span class="dim-text">${rec.vocabulary || '客語詞彙運用適當'}</span>
+             </div>
+             <div class="dim-box dim-grammar">
+               <span class="dim-title">📝 語意流暢度</span>
+               <span class="dim-text">${rec.grammar || '語意通順自然'}</span>
+             </div>
+           </div>
+
+           <div class="result-critique-box">
+             <strong>💡 走讀講評：</strong>${rec.critique || '觀察仔細，客語表達自然通順！'}
+           </div>
+
+           <div class="result-target-box">
+             <strong>🎯 客莊示範金句：</strong>${rec.suggestedExpression || q.target}
+           </div>
+
+           ${rec.audioUrl ? `
+             <div class="result-card-footer">
+               <button type="button" class="ai-play-btn" onclick="playUserAudio('${rec.audioUrl}')">🎧 試聽我的錄音 (${rec.duration || 1}s)</button>
+             </div>
+           ` : ''}
+         </div>
+       `;
+     }
+   });
+
+   const board = document.createElement('div');
+   board.className = 'stage-result-board';
+   board.innerHTML = `
+     <div class="result-summary-header">
+       <p class="result-sub">客莊走讀・巷口帶路口說挑戰</p>
+       <h1 class="result-title">測驗結算成績</h1>
+       <div class="result-avg-pill">
+         <span class="avg-label">平均總分：</span>
+         <span class="avg-num">${avgScore}</span>
+         <span class="avg-unit">/ 100</span>
+       </div>
+       <p class="result-status-text">
+         共 10 題測驗。
+         ${!isAllDone ? `<span class="eval-note">（目前已完成 ${doneList.length} / 10 題，其餘正在背景加速評估中…）</span>` : '已全部評分完畢！'}
+       </p>
+     </div>
+
+     ${!isAllDone ? `
+       <div class="bg-eval-banner">
+         <span class="eval-spinner">⏳</span>
+         <span><strong>⚡ 背景非同步評分中：</strong>系統正在背景並行進行客語語音辨識與 AI 走讀講評，完成後卡片將<strong>自動即時更新</strong>！</span>
+       </div>
+     ` : ''}
+
+     <div class="result-items-list">
+       ${itemsHtml}
+     </div>
+
+     <div class="result-action-bar">
+       <button type="button" class="action-btn btn-primary" onclick="play(A.click); go(1);">🔄 重新挑戰</button>
+       <button type="button" class="action-btn btn-secondary" onclick="play(A.click); setTimeout(()=>{ location.href='../classroom.html'; }, 400);">🏠 返回單元選單</button>
+     </div>
+   `;
+
+   game.appendChild(board);
  }
 
  const play=(a)=>{try{if(a){a.volume=sfxVolume;a.currentTime=0;a.play().catch(()=>{})}}catch(e){}};

@@ -159,6 +159,9 @@ async function callJudgeApi(q, transcriptText, duration) {
       const data = await res.json();
       return {
         score: Math.min(100, Math.max(60, Math.round(Number(data.score) || 82))),
+        relevance: data.relevance || '切合情境與題目要求。',
+        vocabulary: data.vocabulary || '客語詞彙運用適當。',
+        grammar: data.grammar || '語法通順完整。',
         critique: data.critique || '作答切題，掌握客語口說表達重點。',
         suggestedExpression: data.suggestedExpression || q.target
       };
@@ -169,6 +172,9 @@ async function callJudgeApi(q, transcriptText, duration) {
 
   return {
     score: 80,
+    relevance: '基本符合情境要求。',
+    vocabulary: '詞彙有發揮空間。',
+    grammar: '語法基本通順。',
     critique: '已完成口語表達，建議在詞彙道地度與發音抑揚頓挫上持續練習！',
     suggestedExpression: q.target
   };
@@ -215,79 +221,140 @@ function playUserAudio(url) {
   a.play().catch(e => console.warn('播放錄音失敗:', e));
 }
 
-function openFullReportModal() {
-  const existing = document.querySelector('.report-modal-backdrop');
-  if (existing) existing.remove();
+function renderFinalResultBoard() {
+  const stage = document.querySelector('.stage');
+  const questionKeys = [2, 4, 6, 8, 10, 12, 14, 16];
+  
+  const attemptedList = questionKeys.map(k => examRecords[k]).filter(Boolean);
+  const doneList = attemptedList.filter(r => r.status === 'done' && r.score !== undefined);
+  const pendingCount = attemptedList.filter(r => r.status === 'evaluating').length;
+  const isAllDone = pendingCount === 0;
 
-  const backdrop = document.createElement('div');
-  backdrop.className = 'report-modal-backdrop';
+  const totalScore = doneList.reduce((acc, cur) => acc + (cur.score || 0), 0);
+  const avgScore = doneList.length > 0 ? Math.round(totalScore / doneList.length) : (attemptedList.length > 0 ? 82 : 0);
 
-  let totalScore = 0;
-  let count = 0;
   let itemsHtml = '';
+  questionKeys.forEach((k, idx) => {
+    const q = networldQuestions[k];
+    const rec = examRecords[k];
 
-  for (const p of [2, 4, 6, 8, 10, 12, 14, 16]) {
-    const q = networldQuestions[p];
-    const rec = examRecords[p];
-    if (rec && rec.status === 'done') {
-      totalScore += rec.score || 0;
-      count++;
+    if (!rec) {
       itemsHtml += `
-        <div class="report-item">
-          <div class="report-item-header">
-            <span class="report-item-title">${q.title}</span>
-            <span class="report-item-score">${rec.score} 分</span>
+        <div class="result-card" style="opacity:0.7; background:#f8fafc;">
+          <div class="result-card-header">
+            <span class="result-card-title">第 ${idx + 1} 題：${q.title}</span>
+            <span class="result-card-score score-pending">未作答</span>
           </div>
-          <div class="ai-row" style="margin-bottom:4px;">
-            <span class="ai-label">📝 學生轉譯：</span>
-            <span class="ai-text">${rec.transcript ? `「${rec.transcript}」` : '（錄音已接收）'}</span>
+          <div class="result-card-q"><span style="font-weight:700;color:#64748b;">題目：</span>${q.question}</div>
+          <div class="result-target-box">
+            <strong>🎯 客語示範金句：</strong>${q.target}
           </div>
-          <div class="ai-row" style="margin-bottom:4px;">
-            <span class="ai-label">💡 考官講評：</span>
-            <span class="ai-critique">${rec.critique}</span>
+        </div>
+      `;
+    } else if (rec.status === 'evaluating') {
+      itemsHtml += `
+        <div class="result-card">
+          <div class="result-card-header">
+            <span class="result-card-title">第 ${idx + 1} 題：${q.title}</span>
+            <span class="result-card-score score-pending">⏳ AI 評估中…</span>
           </div>
-          <div class="ai-row">
-            <span class="ai-label">💬 標準示範：</span>
-            <span class="ai-target">${rec.suggestedExpression || q.target}</span>
+          <div class="result-card-q"><span style="font-weight:700;color:#64748b;">題目：</span>${q.question}</div>
+          <div class="result-evaluating-box">
+            <span class="eval-spinner">⏳</span>
+            <span>正在背景並行進行客語語音辨識與 AI 考官講評，評分完成時將自動即時更新…（錄音時長：${rec.duration || 1} 秒）</span>
           </div>
-          ${rec.audioUrl ? `<button type="button" class="ai-play-btn" onclick="playUserAudio('${rec.audioUrl}')">🎧 試聽錄音</button>` : ''}
+          <div class="result-target-box">
+            <strong>🎯 客語示範金句：</strong>${q.target}
+          </div>
+          ${rec.audioUrl ? `
+            <div class="result-card-footer">
+              <button type="button" class="ai-play-btn" onclick="playUserAudio('${rec.audioUrl}')">🎧 試聽我的錄音 (${rec.duration || 1}s)</button>
+            </div>
+          ` : ''}
         </div>
       `;
     } else {
+      const isHigh = (rec.score || 0) >= 80;
       itemsHtml += `
-        <div class="report-item" style="opacity:0.75;">
-          <div class="report-item-header">
-            <span class="report-item-title">${q.title}</span>
-            <span class="report-item-score" style="background:#f1f5f9;color:#64748b;">未完成/評估中</span>
+        <div class="result-card">
+          <div class="result-card-header">
+            <span class="result-card-title">第 ${idx + 1} 題：${q.title}</span>
+            <span class="result-card-score ${isHigh ? 'score-high' : 'score-mid'}">${rec.score || 80} 分</span>
           </div>
-          <div class="ai-row">
-            <span class="ai-label">💬 標準示範：</span>
-            <span class="ai-target">${q.target}</span>
+          <div class="result-card-q"><span style="font-weight:700;color:#64748b;">題目：</span>${q.question}</div>
+          
+          <div class="result-card-transcript">
+            <span>🗣️ <strong>作答語音轉譯：</strong>${rec.transcript ? `「${rec.transcript}」` : '（錄音已完成接收）'}</span>
           </div>
+
+          <div class="result-dimensions">
+            <div class="dim-box dim-relevance">
+              <span class="dim-title">🎯 切題程度</span>
+              <span class="dim-text">${rec.relevance || '切合情境與題目要求'}</span>
+            </div>
+            <div class="dim-box dim-vocab">
+              <span class="dim-title">🗣️ 客語用詞道地度</span>
+              <span class="dim-text">${rec.vocabulary || '客語詞彙運用適當'}</span>
+            </div>
+            <div class="dim-box dim-grammar">
+              <span class="dim-title">📝 語法流暢度</span>
+              <span class="dim-text">${rec.grammar || '語法完整自然'}</span>
+            </div>
+          </div>
+
+          <div class="result-critique-box">
+            <strong>💡 考官總評：</strong>${rec.critique || '作答切題，掌握客語口說表達重點。'}
+          </div>
+
+          <div class="result-target-box">
+            <strong>🎯 客語示範金句：</strong>${rec.suggestedExpression || q.target}
+          </div>
+
+          ${rec.audioUrl ? `
+            <div class="result-card-footer">
+              <button type="button" class="ai-play-btn" onclick="playUserAudio('${rec.audioUrl}')">🎧 試聽我的錄音 (${rec.duration || 1}s)</button>
+            </div>
+          ` : ''}
         </div>
       `;
     }
-  }
+  });
 
-  const avgScore = count > 0 ? Math.round(totalScore / count) : 0;
+  const board = document.createElement('div');
+  board.className = 'stage-result-board';
+  board.innerHTML = `
+    <div class="result-summary-header">
+      <p class="result-sub">網路世界・客語口說能力測驗</p>
+      <h1 class="result-title">測驗結算成績</h1>
+      <div class="result-avg-pill">
+        <span class="avg-label">平均總分：</span>
+        <span class="avg-num">${avgScore}</span>
+        <span class="avg-unit">/ 100</span>
+      </div>
+      <p class="result-status-text">
+        共 8 題測驗。
+        ${!isAllDone ? `<span class="eval-note">（目前已完成 ${doneList.length} / 8 題，其餘正在背景加速評估中…）</span>` : '已全部評分完畢！'}
+      </p>
+    </div>
 
-  backdrop.innerHTML = `
-    <div class="report-modal">
-      <div class="report-header">
-        <span class="report-title">📊 網路世界・AI 考官口說評估成績單</span>
-        <button type="button" class="report-close" onclick="this.closest('.report-modal-backdrop').remove()">✕</button>
+    ${!isAllDone ? `
+      <div class="bg-eval-banner">
+        <span class="eval-spinner">⏳</span>
+        <span><strong>⚡ 背景非同步評分中：</strong>系統正在背景並行進行客語語音辨識與 AI 考官講評，評分完成時卡片會<strong>自動即時更新</strong>！</span>
       </div>
-      <div class="report-body">
-        <div class="report-summary-bar">
-          <span>完成題數：${count} / 8 題</span>
-          <span>平均成績：<strong style="font-size:18px; color:#0284c7;">${avgScore} 分</strong></span>
-        </div>
-        ${itemsHtml}
-      </div>
+    ` : ''}
+
+    <div class="result-items-list">
+      ${itemsHtml}
+    </div>
+
+    <div class="result-action-bar">
+      <button type="button" class="action-btn btn-primary" onclick="play('select'); show(1);">🔄 重新挑戰</button>
+      <button type="button" class="action-btn btn-secondary" onclick="location.href='../classroom.html';">🏠 返回單元選單</button>
     </div>
   `;
 
-  document.body.appendChild(backdrop);
+  stage.appendChild(board);
 }
 
 function show(n) {
@@ -296,36 +363,15 @@ function show(n) {
   document.querySelector('#status').textContent = `${page} / 18`;
   hs.innerHTML = '';
 
-  // 移除舊的 AI 評分卡片
+  // 移除舊的 AI 評分卡片與結算看板
   const oldCard = document.querySelector('.ai-eval-card');
   if (oldCard) oldCard.remove();
+  const oldBoard = document.querySelector('.stage-result-board');
+  if (oldBoard) oldBoard.remove();
 
   if (page === 18) {
-    let repBtn = document.createElement('button');
-    repBtn.className = 'restart';
-    repBtn.style.bottom = '11.5%';
-    repBtn.style.background = '#1F3A5F';
-    repBtn.style.fontSize = 'clamp(14px,1.5vw,22px)';
-    repBtn.textContent = '📊 查看全單元 AI 成績單';
-    repBtn.onclick = () => openFullReportModal();
-    hs.appendChild(repBtn);
-
-    let b = document.createElement('button');
-    b.className = 'restart';
-    b.textContent = '重新挑戰';
-    b.onclick = () => { play('select'); show(1); };
-    hs.appendChild(b);
-
-    let ret = document.createElement('button');
-    ret.className = 'restart';
-    ret.style.bottom = '1.2%';
-    ret.style.background = '#2f946f';
-    ret.style.fontSize = 'clamp(14px,1.5vw,22px)';
-    ret.textContent = '返回選單';
-    ret.onclick = () => { location.href = '../classroom.html'; };
-    hs.appendChild(ret);
-
     play('achievement');
+    renderFinalResultBoard();
     return;
   }
 
@@ -379,7 +425,7 @@ function show(n) {
           </div>
           <div class="ai-row">
             <span class="ai-label">💡 考官講評：</span>
-            <span class="ai-critique">${rec.critique || '作答表現良好！'}</span>
+            <span class="ai-critique">${rec.critique || '作答切題，掌握客語口說表達重點。'}</span>
           </div>
           <div class="ai-row">
             <span class="ai-label">💬 客語示範金句：</span>
@@ -434,13 +480,16 @@ async function recordToggle() {
 
     play('confirm');
 
-    // 先存入 evaluating 狀態，讓結果頁即使立刻翻到也能看到載入中動畫與錄音試聽
+    // 先存入 evaluating 狀態
     examRecords[currentQuestionPage] = {
       status: 'evaluating',
       audioUrl: audioUrl,
       duration: finalDuration,
       score: 0,
       transcript: '',
+      relevance: '',
+      vocabulary: '',
+      grammar: '',
       critique: '',
       suggestedExpression: ''
     };
@@ -456,6 +505,9 @@ async function recordToggle() {
         examRecords[currentQuestionPage] = {
           status: 'done',
           score: judgeRes.score,
+          relevance: judgeRes.relevance,
+          vocabulary: judgeRes.vocabulary,
+          grammar: judgeRes.grammar,
           critique: judgeRes.critique,
           suggestedExpression: judgeRes.suggestedExpression,
           transcript: transcript,
@@ -463,8 +515,8 @@ async function recordToggle() {
           duration: finalDuration
         };
 
-        // 若使用者仍停留在該結果頁，刷新 AI 卡片
-        if (page === currentQuestionPage + 1) {
+        // 若使用者仍停留在該結果頁或已在結算頁，即時刷新畫面
+        if (page === currentQuestionPage + 1 || page === 18) {
           show(page);
         }
       });
