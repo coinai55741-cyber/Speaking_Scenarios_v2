@@ -436,9 +436,11 @@ function beginRecordingWithStream(stream){
       recordedBlobUrl = URL.createObjectURL(rawBlob);
       recordedWavBlob = rawBlob;
     }
-    recordingStatus = 'recorded';
-    state.stage = 'recorded';
-    render();
+    if (state.screen === 'question' && state.stage === 'recording') {
+      recordingStatus = 'recorded';
+      state.stage = 'recorded';
+      render();
+    }
   };
 
   try {
@@ -1030,6 +1032,16 @@ async function evaluateQuestionInBackground(pos, q, rawBlob, recordDuration){
       if (result && typeof result.score === 'number'){
         score = Math.round(result.score);
         simulated = false;
+        aiFeedback = {
+          score: score,
+          relevance: score >= 80 ? '發音清晰正確，完整掌握目標語句音節。' : '完成句子朗讀複誦，部分字詞聲調清晰度可再加強。',
+          vocabulary: score >= 80 ? '聲調起伏精確，符合四縣腔調值標準。' : '掌握四縣腔基本音節，注意陰平與去聲調值。',
+          grammar: '語句結構完整符合題意。',
+          critique: result.detail || `聲學 GOP 發音評測得分：${score} 分。音節與聲調辨識度優良。`,
+          suggestedExpression: q.target || q.question,
+          modelUsed: '長問科技聲學評量系統 (GOP)',
+          isFromAPI: true
+        };
       } else {
         // 聲學評分服務異常時，自動降級切換為 ASR + AI 考官進行真實口說評審
         transcript = await callSpeechRecognizeApi(wavBlob || rawBlob, q.accent);

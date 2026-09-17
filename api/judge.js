@@ -174,7 +174,8 @@ const CLAUDE_GROUNDING_RULES = `
 `;
 
 async function callClaude(apiKey, model, systemPrompt, userPrompt) {
-  const enhancedSystemPrompt = (systemPrompt || "") + CLAUDE_GROUNDING_RULES;
+  const isNpcQuest = systemPrompt && (systemPrompt.includes("NPC") || systemPrompt.includes("情境關卡") || systemPrompt.includes("isMatch") || systemPrompt.includes("角色扮演"));
+  const enhancedSystemPrompt = isNpcQuest ? ((systemPrompt || "") + CLAUDE_GROUNDING_RULES) : (systemPrompt || "");
   const candidateModels = [
     model,
     "claude-haiku-4-5-20251001",
@@ -229,7 +230,8 @@ async function callClaude(apiKey, model, systemPrompt, userPrompt) {
 }
 
 async function callGemini(apiKey, models, systemPrompt, userPrompt) {
-  const enhancedSystemPrompt = (systemPrompt || "") + CLAUDE_GROUNDING_RULES;
+  const isNpcQuest = systemPrompt && (systemPrompt.includes("NPC") || systemPrompt.includes("情境關卡") || systemPrompt.includes("isMatch") || systemPrompt.includes("角色扮演"));
+  const enhancedSystemPrompt = isNpcQuest ? ((systemPrompt || "") + CLAUDE_GROUNDING_RULES) : (systemPrompt || "");
   const errors = [];
   for (const model of models) {
     const controller = new AbortController();
@@ -370,6 +372,8 @@ module.exports = async function handler(req, res) {
     } else {
       // 標準 OpenAI 格式
       const openaiEndpoint = endpoint || "https://api.openai.com/v1/chat/completions";
+      const isNpcQuest = systemPrompt && (systemPrompt.includes("NPC") || systemPrompt.includes("情境關卡") || systemPrompt.includes("isMatch") || systemPrompt.includes("角色扮演"));
+      const enhancedSystemPrompt = isNpcQuest ? ((systemPrompt || "") + CLAUDE_GROUNDING_RULES) : (systemPrompt || "");
       const openAiRes = await fetch(openaiEndpoint, {
         method: "POST",
         headers: {
@@ -379,7 +383,7 @@ module.exports = async function handler(req, res) {
         body: JSON.stringify({
           model: primaryModel,
           messages: [
-            { role: "system", content: (systemPrompt || "") + CLAUDE_GROUNDING_RULES },
+            { role: "system", content: enhancedSystemPrompt },
             { role: "user", content: userPrompt }
           ],
           response_format: { type: "json_object" },
