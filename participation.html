@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>一起參與｜打造下一個客語任務</title>
+  <link rel="stylesheet" href="./styles.css?v=20261005-participation-page1">
+</head>
+<body class="participation-page">
+  <main class="participation-page-shell">
+    <a class="participation-back-link" href="./index.html">← 回任務首頁</a>
+    <section class="participation-page-card" aria-labelledby="participationTitle">
+      <div class="participation-hero participation-page-hero">
+        <div>
+          <p class="participation-kicker">一起參與</p>
+          <h1 id="participationTitle">打造下一個客語任務</h1>
+        </div>
+        <img class="participation-page-avatar" src="./assets/participation-girl-megaphone-avatar.png" alt="拿著大聲公發話的女孩">
+      </div>
+
+      <div class="participation-tabs" role="tablist" aria-label="參與方式">
+        <button class="participation-tab is-active" id="wishTab" type="button" role="tab" aria-selected="true" aria-controls="wishPanel" data-participation-tab="wish">許願池</button>
+        <button class="participation-tab" id="voteTab" type="button" role="tab" aria-selected="false" aria-controls="votePanel" data-participation-tab="vote">票選遊戲</button>
+      </div>
+
+      <form class="participation-panel is-active participation-page-panel" id="wishPanel" role="tabpanel" aria-labelledby="wishTab" data-participation-panel="wish">
+        <label class="participation-field"><span>我想學的主題</span><select name="topic"><option value="">請選擇</option><option>飲食</option><option>家庭</option><option>校園</option><option>交通</option><option>節慶</option><option>自然</option><option>其他</option></select></label>
+        <label class="participation-field"><span>補充說明</span><textarea name="sentence" maxlength="200" rows="5" placeholder="例如：化妝用品的客語怎麼說呢？我想用客語拍美妝短影音～"></textarea><small><output id="wishCount">0</output> / 200</small></label>
+        <fieldset class="participation-role-group"><legend>我是</legend><label><input type="radio" name="role" value="學生" checked><span>學生</span></label><label><input type="radio" name="role" value="老師"><span>老師</span></label><label><input type="radio" name="role" value="家長"><span>家長</span></label></fieldset>
+        <button class="participation-submit" type="submit">送出願望 →</button>
+      </form>
+
+      <form class="participation-panel participation-page-panel" id="votePanel" role="tabpanel" aria-labelledby="voteTab" data-participation-panel="vote" hidden>
+        <h2>你喜歡哪些遊戲內容？可複選。</h2>
+        <div class="participation-vote-groups" id="participationVoteGroups"></div>
+        <button class="participation-submit participation-submit-orange" type="submit">送出我的票</button>
+        <button class="participation-text-button" type="button" data-participation-tab="wish">我也想許願 ›</button>
+      </form>
+
+      <p class="participation-note" id="participationStatus" role="status" aria-live="polite">匿名表達想法，一起解鎖新任務！</p>
+    </section>
+  </main>
+  <script src="./app.js?v=20261005-participation-page2"></script>
+</body>
+</html>
