@@ -85,14 +85,14 @@ body {
   position: relative;
   z-index: 2;
   display: flex;
-  align-items: center;
+  align-items: end;
   justify-content: space-between;
   gap: 20px;
 }
 
 .brand {
   display: inline-flex;
-  align-items: center;
+  align-items: end;
   gap: 20px;
   color: var(--ink);
   text-decoration: none;
@@ -130,7 +130,7 @@ main {
   display: grid;
   grid-template-columns: minmax(0, 0.88fr) minmax(430px, 1.22fr);
   gap: 22px;
-  align-items: center;
+  align-items: end;
   min-height: 410px;
   padding: 34px 12px 20px;
 }
@@ -145,7 +145,7 @@ main {
 
 .pill-label {
   display: inline-flex;
-  align-items: center;
+  align-items: end;
   width: fit-content;
   margin: 0 0 14px;
   padding: 7px 14px;
@@ -184,7 +184,7 @@ h1 {
 .primary-link,
 .card-link {
   display: inline-flex;
-  align-items: center;
+  align-items: end;
   justify-content: center;
   min-height: 46px;
   border-radius: 999px;
@@ -358,7 +358,7 @@ h1 {
   transform: translateY(-50%);
   z-index: 999;
   display: flex;
-  align-items: center;
+  align-items: end;
   transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
@@ -387,7 +387,7 @@ h1 {
   color: #fff;
   cursor: pointer;
   display: flex;
-  align-items: center;
+  align-items: end;
   justify-content: center;
   transition: opacity 0.3s, visibility 0.3s;
   box-shadow: -2px 0 8px rgba(0, 0, 0, 0.15);
@@ -408,7 +408,7 @@ h1 {
 .sidebar-link {
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: end;
   padding: 14px 8px;
   text-decoration: none;
   color: #1e315b;
@@ -437,7 +437,7 @@ h1 {
   color: #fff;
   cursor: pointer;
   display: flex;
-  align-items: center;
+  align-items: end;
   justify-content: center;
 }
 
@@ -460,7 +460,7 @@ h1 {
   position: relative;
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: end;
   justify-content: center;
   gap: 8px;
   min-height: 74px;
@@ -666,7 +666,7 @@ h1 {
 
 .start-learning-btn {
   display: inline-flex;
-  align-items: center;
+  align-items: end;
   justify-content: center;
   margin-top: 8px;
   padding: 7px 16px;
@@ -718,7 +718,7 @@ h1 {
   top: 14px;
   right: 14px;
   display: inline-flex;
-  align-items: center;
+  align-items: end;
   padding: 4px 10px;
   border: 1.5px solid #d0dbe5;
   border-radius: 999px;
@@ -809,7 +809,7 @@ h1 {
   display: grid;
   grid-template-columns: 180px minmax(0, 1fr);
   gap: 22px;
-  align-items: center;
+  align-items: end;
   min-height: 210px;
   padding: 20px;
 }
@@ -1209,7 +1209,7 @@ h1 {
 .wide-art,
 .scenario-art {
   justify-content: center;
-  align-items: center;
+  align-items: end;
   margin: 0 auto;
   display: block;
   max-width: 90%;
@@ -1220,7 +1220,7 @@ h1 {
 
 .hero-illustration {
   display: flex;
-  align-items: center;
+  align-items: end;
   min-height: 360px;
   margin-right: -42px;
 }
@@ -1527,7 +1527,7 @@ h1 {
 
 .participation-back-link {
   display: inline-flex;
-  align-items: center;
+  align-items: end;
   min-height: 40px;
   margin-bottom: 14px;
   color: var(--primary-deep);
@@ -1547,9 +1547,13 @@ h1 {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(220px, 280px);
   gap: 20px;
-  align-items: center;
-  padding: 34px 36px 28px;
+  align-items: end;
+  padding: 34px 36px 0;
   background: linear-gradient(135deg, #fff0c9 0%, #ecfae5 100%);
+}
+
+.participation-page-hero > div {
+  padding-bottom: 28px;
 }
 
 .participation-kicker {
@@ -1732,7 +1736,7 @@ h1 {
 .vote-node summary {
   display: grid;
   grid-template-columns: 1fr auto;
-  align-items: center;
+  align-items: end;
   gap: 8px;
   list-style: none;
 }
@@ -1784,7 +1788,7 @@ h1 {
   position: relative;
   display: grid;
   grid-template-columns: 26px 58px 1fr;
-  align-items: center;
+  align-items: end;
   gap: 12px;
   min-height: 68px;
   padding: 10px 12px;
@@ -1858,7 +1862,7 @@ h1 {
 
   .participation-page-hero {
     grid-template-columns: 1fr;
-    padding: 28px 22px 22px;
+    padding: 28px 22px 0;
   }
 
   .participation-page-avatar {
