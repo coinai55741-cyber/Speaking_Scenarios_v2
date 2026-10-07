@@ -1545,7 +1545,7 @@ h1 {
 
 .participation-page-hero {
   display: grid;
-  grid-template-columns: 1fr 132px;
+  grid-template-columns: minmax(0, 1fr) minmax(220px, 280px);
   gap: 20px;
   align-items: center;
   padding: 34px 36px 28px;
@@ -1566,11 +1566,11 @@ h1 {
 }
 
 .participation-page-avatar {
-  width: 128px;
-  aspect-ratio: 1;
-  border-radius: 999px;
-  object-fit: cover;
-  box-shadow: 0 14px 30px rgba(24, 88, 79, 0.16);
+  width: min(100%, 280px);
+  justify-self: end;
+  align-self: end;
+  object-fit: contain;
+  filter: drop-shadow(0 16px 24px rgba(24, 88, 79, 0.16));
 }
 
 .participation-tabs {
@@ -1861,7 +1861,10 @@ h1 {
     padding: 28px 22px 22px;
   }
 
-  .participation-page-avatar { width: 98px; }
+  .participation-page-avatar {
+    width: min(100%, 220px);
+    justify-self: center;
+  }
 
   .participation-tabs,
   .participation-note { margin-inline: 18px; }
@@ -1877,4 +1880,3 @@ h1 {
   .vote-nested-list { margin-left: 10px; padding-left: 10px; }
   .vote-card { grid-template-columns: 24px 52px 1fr; }
 }
-
