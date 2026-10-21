@@ -81,8 +81,8 @@ const SCENARIOS_GRAPH = {
     bannerImage: "./assets/zoo-ticket-booth.png",
     objectFit: "cover",
     objectPosition: "50% 50%",
-    objective: "體驗購票、驗票、口說問路並依照指引在 Canvas 地圖操縱小人走入展區，完成對話並於出口集合。",
-    mandarinObjective: "體驗購票、驗票、口說問路並依照指引在 Canvas 地圖操縱角色走入展區，完成對話並於出口集合。",
+    objective: "體驗購票、驗票、向工作人員問路後並依照指引地圖走入展區，觀賞完動物後並於出口集合。",
+    mandarinObjective: "體驗購票、驗票、向工作人員問路後並依照指引地圖走入展區，觀賞完動物後並於出口集合。",
     startNodeId: "zoo_start",
     nodes: {
       zoo_start: {
@@ -297,8 +297,8 @@ const SCENARIOS_GRAPH = {
     bannerImage: "./assets/food-counter-order.png",
     objectFit: "cover",
     objectPosition: "50% 50%",
-    objective: "在熱鬧的客家小吃店，向老闆點餐、確認客製化需求，最後到收銀機前結帳並說出評價。菜單與客製化選項可由 UI 或 LLM 替換。",
-    mandarinObjective: "在熱鬧的傳統小吃店，向老闆點餐、確認客製化需求，最後到收銀機前結帳並說出評價。菜單與客製化選項可由 UI 或 LLM 替換。",
+    objective: "在熱鬧的客家小吃店，向老闆點餐並確認你的客製化需求，最後到收銀機前結帳並說出評價。",
+    mandarinObjective: "在熱鬧的傳統小吃店，向老闆點餐並確認你的客製化需求，最後到收銀機前結帳並說出評價。",
     startNodeId: "food_step1",
     nodes: {
       food_step1: {
