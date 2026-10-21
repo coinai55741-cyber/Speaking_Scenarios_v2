@@ -406,10 +406,11 @@ module.exports = async function handler(req, res) {
       llmResponseContent = result.text;
       modelUsed = result.modelUsed;
     } else if (isGemini) {
-      // 每次評分最多依序呼叫 2 次：主模型 (預設 gemini-3.6-flash)，503 高負載時改用較不擁擠的 gemini-2.5-flash
+      // 每次評分最多依序呼叫 2 次：主模型 (預設 gemini-3.6-flash)，503 高負載時改用低延遲的 gemini-3.1-flash-lite
+      // (gemini-2.5-flash 已不開放新使用者，會回 404)
       const candidateModels = [
         primaryModel,
-        "gemini-2.5-flash"
+        "gemini-3.1-flash-lite"
       ].filter((v, i, a) => a.indexOf(v) === i && v);
 
       const result = await callGemini(apiKey, candidateModels, systemPrompt, userPrompt);
