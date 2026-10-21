@@ -298,7 +298,7 @@ const SCENARIOS_GRAPH = {
     objectFit: "cover",
     objectPosition: "50% 50%",
     objective: "在熱鬧的客家小吃店，向老闆點餐並確認你的客製化需求，最後到收銀機前結帳並說出評價。",
-    mandarinObjective: "在熱鬧的傳統小吃店，向老闆點餐並確認你的客製化需求，最後到收銀機前結帳並說出評價。",
+    mandarinObjective: "在熱鬧的客家小吃店，向老闆點餐並確認你的客製化需求，最後到收銀機前結帳並說出評價。",
     startNodeId: "food_step1",
     nodes: {
       food_step1: {
