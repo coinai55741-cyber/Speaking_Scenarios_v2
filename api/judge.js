@@ -406,11 +406,9 @@ module.exports = async function handler(req, res) {
       llmResponseContent = result.text;
       modelUsed = result.modelUsed;
     } else if (isGemini) {
+      // 每次評分最多依序呼叫 2 次：主模型 (預設 gemini-3.6-flash)，503 高負載時改用較不擁擠的 gemini-2.5-flash
       const candidateModels = [
-        "gemini-3.5-flash",
-        "gemini-3.6-flash",
         primaryModel,
-        // 備用：較不擁擠的穩定版模型，前述模型 503 高負載時改用
         "gemini-2.5-flash"
       ].filter((v, i, a) => a.indexOf(v) === i && v);
 
