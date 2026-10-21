@@ -258,9 +258,16 @@ async function callClaude(apiKey, model, systemPrompt, userPrompt) {
 async function callGemini(apiKey, models, systemPrompt, userPrompt) {
   const enhancedSystemPrompt = getEnhancedSystemPrompt(systemPrompt);
   const errors = [];
+  // 整體時間上限：所有候選模型合計需在 Vercel 函式 maxDuration (30s) 內完成
+  const deadline = Date.now() + 24000;
   for (const model of models) {
+    const remaining = deadline - Date.now();
+    if (remaining < 2000) {
+      errors.push(`[${model}] skipped: 已超過整體時間上限`);
+      break;
+    }
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 12000);
+    const timeoutId = setTimeout(() => controller.abort(), Math.min(12000, remaining));
     try {
       const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
       const geminiRes = await fetch(geminiUrl, {
@@ -330,6 +337,28 @@ function loadEnv() {
   }
 }
 
+// 目前僅使用 Gemini 通道；Claude 通道暫時停用（callClaude 保留），需恢復時改為 true
+const ENABLE_CLAUDE = false;
+
+function resolveLlmConfig() {
+  const endpoint = (process.env.LLM_ENDPOINT || "").trim();
+
+  if (ENABLE_CLAUDE) {
+    const apiKey = (process.env.ANTHROPIC_API_KEY || process.env.CLAUDE_API_KEY || process.env.LLM_API_KEY || process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY || process.env.OPENAI_API_KEY || "").trim();
+    const primaryModel = (process.env.LLM_MODEL || (apiKey.startsWith("sk-ant-") ? "claude-haiku-4-5-20251001" : "gemini-3.6-flash")).trim();
+    const isClaude = apiKey.startsWith("sk-ant-") || endpoint.includes("anthropic.com") || primaryModel.toLowerCase().includes("claude");
+    const isGemini = !isClaude && (apiKey.startsWith("AQ.") || apiKey.startsWith("AIza") || endpoint.includes("googleapis.com") || primaryModel.toLowerCase().includes("gemini"));
+    return { apiKey, primaryModel, endpoint, isClaude, isGemini };
+  }
+
+  // Gemini 專用：略過 Claude 金鑰 (sk-ant-) 與 Claude 模型名稱
+  const llmKey = (process.env.LLM_API_KEY || "").trim();
+  const apiKey = (process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY || (llmKey.startsWith("sk-ant-") ? "" : llmKey) || "").trim();
+  const envModel = (process.env.LLM_MODEL || "").trim();
+  const primaryModel = envModel && !envModel.toLowerCase().includes("claude") ? envModel : "gemini-3.6-flash";
+  return { apiKey, primaryModel, endpoint, isClaude: false, isGemini: true };
+}
+
 module.exports = async function handler(req, res) {
   loadEnv();
 
@@ -339,10 +368,7 @@ module.exports = async function handler(req, res) {
   }
 
   if (req.method === "GET") {
-    const apiKey = process.env.ANTHROPIC_API_KEY || process.env.CLAUDE_API_KEY || process.env.LLM_API_KEY || process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY || process.env.OPENAI_API_KEY || "";
-    const primaryModel = process.env.LLM_MODEL || (apiKey.startsWith("sk-ant-") ? "claude-haiku-4-5-20251001" : "gemini-3.6-flash");
-    const isClaude = apiKey.startsWith("sk-ant-") || primaryModel.toLowerCase().includes("claude");
-    const isGemini = !isClaude && (apiKey.startsWith("AQ.") || apiKey.startsWith("AIza") || primaryModel.toLowerCase().includes("gemini"));
+    const { primaryModel, isClaude, isGemini } = resolveLlmConfig();
     const providerName = isClaude ? "Claude" : (isGemini ? "Google Gemini" : "OpenAI");
 
     json(res, 200, {
@@ -364,21 +390,16 @@ module.exports = async function handler(req, res) {
     const body = await readBody(req);
     const { systemPrompt, userPrompt } = body;
 
-    const apiKey = (process.env.ANTHROPIC_API_KEY || process.env.CLAUDE_API_KEY || process.env.LLM_API_KEY || process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY || process.env.OPENAI_API_KEY || "").trim();
-    const primaryModel = (process.env.LLM_MODEL || (apiKey.startsWith("sk-ant-") ? "claude-haiku-4-5-20251001" : "gemini-3.6-flash")).trim();
-    const endpoint = (process.env.LLM_ENDPOINT || "").trim();
+    // 判斷模型提供者 (目前僅 Gemini；Claude 由 ENABLE_CLAUDE 控制)
+    const { apiKey, primaryModel, endpoint, isClaude, isGemini } = resolveLlmConfig();
 
     if (!apiKey) {
-      json(res, 503, { error: "後端尚未設定 LLM_API_KEY 環境變數。" });
+      json(res, 503, { error: "後端尚未設定 Gemini 金鑰（LLM_API_KEY 或 GEMINI_API_KEY）環境變數。" });
       return;
     }
 
     let llmResponseContent = "";
     let modelUsed = primaryModel;
-
-    // 判斷模型提供者 (Claude / Gemini / OpenAI)
-    const isClaude = apiKey.startsWith("sk-ant-") || endpoint.includes("anthropic.com") || primaryModel.toLowerCase().includes("claude");
-    const isGemini = !isClaude && (apiKey.startsWith("AQ.") || apiKey.startsWith("AIza") || endpoint.includes("googleapis.com") || primaryModel.toLowerCase().includes("gemini"));
 
     if (isClaude) {
       const result = await callClaude(apiKey, primaryModel, systemPrompt, userPrompt);
@@ -388,7 +409,9 @@ module.exports = async function handler(req, res) {
       const candidateModels = [
         "gemini-3.5-flash",
         "gemini-3.6-flash",
-        primaryModel
+        primaryModel,
+        // 備用：較不擁擠的穩定版模型，前述模型 503 高負載時改用
+        "gemini-2.5-flash"
       ].filter((v, i, a) => a.indexOf(v) === i && v);
 
       const result = await callGemini(apiKey, candidateModels, systemPrompt, userPrompt);

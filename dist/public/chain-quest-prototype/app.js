@@ -1434,12 +1434,12 @@ class HakkaToMandarinAdapter {
 class LLMServiceAdapter {
   static config = {
     provider: "vercel_api", // 支援後端 /api/judge 與 Vercel 雲端評估
-    model: "claude-haiku-4-5-20251001",
+    model: "gemini-3.6-flash",
     apiEndpoint: (typeof location !== "undefined" && (location.hostname.endsWith("github.io") || location.protocol === "file:" || (location.port && location.port !== "3000")))
       ? "https://speaking-scenarios-v2.vercel.app/api/judge"
       : "/api/judge",
     apiKey: (typeof localStorage !== "undefined" ? localStorage.getItem("llm_api_key") : "") || (typeof window !== "undefined" ? window.LLM_API_KEY : "") || "",
-    timeout: 12000
+    timeout: 28000 // 後端依序嘗試多個模型 (上限約 24s)，需大於後端整體時間
   };
 
   /**
@@ -1724,12 +1724,18 @@ class LLMServiceAdapter {
       this.config.apiEndpoint || "/api/judge",
       "/api/judge",
       "https://speaking-scenarios-v2.vercel.app/api/judge"
-    ].filter((v, i, a) => a.indexOf(v) === i && v);
+    ]
+      // 以完整網址去重，避免在 Vercel 網域上對同一後端重複等待
+      .map((v) => { try { return new URL(v, location.href).href; } catch (e) { return v; } })
+      .filter((v, i, a) => a.indexOf(v) === i && v);
+
+    // 記錄雲端評分失敗原因，降級至本地安全網時顯示給使用者
+    let apiFailureReason = "";
 
     for (const targetEndpoint of endpointsToTry) {
       try {
         const controller = new AbortController();
-        const timer = setTimeout(() => controller.abort(), 12000);
+        const timer = setTimeout(() => controller.abort(), this.config.timeout);
 
         const res = await fetch(targetEndpoint, {
           method: "POST",
@@ -1748,9 +1754,10 @@ class LLMServiceAdapter {
               matchedChoice,
               matchedChoiceId: matchedChoice ? matchedChoice.id : (data.matchedChoiceId || null),
               isFromAPI: true,
-              provider: (data.modelUsed || "Claude") + " (後端轉發)"
+              provider: (data.modelUsed || "Gemini") + " (後端轉發)"
             };
           }
+          apiFailureReason = "雲端回傳格式異常";
         } else if (res.status === 429) {
           const rateLimitReply = this.getRateLimitNpcResponse(nodeConfig.npcRole, isMandarin);
           return {
@@ -1765,9 +1772,15 @@ class LLMServiceAdapter {
             feedback: "連線整理中（429 頻率冷卻），請稍候 5 秒再試一次。",
             dynamicNpcResponse: rateLimitReply
           };
+        } else {
+          const errText = await res.text().catch(() => "");
+          apiFailureReason = /invalid x-api-key|authentication_error|HTTP 401/i.test(errText)
+            ? `HTTP ${res.status}：API 金鑰無效`
+            : `HTTP ${res.status}`;
         }
       } catch (err) {
         // 當前 endpoint 失敗，繼續嘗試備用端點
+        apiFailureReason = err && err.name === "AbortError" ? "連線逾時" : "無法連線";
       }
     }
 
@@ -1860,7 +1873,8 @@ class LLMServiceAdapter {
       feedback: fallbackEval.feedback,
       dynamicNpcResponse: dynamicNpcResponse,
       isFromAPI: false,
-      provider: "local_safety_net"
+      provider: "local_safety_net",
+      fallbackReason: apiFailureReason || "雲端評分無回應"
     };
   }
 }
@@ -2966,6 +2980,7 @@ class UIController {
       toggleLlmBtn: byId("toggleLlmBtn"),
       llmViewer: byId("llmViewer"),
       devLlmStatusTag: byId("devLlmStatusTag"),
+      llmFallbackBanner: byId("llmFallbackBanner"),
       toggleJsonBtn: byId("toggleJsonBtn"),
       jsonViewer: byId("jsonViewer"),
 
@@ -2998,6 +3013,26 @@ class UIController {
       },
       (msg) => this.showMapToast(msg)
     );
+  }
+
+  // 雲端 LLM 評分失敗、改用本地關鍵詞規則時，於錄音區顯示明確提示
+  setLlmFallbackNotice(evalResult) {
+    const banner = this.els.llmFallbackBanner;
+    const isFallback = !!evalResult && !evalResult.isFromAPI && !evalResult.isRateLimited;
+    if (banner) {
+      banner.hidden = !isFallback;
+      if (isFallback) {
+        banner.textContent = `⚠️ 雲端 AI 評分暫時無法使用（${evalResult.fallbackReason}），本次改用本地關鍵詞規則判定，結果與 NPC 回覆為預設內容。`;
+      }
+    }
+    if (isFallback && this.els.devLlmStatusTag) {
+      this.els.devLlmStatusTag.textContent = `本地規則（${evalResult.fallbackReason}）`;
+      this.els.devLlmStatusTag.style.background = "#fee2e2";
+      this.els.devLlmStatusTag.style.color = "#b91c1c";
+    } else if (evalResult && evalResult.isFromAPI && this.els.devLlmStatusTag) {
+      this.els.devLlmStatusTag.style.background = "#dcfce7";
+      this.els.devLlmStatusTag.style.color = "#15803d";
+    }
   }
 
   showMapToast(msg, isError = false) {
@@ -3198,7 +3233,7 @@ class UIController {
       if (res.ok) {
         const data = await res.json();
         if (data && data.model) {
-          const provider = data.provider || "Claude";
+          const provider = data.provider || "Gemini";
           if (this.els.devLlmStatusTag) {
             this.els.devLlmStatusTag.textContent = `${provider} (${data.model})`;
             this.els.devLlmStatusTag.style.background = "#dcfce7";
@@ -3209,7 +3244,7 @@ class UIController {
       }
     } catch (e) {}
     if (this.els.devLlmStatusTag) {
-      this.els.devLlmStatusTag.textContent = "Claude (/api/judge)";
+      this.els.devLlmStatusTag.textContent = "Gemini (/api/judge)";
     }
   }
 
@@ -3384,6 +3419,7 @@ class UIController {
       dialogueHistoryText
     });
     this.updatePipelineStep(3, evalResult.isMatch ? "success" : "fail", evalResult);
+    this.setLlmFallbackNotice(evalResult);
 
     // 呈現學生氣泡
     if (this.els.studentSpeechBubble) this.els.studentSpeechBubble.hidden = false;
@@ -3601,11 +3637,11 @@ class UIController {
             this.els.pipeLlmResult.textContent = "⏳ 請求頻率飽和 (Rate Limit 429) [已觸發 NPC 情境緩衝]";
             this.els.pipeLlmResult.style.color = "#f59e0b";
           } else {
-            const sourceTag = data.isFromAPI ? ` [☁️ ${data.provider || data.modelUsed || 'Claude'}]` : " [🛡️ 本地安全網]";
+            const sourceTag = data.isFromAPI ? ` [☁️ ${data.provider || data.modelUsed || 'Gemini'}]` : " [🛡️ 本地安全網]";
             this.els.pipeLlmResult.textContent = (data.isMatch ? "✓ 通過 (Match)" : "⚠️ 未命中重試 (Retry)") + sourceTag;
             this.els.pipeLlmResult.style.color = data.isMatch ? "#34d399" : "#f87171";
             if (data.isFromAPI && (data.modelUsed || data.provider) && this.els.devLlmStatusTag) {
-              this.els.devLlmStatusTag.textContent = `${data.provider || 'Claude'} (${data.modelUsed || '/api/judge'})`;
+              this.els.devLlmStatusTag.textContent = `${data.provider || 'Gemini'} (${data.modelUsed || '/api/judge'})`;
             }
           }
         }

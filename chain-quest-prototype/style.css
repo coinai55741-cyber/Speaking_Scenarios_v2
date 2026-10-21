@@ -1535,6 +1535,23 @@ html, body {
   color: var(--color-muted);
 }
 
+/* 雲端 AI 評分失敗、改用本地規則提示 */
+.llm-fallback-banner {
+  margin-top: 8px;
+  padding: 8px 12px;
+  border: 1px solid #fca5a5;
+  border-radius: var(--radius-sm);
+  background: #fef2f2;
+  color: #b91c1c;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.5;
+}
+
+.llm-fallback-banner[hidden] {
+  display: none;
+}
+
 /* 口說模式切換器 (客語專用 vs 華語對照) */
 .speech-mode-toggle-bar {
   display: flex;
