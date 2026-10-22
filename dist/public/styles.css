@@ -1649,6 +1649,21 @@ h1 {
   resize: vertical;
 }
 
+.required-mark {
+  margin-left: 4px;
+  color: #d1352b;
+}
+
+/* 「我是」標題內的星號：取消角色選項按鈕 (span) 的外框樣式 */
+.participation-role-group legend .required-mark {
+  display: inline;
+  min-height: 0;
+  border: 0;
+  border-radius: 0;
+  background: none;
+  color: #d1352b;
+}
+
 .participation-field small {
   justify-self: end;
   color: var(--ink-soft);

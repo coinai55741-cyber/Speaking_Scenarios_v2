@@ -8,7 +8,7 @@
   <link rel="icon" type="image/svg+xml" href="./favicon.svg">
   <link rel="apple-touch-icon" href="./apple-touch-icon.png">
   <link rel="manifest" href="./site.webmanifest">
-  <link rel="stylesheet" href="./styles.css?v=20261007-participation-avatar2">
+  <link rel="stylesheet" href="./styles.css?v=20261022-required">
 </head>
 <body class="participation-page">
   <main class="participation-page-shell">
@@ -27,10 +27,10 @@
         <button class="participation-tab" id="voteTab" type="button" role="tab" aria-selected="false" aria-controls="votePanel" data-participation-tab="vote">票選遊戲</button>
       </div>
 
-      <form class="participation-panel is-active participation-page-panel" id="wishPanel" role="tabpanel" aria-labelledby="wishTab" data-participation-panel="wish">
-        <label class="participation-field"><span>我想學的主題</span><select name="topic"><option value="">請選擇</option><option>飲食</option><option>家庭</option><option>校園</option><option>交通</option><option>節慶</option><option>自然</option><option>其他</option></select></label>
-        <label class="participation-field"><span>補充說明</span><textarea name="sentence" maxlength="200" rows="5" placeholder="例如：化妝用品的客語怎麼說呢？我想用客語拍美妝短影音～"></textarea><small><output id="wishCount">0</output> / 200</small></label>
-        <fieldset class="participation-role-group"><legend>我是</legend><label><input type="radio" name="role" value="學生" checked><span>學生</span></label><label><input type="radio" name="role" value="老師"><span>老師</span></label><label><input type="radio" name="role" value="家長"><span>家長</span></label></fieldset>
+      <form class="participation-panel is-active participation-page-panel" id="wishPanel" novalidate role="tabpanel" aria-labelledby="wishTab" data-participation-panel="wish">
+        <label class="participation-field"><span>我想學的主題<span class="required-mark" aria-hidden="true">*</span></span><select name="topic" required aria-required="true"><option value="">請選擇</option><option>飲食</option><option>家庭</option><option>校園</option><option>交通</option><option>節慶</option><option>自然</option><option>其他</option></select></label>
+        <label class="participation-field"><span>補充說明<span class="required-mark" aria-hidden="true">*</span></span><textarea name="sentence" required aria-required="true" maxlength="200" rows="5" placeholder="例如：化妝用品的客語怎麼說呢？我想用客語拍美妝短影音～"></textarea><small><output id="wishCount">0</output> / 200</small></label>
+        <fieldset class="participation-role-group"><legend>我是<span class="required-mark" aria-hidden="true">*</span></legend><label><input type="radio" name="role" value="學生" checked required><span>學生</span></label><label><input type="radio" name="role" value="老師"><span>老師</span></label><label><input type="radio" name="role" value="家長"><span>家長</span></label></fieldset>
         <button class="participation-submit" type="submit">送出願望 →</button>
       </form>
 
@@ -44,6 +44,6 @@
       <p class="participation-note" id="participationStatus" role="status" aria-live="polite">匿名表達想法，一起解鎖新任務！</p>
     </section>
   </main>
-  <script src="./app.js?v=20261022-sheet2"></script>
+  <script src="./app.js?v=20261022-required"></script>
 </body>
 </html>

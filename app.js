@@ -362,10 +362,23 @@ function initParticipationWidget() {
     event.preventDefault();
     const formData = new FormData(wishPanel);
     const payload = {
-      topic: formData.get("topic") || "未選擇",
-      sentence: formData.get("sentence") || "",
-      role: formData.get("role") || "學生"
+      topic: String(formData.get("topic") || "").trim(),
+      sentence: String(formData.get("sentence") || "").trim(),
+      role: String(formData.get("role") || "").trim()
     };
+
+    // 必填檢查：主題、補充說明、身分任一未填即跳出警示框，不送出
+    const requiredFields = [
+      { key: "topic", label: "我想學的主題", el: wishTopicSelect },
+      { key: "sentence", label: "補充說明", el: wishTextarea },
+      { key: "role", label: "我是", el: wishPanel.querySelector('input[name="role"]') }
+    ];
+    const missing = requiredFields.filter((field) => !payload[field.key]);
+    if (missing.length) {
+      window.alert(`請填寫必填欄位：${missing.map((field) => field.label).join("、")}`);
+      missing[0].el?.focus();
+      return;
+    }
     saveLocalResponse("wish", payload);
     maybeSendToGoogleForm({ formType: "wish", ...payload });
     wishPanel.reset();
