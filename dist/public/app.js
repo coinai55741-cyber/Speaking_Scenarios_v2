@@ -216,7 +216,8 @@ function initParticipationWidget() {
     "其他": "例如：化妝用品的客語怎麼說呢？我想用客語拍美妝短影音～"
   };
   const tabs = Array.from(document.querySelectorAll("[data-participation-tab]"));
-  const googleFormEndpoint = "";
+  // Google Apps Script 網頁應用程式：寫入許願池／票選紀錄試算表
+  const googleFormEndpoint = "https://script.google.com/macros/s/AKfycbzyz755LpaY4nJti_LbDSkuIQ1vWtTFzODMOyk0eJnZnCQPq9hGFkqK9ZWQg-gYztTJ5g/exec";
   const voteGroupsContainer = document.getElementById("participationVoteGroups");
 
   function escapeParticipationHtml(value) {
@@ -279,9 +280,10 @@ function initParticipationWidget() {
   function maybeSendToGoogleForm(payload) {
     if (!googleFormEndpoint) return;
     try {
-      const formData = new FormData();
-      Object.entries(payload).forEach(([key, value]) => formData.append(key, value));
-      fetch(googleFormEndpoint, { method: "POST", mode: "no-cors", body: formData });
+      // 以 URL 編碼送出，Apps Script 的 e.parameter 才讀得到欄位
+      const body = new URLSearchParams();
+      Object.entries(payload).forEach(([key, value]) => body.append(key, value));
+      fetch(googleFormEndpoint, { method: "POST", mode: "no-cors", body });
     } catch (error) {
       // Keep the UI lightweight even if the optional Google Form endpoint is not ready.
     }
