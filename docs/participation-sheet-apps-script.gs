@@ -37,7 +37,9 @@ function doPost(e) {
         const detail = getOrCreateSheet(ss, DETAIL_SHEET, DETAIL_HEADERS);
         const id = "V-" + Utilities.formatDate(now, ss.getSpreadsheetTimeZone(), "MMdd-HHmmss") + "-" + Math.floor(Math.random() * 90 + 10);
         const rows = items.map((item) => [id, now, item[0], item[1], item[2]]);
-        detail.getRange(detail.getLastRow() + 1, 1, rows.length, DETAIL_HEADERS.length).setValues(rows);
+        const startRow = detail.getLastRow() + 1;
+        detail.getRange(startRow, 1, rows.length, DETAIL_HEADERS.length).setValues(rows);
+        detail.getRange(startRow, 2, rows.length, 1).setNumberFormat("yyyy/mm/dd hh:mm:ss");
         ensureStatsSheet(ss);
       }
     }
