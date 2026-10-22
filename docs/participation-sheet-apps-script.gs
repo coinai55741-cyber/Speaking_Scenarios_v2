@@ -3,11 +3,14 @@
 // 再到「部署 → 管理部署作業」編輯現有部署，版本選「新版本」後部署（網址不變）。
 // 部署設定：執行身分＝我；誰可以存取＝所有人。
 
-const MAIN_SHEET = "回覆紀錄";
+const WISH_SHEET = "許願紀錄";
+const VOTE_SHEET = "票選紀錄";
 const DETAIL_SHEET = "票選明細";
 const STATS_SHEET = "票選統計";
-const MAIN_HEADERS = ["日期時間", "類型", "想學的主題", "補充說明", "身分", "勾選的遊戲內容"];
+const WISH_HEADERS = ["日期時間", "想學的主題", "補充說明", "身分"];
+const VOTE_HEADERS = ["送出編號", "日期時間", "勾選的遊戲內容"];
 const DETAIL_HEADERS = ["送出編號", "日期時間", "大類", "項目", "子項目"];
+const DATETIME_FORMAT = "yyyy/mm/dd hh:mm:ss";
 
 function doPost(e) {
   const lock = LockService.getScriptLock();
@@ -16,32 +19,39 @@ function doPost(e) {
     const p = (e && e.parameter) || {};
     const ss = SpreadsheetApp.getActiveSpreadsheet();
     const now = new Date();
-    const isVote = p.formType === "vote";
 
-    // 主表：每次送出一列；票選內容依大類分行顯示
-    const main = getOrCreateSheet(ss, MAIN_SHEET, MAIN_HEADERS);
-    main.appendRow([
-      now,
-      isVote ? "票選" : "許願",
-      clean(p.topic, 50),
-      clean(p.sentence, 500),
-      clean(p.role, 20),
-      clean(p.votes, 2000)
-    ]);
-    main.getRange(main.getLastRow(), MAIN_HEADERS.length).setWrap(true);
+    if (p.formType === "vote") {
+      const id = "V-" + Utilities.formatDate(now, ss.getSpreadsheetTimeZone(), "MMdd-HHmmss") + "-" + Math.floor(Math.random() * 90 + 10);
 
-    // 明細表：每個勾選項目一列，方便篩選與統計
-    if (isVote) {
+      // 票選紀錄：每次送出一列；勾選內容依大類分行顯示
+      const vote = getOrCreateSheet(ss, VOTE_SHEET, VOTE_HEADERS);
+      const voteRow = vote.getLastRow() + 1;
+      vote.getRange(voteRow, 1, 1, VOTE_HEADERS.length).setValues([[id, now, clean(p.votes, 2000)]]);
+      vote.getRange(voteRow, 2).setNumberFormat(DATETIME_FORMAT);
+      vote.getRange(voteRow, 3).setWrap(true);
+
+      // 票選明細：每個勾選項目一列，方便篩選與統計
       const items = parseVoteItems(p.voteItems);
       if (items.length) {
         const detail = getOrCreateSheet(ss, DETAIL_SHEET, DETAIL_HEADERS);
-        const id = "V-" + Utilities.formatDate(now, ss.getSpreadsheetTimeZone(), "MMdd-HHmmss") + "-" + Math.floor(Math.random() * 90 + 10);
-        const rows = items.map((item) => [id, now, item[0], item[1], item[2]]);
         const startRow = detail.getLastRow() + 1;
+        const rows = items.map((item) => [id, now, item[0], item[1], item[2]]);
         detail.getRange(startRow, 1, rows.length, DETAIL_HEADERS.length).setValues(rows);
-        detail.getRange(startRow, 2, rows.length, 1).setNumberFormat("yyyy/mm/dd hh:mm:ss");
+        detail.getRange(startRow, 2, rows.length, 1).setNumberFormat(DATETIME_FORMAT);
         ensureStatsSheet(ss);
       }
+    } else {
+      // 許願紀錄：每次送出一列
+      const wish = getOrCreateSheet(ss, WISH_SHEET, WISH_HEADERS);
+      const wishRow = wish.getLastRow() + 1;
+      wish.getRange(wishRow, 1, 1, WISH_HEADERS.length).setValues([[
+        now,
+        clean(p.topic, 50),
+        clean(p.sentence, 500),
+        clean(p.role, 20)
+      ]]);
+      wish.getRange(wishRow, 1).setNumberFormat(DATETIME_FORMAT);
+      wish.getRange(wishRow, 3).setWrap(true);
     }
 
     return ContentService.createTextOutput(JSON.stringify({ ok: true }))
