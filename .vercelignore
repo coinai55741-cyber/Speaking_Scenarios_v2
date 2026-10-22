@@ -11,3 +11,6 @@ dist/
 *.bat
 SPEAKING_EXAM_PLAN.md
 HIDDEN_FEATURES_ROADMAP.md
+
+# Ignore art source files (Clip Studio); the site only uses exported images
+*.clip
