@@ -277,6 +277,37 @@ function initParticipationWidget() {
     }
   }
 
+  // 票選勾選值 ➔ [大類, 項目, 子項目]，供試算表分欄紀錄與統計
+  const voteItemPaths = new Map();
+  participationVoteGroups.forEach((group) => {
+    (group.children || []).forEach((item) => {
+      const hasChildren = Array.isArray(item.children) && item.children.length > 0;
+      voteItemPaths.set(item.value, { category: group.value, item: item.title, subItem: "", hasChildren });
+      (item.children || []).forEach((sub) => {
+        voteItemPaths.set(sub.value, { category: group.value, item: item.title, subItem: sub.title, hasChildren: false });
+      });
+    });
+  });
+
+  function describeVotes(votes) {
+    const paths = votes.map((value) => voteItemPaths.get(value) || { category: "其他", item: value, subItem: "", hasChildren: false });
+    const rows = paths.map((p) => [p.category, p.item, p.subItem || (p.hasChildren ? "（整類）" : "")]);
+
+    // 主表摘要：【大類】項目（子項目、子項目）、項目；不同大類換行
+    const byCategory = new Map();
+    paths.forEach((p) => {
+      if (!byCategory.has(p.category)) byCategory.set(p.category, new Map());
+      const items = byCategory.get(p.category);
+      if (!items.has(p.item)) items.set(p.item, []);
+      if (p.subItem) items.get(p.item).push(p.subItem);
+    });
+    const summary = Array.from(byCategory, ([category, items]) =>
+      `【${category}】` + Array.from(items, ([item, subs]) => (subs.length ? `${item}（${subs.join("、")}）` : item)).join("、")
+    ).join("\n");
+
+    return { summary, rows };
+  }
+
   function maybeSendToGoogleForm(payload) {
     if (!googleFormEndpoint) return;
     try {
@@ -352,7 +383,8 @@ function initParticipationWidget() {
     }
     const payload = { votes };
     saveLocalResponse("vote", payload);
-    maybeSendToGoogleForm({ formType: "vote", votes: votes.join("、") });
+    const { summary, rows } = describeVotes(votes);
+    maybeSendToGoogleForm({ formType: "vote", votes: summary, voteItems: JSON.stringify(rows) });
     votePanel.reset();
     setStatus(`謝謝你投票！已收到 ${votes.length} 個想法，結果會整理成下一波任務建議。`);
   });
