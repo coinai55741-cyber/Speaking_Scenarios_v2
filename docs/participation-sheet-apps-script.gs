@@ -7,6 +7,7 @@ const WISH_SHEET = "許願紀錄";
 const VOTE_SHEET = "票選紀錄";
 const DETAIL_SHEET = "票選明細";
 const STATS_SHEET = "票選統計";
+const WISH_STATS_SHEET = "許願統計";
 const WISH_HEADERS = ["日期時間", "想學的主題", "補充說明", "身分"];
 const VOTE_HEADERS = ["送出編號", "日期時間", "勾選的遊戲內容"];
 const DETAIL_HEADERS = ["送出編號", "日期時間", "大類", "項目", "子項目"];
@@ -52,6 +53,7 @@ function doPost(e) {
       ]]);
       wish.getRange(wishRow, 1).setNumberFormat(DATETIME_FORMAT);
       wish.getRange(wishRow, 3).setWrap(true);
+      ensureWishStatsSheet(ss);
     }
 
     return ContentService.createTextOutput(JSON.stringify({ ok: true }))
@@ -78,6 +80,23 @@ function ensureStatsSheet(ss) {
   const sheet = ss.insertSheet(STATS_SHEET);
   sheet.getRange("A1").setFormula(
     "=QUERY('" + DETAIL_SHEET + "'!A1:E, \"select C, D, E, count(A) where C is not null group by C, D, E order by count(A) desc label count(A) '票數'\", 1)"
+  );
+  sheet.setFrozenRows(1);
+}
+
+// 許願統計：依主題、依身分、主題 × 身分交叉表，以公式自動計算
+function ensureWishStatsSheet(ss) {
+  if (ss.getSheetByName(WISH_STATS_SHEET)) return;
+  const sheet = ss.insertSheet(WISH_STATS_SHEET);
+  const source = "'" + WISH_SHEET + "'!A1:D";
+  sheet.getRange("A1").setFormula(
+    "=QUERY(" + source + ", \"select B, count(A) where B is not null group by B order by count(A) desc label count(A) '願望數'\", 1)"
+  );
+  sheet.getRange("D1").setFormula(
+    "=QUERY(" + source + ", \"select D, count(A) where D is not null group by D order by count(A) desc label count(A) '人數'\", 1)"
+  );
+  sheet.getRange("G1").setFormula(
+    "=QUERY(" + source + ", \"select B, count(A) where B is not null group by B pivot D\", 1)"
   );
   sheet.setFrozenRows(1);
 }
