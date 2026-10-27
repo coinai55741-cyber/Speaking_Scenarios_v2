@@ -1,7 +1,9 @@
 @font-face {
   font-family: "HAKKAsong";
   src: url("./assets/fonts/HakkaSong-subset.woff2") format("woff2");
-  font-weight: 400 900;
+  /* The official HAKKAsong file is a static Regular (400) face.
+     Declaring it as 400-900 prevents browsers from synthesizing bold. */
+  font-weight: 400;
   font-style: normal;
   font-display: swap;
 }
