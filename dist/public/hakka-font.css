@@ -1,4 +1,11 @@
 @font-face {
+  font-family: "HAKKAsong";
+  src: url("./assets/fonts/HakkaSong-subset.woff2") format("woff2");
+  font-weight: 400 900;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
   font-family: "GenSekiGothic2TW";
   src: url("./assets/fonts/GenSekiGothic2TW-R.otf") format("opentype");
   font-weight: 400 500;

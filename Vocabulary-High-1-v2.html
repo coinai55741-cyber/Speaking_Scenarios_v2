@@ -5,8 +5,10 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>庄頭廣播電台</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="./hakka-font.css?v=20261027-hakka-song1">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;600;900&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="./hakka-font.css?v=20261027-hakka-song1">
 <script src="./speech-api-config.js?v=20260909-global-ticket2"></script>
 <style>
   :root{--bg:#10161C;--panel:#19212B;--line:#2B3743;--soft:#212C38;
@@ -30,14 +32,14 @@
   /* 電台面板 */
   .top{background:var(--panel);border:1px solid var(--line);border-radius:16px;
     padding:13px 17px;display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:12px}
-  .logo{font-family:"Noto Serif TC",serif;font-size:16px;font-weight:900;letter-spacing:.14em}
+  .logo{font-family:"HAKKAsong","Noto Serif TC",serif;font-size:16px;font-weight:900;letter-spacing:.14em}
   .logo b{color:var(--gold)}
   .sig{flex:1;min-width:170px;display:flex;align-items:center;gap:9px}
   .sig span{font-size:11px;color:var(--dim);letter-spacing:.16em;white-space:nowrap}
   .sbar{flex:1;height:9px;border-radius:99px;background:#0E141A;overflow:hidden;border:1px solid var(--line)}
   .sbar i{display:block;height:100%;width:0%;border-radius:99px;
     background:linear-gradient(90deg,var(--rose),var(--gold),var(--jade));transition:width .7s}
-  .combo{font-family:"Noto Serif TC",serif;font-size:13px;color:var(--dim);letter-spacing:.06em;white-space:nowrap}
+  .combo{font-family:"HAKKAsong","Noto Serif TC",serif;font-size:13px;color:var(--dim);letter-spacing:.06em;white-space:nowrap}
   .combo b{color:var(--gold);font-size:17px}
 
   /* 波形與播放按鈕 */
@@ -60,7 +62,7 @@
   .meta{display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap}
   .who{background:rgba(217,174,95,.14);border:1px solid rgba(217,174,95,.36);border-radius:999px;
     padding:4px 13px;font-size:12.5px;color:var(--gold)}
-  .word{font-family:"Noto Serif TC",serif;font-size:16px;font-weight:900;letter-spacing:.05em}
+  .word{font-family:"HAKKAsong","Noto Serif TC",serif;font-size:16px;font-weight:900;letter-spacing:.05em}
   .word small{font-family:"Noto Sans TC";font-size:11.5px;font-weight:400;color:var(--dim);margin-left:6px}
   .spk{margin-left:auto;background:var(--gold);color:#12191F;border:0;border-radius:999px;
     padding:9px 20px;font-weight:700;font-size:13.5px;cursor:pointer;font-family:"Noto Sans TC"}
@@ -68,7 +70,7 @@
 
   .line{display:flex;flex-wrap:wrap;gap:3px 2px;justify-content:center;padding:4px 0}
   .u{min-width:34px;text-align:center;padding:3px 2px;border-radius:8px;transition:background .25s}
-  .u .h{font-family:"Noto Serif TC",serif;font-size:22px;font-weight:600;line-height:1.5}
+  .u .h{font-family:"HAKKAsong","Noto Serif TC",serif;font-size:22px;font-weight:600;line-height:1.5}
   .u .p{font-size:11px;color:var(--dim);line-height:1.6;white-space:nowrap}
   .u.tgt .h{color:var(--gold);font-weight:900}
   .slot{display:inline-block;min-width:50px;height:21px;line-height:21px;margin-top:2px;
@@ -124,11 +126,11 @@
   .over.on .tower .r2{animation:ring 2.4s ease-out .8s infinite}
   .over.on .tower .r3{animation:ring 2.4s ease-out 1.6s infinite}
   @keyframes ring{0%{transform:scale(.35);opacity:.9}100%{transform:scale(1.5);opacity:0}}
-  .over h2{font-family:"Noto Serif TC",serif;font-size:29px;font-weight:900;letter-spacing:.14em;color:var(--gold)}
+  .over h2{font-family:"HAKKAsong","Noto Serif TC",serif;font-size:29px;font-weight:900;letter-spacing:.14em;color:var(--gold)}
   .over .sub{margin-top:9px;font-size:14px;color:var(--dim);line-height:1.8}
   .stats{margin:22px 0 6px;display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
   .st{background:rgba(237,230,216,.05);border:1px solid var(--line);border-radius:14px;padding:12px 20px;min-width:104px}
-  .st b{display:block;font-family:"Noto Serif TC",serif;font-size:25px;font-weight:900;color:var(--ink)}
+  .st b{display:block;font-family:"HAKKAsong","Noto Serif TC",serif;font-size:25px;font-weight:900;color:var(--ink)}
   .st span{font-size:11px;color:var(--dim);letter-spacing:.14em}
   .st.gold b{color:var(--gold)}
   .overbtn{margin-top:20px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
@@ -231,7 +233,7 @@
   }
   .developer-panel .target-sentence strong {
     display: block;
-    font-family: "Noto Serif TC", serif;
+    font-family: "HAKKAsong", "Noto Serif TC", serif;
     font-size: 18px;
     font-weight: 900;
     color: var(--ink, #EDE6D8);
@@ -1096,8 +1098,3 @@ build();
 </script>
 </body>
 </html>
-
-
-
-
-
