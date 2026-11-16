@@ -8,6 +8,7 @@
 <link rel="stylesheet" href="./hakka-font.css?v=20260907-font4">
 <link rel="stylesheet" href="./unit-menu.css?v=20260909-fixed-back2">
 <script src="./speech-api-config.js?v=20260909-global-ticket2"></script>
+<script src="./hakka-pinyin-match.js?v=20261116-pinyin1"></script>
 <style>
   :root{--indigo:#1F3A5F;--grain:#E8C87A;--paper:#FDFBF5;--bamboo:#4A7A5E;
         --lantern:#C0392B;--brick:#A8553A;--ink:#20242B}
@@ -798,17 +799,25 @@ function releaseMic(){
 addEventListener("pagehide", () => {
   if(micStream){ micStream.getTracks().forEach(t => t.stop()); micStream = null; }
 });
-function judge(got){
+/* 客語：標準答案與辨識結果都轉拼音再逐音節比（同音錯別字也算著）；畫面毋顯示辨識出來个字 */
+async function judge(got){
   const q = list[at]; if(!q || stage !== "say") return;
   const exp = [...q.w].filter(c => ASR.CJK.test(c));
-  const a = ASR.align(exp, got);
+  let a = ASR.align(exp, got);
+  const heard = !!a.got;
+  if(heard && !(a.ok === a.n && a.n > 0) && window.HAKKA_PINYIN){
+    $("heard").textContent = "評分中⋯⋯";
+    const p = await window.HAKKA_PINYIN.judge(q.w, got, { dialect: "sixian" });
+    if(list[at] !== q || stage !== "say") return;          /* 已經換題 */
+    if(p.method === "pinyin") a = { hit: p.hit, ok: p.ok, n: p.n };
+  }
   if(a.ok === a.n && a.n > 0){
-    $("heard").innerHTML = "聽著：<b>" + (a.got || q.w) + "</b>";
+    $("heard").innerHTML = "念著咧：<b>" + q.w + "</b>";
     passed();
     return;
   }
   const marks = exp.map((c,i) => (a.hit[i] ? '<b>'+c+'</b>' : '<s>'+c+'</s>')).join("");
-  $("heard").innerHTML = (a.got ? "聽著：" + a.got + "　" : "無聽著聲。　")
+  $("heard").innerHTML = (heard ? "" : "無聽著聲。　")
     + marks + "　再念一擺看啊。";
 }
 async function startRec(){

@@ -480,6 +480,16 @@
     return rawGot.includes(rawDefault) || rawDefault.includes(rawGot);
   }
 
+  /* 最後判定：先用上面的關鍵字清單快速比對；客語沒過的話，
+   * 再把辨識結果與標準答案都轉成拼音比（同音錯別字也算對）。 */
+  async function judgeAnswer(q, recognizedText) {
+    if (checkAnswerMatch(q, recognizedText)) return true;
+    if (isMandarinMode() || !window.HAKKA_PINYIN || !normalizeText(recognizedText)) return false;
+    const r = await window.HAKKA_PINYIN.judge(q.answer, recognizedText, { dialect: "sixian" });
+    if (r.method !== "pinyin") return false;   // 轉拼音失敗：維持關鍵字判定結果
+    return q.id === 5 ? r.ratio >= 0.65 : r.pass;
+  }
+
   /* ─────────────────────────────────────────────────────────────
    * 錄音與檔案/串流辨識流程
    * ───────────────────────────────────────────────────────────── */
@@ -548,7 +558,7 @@
               "recording",
               "🎙️ 錄音中 (華語)",
               `正在收音⋯ 請說出「${targetLabel}」`,
-              liveTranscript || "（聆聽中⋯）"
+              "（聆聽中⋯）"
             );
             if (answerInput) answerInput.value = liveTranscript || "";
             if (asrStatusText) asrStatusText.textContent = liveTranscript ? `即時文字：${liveTranscript}` : "華語辨識中⋯";
@@ -612,7 +622,7 @@
               "recording",
               "🎙️ 錄音中 (客語)",
               `正在收音⋯ 請說出「${targetLabel}」`,
-              liveTranscript || "（聆聽中⋯）"
+              "（聆聽中⋯）"
             );
             if (answerInput) answerInput.value = liveTranscript || "";
             if (asrStatusText) asrStatusText.textContent = liveTranscript ? `即時文字：${liveTranscript}` : "即時辨識中⋯";
@@ -740,7 +750,7 @@
   // 處理辨識結果 (分支 A / 分支 B)
   async function handleRecognitionResult(q, transcript) {
     if (answerInput) answerInput.value = transcript || "";
-    const isPassed = checkAnswerMatch(q, transcript);
+    const isPassed = await judgeAnswer(q, transcript);
     const isMandarin = isMandarinMode();
     const targetTxt = isMandarin ? (q.mandarinAnswer || q.answer) : q.answer;
 
@@ -755,7 +765,7 @@
         "success",
         "✅ 辨識成功",
         `命中「${targetTxt}」！獲得 20 分！請點擊右下角「下一題」繼續。`,
-        transcript || targetTxt
+        "✓ 唸對了"
       );
       if (asrStatusText) asrStatusText.textContent = `✓ 辨識成功（命中 ${targetTxt}）`;
 
@@ -767,12 +777,13 @@
       render();
     } else {
       // ── 分支 B：辨識未通過（不吻合 / 沒聲音） ──
-      const gotDisplay = transcript ? `「${transcript}」` : "（未偵測到清晰語音）";
       setAsrState(
         "retry",
         "⚠️ 請再試一次",
-        `辨識為 ${gotDisplay}，跟目標「${targetTxt}」不太一樣喔！請點「聽一聽」重聽後再次挑戰。`,
-        transcript || "（無清晰文字）"
+        transcript
+          ? `跟目標「${targetTxt}」的發音還不太一樣喔！請點「聽一聽」重聽後再次挑戰。`
+          : "沒有聽清楚聲音，請靠近麥克風再唸一次。",
+        transcript ? "再試一次" : "（未偵測到清晰語音）"
       );
       if (asrStatusText) asrStatusText.textContent = `未通過比對（辨識為：${transcript || "無"}）`;
     }

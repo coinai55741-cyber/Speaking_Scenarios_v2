@@ -104,8 +104,18 @@ async function mtLogin(force = false) {
   return cachedMtToken;
 }
 
-async function callTranslateApi(baseUrl, token, text) {
-  return fetch(`${baseUrl}/MT/translate/hakka_zh_hk`, {
+// 客委會 MT API 可用的轉換模式（見 API 使用手冊 (4) 文字翻譯、漢字轉拼音）
+const MT_MODES = new Set([
+  "hakka_zh_hk",            // 華語 → 客語漢字（四縣）
+  "hakka_hailu_zh_hk",      // 華語 → 客語漢字（海陸）
+  "hakka_hk_py",            // 客語漢字（四縣）→ 拼音數字調
+  "hakka_hailu_hk_py",      // 客語漢字（海陸）→ 拼音數字調
+  "hakka_hk_py_tone",       // 客語漢字（四縣）→ 拼音調型符號
+  "hakka_hailu_hk_py_tone"  // 客語漢字（海陸）→ 拼音調型符號
+]);
+
+async function callTranslateApi(baseUrl, token, text, mode) {
+  return fetch(`${baseUrl}/MT/translate/${mode}`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -115,14 +125,14 @@ async function callTranslateApi(baseUrl, token, text) {
   });
 }
 
-async function translate(text) {
+async function translate(text, mode = "hakka_zh_hk") {
   const baseUrl = getMtBaseUrl();
   let token = await mtLogin(false);
-  let response = await callTranslateApi(baseUrl, token, text);
+  let response = await callTranslateApi(baseUrl, token, text, mode);
 
   if (response.status === 401) {
     token = await mtLogin(true);
-    response = await callTranslateApi(baseUrl, token, text);
+    response = await callTranslateApi(baseUrl, token, text, mode);
   }
 
   const respText = await response.text();
@@ -149,7 +159,8 @@ module.exports = async function handler(req, res) {
       ok: true,
       service: "hakka-translate-api",
       host: getMtBaseUrl(),
-      description: "華語轉客語文字翻譯 API。請使用 POST 傳送 { text: '華語文字' }"
+      description: "客語文字翻譯／轉拼音 API。請使用 POST 傳送 { text, mode }；mode 預設 hakka_zh_hk（華語→客語），hakka_hk_py 為客語漢字→拼音數字調（四縣）。",
+      modes: [...MT_MODES]
     });
     return;
   }
@@ -173,11 +184,19 @@ module.exports = async function handler(req, res) {
       return;
     }
 
-    const hakka = await translate(text);
+    const mode = String(body.mode || "hakka_zh_hk").trim();
+    if (!MT_MODES.has(mode)) {
+      json(req, res, 400, { error: `不支援的 mode：${mode}` });
+      return;
+    }
+
+    const hakka = await translate(text, mode);
     json(req, res, 200, {
       ok: true,
       text,
-      hakka
+      mode,
+      hakka,
+      output: hakka
     });
   } catch (error) {
     json(req, res, error.statusCode || 500, {

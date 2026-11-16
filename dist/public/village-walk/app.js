@@ -302,9 +302,6 @@
            </div>
            <div class="result-card-q"><span style="font-weight:700;color:#64748b;">題目：</span>${q.question}</div>
            
-           <div class="result-card-transcript">
-             <span>🗣️ <strong>作答語音轉譯：</strong>${rec.transcript ? `“${rec.transcript}”` : '（錄音已完成接收）'}</span>
-           </div>
 
            <div class="result-dimensions">
              <div class="dim-box dim-relevance">
@@ -375,6 +372,16 @@
 
    game.appendChild(board);
  }
+
+ const play=(a)=>{try{if(a){a.volume=sfxVolume;a.currentTime=0;a.play().catch(()=>{})}}catch(e){}};
+ const birds=()=>{if(!recording&&(page===1||[2,4,6,8,10,12,14,16,18,20].includes(page))){A.birds.volume=bgmVolume*0.32;A.birds.play().catch(()=>{})}else A.birds.pause()};
+ const stopBirds=()=>{A.birds.pause();A.birds.currentTime=0};
+ function closeHint(){hintOpen=false;const c=document.getElementById('hintCard');if(c)c.remove()}
+ function go(n){recording=false;busy=false;cleanupMic();closeHint();page=Math.max(1,Math.min(22,n));img.src=`images/${String(page).padStart(2,'0')}.jpg`;render();setTimeout(birds,100)}
+ function hit(box,fn,label){if(!box)return;const [x,y,w,h]=box;const b=document.createElement('button');b.className='hit';b.style.cssText=`left:${x}%;top:${y}%;width:${w}%;height:${h}%`;b.setAttribute('aria-label',label);b.onclick=fn;hs.appendChild(b)}
+ function toggleHint(){play(A.click);if(hintOpen){closeHint();return}const text=hints[page];if(!text)return;hintOpen=true;const c=document.createElement('div');c.id='hintCard';c.className='hint-card';c.setAttribute('role','status');c.innerHTML=`<div class="hint-title">💡 觀察提示</div><div class="hint-text">${text}</div>`;game.appendChild(c)}
+ function transition(n){closeHint();play(A.next);setTimeout(()=>{play(A.walk);go(n)},250)}
+ function cleanupMic(){if(stream){stream.getTracks().forEach(t=>t.stop());stream=null}if(recordTimerHandle){clearInterval(recordTimerHandle);recordTimerHandle=null}recorder=null}
 
   let selectedAsrProvider = 'hakka_api_hak';
   let browserRecognition = null;
@@ -664,10 +671,6 @@
            <div class="ai-eval-header">
              <div class="ai-badge">🤖 AI 考官即時講評</div>
              <div class="ai-score-badge ${isHigh ? '' : 'medium'}">${rec.score || 85} 分</div>
-           </div>
-           <div class="ai-row">
-             <span class="ai-label">📝 你的作答轉譯：</span>
-             <span class="ai-text">${rec.transcript ? `「${rec.transcript}」` : '（錄音已完成接收）'}</span>
            </div>
            <div class="ai-row">
              <span class="ai-label">💡 走讀講評：</span>

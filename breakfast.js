@@ -525,6 +525,18 @@ function speechMatchesQuestion(text, question) {
   ));
 }
 
+/* 客語：漢字比不到時，再把答案與辨識結果轉拼音比（同音錯別字也算唸對） */
+async function speechMatchesQuestionByPinyin(text, question) {
+  if (speechMatchesQuestion(text, question)) return true;
+  const provider = breakfastSpeechProvider();
+  if (provider === "mandarin" || !window.HAKKA_PINYIN || !cleanSpeechText(text)) return false;
+  const results = await Promise.all(acceptedAnswers(question).map(answer => {
+    const food = findFood(answer);
+    return window.HAKKA_PINYIN.contains(food?.hakka || answer, text, { dialect: selectedDialect || "sixian" });
+  }));
+  return results.every(Boolean);
+}
+
 function selectedChoiceForQuestion(question) {
   const answer = Array.isArray(question.answer) ? question.answer[0] : question.answer;
   const food = findFood(answer);
@@ -784,7 +796,7 @@ function startMandarinBreakfastSpeech() {
     onTranscript(text) {
       recognizedSpeechText = text || "";
       lastRecognitionPayload = { text: recognizedSpeechText, provider: "mandarin_web_speech", mode: "realtime" };
-      if (els.speechStatus) els.speechStatus.textContent = recognizedSpeechText ? `即時辨識：${recognizedSpeechText}` : "華語語音辨識中...";
+      if (els.speechStatus) els.speechStatus.textContent = "華語語音辨識中...";
       renderDeveloperPanel();
       if (recognizedSpeechText && speechMatchesQuestion(recognizedSpeechText, question)) {
         finish(recognizedSpeechText, { silent: true });
@@ -840,7 +852,7 @@ async function startRealtimeBreakfastSpeech() {
     (text) => {
       recognizedSpeechText = text || "";
       lastRecognitionPayload = { text: recognizedSpeechText, provider: "hakka_realtime_asr", mode: "realtime" };
-      if (els.speechStatus) els.speechStatus.textContent = recognizedSpeechText ? `即時辨識：${recognizedSpeechText}` : "客語即時辨識中...";
+      if (els.speechStatus) els.speechStatus.textContent = "客語即時辨識中...";
       renderDeveloperPanel();
       if (recognizedSpeechText && speechMatchesQuestion(recognizedSpeechText, question)) finish(recognizedSpeechText, { silent: true });
     },
@@ -992,15 +1004,15 @@ async function recognizeBreakfastSpeech(blob) {
   }
 }
 
-function handleSpeechAnswer(text, question, options = {}) {
-  const pass = speechMatchesQuestion(text, question);
+async function handleSpeechAnswer(text, question, options = {}) {
+  const pass = await speechMatchesQuestionByPinyin(text, question);
   els.feedback.hidden = false;
   if (!pass) {
     markCurrentQuestionMissed();
     if (!options.silent) playSound("wrong");
     els.feedback.textContent = question.hint;
     els.nextBtn.disabled = true;
-    if (els.speechStatus) els.speechStatus.textContent = text ? `辨識：${text}` : "沒有辨識到文字。";
+    if (els.speechStatus) els.speechStatus.textContent = text ? "發音還不太一樣，再試一次。" : "沒有聽清楚聲音，請再唸一次。";
     renderDeveloperPanel();
     return;
   }
@@ -1011,7 +1023,7 @@ function handleSpeechAnswer(text, question, options = {}) {
   if (!options.silent) playSound("correct");
   els.feedback.textContent = Array.isArray(question.answer) ? "答對了！這兩樣就是句子裡的食物。" : "答對了！得到一顆星星。";
   els.nextBtn.disabled = false;
-  if (els.speechStatus) els.speechStatus.textContent = text ? `辨識：${text}` : "辨識正確。";
+  if (els.speechStatus) els.speechStatus.textContent = "唸對了！";
   renderDeveloperPanel();
 }
 

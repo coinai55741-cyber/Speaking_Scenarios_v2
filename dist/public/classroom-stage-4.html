@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>念課文 · 第四學習階段</title>
 <script src="./speech-api-config.js?v=20260909-global-ticket2"></script>
+<script src="./hakka-pinyin-match.js?v=20261116-pinyin1"></script>
 <link rel="stylesheet" href="./hakka-font.css?v=20260907-font4">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Noto+Serif+TC:wght@600;700;900&display=swap" rel="stylesheet">
 <style>
@@ -1162,10 +1163,18 @@ function stopRec(){
 $("mic").onclick = () => { micOn ? stopRec() : startRec(); };
 
 /* ── 判定：逐字對齊，中率到 PASS 就算過 ───────────── */
-function judge(got){
+/* 客語：標準句與辨識結果都轉拼音再逐音節比（同音錯別字也算著）；畫面毋顯示辨識出來个字 */
+async function judge(got){
   const q = list[at]; if(!q) return;
   const exp = [...q.s.replace(/\[|\]/g,"")].filter(c => ASR.CJK.test(c));
-  const a = ASR.align(exp, got);
+  let a = ASR.align(exp, got);
+  const heard = !!a.got;
+  if(heard && a.ok < a.n && window.HAKKA_PINYIN){
+    $("jtit").textContent = "評分中⋯⋯";
+    const p = await window.HAKKA_PINYIN.judge(exp.join(""), got, { dialect: "sixian" });
+    if(list[at] !== q) return;                              /* 已經換句 */
+    if(p.method === "pinyin") a = { hit: p.hit, ok: p.ok, n: p.n };
+  }
   const rate = a.n ? a.ok / a.n : 0;
   const ok = rate >= PASS;
 
@@ -1175,7 +1184,7 @@ function judge(got){
   $("bar").style.width = Math.round(rate*100) + "%";
   $("bar").className = ok ? "pass" : "part";
   $("score").textContent = "中 " + a.ok + " / " + a.n + " 字　" + Math.round(rate*100) + "%";
-  $("raw").textContent = a.got ? "辨識：" + a.got : "無聽著聲";
+  $("raw").textContent = heard ? "" : "無聽著聲";
   $("jtit").textContent = ok ? (a.ok === a.n ? "全中，蓋𠢕！" : "過咧") : "還差兜仔";
   $("judge").className = "judge on " + (ok ? "pass" : "part");
   if(ok){ passed.add(at); lanterns();

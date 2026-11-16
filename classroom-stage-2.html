@@ -311,6 +311,7 @@
   .sq-res.v0{color:var(--lantern);opacity:1;font-weight:700}
   .sq-demo{font-size:11px;opacity:.4;margin:9px 0 0;line-height:1.5}
 </style>
+<script src="./hakka-pinyin-match.js?v=20261116-pinyin1"></script>
 </head>
 <body>
 <a class="menu-back" href="./classroom.html" aria-label="返回單元快問快答">返回</a>
@@ -1281,7 +1282,7 @@ const SAY=(()=>{
       if(kind==="err"){ stopRec(true); busy=false;
         res.textContent="（"+msg+"）這題先過。"; res.className="sq-res";
         bNext.disabled=false; return; }
-      stopRec(true); busy=false; grade(msg);
+      stopRec(true); busy=false; grade(msg).catch(()=>{});
     });
     if(!ok){ busy=false; return; }
     recording=true; bMic.classList.add("on");
@@ -1296,16 +1297,25 @@ const SAY=(()=>{
     /* 麥克風留等 —— 考驗煞咧正關，免得逐題重討權限 */
   }
 
-  function grade(txt){
-    const q=list[at], r=judge(q.w, txt);
+  /* 客語：漢字比不到時，把正解與辨識結果轉拼音再比（同音錯別字也算著）；畫面毋顯示辨識出來个字 */
+  async function grade(txt){
+    const q=list[at];
+    let r=judge(q.w, txt);
+    const lang=(function(){ try { return localStorage.getItem("speakingDemoAsrLanguage"); }catch(e){ return null; } })() || "hak";
+    if(r.v>=0 && r.v<2 && lang!=="zh" && window.HAKKA_PINYIN){
+      res.textContent="評分中⋯⋯"; res.className="sq-res";
+      const p=await window.HAKKA_PINYIN.judge(q.w, txt, { dialect:"sixian" });
+      if(list[at]!==q) return;              /* 已經換題 */
+      if(p.method==="pinyin") r={v: p.pass?2:(p.ratio>=0.6?1:0), got:r.got};
+    }
     elW.textContent=q.w; elW.className="sq-ans on";
     bHear.disabled=false; bNext.disabled=false;
     if(r.v===2){ right++;
       res.textContent="✓ 著咧！就係「"+q.w+"」。"; res.className="sq-res v2"; }
     else if(r.v===1){
-      res.textContent="～ 當接近。聽著「"+r.got+"」，正解係「"+q.w+"」。"; res.className="sq-res v1"; }
+      res.textContent="～ 當接近。正解係「"+q.w+"」，撳「聽正解」跈等唸。"; res.className="sq-res v1"; }
     else if(r.v===0){
-      res.textContent="聽著「"+r.got+"」。正解係「"+q.w+"」—— 撳「聽正解」跈等唸。";
+      res.textContent="發音還差兜仔。正解係「"+q.w+"」—— 撳「聽正解」跈等唸。";
       res.className="sq-res v0"; }
     else {
       res.textContent="無聽著聲。正解係「"+q.w+"」。"; res.className="sq-res"; }
@@ -1342,15 +1352,14 @@ const SAY=(()=>{
     list=mix(h).concat(mix(e)).slice(0,Math.min(N,words.length));
     if(!list.length) return false;
     at=0; right=0; busy=false;
-    demo.textContent="辨識用字同課本無共樣乜會判做無著，毋一定係你講毋著。";
+    demo.textContent="";
     box.classList.add("on"); show();
     return true;
   }
   function passCurrent(){
     if(!list[at]) return;
     const q = list[at];
-    grade(q.w);
-    renderDeveloperPanel();
+    grade(q.w).then(renderDeveloperPanel);
   }
   function getCurrent(){ return list[at] || null; }
   function getProgress(){ return { at: at + 1, total: list.length, isDone: at >= list.length }; }

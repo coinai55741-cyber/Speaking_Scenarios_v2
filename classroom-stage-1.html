@@ -192,6 +192,7 @@
 <link rel="stylesheet" href="./unit-menu.css?v=20260909-fixed-back2">
 <script src="./speech-api-config.js?v=20260909-global-ticket2"></script>
 <script src="./speech-realtime-asr.js"></script>
+<script src="./hakka-pinyin-match.js?v=20261116-pinyin1"></script>
 </head>
 <body><a class="menu-back" href="./Vocabulary.html" aria-label="返回口說詞彙卡">返回</a>
   <header>
@@ -226,7 +227,7 @@ const micMsg = document.getElementById("micMsg");
 const asrBadge = document.getElementById("asrLiveBadge");
 const asrTextEl = document.getElementById("asrText");
 let micStream = null, hostRec = null, hostChunks = [];
-let currentAsrSession = null, liveAsrText = "";
+let currentAsrSession = null, liveAsrText = "", evalToken = 0, lastJudgeResult = null;
 
 function tell(msg){
   try{ if(frame.contentWindow) frame.contentWindow.postMessage(msg, "*"); }catch(e){}
@@ -243,7 +244,8 @@ window.addEventListener("message", e => {
 
   if(d.echo === "guest-ready"){ announce(); return; }
 
-  function evaluateAndAwardStars(txt) {
+  async function evaluateAndAwardStars(txt) {
+    const token = ++evalToken;
     const doc = frame.contentDocument;
     const targetWord = (doc?.querySelector(".echo-w")?.textContent?.trim()) || lastTargetWord || "";
     const targetGloss = (doc?.querySelector(".cn")?.textContent?.trim()) || "";
@@ -251,30 +253,32 @@ window.addEventListener("message", e => {
     const isMandarin = (currentLang === "zh");
 
     const expectedText = isMandarin ? targetGloss : targetWord;
-    const expectedLabel = isMandarin ? "華語意思" : "客語正字";
-    const cleanedExpected = (expectedText || "").replace(/[^\u4e00-\u9fa5a-zA-Z0-9]/g, "");
-    const cleanedGot = (txt || "").replace(/[^\u4e00-\u9fa5a-zA-Z0-9]/g, "");
+    const cleanedGot = (txt || "").replace(/[^一-龥a-zA-Z0-9]/g, "");
+
+    /* 客語：辨識結果與標準答案都轉拼音再比（避免同音錯別字被判錯）；華語維持逐字比對 */
+    let result = null;
+    if (cleanedGot && window.HAKKA_PINYIN) {
+      result = isMandarin
+        ? window.HAKKA_PINYIN.judgeByChar(expectedText, cleanedGot)
+        : await window.HAKKA_PINYIN.judge(expectedText, cleanedGot, { dialect: "sixian" });
+      if (token !== evalToken) return;          /* 已有較新的判定 */
+    }
+    lastJudgeResult = result;
 
     let stars = 1;
     let message = "";
     if (!cleanedGot) {
       stars = 0;
       message = "無聽著聲音，請靠近麥克風再唸一擺。";
-    } else if (cleanedExpected && (cleanedGot.includes(cleanedExpected) || cleanedExpected.includes(cleanedGot))) {
+    } else if (result && result.pass) {
       stars = 3;
-      message = `當著！${expectedLabel}辨識正確：【${cleanedGot}】。`;
+      message = "當著！發音正確。";
+    } else if (result && result.ok > 0) {
+      stars = 2;
+      message = "當接近咧！再唸一擺看會較像無。";
     } else {
-      let hits = 0;
-      for (const c of cleanedExpected) {
-        if (cleanedGot.includes(c)) hits++;
-      }
-      if (hits > 0) {
-        stars = 2;
-        message = `當接近咧！辨識結果：【${cleanedGot}】，再唸一擺看會較像無。`;
-      } else {
-        stars = 1;
-        message = `辨識為【${cleanedGot}】，與${expectedLabel}【${expectedText}】不符，請再試一次。`;
-      }
+      stars = 1;
+      message = "同標準發音還有差，請再試一次。";
     }
 
     if (doc) {
@@ -294,7 +298,7 @@ window.addEventListener("message", e => {
       if (bNext) bNext.disabled = (stars === 0);
     }
     if (asrTextEl) {
-      asrTextEl.textContent = (cleanedGot ? `「${cleanedGot}」(${stars}星)` : "無辨識到聲音");
+      asrTextEl.textContent = (cleanedGot ? "★★★".slice(0, stars) + "☆☆☆".slice(0, 3 - stars) : "無辨識到聲音");
     }
     renderDeveloperPanel();
   }
@@ -333,16 +337,11 @@ window.addEventListener("message", e => {
             onTranscript: (txt) => {
               if(txt) {
                 liveAsrText = txt;
-                if(asrTextEl) asrTextEl.textContent = txt;
-                const note = frame.contentDocument?.querySelector(".echo-note");
-                if(note) note.textContent = "即時辨識中：【" + txt + "】";
+                if(asrTextEl) asrTextEl.textContent = "聆聽中⋯⋯";
               }
             },
             onFinal: (txt) => {
-              if(txt) {
-                liveAsrText = txt;
-                if(asrTextEl) asrTextEl.textContent = txt;
-              }
+              if(txt) liveAsrText = txt;
               evaluateAndAwardStars(liveAsrText);
             },
             onError: (err) => {
