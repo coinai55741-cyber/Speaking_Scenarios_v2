@@ -6,6 +6,7 @@
 <title>念課文 · 第四學習階段</title>
 <script src="./speech-api-config.js?v=20260909-global-ticket2"></script>
 <script src="./hakka-pinyin-match.js?v=20261116-pinyin1"></script>
+<script src="./hakka-score.js?v=20261116-score1"></script>
 <link rel="stylesheet" href="./hakka-font.css?v=20260907-font4">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Noto+Serif+TC:wght@600;700;900&display=swap" rel="stylesheet">
 <style>
@@ -825,6 +826,7 @@ function renderDeveloperPanel() {
     </div>
   `;
 
+  if (window.HAKKA_SCORE) HAKKA_SCORE.upgradeSelect(panel.querySelector("#devLangSelect"));
   panel.querySelector("#devLangSelect")?.addEventListener("change", (e) => {
     currentAsrLang = e.target.value;
     try { localStorage.setItem("speakingDemoAsrLanguage", currentAsrLang); } catch(err){}
@@ -934,6 +936,7 @@ function paint(s){
 
 function show(){
   const q = list[at];
+  if(q && window.HAKKA_SCORE) HAKKA_SCORE.setCurrent({ pinyin: q.p || "", text: (q.s || "").replace(/\[|\]/g, "") });
   if(!q){ done(); return; }
   stage = "listen";
   document.querySelector(".card").classList.remove("end");
@@ -1141,12 +1144,44 @@ function onState(kind, msg){
   }
   if(kind === "done"){ releaseMic(); judge(msg); }
 }
+/* ── 長問發音評分（有拼音个句仔）──────────────── */
+let scoreSess = null;
+function scoreMethod(){ return window.HAKKA_SCORE ? HAKKA_SCORE.resolve(list[at] && list[at].p).method : "hakka"; }
+async function finishScore(){
+  const sess = scoreSess; scoreSess = null;
+  const q = list[at];
+  const r = await sess.finish();
+  releaseMic();
+  if(list[at] !== q) return;
+  $("marks").innerHTML = ""; $("raw").textContent = "";
+  if(!r.ok){
+    $("jtit").textContent = r.silent ? "無聽著聲" : "評分無成功，請再念一擺";
+    $("score").textContent = ""; $("bar").style.width = "0%";
+    $("judge").className = "judge on part"; return;
+  }
+  $("bar").style.width = r.score + "%";
+  $("bar").className = r.pass ? "pass" : "part";
+  $("score").textContent = r.score + " 分";
+  $("jtit").textContent = r.pass ? (r.score >= 90 ? "全中，蓋𠢕！" : "過咧") : "還差兜仔";
+  $("judge").className = "judge on " + (r.pass ? "pass" : "part");
+  if(r.pass){ passed.add(at); lanterns();
+    $("prog").textContent = DATA[li].g + "　第 " + (at+1) + " / " + list.length + " 句　（過 " + passed.size + "）"; }
+}
 async function startRec(){
   if(micOn || !list[at]) return;
-  if(!ASR_URL){ $("heard").innerHTML = "還吂設定辨識服務。搉下背該條算佢念著。"; return; }
+  const method = scoreMethod();
+  if(method === "none"){ $("heard").innerHTML = "這句無拼音，長問評分用毋著。"; return; }
+  if(method !== "changwen" && !ASR_URL){ $("heard").innerHTML = "還吂設定辨識服務。搉下背該條算佢念著。"; return; }
   let st;
   try{ st = await getMic(); }
   catch(e){ $("heard").innerHTML = "開毋著麥克風。看下瀏覽器有無准。"; return; }
+  if(method === "changwen"){
+    micOn = true;
+    $("judge").className = "judge";
+    scoreSess = HAKKA_SCORE.startScoring(st);
+    onState("rec");
+    return;
+  }
   micOn = true;
   $("judge").className = "judge";
   $("mic").disabled = true; $("mic").textContent = "連線中⋯⋯";
@@ -1158,6 +1193,7 @@ function stopRec(){
   clearTimeout(capTimer);
   $("mic").disabled = true;
   $("mic").classList.remove("rec"); $("mic").textContent = "送出⋯⋯";
+  if(scoreSess){ $("heard").textContent = "評分中⋯⋯"; finishScore(); return; }
   ASR.stop();
 }
 $("mic").onclick = () => { micOn ? stopRec() : startRec(); };
@@ -1196,7 +1232,7 @@ $("demo").onclick = () => { if(list[at]){ passed.add(at); lanterns();
   $("score").textContent = ""; $("raw").textContent = "（示範模式）";
   $("judge").className = "judge on pass"; } };
 
-function go(n){ if(micOn){ ASR.abort(); releaseMic(); } at = n; show(); }
+function go(n){ if(scoreSess){ scoreSess.abort(); scoreSess = null; } if(micOn){ ASR.abort(); releaseMic(); } at = n; show(); }
 $("next").onclick = () => go(at + 1);
 $("skip").onclick = () => go(at + 1);
 

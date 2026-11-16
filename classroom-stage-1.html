@@ -193,6 +193,7 @@
 <script src="./speech-api-config.js?v=20260909-global-ticket2"></script>
 <script src="./speech-realtime-asr.js"></script>
 <script src="./hakka-pinyin-match.js?v=20261116-pinyin1"></script>
+<script src="./hakka-score.js?v=20261116-score1"></script>
 </head>
 <body><a class="menu-back" href="./Vocabulary.html" aria-label="返回口說詞彙卡">返回</a>
   <header>
@@ -245,6 +246,7 @@ window.addEventListener("message", e => {
   if(d.echo === "guest-ready"){ announce(); return; }
 
   async function evaluateAndAwardStars(txt) {
+    if (stage1Scoring) return;                 /* 長問評分中，等評分結果 */
     const token = ++evalToken;
     const doc = frame.contentDocument;
     const targetWord = (doc?.querySelector(".echo-w")?.textContent?.trim()) || lastTargetWord || "";
@@ -311,6 +313,11 @@ window.addEventListener("message", e => {
       const currentLang = window.HAKKA_REALTIME_ASR?.getLanguage?.() || "hak";
       const isMandarin = (currentLang === "zh");
       if(asrBadge) { asrBadge.style.display = "inline-flex"; asrTextEl.textContent = "聆聽中⋯⋯"; }
+      const scoreWord = (frame.contentDocument?.querySelector(".echo-w")?.textContent?.trim()) || lastTargetWord || "";
+      if (window.HAKKA_SCORE) HAKKA_SCORE.setCurrent({ pinyin: pinyinForWord(scoreWord), text: scoreWord });
+      const scoreMethod = window.HAKKA_SCORE ? HAKKA_SCORE.resolve(pinyinForWord(scoreWord)).method : "hakka";
+      stage1Scoring = (scoreMethod === "changwen");
+      if (stage1Scoring) stage1ScoreSess = HAKKA_SCORE.startScoring(micStream);
 
       const doc = frame.contentDocument;
       if (doc) {
@@ -329,7 +336,7 @@ window.addEventListener("message", e => {
       }
 
       // 同步啟動 Realtime ASR 串流，傳入當前選定語種
-      if(window.HAKKA_REALTIME_ASR && window.HAKKA_REALTIME_ASR.createSession){
+      if(!stage1ScoreSess && window.HAKKA_REALTIME_ASR && window.HAKKA_REALTIME_ASR.createSession){
         try {
           if(currentAsrSession) { currentAsrSession.abort(); currentAsrSession = null; }
           currentAsrSession = window.HAKKA_REALTIME_ASR.createSession({
@@ -358,6 +365,10 @@ window.addEventListener("message", e => {
       hostRec.ondataavailable = ev => { if(ev.data && ev.data.size) hostChunks.push(ev.data); };
       hostRec.onerror = () => tell({echo:"rec-error", name:"RecError"});
       hostRec.onstop = () => {
+        if(stage1ScoreSess){
+          const sess = stage1ScoreSess; stage1ScoreSess = null;
+          sess.finish().then(awardFromScore);
+        }
         if(currentAsrSession){
           try { currentAsrSession.stop(); } catch(e){}
         }
@@ -449,20 +460,50 @@ let lastTargetWord = "";
 
 const GAME_WORDS = [
   [
-    {k:"喊", c:"叫"}, {k:"搞", c:"玩耍"}, {k:"囥人尋", c:"捉迷藏"},
-    {k:"這位", c:"這裡"}, {k:"恬恬", c:"安靜、不出聲"}, {k:"跈", c:"跟隨"}, {k:"仰會", c:"怎麼會"}
+    {k:"喊", c:"叫"}, {k:"搞", p:"gauˋ", c:"玩耍"}, {k:"囥人尋", p:"kon nginˇ qimˇ", c:"捉迷藏"},
+    {k:"這位", p:"iaˋ vi", c:"這裡"}, {k:"恬恬", c:"安靜、不出聲"}, {k:"跈", p:"tenˇ", c:"跟隨"}, {k:"仰會", c:"怎麼會"}
   ],
   [
-    {k:"果子", c:"水果"}, {k:"頭家", c:"老闆"}, {k:"弓蕉", c:"香蕉"},
-    {k:"葡萄", c:"葡萄"}, {k:"西瓜", c:"西瓜"}, {k:"黃梨", c:"鳳梨"},
-    {k:"味緒", c:"味道"}, {k:"有兜仔", c:"有些"}
+    {k:"果子", p:"goˋ ziiˋ", c:"水果"}, {k:"頭家", p:"teuˇ gaˊ", c:"老闆"}, {k:"弓蕉", p:"giungˊ zeuˊ", c:"香蕉"},
+    {k:"葡萄", p:"puˇ toˇ", c:"葡萄"}, {k:"西瓜", p:"xiˊ guaˊ", c:"西瓜"}, {k:"黃梨", c:"鳳梨"},
+    {k:"味緒", p:"mi xi", c:"味道"}, {k:"有兜仔", c:"有些"}
   ],
   [
-    {k:"注射", c:"打針"}, {k:"叼著", c:"叮到"}, {k:"當", c:"很…"},
-    {k:"驚", c:"害怕"}, {k:"毋好", c:"不可以、不要"}, {k:"停動", c:"動"},
-    {k:"毋使", c:"不必、不用"}, {k:"毋驚", c:"不怕"}, {k:"天光日", c:"明天"}, {k:"共樣", c:"一樣"}
+    {k:"注射", p:"zu sa", c:"打針"}, {k:"叼著", p:"diauˊ doˋ", c:"叮到"}, {k:"當", p:"dongˊ", c:"很…"},
+    {k:"驚", p:"giangˊ", c:"害怕"}, {k:"毋好", c:"不可以、不要"}, {k:"停動", c:"動"},
+    {k:"毋使", c:"不必、不用"}, {k:"毋驚", c:"不怕"}, {k:"天光日", c:"明天"}, {k:"共樣", p:"kiung iong", c:"一樣"}
   ]
 ];
+
+/* ── 長問發音評分 ──────────────────────────────
+ * 拼音來源：來上客對應課文（見 docs/評分API題目拼音清單.csv），沒有 p 个詞改用客委會辨識 */
+let stage1ScoreSess = null, stage1Scoring = false;
+function pinyinForWord(k) {
+  for (const lesson of GAME_WORDS) for (const w of lesson) if (w.k === k) return w.p || "";
+  return "";
+}
+function awardFromScore(r) {
+  /* stage1Scoring 留到下一擺錄音正改，免得原本辨識流程晏兜仔又蓋過評分結果 */
+  let stars, message;
+  if (r.ok && r.pass) { stars = 3; message = `當著！發音正確（${r.score} 分）。`; }
+  else if (r.ok && r.score >= 40) { stars = 2; message = `當接近咧（${r.score} 分）！再唸一擺看會較像無。`; }
+  else if (r.ok) { stars = 1; message = `同標準發音還有差（${r.score} 分），請再試一次。`; }
+  else { stars = 0; message = r.silent ? "無聽著聲音，請靠近麥克風再唸一擺。" : "評分無成功，請再唸一擺。"; }
+  const doc = frame.contentDocument;
+  if (doc) {
+    const starsEl = doc.querySelector(".echo-stars");
+    const note = doc.querySelector(".echo-note");
+    const bNext = doc.querySelector(".echo-next");
+    if (starsEl) {
+      if (stars > 0) { starsEl.textContent = "★★★".slice(0, stars) + "☆☆☆".slice(0, 3 - stars); starsEl.className = "echo-stars on s" + stars; }
+      else { starsEl.textContent = ""; starsEl.className = "echo-stars"; }
+    }
+    if (note) note.textContent = message;
+    if (bNext) bNext.disabled = (stars === 0);
+  }
+  if (asrTextEl) asrTextEl.textContent = stars ? "★★★".slice(0, stars) + "☆☆☆".slice(0, 3 - stars) : "無辨識到聲音";
+  renderDeveloperPanel();
+}
 
 function simulatePassWord(wordKey) {
   try {
@@ -589,6 +630,11 @@ function renderDeveloperPanel() {
     </div>
   `;
 
+  if (window.HAKKA_SCORE) {
+    const tw = (frame.contentDocument?.querySelector(".echo-w")?.textContent?.trim()) || lastTargetWord || "";
+    if (tw) HAKKA_SCORE.setCurrent({ pinyin: pinyinForWord(tw), text: tw });
+    HAKKA_SCORE.upgradeSelect(panel.querySelector("#devLangSelect"));
+  }
   panel.querySelector("#devLangSelect")?.addEventListener("change", (e) => {
     const val = e.target.value;
     if (window.HAKKA_REALTIME_ASR?.setLanguage) window.HAKKA_REALTIME_ASR.setLanguage(val);

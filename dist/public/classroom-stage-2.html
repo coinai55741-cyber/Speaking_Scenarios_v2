@@ -312,6 +312,7 @@
   .sq-demo{font-size:11px;opacity:.4;margin:9px 0 0;line-height:1.5}
 </style>
 <script src="./hakka-pinyin-match.js?v=20261116-pinyin1"></script>
+<script src="./hakka-score.js?v=20261116-score1"></script>
 </head>
 <body>
 <a class="menu-back" href="./classroom.html" aria-label="返回單元快問快答">返回</a>
@@ -1246,6 +1247,19 @@ const SAY=(()=>{
   }
 
   const CJK=/[\u3400-\u9fff]/;
+  /* 詞个拼音：從 SENT 例句（h 漢字、p 拼音逐字對應）對出來 */
+  function wordPinyin(word){
+    const CJK2=/[\u3400-\u9fff\uf900-\ufaff\u{20000}-\u{2fa1f}]/u;
+    for(const L of Object.values(typeof SENT==="object"?SENT:{})){
+      const e=L&&L[word]; if(!e||!e.h||!e.p) continue;
+      const ch=[...e.h].filter(c=>CJK2.test(c)), sy=e.p.trim().split(/\s+/);
+      const wc=[...word], n=wc.length;              /* 用字陣列找位置，𠊎 這類擴充字才毋會算錯 */
+      if(ch.length!==sy.length) continue;
+      for(let i=0;i+n<=ch.length;i++) if(ch.slice(i,i+n).join("")===word) return sy.slice(i,i+n).join(" ");
+    }
+    return "";
+  }
+  let scoreSess=null;
   function judge(word, got){
     const g=[...String(got||"")].filter(c=>CJK.test(c)).join("");
     if(!g) return {v:-1, got:""};
@@ -1267,8 +1281,35 @@ const SAY=(()=>{
     stream=null;
   }
 
+  async function finishScore(){
+    const sess=scoreSess; scoreSess=null;
+    const q=list[at];
+    res.textContent="評分中⋯⋯"; res.className="sq-res";
+    const r=await sess.finish();
+    busy=false;
+    if(list[at]!==q) return;
+    elW.textContent=q.w; elW.className="sq-ans on";
+    bHear.disabled=false; bNext.disabled=false;
+    if(r.ok && r.pass){ right++; res.textContent="✓ 著咧！就係「"+q.w+"」（"+r.score+" 分）。"; res.className="sq-res v2"; }
+    else if(r.ok){ res.textContent="發音還差兜仔（"+r.score+" 分）。正解係「"+q.w+"」—— 撳「聽正解」跈等唸。"; res.className="sq-res v0"; }
+    else { res.textContent=(r.silent?"無聽著聲。":"評分無成功。")+"正解係「"+q.w+"」。"; res.className="sq-res"; }
+  }
   async function speak(){
     if(busy||recording) { if(recording) stopRec(); return; }
+    const method=window.HAKKA_SCORE?HAKKA_SCORE.resolve(wordPinyin(list[at]&&list[at].w)).method:"hakka";
+    if(method==="none"){ res.textContent="這題無拼音，長問評分用毋著。"; res.className="sq-res"; return; }
+    if(method==="changwen"){
+      let st0;
+      try{ st0=await getMic(); }
+      catch(e){ res.textContent="麥克風用毋著。"; res.className="sq-res"; return; }
+      busy=true;
+      scoreSess=HAKKA_SCORE.startScoring(st0);
+      res.textContent="講啊⋯⋯"; res.className="sq-res";
+      recording=true; bMic.classList.add("on");
+      let left0=SEC; bMic.textContent="■ 停（"+left0+"）";
+      timer=setInterval(()=>{ left0--; bMic.textContent="■ 停（"+left0+"）"; if(left0<=0) stopRec(); },1000);
+      return;
+    }
     if(typeof ASR_URL!=="string" || !ASR_URL){
       res.textContent="還吂設定辨識服務。"; res.className="sq-res"; return;
     }
@@ -1293,6 +1334,7 @@ const SAY=(()=>{
     if(timer){ clearInterval(timer); timer=null; }
     if(!recording) return;
     recording=false; bMic.classList.remove("on"); bMic.textContent="🎤 講";
+    if(scoreSess){ if(silent){ scoreSess.abort(); scoreSess=null; busy=false; } else finishScore(); return; }
     if(!silent) ASR.stop();
     /* 麥克風留等 —— 考驗煞咧正關，免得逐題重討權限 */
   }
@@ -1325,6 +1367,7 @@ const SAY=(()=>{
 
   function show(){
     const q=list[at];
+    if(q && window.HAKKA_SCORE) HAKKA_SCORE.setCurrent({ pinyin: wordPinyin(q.w), text: q.w });
     elC.textContent=q.c;
     elW.textContent=""; elW.className="sq-ans";
     prog.textContent=(at+1)+" / "+list.length;
@@ -1611,6 +1654,7 @@ function renderDeveloperPanel() {
       </div>
     `;
 
+    if (window.HAKKA_SCORE) HAKKA_SCORE.upgradeSelect(panel.querySelector("#devLangSelect"));
     panel.querySelector("#devLangSelect")?.addEventListener("change", (e) => {
       const val = e.target.value;
       try { localStorage.setItem("speakingDemoAsrLanguage", val); } catch(err) {}
@@ -1698,6 +1742,7 @@ function renderDeveloperPanel() {
     </div>
   `;
 
+  if (window.HAKKA_SCORE) HAKKA_SCORE.upgradeSelect(panel.querySelector("#devLangSelect"));
   panel.querySelector("#devLangSelect")?.addEventListener("change", (e) => {
     const val = e.target.value;
     try { localStorage.setItem("speakingDemoAsrLanguage", val); } catch(err) {}

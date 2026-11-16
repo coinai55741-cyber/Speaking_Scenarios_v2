@@ -50,6 +50,17 @@ function breakfastRecognitionMode() {
   return value === "realtime" ? "realtime" : "file";
 }
 
+/* 長問發音評分：題目要念个拼音（多樣食物就照順序接起來） */
+function questionPinyin(question) {
+  const list = acceptedAnswers(question).map(answer => findFood(answer)?.pinyin || "");
+  return list.every(Boolean) ? list.join(" ") : "";
+}
+function questionHakkaText(question) {
+  return acceptedAnswers(question).map(answer => findFood(answer)?.hakka || answer).join("");
+}
+if (window.HAKKA_SCORE) HAKKA_SCORE.configure({ isMandarin: () => breakfastSpeechProvider() === "mandarin" });
+let breakfastScoreSess = null;
+
 function breakfastSpeechProvider() {
   const value = localStorage.getItem(BREAKFAST_PROVIDER_KEY) || "hakka";
   return value === "mandarin" ? "mandarin" : "hakka";
@@ -306,6 +317,7 @@ function renderDeveloperPanel() {
     renderDeveloperPanel();
   });
 
+  if (window.HAKKA_SCORE) HAKKA_SCORE.upgradeSelect(els.developerContent.querySelector("#developerProviderSelect"), { hak: "hakka", zh: "mandarin" });
   els.developerContent.querySelector("#developerProviderSelect")?.addEventListener("change", event => {
     localStorage.setItem(BREAKFAST_PROVIDER_KEY, event.target.value === "mandarin" ? "mandarin" : "hakka");
     renderDeveloperPanel();
@@ -733,7 +745,12 @@ async function startSpeechRecording() {
     speechRecorder.addEventListener("stop", finishSpeechRecording, { once: true });
     speechRecorder.start();
     isSpeechRecording = true;
-    if (breakfastSpeechProvider() === "hakka" && breakfastRecognitionMode() === "realtime") {
+    const scoreMethod = window.HAKKA_SCORE ? HAKKA_SCORE.resolve(questionPinyin(activeQuestions[currentIndex])).method : "hakka";
+    if (scoreMethod === "changwen") {
+      breakfastScoreSess = HAKKA_SCORE.startScoring(speechStream);
+    } else if (scoreMethod === "none") {
+      if (els.speechStatus) els.speechStatus.textContent = "這題沒有拼音，長問評分無法使用。";
+    } else if (breakfastSpeechProvider() === "hakka" && breakfastRecognitionMode() === "realtime") {
       startRealtimeBreakfastSpeech();
     } else if (breakfastSpeechProvider() === "mandarin") {
       startMandarinBreakfastSpeech();
@@ -896,6 +913,29 @@ async function startRealtimeBreakfastSpeech() {
   }
 }
 async function finishSpeechRecording() {
+  if (breakfastScoreSess) {
+    const sess = breakfastScoreSess; breakfastScoreSess = null;
+    const question = activeQuestions[currentIndex];
+    const r = await sess.finish();
+    const type0 = speechRecorder?.mimeType || "audio/webm";
+    speechAudioBlob = new Blob(speechChunks, { type: type0 });
+    if (speechAudioUrl) URL.revokeObjectURL(speechAudioUrl);
+    speechAudioUrl = URL.createObjectURL(speechAudioBlob);
+    if (speechStream) { speechStream.getTracks().forEach(track => track.stop()); speechStream = null; }
+    if (els.playSpeechBtn) els.playSpeechBtn.disabled = false;
+    isSpeechRecognizing = false;
+    if (els.recordSpeechBtn) { els.recordSpeechBtn.disabled = false; setIconButton(els.recordSpeechBtn, "mic", "重新錄音"); }
+    if (activeQuestions[currentIndex] !== question) return;
+    if (r.ok) {
+      await handleSpeechAnswer("", question, { forcePass: r.pass, statusText: r.pass ? `唸對了！（${r.score} 分）` : `發音還不太一樣（${r.score} 分），再試一次。` });
+    } else {
+      els.feedback.hidden = false;
+      els.feedback.textContent = question.hint;
+      if (els.speechStatus) els.speechStatus.textContent = r.silent ? "沒有聽清楚聲音，請再唸一次。" : "評分沒有成功，請再唸一次。";
+      renderDeveloperPanel();
+    }
+    return;
+  }
   const type = speechRecorder?.mimeType || "audio/webm";
   const blob = new Blob(speechChunks, { type });
   speechAudioBlob = blob;
@@ -1005,14 +1045,14 @@ async function recognizeBreakfastSpeech(blob) {
 }
 
 async function handleSpeechAnswer(text, question, options = {}) {
-  const pass = await speechMatchesQuestionByPinyin(text, question);
+  const pass = typeof options.forcePass === "boolean" ? options.forcePass : await speechMatchesQuestionByPinyin(text, question);
   els.feedback.hidden = false;
   if (!pass) {
     markCurrentQuestionMissed();
     if (!options.silent) playSound("wrong");
     els.feedback.textContent = question.hint;
     els.nextBtn.disabled = true;
-    if (els.speechStatus) els.speechStatus.textContent = text ? "發音還不太一樣，再試一次。" : "沒有聽清楚聲音，請再唸一次。";
+    if (els.speechStatus) els.speechStatus.textContent = options.statusText || (text ? "發音還不太一樣，再試一次。" : "沒有聽清楚聲音，請再唸一次。");
     renderDeveloperPanel();
     return;
   }
@@ -1023,7 +1063,7 @@ async function handleSpeechAnswer(text, question, options = {}) {
   if (!options.silent) playSound("correct");
   els.feedback.textContent = Array.isArray(question.answer) ? "答對了！這兩樣就是句子裡的食物。" : "答對了！得到一顆星星。";
   els.nextBtn.disabled = false;
-  if (els.speechStatus) els.speechStatus.textContent = "唸對了！";
+  if (els.speechStatus) els.speechStatus.textContent = options.statusText || "唸對了！";
   renderDeveloperPanel();
 }
 
@@ -1052,6 +1092,7 @@ function renderQuestionImage(question) {
 
 function renderQuestion() {
   const question = activeQuestions[currentIndex];
+  if (question && window.HAKKA_SCORE) HAKKA_SCORE.setCurrent({ pinyin: questionPinyin(question), text: questionHakkaText(question) });
   selectedAnswers = [];
   resetSpeechAnswer();
   if (els.questionNumber) els.questionNumber.textContent = String(currentIndex + 1);

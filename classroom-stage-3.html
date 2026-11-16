@@ -9,6 +9,7 @@
 <link rel="stylesheet" href="./unit-menu.css?v=20260909-fixed-back2">
 <script src="./speech-api-config.js?v=20260909-global-ticket2"></script>
 <script src="./hakka-pinyin-match.js?v=20261116-pinyin1"></script>
+<script src="./hakka-score.js?v=20261116-score1"></script>
 <style>
   :root{--indigo:#1F3A5F;--grain:#E8C87A;--paper:#FDFBF5;--bamboo:#4A7A5E;
         --lantern:#C0392B;--brick:#A8553A;--ink:#20242B}
@@ -424,6 +425,7 @@ function renderDeveloperPanel() {
     </div>
   `;
 
+  if (window.HAKKA_SCORE) HAKKA_SCORE.upgradeSelect(panel.querySelector("#devLangSelect"));
   panel.querySelector("#devLangSelect")?.addEventListener("change", (e) => {
     currentAsrLang = e.target.value;
     try { localStorage.setItem("speakingDemoAsrLanguage", currentAsrLang); } catch(err){}
@@ -527,8 +529,9 @@ function lanterns(){
 
 /* ── 出題 ──────────────────────────────────────── */
 function show(){
-  renderDeveloperPanel();
   const q = list[at];
+  if(q && window.HAKKA_SCORE) HAKKA_SCORE.setCurrent({ pinyin: q.p, text: q.w });
+  renderDeveloperPanel();
   if(!q){ done(); return; }
   stage = "spell"; typed = "";
   $("hak").textContent = q.w;
@@ -820,13 +823,34 @@ async function judge(got){
   $("heard").innerHTML = (heard ? "" : "無聽著聲。　")
     + marks + "　再念一擺看啊。";
 }
+/* ── 長問發音評分（有拼音个題目）──────────────── */
+let scoreSess = null;
+function scoreMethod(){ return window.HAKKA_SCORE ? HAKKA_SCORE.resolve(list[at] && list[at].p).method : "hakka"; }
+async function finishScore(){
+  const sess = scoreSess; scoreSess = null;
+  const q = list[at];
+  const r = await sess.finish();
+  releaseMic();
+  if(list[at] !== q || stage !== "say") return;
+  if(r.ok && r.pass){ $("heard").innerHTML = "念著咧：<b>" + q.w + "</b>（" + r.score + " 分）"; passed(); return; }
+  if(r.ok){ $("heard").innerHTML = "還差兜仔（" + r.score + " 分），撳「聽一擺」再跈等念看啊。"; return; }
+  $("heard").innerHTML = r.silent ? "無聽著聲。靠近麥克風再念一擺。" : "評分無成功，請再念一擺。";
+}
 async function startRec(){
   if(stage !== "say" || micOn) return;
-  if(!ASR_URL){ $("heard").innerHTML = "還吂設定辨識服務。搉下背該條算佢念著。"; return; }
+  const method = scoreMethod();
+  if(method === "none"){ $("heard").innerHTML = "這題無拼音，長問評分用毋著。"; return; }
+  if(method !== "changwen" && !ASR_URL){ $("heard").innerHTML = "還吂設定辨識服務。搉下背該條算佢念著。"; return; }
   let st;
   try{ st = await getMic(); }
   catch(e){
     $("heard").innerHTML = "開毋著麥克風。看下瀏覽器有無准。"; return;
+  }
+  if(method === "changwen"){
+    micOn = true;
+    scoreSess = HAKKA_SCORE.startScoring(st);
+    onState("rec");
+    return;
   }
   micOn = true;
   $("mic").disabled = true;                 /* 接通（code 180）前毋做得送出 */
@@ -839,6 +863,7 @@ function stopRec(){
   clearTimeout(capTimer);
   $("mic").disabled = true;
   $("mic").classList.remove("rec"); $("mic").textContent = "送出⋯⋯";
+  if(scoreSess){ $("heard").textContent = "評分中⋯⋯"; finishScore(); return; }
   ASR.stop();
 }
 
@@ -867,8 +892,8 @@ function showPic(q){
   box.appendChild(im);
 }
 
-$("next").onclick = () => { if(micOn){ ASR.abort(); releaseMic(); } at++; if(at<=list.length-1){ show(); } else { at=list.length; lanterns(); done(); } };
-$("skip").onclick = () => { if(micOn){ ASR.abort(); releaseMic(); } at++; if(at<=list.length-1){ show(); } else { at=list.length; lanterns(); done(); } };
+$("next").onclick = () => { if(scoreSess){ scoreSess.abort(); scoreSess = null; } if(micOn){ ASR.abort(); releaseMic(); } at++; if(at<=list.length-1){ show(); } else { at=list.length; lanterns(); done(); } };
+$("skip").onclick = () => { if(scoreSess){ scoreSess.abort(); scoreSess = null; } if(micOn){ ASR.abort(); releaseMic(); } at++; if(at<=list.length-1){ show(); } else { at=list.length; lanterns(); done(); } };
 
 $("foot").textContent = ASR_URL ? "" : "（還吂設定客語語音辨識 —— 這下用示範模式）";
 tabs(); start(); initDebugToggle(); renderDeveloperPanel(); renderDeveloperPanel();

@@ -8,6 +8,11 @@
     return;
   }
 
+  /* 長問發音評分用的答案拼音（四縣），來源：來上客 3年上 第1課「公廳」生詞表。
+   * 第 4、5 題來上客找不到，暫缺 → 自動模式改用客委會辨識（見 docs/缺拼音題目清單.csv） */
+  const QUESTION_PINYIN = { 1: "gungˊ tangˊ", 2: "foˋ fongˇ vugˋ", 3: "zangˊ ngied ban" };
+  let scoreSess = null;
+
   // DOM 元素引用
   const screenImg = document.getElementById("screen");
   const hotspotLayer = document.getElementById("hotspots");
@@ -129,6 +134,7 @@
 
     const isMandarin = isMandarinMode();
     const q = qForScreen(state.screen);
+    if (q && window.HAKKA_SCORE) HAKKA_SCORE.setCurrent({ pinyin: QUESTION_PINYIN[q.id] || "", text: q.answer });
 
     if (q) {
       const targetTxt = isMandarin ? (q.mandarinAnswer || q.answer) : q.answer;
@@ -528,6 +534,18 @@
         if (isRecording) stopRecording();
       }, maxSec);
 
+      const scoreMethod = window.HAKKA_SCORE ? HAKKA_SCORE.resolve(QUESTION_PINYIN[q.id]).method : "hakka";
+      if (scoreMethod === "none") {
+        isRecording = false; clearTimeout(recTimeout);
+        mediaStream.getTracks().forEach((t) => t.stop()); mediaStream = null;
+        setAsrState("retry", "⚠️ 無法評分", "這題沒有拼音，長問評分無法使用。");
+        return;
+      }
+      if (scoreMethod === "changwen") {
+        scoreSess = HAKKA_SCORE.startScoring(mediaStream);
+        return;
+      }
+
       let resultHandled = false;
       audioChunks = [];
       mediaRecorder = null;
@@ -672,6 +690,19 @@
     isRecording = false;
     clearTimeout(recTimeout);
 
+    if (scoreSess) {
+      const sess = scoreSess; scoreSess = null;
+      const q = qForScreen(state.screen);
+      setAsrState("recording", "⏳ 評分中", "長問發音評分中⋯", "（評分中⋯）");
+      sess.finish().then((r) => {
+        if (mediaStream) { mediaStream.getTracks().forEach((t) => t.stop()); mediaStream = null; }
+        if (!q || qForScreen(state.screen) !== q) return;
+        if (r.ok) handleRecognitionResult(q, "", { pass: r.pass, score: r.score });
+        else setAsrState("retry", "⚠️ 請再試一次", r.silent ? "沒有聽清楚聲音，請靠近麥克風再唸一次。" : "評分沒有成功，請再唸一次。", "（未完成評分）");
+      });
+      return;
+    }
+
     if (activeMandarinSession) {
       activeMandarinSession.stop();
       activeMandarinSession = null;
@@ -748,9 +779,9 @@
   }
 
   // 處理辨識結果 (分支 A / 分支 B)
-  async function handleRecognitionResult(q, transcript) {
-    if (answerInput) answerInput.value = transcript || "";
-    const isPassed = await judgeAnswer(q, transcript);
+  async function handleRecognitionResult(q, transcript, scored) {
+    if (answerInput && !scored) answerInput.value = transcript || "";
+    const isPassed = scored ? scored.pass : await judgeAnswer(q, transcript);
     const isMandarin = isMandarinMode();
     const targetTxt = isMandarin ? (q.mandarinAnswer || q.answer) : q.answer;
 
@@ -764,7 +795,7 @@
       setAsrState(
         "success",
         "✅ 辨識成功",
-        `命中「${targetTxt}」！獲得 20 分！請點擊右下角「下一題」繼續。`,
+        `命中「${targetTxt}」！${scored ? "（發音 " + scored.score + " 分）" : ""}獲得 20 分！請點擊右下角「下一題」繼續。`,
         "✓ 唸對了"
       );
       if (asrStatusText) asrStatusText.textContent = `✓ 辨識成功（命中 ${targetTxt}）`;
@@ -780,10 +811,10 @@
       setAsrState(
         "retry",
         "⚠️ 請再試一次",
-        transcript
-          ? `跟目標「${targetTxt}」的發音還不太一樣喔！請點「聽一聽」重聽後再次挑戰。`
+        (transcript || scored)
+          ? `跟目標「${targetTxt}」的發音還不太一樣喔${scored ? "（" + scored.score + " 分）" : ""}！請點「聽一聽」重聽後再次挑戰。`
           : "沒有聽清楚聲音，請靠近麥克風再唸一次。",
-        transcript ? "再試一次" : "（未偵測到清晰語音）"
+        (transcript || scored) ? "再試一次" : "（未偵測到清晰語音）"
       );
       if (asrStatusText) asrStatusText.textContent = `未通過比對（辨識為：${transcript || "無"}）`;
     }
@@ -852,7 +883,7 @@
       await playSfx("click");
       const url =
         lessonUrl ||
-        "https://12basic.hakka.gov.tw/lesson?id=15&step_no=3&semester_no=1&dialect_id=2&no=1&type_no=1&mod_no=1#mod-1";
+        "https://12basic.hakka.gov.tw/lesson?id=9&step_no=3&semester_no=1&dialect_id=1&no=1&type_no=1&mod_no=1#mod-1";
       window.open(url, "_blank", "noopener,noreferrer");
       return;
     }
@@ -911,6 +942,11 @@
       developerPanel.hidden = !debugToggle.checked;
       updateDeveloperPanel();
     });
+  }
+
+  if (window.HAKKA_SCORE) {
+    HAKKA_SCORE.configure({ isMandarin: () => isMandarinMode() });
+    HAKKA_SCORE.upgradeSelect(asrProviderSelect, { hak: "hakka_api_hak", zh: "taiwan_tongues_zh" });
   }
 
   if (asrProviderSelect) {
