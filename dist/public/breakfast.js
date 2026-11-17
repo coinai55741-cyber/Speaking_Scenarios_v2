@@ -60,6 +60,8 @@ function questionHakkaText(question) {
 }
 if (window.HAKKA_SCORE) HAKKA_SCORE.configure({ isMandarin: () => breakfastSpeechProvider() === "mandarin" });
 let breakfastScoreSess = null;
+/* 每次重設（重念、換題）都換一個錄音編號，舊錄音晚到的結果一律不採用 */
+let speechAttempt = 0;
 
 /* 多樣食物的題目：同一段錄音對每樣食物各評一次分，全部達標才過關；
  * 只念到其中幾樣時回傳 partial，提示學生還少了一樣 */
@@ -719,6 +721,11 @@ let mandarinSpeechSession = null;
 let mandarinSpeechActive = false;
 
 function resetSpeechAnswer(options = {}) {
+  speechAttempt += 1;
+  if (breakfastScoreSess) {
+    breakfastScoreSess.abort();
+    breakfastScoreSess = null;
+  }
   BreakfastRealtimeASR.abort();
   if (mandarinSpeechSession) {
     mandarinSpeechSession.abort();
@@ -778,7 +785,8 @@ async function startSpeechRecording() {
     speechRecorder.addEventListener("dataavailable", event => {
       if (event.data?.size) speechChunks.push(event.data);
     });
-    speechRecorder.addEventListener("stop", finishSpeechRecording, { once: true });
+    const attempt = speechAttempt;
+    speechRecorder.addEventListener("stop", () => finishSpeechRecording(attempt), { once: true });
     speechRecorder.start();
     isSpeechRecording = true;
     const scoreMethod = window.HAKKA_SCORE ? HAKKA_SCORE.resolve(questionPinyin(activeQuestions[currentIndex])).method : "hakka";
@@ -948,11 +956,13 @@ async function startRealtimeBreakfastSpeech() {
     }
   }
 }
-async function finishSpeechRecording() {
+async function finishSpeechRecording(attempt) {
+  if (attempt !== speechAttempt) return;
   if (breakfastScoreSess) {
     const sess = breakfastScoreSess; breakfastScoreSess = null;
     const question = activeQuestions[currentIndex];
     const r = await sess.finish();
+    if (attempt !== speechAttempt) return;
     const type0 = speechRecorder?.mimeType || "audio/webm";
     speechAudioBlob = new Blob(speechChunks, { type: type0 });
     if (speechAudioUrl) URL.revokeObjectURL(speechAudioUrl);
@@ -984,6 +994,7 @@ async function finishSpeechRecording() {
   if (els.playSpeechBtn) els.playSpeechBtn.disabled = false;
   if (breakfastSpeechProvider() === "hakka" && breakfastRecognitionMode() === "realtime") {
     setTimeout(() => {
+      if (attempt !== speechAttempt) return;
       if (!realtimeResultHandled) {
         realtimeSpeechActive = false;
         realtimeResultHandled = true;
@@ -1002,6 +1013,7 @@ async function finishSpeechRecording() {
   }
   if (breakfastSpeechProvider() === "mandarin") {
     setTimeout(() => {
+      if (attempt !== speechAttempt) return;
       if (!realtimeResultHandled) {
         mandarinSpeechActive = false;
         realtimeResultHandled = true;
@@ -1018,10 +1030,10 @@ async function finishSpeechRecording() {
     }, 400);
     return;
   }
-  await recognizeBreakfastSpeech(blob);
+  await recognizeBreakfastSpeech(blob, attempt);
 }
 
-async function recognizeBreakfastSpeech(blob) {
+async function recognizeBreakfastSpeech(blob, attempt = speechAttempt) {
   const question = activeQuestions[currentIndex];
   isSpeechRecognizing = true;
   if (els.speechStatus) els.speechStatus.textContent = "辨識中...";
@@ -1060,9 +1072,11 @@ async function recognizeBreakfastSpeech(blob) {
       recognizer: speechProvider === "mandarin" ? "mandarin" : `hakka-${selectedDialect || "sixian"}`,
       scene_id: "breakfast"
     }) || raw;
+    if (attempt !== speechAttempt) return;
     recognizedSpeechText = result.text || "";
     handleSpeechAnswer(recognizedSpeechText, question);
   } catch (error) {
+    if (attempt !== speechAttempt) return;
     markCurrentQuestionMissed();
     playSound("wrong");
     els.feedback.hidden = false;
