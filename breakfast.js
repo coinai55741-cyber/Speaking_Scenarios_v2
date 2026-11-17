@@ -1158,10 +1158,14 @@ async function handleSpeechAnswer(text, question, options = {}) {
   }
   const selectedChoice = selectedChoiceForQuestion(question);
   if (question.playMode === "scene" && selectedChoice) renderSceneStage(question, selectedChoice);
+  // 這題之前答錯過：不給星星，訊息也不提星星
+  const missedBefore = missedQuestions.has(currentIndex);
   awardCurrentQuestionStar();
   renderStars();
   if (!options.silent) playSound("correct");
-  els.feedback.textContent = Array.isArray(question.answer) ? "答對了！這兩樣就是句子裡的食物。" : "答對了！得到一顆星星。";
+  els.feedback.textContent = Array.isArray(question.answer)
+    ? "答對了！這兩樣就是句子裡的食物。"
+    : (missedBefore ? "答對了！" : "答對了！得到一顆星星。");
   els.nextBtn.disabled = false;
   if (els.speechStatus) els.speechStatus.textContent = options.statusText || "唸對了！";
   renderDeveloperPanel();
