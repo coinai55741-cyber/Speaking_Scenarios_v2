@@ -49,7 +49,9 @@ function updateProviderUi() {
 
 function getAsrEndpoint() {
   const urlParams = new URLSearchParams(window.location.search);
-  const paramUrl = urlParams.get('asr');
+  // ?asr= 自訂辨識網址僅限內部人員（開發者模式解鎖後）使用
+  const devUnlocked = !!(window.DevLock && window.DevLock.isUnlocked());
+  const paramUrl = devUnlocked ? urlParams.get('asr') : null;
   const hosted = window.SPEECH_API?.isHostedPage?.();
   const isVercelEndpoint = value => {
     try { return new URL(value).hostname.endsWith('.vercel.app'); }

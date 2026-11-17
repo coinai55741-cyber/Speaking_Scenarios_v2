@@ -434,7 +434,9 @@
     };
     let saved;
     try { saved = localStorage.getItem(api.storageKey); } catch { /* Browser storage may be disabled. */ }
-    const supplied = new URLSearchParams(location.search).get('asr');
+    // ?asr= 自訂辨識網址僅限內部人員（開發者模式解鎖後）使用
+    const devUnlocked = !!(window.DevLock && window.DevLock.isUnlocked());
+    const supplied = devUnlocked ? new URLSearchParams(location.search).get('asr') : null;
     return [supplied, saved, api.endpoint()].find(value => value && api.isAllowedEndpoint(value) && (!hosted || isVercelEndpoint(value)));
   }
 
