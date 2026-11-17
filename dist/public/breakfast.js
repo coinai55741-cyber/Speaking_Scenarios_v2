@@ -92,7 +92,6 @@ function startBreakfastScoring(question, stream) {
       const failed = results.find(r => !r.ok);
       if (failed) {
         HAKKA_SCORE.setResult(`評分失敗：${failed.error}`);
-        if (HAKKA_SCORE.getMode() === "auto" && !failed.silent) HAKKA_SCORE.fallbackCurrent();
         return failed;
       }
 
@@ -157,6 +156,8 @@ let currentIndex = 0;
 let earnedStars = 0;
 let earnedQuestions = new Set();
 let missedQuestions = new Set();
+/* 每題念錯次數（重念不會歸零，換課或重玩才歸零） */
+let failedAttempts = {};
 let selectedAnswers = [];
 let selectedDialect = "";
 let buttonSoundEnabled = false;
@@ -504,6 +505,7 @@ function startLesson(lesson) {
   earnedStars = 0;
   earnedQuestions = new Set();
   missedQuestions = new Set();
+  failedAttempts = {};
   renderQuestion();
   showScreen("play");
   renderDeveloperPanel();
@@ -533,6 +535,24 @@ function awardCurrentQuestionStar() {
 
 function markCurrentQuestionMissed() {
   missedQuestions.add(currentIndex);
+}
+
+/* 辨識一直失敗時讓學生可以繼續往下：
+ * - 服務連不上（客委會、評分 API）：顯示暫停中、開放「下一題」，不算答錯
+ * - 同一題念錯 3 次：開放「下一題」（這題不給星星） */
+const MAX_FAILED_ATTEMPTS = 3;
+function showServiceUnavailable() {
+  els.feedback.hidden = false;
+  els.feedback.textContent = "客語辨識服務暫停中，這題可以先跳過。";
+  els.nextBtn.disabled = false;
+  if (els.speechStatus) els.speechStatus.textContent = "客語辨識服務暫停中，請按「下一題」繼續。";
+}
+
+function countFailedAttempt() {
+  failedAttempts[currentIndex] = (failedAttempts[currentIndex] || 0) + 1;
+  if (failedAttempts[currentIndex] < MAX_FAILED_ATTEMPTS) return;
+  els.nextBtn.disabled = false;
+  if (els.speechStatus) els.speechStatus.textContent = "這題先到這裡，可以按「下一題」繼續，也可以再念一次。";
 }
 
 function renderCompleteResult() {
@@ -839,7 +859,10 @@ async function startSpeechRecording() {
     speechRecorder.addEventListener("stop", () => finishSpeechRecording(attempt), { once: true });
     speechRecorder.start();
     isSpeechRecording = true;
-    const scoreMethod = window.HAKKA_SCORE ? HAKKA_SCORE.resolve(questionPinyin(activeQuestions[currentIndex])).method : "hakka";
+    // 自動模式下有拼音的題目一律用長問評分（不因一次評分失敗就改走客委會辨識）；開發者手動選的模式照舊
+    const questionHasPinyin = !!questionPinyin(activeQuestions[currentIndex]);
+    const scoreMethod = !window.HAKKA_SCORE ? "hakka"
+      : (HAKKA_SCORE.getMode() === "auto" && questionHasPinyin ? "changwen" : HAKKA_SCORE.resolve(questionPinyin(activeQuestions[currentIndex])).method);
     if (scoreMethod === "changwen") {
       breakfastScoreSess = startBreakfastScoring(activeQuestions[currentIndex], speechStream);
     } else if (scoreMethod === "none") {
@@ -974,11 +997,7 @@ async function startRealtimeBreakfastSpeech() {
       isSpeechRecognizing = false;
       recognitionError = message || "客語即時辨識連線失敗。";
       lastRecognitionPayload = { error: recognitionError };
-      markCurrentQuestionMissed();
-      playSound("wrong");
-      els.feedback.hidden = false;
-      els.feedback.textContent = question.hint;
-      if (els.speechStatus) els.speechStatus.textContent = recognitionError;
+      showServiceUnavailable();
       if (speechStream) {
         speechStream.getTracks().forEach(track => track.stop());
         speechStream = null;
@@ -1025,9 +1044,13 @@ async function finishSpeechRecording(attempt) {
     if (r.ok) {
       await handleSpeechAnswer("", question, { forcePass: r.pass, statusText: r.pass ? "唸對了！" : (r.partial ? "還少了一樣喔！" : (r.unheard ? "沒有聽清楚，請再唸一次。" : "發音還不太一樣，再試一次。")) });
     } else {
-      els.feedback.hidden = false;
-      els.feedback.textContent = question.hint;
-      if (els.speechStatus) els.speechStatus.textContent = r.silent ? "沒有聽清楚聲音，請再唸一次。" : "評分沒有成功，請再唸一次。";
+      if (r.silent) {
+        els.feedback.hidden = false;
+        els.feedback.textContent = question.hint;
+        if (els.speechStatus) els.speechStatus.textContent = "沒有聽清楚聲音，請再唸一次。";
+      } else {
+        showServiceUnavailable();
+      }
       renderDeveloperPanel();
     }
     return;
@@ -1127,13 +1150,9 @@ async function recognizeBreakfastSpeech(blob, attempt = speechAttempt) {
     handleSpeechAnswer(recognizedSpeechText, question);
   } catch (error) {
     if (attempt !== speechAttempt) return;
-    markCurrentQuestionMissed();
-    playSound("wrong");
-    els.feedback.hidden = false;
-    els.feedback.textContent = question.hint;
     recognitionError = error.message || "辨識失敗，請再錄一次。";
     lastRecognitionPayload = { error: recognitionError };
-    if (els.speechStatus) els.speechStatus.textContent = recognitionError;
+    showServiceUnavailable();
     renderDeveloperPanel();
   } finally {
     isSpeechRecognizing = false;
@@ -1153,6 +1172,7 @@ async function handleSpeechAnswer(text, question, options = {}) {
     els.feedback.textContent = question.hint;
     els.nextBtn.disabled = true;
     if (els.speechStatus) els.speechStatus.textContent = options.statusText || (text ? "發音還不太一樣，再試一次。" : "沒有聽清楚聲音，請再唸一次。");
+    countFailedAttempt();
     renderDeveloperPanel();
     return;
   }
@@ -1309,6 +1329,7 @@ function restartGame() {
   earnedStars = 0;
   earnedQuestions = new Set();
   missedQuestions = new Set();
+  failedAttempts = {};
   selectedDialect = "sixian";
   updateLessonCards();
   startLesson("1");
