@@ -239,13 +239,18 @@ const els = {
 function init() {
   loadProgress();
   renderDialectOptions();
+  window.addEventListener("devlock:unlocked", renderDialectOptions);
   renderTabs();
   bindGlobalControls();
   render();
 }
 
 function renderDialectOptions() {
-  els.dialect.innerHTML = DIALECTS.map((dialect) => {
+  // 「華語」辨識僅限內部人員（開發者模式解鎖後）使用
+  const devUnlocked = !!(window.DevLock && window.DevLock.isUnlocked());
+  if (!devUnlocked && state.dialect === "mandarin") state.dialect = "sixian";
+  const visibleDialects = devUnlocked ? DIALECTS : DIALECTS.filter((dialect) => dialect.id !== "mandarin");
+  els.dialect.innerHTML = visibleDialects.map((dialect) => {
     const disabled = dialect.enabled ? "" : "disabled";
     return `<option value="${dialect.id}" ${disabled}>${dialect.label}${dialect.enabled ? "" : "（待補）"}</option>`;
   }).join("");

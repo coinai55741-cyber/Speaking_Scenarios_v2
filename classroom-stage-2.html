@@ -1000,7 +1000,10 @@ const QUIZ=(()=>{
     inp.onkeydown=e=>{ if(e.key==="Enter") submit(); };
     bMic.onclick=speak;
     const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
-    if(!SR) bMic.style.display="none";
+    // 華語麥克風僅限內部人員（開發者模式解鎖後）使用
+    const micAllowed=()=>!!SR && !!(window.DevLock && window.DevLock.isUnlocked());
+    if(!micAllowed()) bMic.style.display="none";
+    window.addEventListener("devlock:unlocked",()=>{ if(micAllowed()) bMic.style.display=""; });
     box.addEventListener("pointerdown",e=>e.stopPropagation());
   }
 

@@ -49,11 +49,12 @@
 
   if (!isUnlocked()) clearDevSettings();
 
-  // 未解鎖時隱藏開關與面板（!important 以蓋過各頁自己的顯示樣式）
+  // 未解鎖時隱藏開關、面板與「僅限內部」的按鈕（!important 以蓋過各頁自己的顯示樣式）
   var style = document.createElement("style");
   style.textContent =
     "html:not(.dev-unlocked) [data-dev-toggle]," +
-    "html:not(.dev-unlocked) [data-dev-panel]{display:none !important;}";
+    "html:not(.dev-unlocked) [data-dev-panel]," +
+    "html:not(.dev-unlocked) [data-dev-only]{display:none !important;}";
   (document.head || root).appendChild(style);
   applyState();
 
