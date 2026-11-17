@@ -63,40 +63,90 @@ let breakfastScoreSess = null;
 /* 每次重設（重念、換題）都換一個錄音編號，舊錄音晚到的結果一律不採用 */
 let speechAttempt = 0;
 
-/* 多樣食物的題目：同一段錄音對每樣食物各評一次分，全部達標才過關；
- * 只念到其中幾樣時回傳 partial，提示學生還少了一樣 */
+/* 發音評分＋內容檢查：
+ * 長問評分只看「發音像不像指定的詞」，不會發現學生念成別的詞（例：念蘿蔔粄也能拿到卵包的分數），
+ * 所以同一段錄音同時送客委會即時辨識，辨識文字要對得上該樣食物（漢字或拼音），而且發音 ≥ 及格分，才算念對。
+ * 多樣食物的題目每樣分開判斷，全部念對才過關；只念對幾樣時回傳 partial。
+ * 客委會辨識連不上時，退回只看發音分數。 */
 function startBreakfastScoring(question, stream) {
   const parts = acceptedAnswers(question).map(answer => {
     const food = findFood(answer);
     return { name: answer, pinyin: food?.pinyin || "", text: food?.hakka || answer };
   });
-  if (parts.length < 2) return HAKKA_SCORE.startScoring(stream);
 
   const rec = HAKKA_SCORE.createRecorder(stream);
   rec.start();
-  HAKKA_SCORE.setResult("錄音中⋯（多樣食物分開評分）");
+  const content = startContentCheck(stream);
+  HAKKA_SCORE.setResult("錄音中⋯（發音評分＋客委會辨識）");
   return {
     async finish() {
       const wav = await rec.stop();
       HAKKA_SCORE.setResult("評分中⋯");
-      const results = await Promise.all(parts.map(part => HAKKA_SCORE.score(wav, part.pinyin, { text: part.text })));
+      const [results, heard] = await Promise.all([
+        Promise.all(parts.map(part => HAKKA_SCORE.score(wav, part.pinyin, { text: part.text }))),
+        content.result()
+      ]);
+      recognizedSpeechText = heard.text;
+      lastRecognitionPayload = { text: heard.text, provider: "hakka_realtime_asr", mode: "content-check", error: heard.error || "" };
+
       const failed = results.find(r => !r.ok);
       if (failed) {
         HAKKA_SCORE.setResult(`評分失敗：${failed.error}`);
         if (HAKKA_SCORE.getMode() === "auto" && !failed.silent) HAKKA_SCORE.fallbackCurrent();
         return failed;
       }
-      const passedCount = results.filter(r => r.pass).length;
-      HAKKA_SCORE.setResult("分開評分：" + parts.map((part, i) => `${part.name} <b>${results[i].score} 分</b>`).join("、"));
+
+      const contentMatched = heard.available
+        ? await Promise.all(parts.map(part => foodHeardInText(part.name, heard.text)))
+        : parts.map(() => true);
+      const partPassed = parts.map((part, i) => results[i].pass && contentMatched[i]);
+      const passedCount = partPassed.filter(Boolean).length;
+      HAKKA_SCORE.setResult(
+        parts.map((part, i) => `${part.name} <b>${results[i].score} 分</b>${heard.available ? (contentMatched[i] ? " ✓辨識符合" : " ✗辨識不符") : ""}`).join("、")
+        + `<br>客委會辨識：${heard.available ? (heard.text || "（沒有辨識到文字）") : "（無法連線，只看發音分數）"}`
+      );
       return {
         ok: true,
         pass: passedCount === parts.length,
-        partial: passedCount > 0 && passedCount < parts.length,
+        partial: parts.length > 1 && passedCount > 0 && passedCount < parts.length,
+        unheard: heard.available && !heard.text,
         score: Math.min(...results.map(r => r.score))
       };
     },
-    abort() { rec.abort(); }
+    abort() { rec.abort(); content.abort(); }
   };
+}
+
+/* 客委會即時辨識（只收集文字，不直接判對錯） */
+function startContentCheck(stream) {
+  let text = "", error = "", done = false, resolveDone;
+  const finished = new Promise(resolve => { resolveDone = resolve; });
+  const end = () => { if (!done) { done = true; resolveDone(); } };
+  BreakfastRealtimeASR.start(
+    stream,
+    transcript => { if (transcript) text = transcript; },
+    transcript => { if (transcript) text = transcript; end(); },
+    message => { error = message || "辨識失敗"; end(); }
+  ).then(ok => {
+    if (!ok) { if (!error) error = "無法連線客委會辨識"; end(); }
+  });
+  return {
+    async result() {
+      BreakfastRealtimeASR.stop();
+      await Promise.race([finished, new Promise(resolve => setTimeout(resolve, 3000))]);
+      return { available: !(error && !text), text, error };
+    },
+    abort() { BreakfastRealtimeASR.abort(); }
+  };
+}
+
+/* 這樣食物有沒有出現在辨識文字裡（漢字比對，比不到再比拼音，同音字也算） */
+async function foodHeardInText(answer, text) {
+  if (!cleanSpeechText(text)) return false;
+  if (speechMatchesQuestion(text, { answer })) return true;
+  if (!window.HAKKA_PINYIN) return false;
+  const food = findFood(answer);
+  return window.HAKKA_PINYIN.contains(food?.hakka || answer, text, { dialect: selectedDialect || "sixian" });
 }
 
 function breakfastSpeechProvider() {
@@ -973,7 +1023,7 @@ async function finishSpeechRecording(attempt) {
     if (els.recordSpeechBtn) { els.recordSpeechBtn.disabled = false; setIconButton(els.recordSpeechBtn, "mic", "重新錄音"); }
     if (activeQuestions[currentIndex] !== question) return;
     if (r.ok) {
-      await handleSpeechAnswer("", question, { forcePass: r.pass, statusText: r.pass ? "唸對了！" : (r.partial ? "還少了一樣喔！" : "發音還不太一樣，再試一次。") });
+      await handleSpeechAnswer("", question, { forcePass: r.pass, statusText: r.pass ? "唸對了！" : (r.partial ? "還少了一樣喔！" : (r.unheard ? "沒有聽清楚，請再唸一次。" : "發音還不太一樣，再試一次。")) });
     } else {
       els.feedback.hidden = false;
       els.feedback.textContent = question.hint;
