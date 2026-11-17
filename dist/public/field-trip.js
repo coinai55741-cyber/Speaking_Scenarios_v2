@@ -94,6 +94,29 @@
     return activeSfx.play().catch(() => {});
   }
 
+  // 跳過音效：短促下滑的「咻」聲（以 Web Audio 合成，不需音檔）
+  function playSkipSfx() {
+    try {
+      const AC = window.AudioContext || window.webkitAudioContext;
+      const ctx = new AC();
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      const now = ctx.currentTime;
+      osc.type = "triangle";
+      osc.frequency.setValueAtTime(880, now);
+      osc.frequency.exponentialRampToValueAtTime(220, now + 0.22);
+      gain.gain.setValueAtTime(0.0001, now);
+      gain.gain.exponentialRampToValueAtTime(0.25, now + 0.02);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.25);
+      osc.connect(gain).connect(ctx.destination);
+      osc.start(now);
+      osc.stop(now + 0.26);
+      osc.onended = () => ctx.close();
+    } catch (error) {
+      // 瀏覽器不支援 Web Audio 時略過音效
+    }
+  }
+
   // 播放客語示範音檔
   function playLesson(url) {
     if (!url) {
@@ -877,14 +900,10 @@
     }
 
     if (state.screen === q.before) {
-      // 在題目頁跳過：視同通過並進到該題結算圖
-      if (!state.completed[q.id - 1]) {
-        state.completed[q.id - 1] = true;
-        state.score = Math.min(100, state.score + 20);
-      }
-      showToast(`已跳過第 ${q.id} 題！`);
-      await playSfx("sparkle");
-      state.screen = q.after;
+      // 在題目頁跳過：不給分，也不經過「答對了」結算圖，直接到下一題
+      showToast(`已跳過第 ${q.id} 題`);
+      playSkipSfx();
+      state.screen = Math.min(11, q.after + 1);
       render();
     } else if (state.screen === q.after) {
       // 在結算頁跳過：直接前往下一題
