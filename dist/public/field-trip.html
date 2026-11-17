@@ -2,6 +2,7 @@
 <html lang="zh-Hant">
 
 <head>
+  <script src="/dev-lock.js?v=20261117"></script>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>客庄聲音小達人 - 客語/華語口說辨識挑戰</title>
@@ -18,7 +19,7 @@
       <a class="back-link" href="./Vocabulary.html">返回</a>
 
       <!-- 開發者模式切換開關 (同 holiday.html) -->
-      <label class="mode-toggle" title="顯示內部檢視、手動輸入與 API 切換">
+      <label class="mode-toggle" title="顯示內部檢視、手動輸入與 API 切換" data-dev-toggle>
         <input id="debugToggle" type="checkbox">
         <span>開發者模式</span>
       </label>
@@ -63,7 +64,7 @@
     </footer>
 
     <!-- 內部檢視 / 開發者面板 (同 holiday.html) -->
-    <aside id="developerPanel" class="developer-panel" hidden>
+    <aside id="developerPanel" class="developer-panel" hidden data-dev-panel>
       <h2>內部檢視</h2>
       <div id="targetSentence" class="developer-item target-sentence">
         <span id="sentenceLabel" class="sentence-label">目前題目目標</span>

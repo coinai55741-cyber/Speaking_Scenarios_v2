@@ -2872,54 +2872,17 @@ class UIController {
     this.bindEvents();
     this.initMapEngine();
     this.render();
-    this.requestDevUnlock();
   }
 
-  // 開發者模式權限：對外隱藏開關；內部人員在網址加上 ?dev 並輸入內部密碼後解鎖（僅本分頁有效）
+  // 開發者模式權限由全站共用的 /dev-lock.js 管理（對外隱藏；內部以 ?dev + 內部密碼解鎖）
   isDevUnlocked() {
-    try {
-      return sessionStorage.getItem("chainQuest_devUnlocked") === "1";
-    } catch (e) {
-      return false;
-    }
+    return !!(window.DevLock && window.DevLock.isUnlocked());
   }
 
   applyDevAccess() {
-    const unlocked = this.isDevUnlocked();
-    if (this.els.devModeToggleWrap) this.els.devModeToggleWrap.hidden = !unlocked;
-    if (!unlocked && this.els.layoutShell) this.els.layoutShell.classList.remove("is-dev-open");
-  }
-
-  async requestDevUnlock() {
-    const params = new URLSearchParams(location.search);
-    if (!params.has("dev")) return;
-
-    // 先把 ?dev 從網址移除，避免分享連結時一併帶出
-    params.delete("dev");
-    const query = params.toString();
-    history.replaceState(null, "", location.pathname + (query ? `?${query}` : "") + location.hash);
-
-    if (this.isDevUnlocked()) return;
-    const password = window.prompt("請輸入內部密碼以開啟開發者模式：");
-    if (!password) return;
-
-    try {
-      const res = await fetch("/api/dev-unlock", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ password })
-      });
-      const data = await res.json().catch(() => ({}));
-      if (res.ok && data.ok) {
-        sessionStorage.setItem("chainQuest_devUnlocked", "1");
-        this.applyDevAccess();
-        this.setDevMode(true);
-      } else {
-        window.alert(res.status === 401 ? "內部密碼錯誤。" : (data.error || "無法驗證內部密碼。"));
-      }
-    } catch (e) {
-      window.alert("無法連線驗證內部密碼，請稍後再試。");
-    }
+    if (!this.isDevUnlocked() && this.els.layoutShell) this.els.layoutShell.classList.remove("is-dev-open");
+    // 解鎖成功後直接打開開發者面板
+    window.addEventListener("devlock:unlocked", () => this.setDevMode(true));
   }
 
   restorePersistedSettings() {

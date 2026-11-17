@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
+  <script src="/dev-lock.js?v=20261117"></script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>字磚｜伙房屋</title>
@@ -318,7 +319,7 @@
 <a class="menu-back" href="./classroom.html" aria-label="返回單元快問快答">返回</a>
 <div class="frame">
   <div class="mode-toggle-wrap">
-    <label class="mode-toggle">
+    <label class="mode-toggle" data-dev-toggle>
       <input type="checkbox" id="debugToggle">
       開發者模式
     </label>
@@ -368,7 +369,7 @@
   </div>
 </div>
 
-<aside id="developerPanel" class="developer-panel" hidden></aside>
+<aside id="developerPanel" class="developer-panel" hidden data-dev-panel></aside>
 
 <script>
 

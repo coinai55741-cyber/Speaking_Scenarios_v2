@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
+  <script src="/dev-lock.js?v=20261117"></script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>客語互動場景｜學習階段一</title>
@@ -204,7 +205,7 @@
     <button id="micBtn" type="button">開麥克風</button>
     <span id="micMsg">錄音愛先開麥克風。開毋起來就用單課檔，抑係放到 https 伺服器頂。</span>
     <span id="asrLiveBadge" class="asr-badge" style="display:none">即時辨識：<b id="asrText"></b></span>
-    <label class="mode-toggle" title="顯示語音辨識與開發者面板">
+    <label class="mode-toggle" title="顯示語音辨識與開發者面板" data-dev-toggle>
       <input id="debugToggle" type="checkbox">
       <span>開發者模式</span>
     </label>
@@ -684,6 +685,6 @@ load(0);
 renderDeveloperPanel();
 </script>
 
-<aside id="developerPanel" class="developer-panel" hidden></aside>
+<aside id="developerPanel" class="developer-panel" hidden data-dev-panel></aside>
 </body>
 </html>

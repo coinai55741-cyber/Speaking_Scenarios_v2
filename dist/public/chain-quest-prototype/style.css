@@ -651,8 +651,6 @@ html, body {
   flex-shrink: 0;
 }
 
-.dev-mode-toggle[hidden] { display: none; }
-
 .dev-mode-toggle input { display: none; }
 
 .toggle-slider {

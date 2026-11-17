@@ -1,7 +1,8 @@
-<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>客莊走讀・口說挑戰</title><link rel="stylesheet" href="style.css"></head><body>
+<!doctype html><html lang="zh-Hant"><head>
+  <script src="/dev-lock.js?v=20261117"></script><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>客莊走讀・口說挑戰</title><link rel="stylesheet" href="style.css"></head><body>
 <div class="top-nav">
   <a class="back-link" href="../classroom.html">← 返回單元選單</a>
-  <label class="mode-toggle" title="開啟內部檢視與辨識 API 切換">
+  <label class="mode-toggle" title="開啟內部檢視與辨識 API 切換" data-dev-toggle>
     <input id="debugToggle" type="checkbox">
     <span>開發者模式</span>
   </label>
@@ -21,7 +22,7 @@
 <main id="game"><img id="screen" src="images/01.jpg" alt="客莊走讀・口說挑戰遊戲介面" draggable="false"><div id="hotspots"></div></main>
 
 <!-- 內部檢視 / 開發者面板 -->
-<aside id="developerPanel" class="developer-panel" hidden>
+<aside id="developerPanel" class="developer-panel" hidden data-dev-panel>
   <div class="developer-panel-header">
     <h2>🛠️ 開發者模式</h2>
     <button type="button" class="dev-close-btn" id="devCloseBtn">✕</button>

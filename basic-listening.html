@@ -2,6 +2,7 @@
 <html lang="zh-Hant">
 
 <head>
+  <script src="/dev-lock.js?v=20261117"></script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>客字磚｜基礎第二階</title>
@@ -1124,7 +1125,7 @@
       返回
     </a>
     <div class="nav-title">客字磚｜基礎第二階</div>
-    <div class="mode-toggle">
+    <div class="mode-toggle" data-dev-toggle>
       <input type="checkbox" id="debugToggle">
       <label for="debugToggle">開發者模式</label>
     </div>
@@ -1253,7 +1254,7 @@
     </div>
   </div>
 
-  <aside id="developerPanel" class="developer-panel" hidden></aside>
+  <aside id="developerPanel" class="developer-panel" hidden data-dev-panel></aside>
 
   <script>
     /* ── 翻譯服務：優先使用 Vercel 後端通路 /api/translate，本地 port 8788 則 fallback ── */

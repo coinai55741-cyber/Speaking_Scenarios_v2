@@ -2,6 +2,7 @@
 <html lang="zh-Hant">
 
 <head>
+  <script src="/dev-lock.js?v=20261117"></script>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>𠊎中意讀書｜繪本朗讀任務</title>
@@ -18,7 +19,7 @@
     <header class="task-topbar">
       <a class="back-link" href="./reading.html">返回</a>
       <h1 lang="hak">繪本朗讀：𠊎中意讀書</h1>
-      <label class="mode-toggle" title="顯示課文、辨識文字與測試設定">
+      <label class="mode-toggle" title="顯示課文、辨識文字與測試設定" data-dev-toggle>
         <input id="debugToggle" type="checkbox" aria-controls="developerPanel" aria-expanded="false">
         <span>開發者模式</span>
       </label>
@@ -74,7 +75,7 @@
       </article>
     </section>
 
-    <aside id="developerPanel" class="developer-panel" hidden aria-label="開發者模式">
+    <aside id="developerPanel" class="developer-panel" hidden aria-label="開發者模式" data-dev-panel>
       <div class="developer-item">
         <span class="developer-label">快速跳題／測試</span>
         <div class="dev-quick-actions">

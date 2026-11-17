@@ -1,6 +1,7 @@
 <!doctype html>
 <html lang="zh-Hant">
 <head>
+  <script src="/dev-lock.js?v=20261117"></script>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>客語情境互動學習原型｜6大生活任務與連鎖分支</title>
@@ -185,7 +186,7 @@
           </button>
 
           <!-- 開發者模式切換開關（對外隱藏；內部人員以 ?dev 輸入內部密碼後顯示） -->
-          <label class="dev-mode-toggle" id="devModeToggleWrap" title="切換顯示左側內部顯示與即時比對面板" hidden>
+          <label class="dev-mode-toggle" id="devModeToggleWrap" title="切換顯示左側內部顯示與即時比對面板" data-dev-toggle>
             <input id="debugToggle" type="checkbox">
             <span class="toggle-slider"></span>
             <span class="toggle-label">開發者模式</span>

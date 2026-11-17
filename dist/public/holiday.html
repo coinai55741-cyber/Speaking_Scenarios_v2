@@ -2,6 +2,7 @@
 <html lang="zh-Hant">
 
 <head>
+  <script src="/dev-lock.js?v=20261117"></script>
   <link rel="stylesheet" href="./hakka-font.css?v=20260907-font4">
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -17,7 +18,7 @@
       <div>
         <h1>休假日</h1>
       </div>
-      <label class="mode-toggle" title="顯示題目句、辨識文字與手動修正欄位">
+      <label class="mode-toggle" title="顯示題目句、辨識文字與手動修正欄位" data-dev-toggle>
         <input id="debugToggle" type="checkbox">
         <span>開發者模式</span>
       </label>
@@ -89,7 +90,7 @@
       </article>
     </section>
 
-    <aside id="developerPanel" class="developer-panel" hidden>
+    <aside id="developerPanel" class="developer-panel" hidden data-dev-panel>
       <h2>內部檢視</h2>
       <div class="developer-item">
         <span class="developer-label">快速跳題／測試</span>

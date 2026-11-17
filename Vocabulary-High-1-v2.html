@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
+  <script src="/dev-lock.js?v=20261117"></script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>庄頭廣播電台</title>
@@ -317,7 +318,7 @@
 </head>
 <body>
     <a class="back-link" href="./classroom.html">返回</a>
-<aside id="developerPanel" class="developer-panel" aria-label="內部檢視面板">
+<aside id="developerPanel" class="developer-panel" aria-label="內部檢視面板" data-dev-panel>
   <div class="panel-title">
     <span>內部檢視</span>
     <span class="badge">開發者模式</span>
@@ -356,7 +357,7 @@
     <div class="logo">客庄<b>廣播電台</b></div>
     <div class="sig"><span>訊 號</span><div class="sbar"><i id="sig"></i></div></div>
     <div class="combo">連紲 <b id="combo">0</b>　修好 <b id="fix">0</b>/10</div>
-    <label class="mode-toggle" title="顯示內部檢視與開發者面板">
+    <label class="mode-toggle" title="顯示內部檢視與開發者面板" data-dev-toggle>
       <input id="debugToggle" type="checkbox">
       <span>開發者模式</span>
     </label>

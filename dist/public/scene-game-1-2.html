@@ -1,6 +1,7 @@
 <!doctype html>
 <html lang="zh-Hant">
 <head>
+  <script src="/dev-lock.js?v=20261117"></script>
   <link rel="stylesheet" href="./hakka-font.css?v=20260907-font4">
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -18,7 +19,7 @@
       <div class="header-actions">
         <label class="select-label" for="dialectSelect">腔調</label>
         <select id="dialectSelect"></select>
-        <label class="mode-toggle" title="顯示後端辨識狀態與辨識文字">
+        <label class="mode-toggle" title="顯示後端辨識狀態與辨識文字" data-dev-toggle>
           <input id="debugToggle" type="checkbox">
           <span>開發者模式</span>
         </label>
@@ -34,7 +35,7 @@
       <div id="stageView" class="stage-view"></div>
     </section>
 
-    <aside id="developerPanel" class="developer-panel" hidden>
+    <aside id="developerPanel" class="developer-panel" hidden data-dev-panel>
       <h2>內部檢視</h2>
       <div id="developerContent"></div>
     </aside>

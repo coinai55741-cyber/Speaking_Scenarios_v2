@@ -1,7 +1,8 @@
-<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>網路世界｜口說辨識挑戰</title><link rel="stylesheet" href="style.css"></head><body>
+<!doctype html><html lang="zh-Hant"><head>
+  <script src="/dev-lock.js?v=20261117"></script><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>網路世界｜口說辨識挑戰</title><link rel="stylesheet" href="style.css"></head><body>
 <div class="top-nav">
   <a class="back-link" href="../classroom.html">← 返回單元選單</a>
-  <label class="mode-toggle" title="開啟內部檢視與辨識 API 切換">
+  <label class="mode-toggle" title="開啟內部檢視與辨識 API 切換" data-dev-toggle>
     <input id="debugToggle" type="checkbox">
     <span>開發者模式</span>
   </label>
@@ -21,7 +22,7 @@
 <main id="app"><div class="stage"><img id="screen" alt="網路世界遊戲畫面"><div id="hotspots"></div></div><div class="bar"><button id="back">上一頁</button><button id="sound">♫ 音樂：開</button><span id="status">1 / 18</span><button id="next">下一頁</button></div><p class="hint">Demo：依畫面按鈕操作；答題前可錄音，錄音停止後進入答題完成頁。</p></main>
 
 <!-- 內部檢視 / 開發者面板 -->
-<aside id="developerPanel" class="developer-panel" hidden>
+<aside id="developerPanel" class="developer-panel" hidden data-dev-panel>
   <div class="developer-panel-header">
     <h2>🛠️ 開發者模式</h2>
     <button type="button" class="dev-close-btn" id="devCloseBtn">✕</button>

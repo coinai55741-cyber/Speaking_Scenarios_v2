@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="hak-Hant-TW">
 <head>
+  <script src="/dev-lock.js?v=20261117"></script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>拼音磚 · 第三學習階段</title>
@@ -315,12 +316,12 @@
 <body>
 <a class="menu-back" href="./Vocabulary.html" aria-label="返回口說詞彙卡">返回</a>
 <div class="mode-toggle-wrap">
-  <label class="mode-toggle" title="顯示內部檢視、手動輸入與 API 切換">
+  <label class="mode-toggle" title="顯示內部檢視、手動輸入與 API 切換" data-dev-toggle>
     <input id="debugToggle" type="checkbox">
     <span>開發者模式</span>
   </label>
 </div>
-<aside id="developerPanel" class="developer-panel" hidden aria-label="內部檢視面板"></aside>
+<aside id="developerPanel" class="developer-panel" hidden aria-label="內部檢視面板" data-dev-panel></aside>
 <div class="wrap">
   <header>
     <h1>拼音磚</h1>
