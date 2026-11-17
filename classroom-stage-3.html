@@ -546,6 +546,7 @@ function show(){
   $("pass").classList.remove("on");
   $("pic").innerHTML = "";
   $("heard").innerHTML = "";
+  wrongTries = 0;                      /* 換題，念毋著个擺數歸零 */
   $("mic").disabled = false;
   $("next").disabled = true;
   $("verdict").textContent = ""; $("verdict").className = "verdict";
@@ -781,9 +782,8 @@ function onState(kind, msg){
     capTimer = setTimeout(() => { if(micOn) stopRec(); }, 12000);   /* 上長 12 秒 */
     return;
   }
-  if(kind === "err"){
-    h.innerHTML = msg + "<br>看下「啟動辨識服務」該隻視窗有無跑等。";
-    releaseMic(); return;
+  if(kind === "err"){                /* 客委會取票／連線／回錯：當作服務暫停，毋算念毋著 */
+    ASR.abort(); releaseMic(); serviceDown(); return;
   }
   if(kind === "done"){ releaseMic(); judge(msg); }
 }
@@ -820,13 +820,32 @@ async function judge(got){
     passed();
     return;
   }
+  if(heard) countWrong();
   const marks = exp.map((c,i) => (a.hit[i] ? '<b>'+c+'</b>' : '<s>'+c+'</s>')).join("");
   $("heard").innerHTML = (heard ? "" : "無聽著聲。　")
-    + marks + "　再念一擺看啊。";
+    + marks + "　再念一擺看啊。"
+    + (heard && wrongTries >= MAX_WRONG ? "<br>" + GIVE_UP_MSG : "");
+}
+/* ── 服務暫停／念三擺毋著：放佢撳「下一隻」，毋算通過 ── */
+const MAX_WRONG = 3, GIVE_UP_MSG = "這題先到這裡，可以按「下一隻」繼續，也可以再念一次。";
+let wrongTries = 0;
+function serviceDown(){
+  if(stage !== "say") return;
+  $("heard").innerHTML = "客語辨識服務暫停中，請按「下一隻」繼續。";
+  $("next").disabled = false;
+}
+function countWrong(){
+  wrongTries++;
+  if(wrongTries >= MAX_WRONG) $("next").disabled = false;
 }
 /* ── 長問發音評分（有拼音个題目）──────────────── */
 let scoreSess = null;
-function scoreMethod(){ return window.HAKKA_SCORE ? HAKKA_SCORE.resolve(list[at] && list[at].p).method : "hakka"; }
+function scoreMethod(){
+  if(!window.HAKKA_SCORE) return "hakka";
+  const p = list[at] && list[at].p;
+  if(p && HAKKA_SCORE.getMode() === "auto") return "changwen";   /* 有拼音个題目固定用長問，毋轉客委會 */
+  return HAKKA_SCORE.resolve(p).method;
+}
 async function finishScore(){
   const sess = scoreSess; scoreSess = null;
   const q = list[at];
@@ -834,8 +853,9 @@ async function finishScore(){
   releaseMic();
   if(list[at] !== q || stage !== "say") return;
   if(r.ok && r.pass){ $("heard").innerHTML = "念著咧：<b>" + q.w + "</b>"; passed(); return; }
-  if(r.ok){ $("heard").innerHTML = "還差兜仔，撳「聽一擺」再跈等念看啊。"; return; }
-  $("heard").innerHTML = r.silent ? "無聽著聲。靠近麥克風再念一擺。" : "評分無成功，請再念一擺。";
+  if(r.ok){ countWrong(); $("heard").innerHTML = "還差兜仔，撳「聽一擺」再跈等念看啊。" + (wrongTries >= MAX_WRONG ? "<br>" + GIVE_UP_MSG : ""); return; }
+  if(r.silent){ $("heard").innerHTML = "無聽著聲。靠近麥克風再念一擺。"; return; }
+  serviceDown();                            /* 長問評分失敗：服務暫停，毋算念毋著 */
 }
 async function startRec(){
   if(stage !== "say" || micOn) return;

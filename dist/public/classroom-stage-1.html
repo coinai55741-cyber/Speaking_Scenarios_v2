@@ -283,6 +283,9 @@ window.addEventListener("message", e => {
       stars = 1;
       message = "同標準發音還有差，請再試一次。";
     }
+    let notice = "";
+    if (!cleanedGot && stage1AsrDown) notice = SERVICE_DOWN_MSG;           /* 客委會服務暫停：毋算唸毋著 */
+    else if (cleanedGot && !(result && result.pass) && countFailedAttempt()) notice = TOO_MANY_FAILS_MSG;
 
     if (doc) {
       const starsEl = doc.querySelector(".echo-stars");
@@ -300,6 +303,7 @@ window.addEventListener("message", e => {
       if (note) note.textContent = message;
       if (bNext) bNext.disabled = (stars === 0);
     }
+    if (notice) showStage1Notice(notice);
     if (asrTextEl) {
       asrTextEl.textContent = (cleanedGot ? "★★★".slice(0, stars) + "☆☆☆".slice(0, 3 - stars) : "無辨識到聲音");
     }
@@ -315,8 +319,13 @@ window.addEventListener("message", e => {
       const isMandarin = (currentLang === "zh");
       if(asrBadge) { asrBadge.style.display = "inline-flex"; asrTextEl.textContent = "聆聽中⋯⋯"; }
       const scoreWord = (frame.contentDocument?.querySelector(".echo-w")?.textContent?.trim()) || lastTargetWord || "";
+      stage1RecId++; stage1AsrDown = false;
+      resetFailedAttempts(scoreWord);
       if (window.HAKKA_SCORE) HAKKA_SCORE.setCurrent({ pinyin: pinyinForWord(scoreWord), text: scoreWord });
-      const scoreMethod = window.HAKKA_SCORE ? HAKKA_SCORE.resolve(pinyinForWord(scoreWord)).method : "hakka";
+      // 自動模式下有拼音个詞一律用長問評分（毋因為一擺評分失敗就改走客委會辨識）；開發者手動選个模式照舊
+      const scoreHasPinyin = !!pinyinForWord(scoreWord);
+      const scoreMethod = !window.HAKKA_SCORE ? "hakka"
+        : (HAKKA_SCORE.getMode() === "auto" && scoreHasPinyin ? "changwen" : HAKKA_SCORE.resolve(pinyinForWord(scoreWord)).method);
       stage1Scoring = (scoreMethod === "changwen");
       if (stage1Scoring) stage1ScoreSess = HAKKA_SCORE.startScoring(micStream);
 
@@ -340,6 +349,7 @@ window.addEventListener("message", e => {
       if(!stage1ScoreSess && window.HAKKA_REALTIME_ASR && window.HAKKA_REALTIME_ASR.createSession){
         try {
           if(currentAsrSession) { currentAsrSession.abort(); currentAsrSession = null; }
+          const asrRecId = stage1RecId;
           currentAsrSession = window.HAKKA_REALTIME_ASR.createSession({
             language: currentLang,
             onTranscript: (txt) => {
@@ -354,6 +364,8 @@ window.addEventListener("message", e => {
             },
             onError: (err) => {
               console.warn("Realtime ASR notice:", err);
+              /* 麥克風問題以外（票券、WebSocket、服務回應錯誤）當作服務暫停 */
+              if (asrRecId === stage1RecId && !/麥克風/.test(String(err || ""))) stage1AsrDown = true;
             }
           });
           currentAsrSession.start(micStream);
@@ -483,13 +495,49 @@ function pinyinForWord(k) {
   for (const lesson of GAME_WORDS) for (const w of lesson) if (w.k === k) return w.p || "";
   return "";
 }
+
+/* 辨識一直失敗時讓學生做得續下去（本頁个「下一題」係覆誦卡頂个「好了，續下去」）：
+ * - 服務連毋著（長問評分、客委會辨識票券／連線）：顯示暫停中、開放續下去，毋算唸毋著
+ * - 同一隻詞唸毋著 3 擺：開放續下去（這隻詞照樣無三粒星） */
+const MAX_FAILED_ATTEMPTS = 3;
+const SERVICE_DOWN_MSG = "客語辨識服務暫停中，請按「好了，續下去」繼續。";
+const TOO_MANY_FAILS_MSG = "這題先到這裡，可以按「好了，續下去」繼續，也可以再念一次。";
+let stage1RecId = 0, stage1AsrDown = false;
+let failedWordKey = "", failedCount = 0, failedCountedRec = -1;
+function resetFailedAttempts(word) {       /* 換詞正歸零，同一隻詞重錄照算 */
+  const key = currentLessonIdx + ":" + word;
+  if (key !== failedWordKey) { failedWordKey = key; failedCount = 0; failedCountedRec = -1; }
+}
+function countFailedAttempt() {            /* 同一擺錄音辨識結果會回來幾下，只算一擺 */
+  if (failedCountedRec !== stage1RecId) { failedCountedRec = stage1RecId; failedCount++; }
+  return failedCount >= MAX_FAILED_ATTEMPTS;
+}
+function showStage1Notice(message) {
+  /* 子畫面自家个比對評分會晏兜仔蓋過提示，過一下再補一擺（還係同一擺錄音、同一隻詞正補） */
+  const recId = stage1RecId;
+  const word = frame.contentDocument?.querySelector(".echo-w")?.textContent?.trim() || "";
+  const apply = () => {
+    const doc = frame.contentDocument;
+    if (!doc || recId !== stage1RecId) return;
+    if ((doc.querySelector(".echo-w")?.textContent?.trim() || "") !== word) return;
+    const note = doc.querySelector(".echo-note");
+    const bNext = doc.querySelector(".echo-next");
+    if (note) note.textContent = message;
+    if (bNext) bNext.disabled = false;
+  };
+  apply();
+  setTimeout(apply, 1500);
+}
+
 function awardFromScore(r) {
   /* stage1Scoring 留到下一擺錄音正改，免得原本辨識流程晏兜仔又蓋過評分結果 */
-  let stars, message;
+  let stars, message, notice = "";
   if (r.ok && r.pass) { stars = 3; message = "當著！發音正確。"; }
   else if (r.ok && r.score >= 40) { stars = 2; message = "當接近咧！再唸一擺看會較像無。"; }
   else if (r.ok) { stars = 1; message = "同標準發音還有差，請再試一次。"; }
   else { stars = 0; message = r.silent ? "無聽著聲音，請靠近麥克風再唸一擺。" : "評分無成功，請再唸一擺。"; }
+  if (!r.ok && !r.silent) notice = SERVICE_DOWN_MSG;                       /* 服務暫停：毋算唸毋著 */
+  else if (r.ok && !r.pass && countFailedAttempt()) notice = TOO_MANY_FAILS_MSG;
   const doc = frame.contentDocument;
   if (doc) {
     const starsEl = doc.querySelector(".echo-stars");
@@ -502,6 +550,7 @@ function awardFromScore(r) {
     if (note) note.textContent = message;
     if (bNext) bNext.disabled = (stars === 0);
   }
+  if (notice) showStage1Notice(notice);
   if (asrTextEl) asrTextEl.textContent = stars ? "★★★".slice(0, stars) + "☆☆☆".slice(0, 3 - stars) : "無辨識到聲音";
   renderDeveloperPanel();
 }

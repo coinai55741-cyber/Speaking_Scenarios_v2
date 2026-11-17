@@ -58,6 +58,10 @@
   let mediaRecorder = null;
   let audioChunks = [];
   let activeMandarinSession = null;
+  /* 題目頁開放「下一題」的題號（服務暫停或念錯 3 次時開放，不給分） */
+  let nextUnlockedFor = null;
+  /* 目前這題念錯次數（重念不歸零，換題才歸零） */
+  let wrongAttempts = { qId: null, count: 0 };
 
   // 是否切換至華語辨識
   function isMandarinMode() {
@@ -130,7 +134,6 @@
   // 渲染當前畫面與熱區按鈕
   function render() {
     screenImg.src = screens[state.screen];
-    hotspotLayer.innerHTML = "";
 
     const isMandarin = isMandarinMode();
     const q = qForScreen(state.screen);
@@ -158,8 +161,18 @@
     }
 
     updateDeveloperPanel();
+    renderHotspots();
+  }
 
-    const currentHotspots = hotspots[state.screen] || [];
+  // 建立當前畫面的熱區按鈕（題目頁已開放「下一題」時，沿用結算頁右下角的「下一題」熱區）
+  function renderHotspots() {
+    hotspotLayer.innerHTML = "";
+    const q = qForScreen(state.screen);
+    const unlocked = q && q.before === state.screen && nextUnlockedFor === q.id;
+    const unlockedNextBtn = document.getElementById("unlockedNextBtn");
+    if (unlockedNextBtn) unlockedNextBtn.style.display = unlocked ? "" : "none";
+    const currentHotspots = (hotspots[state.screen] || [])
+      .concat(unlocked ? (hotspots[q.after] || []).filter((h) => h.a === "next" || h.a === "finish") : []);
     currentHotspots.forEach((h) => {
       const btn = document.createElement("button");
       btn.className = "hotspot";
@@ -178,6 +191,28 @@
     helpTitle.textContent = title;
     helpText.textContent = text;
     helpPanel.hidden = false;
+  }
+
+  /* 辨識一直失敗時讓學生可以繼續往下（停在題目頁，不給分）：
+   * - 服務連不上（客委會、長問評分）：顯示暫停中、開放「下一題」，不算答錯
+   * - 同一題念錯 3 次：開放「下一題」，也可以再念一次 */
+  const MAX_FAILED_ATTEMPTS = 3;
+  function unlockNext(q) {
+    nextUnlockedFor = q.id;
+    if (state.screen === q.before) renderHotspots();
+  }
+
+  function showServiceUnavailable(q) {
+    unlockNext(q);
+    setAsrState("retry", "⚠️ 服務暫停", "客語辨識服務暫停中，請按「下一題」繼續。", "（尚無辨識文字）");
+  }
+
+  function countFailedAttempt(q) {
+    if (wrongAttempts.qId !== q.id) wrongAttempts = { qId: q.id, count: 0 };
+    wrongAttempts.count += 1;
+    if (wrongAttempts.count < MAX_FAILED_ATTEMPTS) return;
+    unlockNext(q);
+    asrMsg.textContent = "這題先到這裡，可以按「下一題」繼續，也可以再念一次。";
   }
 
   /* ─────────────────────────────────────────────────────────────
@@ -534,7 +569,10 @@
         if (isRecording) stopRecording();
       }, maxSec);
 
-      const scoreMethod = window.HAKKA_SCORE ? HAKKA_SCORE.resolve(QUESTION_PINYIN[q.id]).method : "hakka";
+      // 自動模式下有拼音的題目一律用長問評分（不因一次評分失敗就改走客委會辨識）；開發者手動選的模式照舊
+      const questionHasPinyin = !!QUESTION_PINYIN[q.id];
+      const scoreMethod = !window.HAKKA_SCORE ? "hakka"
+        : (HAKKA_SCORE.getMode() === "auto" && questionHasPinyin ? "changwen" : HAKKA_SCORE.resolve(QUESTION_PINYIN[q.id]).method);
       if (scoreMethod === "none") {
         isRecording = false; clearTimeout(recTimeout);
         mediaStream.getTracks().forEach((t) => t.stop()); mediaStream = null;
@@ -660,7 +698,7 @@
               mediaStream.getTracks().forEach((t) => t.stop());
               mediaStream = null;
             }
-            setAsrState("retry", "⚠️ 即時辨識提示", errMsg || "即時連線中斷，請再試一次。", "（尚無辨識文字）");
+            showServiceUnavailable(q);
             if (asrStatusText) asrStatusText.textContent = errMsg || "即時連線中斷";
           }
         );
@@ -698,7 +736,8 @@
         if (mediaStream) { mediaStream.getTracks().forEach((t) => t.stop()); mediaStream = null; }
         if (!q || qForScreen(state.screen) !== q) return;
         if (r.ok) handleRecognitionResult(q, "", { pass: r.pass, score: r.score });
-        else setAsrState("retry", "⚠️ 請再試一次", r.silent ? "沒有聽清楚聲音，請靠近麥克風再唸一次。" : "評分沒有成功，請再唸一次。", "（未完成評分）");
+        else if (r.silent) setAsrState("retry", "⚠️ 請再試一次", "沒有聽清楚聲音，請靠近麥克風再唸一次。", "（未完成評分）");
+        else showServiceUnavailable(q);
       });
       return;
     }
@@ -757,6 +796,7 @@
       }
 
       const payload = await response.json();
+      if (!isMandarin && payload?.error) throw new Error(String(payload.error));
 
       let text = "";
       if (payload && payload.status !== "not_enabled" && !payload.error) {
@@ -774,7 +814,8 @@
 
       handleRecognitionResult(q, text);
     } catch (e) {
-      setAsrState("retry", "⚠️ 辨識提示", isMandarin ? "華語辨識需要開啟本機後端。" : "客語 Vercel 檔案辨識暫時無法連線，請稍後再試。");
+      if (isMandarin) setAsrState("retry", "⚠️ 辨識提示", "華語辨識需要開啟本機後端。");
+      else showServiceUnavailable(q);
     }
   }
 
@@ -817,6 +858,7 @@
         (transcript || scored) ? "再試一次" : "（未偵測到清晰語音）"
       );
       if (asrStatusText) asrStatusText.textContent = `未通過比對（辨識為：${transcript || "無"}）`;
+      if (transcript || scored) countFailedAttempt(q);
     }
   }
 
@@ -896,7 +938,8 @@
 
     if (action === "next") {
       await playSfx("next");
-      state.screen = Math.min(11, state.screen + 1);
+      // 題目頁開放的「下一題」（服務暫停／念錯 3 次）：不經過答對結算圖，直接到下一題
+      state.screen = q && state.screen === q.before ? Math.min(11, q.after + 1) : Math.min(11, state.screen + 1);
       render();
       return;
     }
@@ -932,6 +975,8 @@
       completed: [false, false, false, false, false],
       badgePlayed: false
     };
+    nextUnlockedFor = null;
+    wrongAttempts = { qId: null, count: 0 };
     render();
     showToast("遊戲已重新開始！");
   }
@@ -979,6 +1024,14 @@
 
   // 綁定按鈕監聽
   document.getElementById("skipBtn")?.addEventListener("click", skipCurrentQuestion);
+  // 服務暫停／念錯 3 次後開放的「下一題」：不給分，直接到下一題
+  document.getElementById("unlockedNextBtn")?.addEventListener("click", async () => {
+    const q = qForScreen(state.screen);
+    if (!q || state.screen !== q.before || nextUnlockedFor !== q.id) return;
+    await playSfx("next");
+    state.screen = Math.min(11, q.after + 1);
+    render();
+  });
   document.getElementById("helpClose")?.addEventListener("click", () => {
     helpPanel.hidden = true;
   });

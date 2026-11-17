@@ -1264,6 +1264,10 @@ const SAY=(()=>{
     return "";
   }
   let scoreSess=null;
+  /* 辨識一直失敗時讓學生做得行下去：服務連毋著 → 暫停中、開「下一題」，毋算唸毋著；同一詞唸毋著 3 擺 → 開「下一題」（這題毋算著） */
+  const DOWN="客語辨識服務暫停中，請按「下一題」繼續。", MAXMISS=3;
+  let miss=0;
+  function countMiss(){ if(++miss<MAXMISS) return; bNext.disabled=false; res.textContent="這題先到這裡，可以按「下一題」繼續，也可以再念一次。"; }
   function judge(word, got){
     const g=[...String(got||"")].filter(c=>CJK.test(c)).join("");
     if(!g) return {v:-1, got:""};
@@ -1295,12 +1299,14 @@ const SAY=(()=>{
     elW.textContent=q.w; elW.className="sq-ans on";
     bHear.disabled=false; bNext.disabled=false;
     if(r.ok && r.pass){ right++; res.textContent="✓ 著咧！就係「"+q.w+"」。"; res.className="sq-res v2"; }
-    else if(r.ok){ res.textContent="發音還差兜仔。正解係「"+q.w+"」—— 撳「聽正解」跈等唸。"; res.className="sq-res v0"; }
-    else { res.textContent=(r.silent?"無聽著聲。":"評分無成功。")+"正解係「"+q.w+"」。"; res.className="sq-res"; }
+    else if(r.ok){ res.textContent="發音還差兜仔。正解係「"+q.w+"」—— 撳「聽正解」跈等唸。"; res.className="sq-res v0"; countMiss(); }
+    else if(r.silent){ res.textContent="無聽著聲。正解係「"+q.w+"」。"; res.className="sq-res"; }
+    else { res.textContent=DOWN; res.className="sq-res"; }
   }
   async function speak(){
     if(busy||recording) { if(recording) stopRec(); return; }
-    const method=window.HAKKA_SCORE?HAKKA_SCORE.resolve(wordPinyin(list[at]&&list[at].w)).method:"hakka";
+    const py=wordPinyin(list[at]&&list[at].w);   /* 有拼音个詞 auto 時固定用長問，毋轉客委會 */
+    const method=window.HAKKA_SCORE?(HAKKA_SCORE.getMode()==="auto"&&py?"changwen":HAKKA_SCORE.resolve(py).method):"hakka";
     if(method==="none"){ res.textContent="這題目前無法評分。"; res.className="sq-res"; return; }
     if(method==="changwen"){
       let st0;
@@ -1325,7 +1331,7 @@ const SAY=(()=>{
       if(kind==="wait"){ res.textContent="連線中⋯⋯"; res.className="sq-res"; return; }
       if(kind==="rec"){ res.textContent="講啊⋯⋯"; res.className="sq-res"; return; }
       if(kind==="err"){ stopRec(true); busy=false;
-        res.textContent="（"+msg+"）這題先過。"; res.className="sq-res";
+        res.textContent=DOWN; res.className="sq-res";
         bNext.disabled=false; return; }
       stopRec(true); busy=false; grade(msg).catch(()=>{});
     });
@@ -1359,10 +1365,10 @@ const SAY=(()=>{
     if(r.v===2){ right++;
       res.textContent="✓ 著咧！就係「"+q.w+"」。"; res.className="sq-res v2"; }
     else if(r.v===1){
-      res.textContent="～ 當接近。正解係「"+q.w+"」，撳「聽正解」跈等唸。"; res.className="sq-res v1"; }
+      res.textContent="～ 當接近。正解係「"+q.w+"」，撳「聽正解」跈等唸。"; res.className="sq-res v1"; countMiss(); }
     else if(r.v===0){
       res.textContent="發音還差兜仔。正解係「"+q.w+"」—— 撳「聽正解」跈等唸。";
-      res.className="sq-res v0"; }
+      res.className="sq-res v0"; countMiss(); }
     else {
       res.textContent="無聽著聲。正解係「"+q.w+"」。"; res.className="sq-res"; }
   }
@@ -1375,7 +1381,7 @@ const SAY=(()=>{
     elC.textContent=q.c;
     elW.textContent=""; elW.className="sq-ans";
     prog.textContent=(at+1)+" / "+list.length;
-    res.textContent=""; res.className="sq-res";
+    res.textContent=""; res.className="sq-res"; miss=0;
     bNext.disabled=true; bHear.disabled=true;
     bMic.disabled=false; bMic.textContent="🎤 講";
     renderDeveloperPanel();

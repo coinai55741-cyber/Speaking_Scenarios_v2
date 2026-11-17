@@ -59,6 +59,8 @@
       <div class="below-toolbar">
         <span class="badge" id="currentApiBadge">即時語音辨識（客語）</span>
         <button id="skipBtn" class="skip-btn" type="button">跳過本題 ➔</button>
+        <!-- 服務暫停或念錯 3 次時才出現：不給分，直接到下一題 -->
+        <button id="unlockedNextBtn" class="skip-btn" type="button" style="display:none">下一題 ➔</button>
         <button id="resetBtn" type="button">重新開始遊戲</button>
       </div>
     </footer>
@@ -108,7 +110,7 @@
   <!-- 載入遊戲資料與資源庫 -->
   <script src="./field-trip-data.js?v=20261116-sixian"></script>
   <!-- 載入遊戲主邏輯 -->
-  <script src="./field-trip.js?v=20261117-noscore"></script>
+  <script src="./field-trip.js?v=20261117-outage"></script>
 </body>
 
 </html>
