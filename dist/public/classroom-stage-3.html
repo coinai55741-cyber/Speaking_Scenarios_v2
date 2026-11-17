@@ -833,14 +833,14 @@ async function finishScore(){
   const r = await sess.finish();
   releaseMic();
   if(list[at] !== q || stage !== "say") return;
-  if(r.ok && r.pass){ $("heard").innerHTML = "念著咧：<b>" + q.w + "</b>（" + r.score + " 分）"; passed(); return; }
-  if(r.ok){ $("heard").innerHTML = "還差兜仔（" + r.score + " 分），撳「聽一擺」再跈等念看啊。"; return; }
+  if(r.ok && r.pass){ $("heard").innerHTML = "念著咧：<b>" + q.w + "</b>"; passed(); return; }
+  if(r.ok){ $("heard").innerHTML = "還差兜仔，撳「聽一擺」再跈等念看啊。"; return; }
   $("heard").innerHTML = r.silent ? "無聽著聲。靠近麥克風再念一擺。" : "評分無成功，請再念一擺。";
 }
 async function startRec(){
   if(stage !== "say" || micOn) return;
   const method = scoreMethod();
-  if(method === "none"){ $("heard").innerHTML = "這題無拼音，長問評分用毋著。"; return; }
+  if(method === "none"){ $("heard").innerHTML = "這題目前無法評分。"; return; }
   if(method !== "changwen" && !ASR_URL){ $("heard").innerHTML = "還吂設定辨識服務。搉下背該條算佢念著。"; return; }
   let st;
   try{ st = await getMic(); }

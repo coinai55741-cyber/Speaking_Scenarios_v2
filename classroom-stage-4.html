@@ -1162,7 +1162,7 @@ async function finishScore(){
   }
   $("bar").style.width = r.score + "%";
   $("bar").className = r.pass ? "pass" : "part";
-  $("score").textContent = r.score + " 分";
+  $("score").textContent = "";
   $("jtit").textContent = r.pass ? (r.score >= 90 ? "全中，蓋𠢕！" : "過咧") : "還差兜仔";
   $("judge").className = "judge on " + (r.pass ? "pass" : "part");
   if(r.pass){ passed.add(at); lanterns();
@@ -1171,7 +1171,7 @@ async function finishScore(){
 async function startRec(){
   if(micOn || !list[at]) return;
   const method = scoreMethod();
-  if(method === "none"){ $("heard").innerHTML = "這句無拼音，長問評分用毋著。"; return; }
+  if(method === "none"){ $("heard").innerHTML = "這句目前無法評分。"; return; }
   if(method !== "changwen" && !ASR_URL){ $("heard").innerHTML = "還吂設定辨識服務。搉下背該條算佢念著。"; return; }
   let st;
   try{ st = await getMic(); }

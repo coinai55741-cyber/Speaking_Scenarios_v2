@@ -486,9 +486,9 @@ function pinyinForWord(k) {
 function awardFromScore(r) {
   /* stage1Scoring 留到下一擺錄音正改，免得原本辨識流程晏兜仔又蓋過評分結果 */
   let stars, message;
-  if (r.ok && r.pass) { stars = 3; message = `當著！發音正確（${r.score} 分）。`; }
-  else if (r.ok && r.score >= 40) { stars = 2; message = `當接近咧（${r.score} 分）！再唸一擺看會較像無。`; }
-  else if (r.ok) { stars = 1; message = `同標準發音還有差（${r.score} 分），請再試一次。`; }
+  if (r.ok && r.pass) { stars = 3; message = "當著！發音正確。"; }
+  else if (r.ok && r.score >= 40) { stars = 2; message = "當接近咧！再唸一擺看會較像無。"; }
+  else if (r.ok) { stars = 1; message = "同標準發音還有差，請再試一次。"; }
   else { stars = 0; message = r.silent ? "無聽著聲音，請靠近麥克風再唸一擺。" : "評分無成功，請再唸一擺。"; }
   const doc = frame.contentDocument;
   if (doc) {

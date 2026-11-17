@@ -749,7 +749,7 @@ async function startSpeechRecording() {
     if (scoreMethod === "changwen") {
       breakfastScoreSess = HAKKA_SCORE.startScoring(speechStream);
     } else if (scoreMethod === "none") {
-      if (els.speechStatus) els.speechStatus.textContent = "這題沒有拼音，長問評分無法使用。";
+      if (els.speechStatus) els.speechStatus.textContent = "這題目前無法評分，請再試一次。";
     } else if (breakfastSpeechProvider() === "hakka" && breakfastRecognitionMode() === "realtime") {
       startRealtimeBreakfastSpeech();
     } else if (breakfastSpeechProvider() === "mandarin") {
@@ -927,7 +927,7 @@ async function finishSpeechRecording() {
     if (els.recordSpeechBtn) { els.recordSpeechBtn.disabled = false; setIconButton(els.recordSpeechBtn, "mic", "重新錄音"); }
     if (activeQuestions[currentIndex] !== question) return;
     if (r.ok) {
-      await handleSpeechAnswer("", question, { forcePass: r.pass, statusText: r.pass ? `唸對了！（${r.score} 分）` : `發音還不太一樣（${r.score} 分），再試一次。` });
+      await handleSpeechAnswer("", question, { forcePass: r.pass, statusText: r.pass ? "唸對了！" : "發音還不太一樣，再試一次。" });
     } else {
       els.feedback.hidden = false;
       els.feedback.textContent = question.hint;

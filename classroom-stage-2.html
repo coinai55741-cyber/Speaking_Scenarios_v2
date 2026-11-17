@@ -1294,14 +1294,14 @@ const SAY=(()=>{
     if(list[at]!==q) return;
     elW.textContent=q.w; elW.className="sq-ans on";
     bHear.disabled=false; bNext.disabled=false;
-    if(r.ok && r.pass){ right++; res.textContent="✓ 著咧！就係「"+q.w+"」（"+r.score+" 分）。"; res.className="sq-res v2"; }
-    else if(r.ok){ res.textContent="發音還差兜仔（"+r.score+" 分）。正解係「"+q.w+"」—— 撳「聽正解」跈等唸。"; res.className="sq-res v0"; }
+    if(r.ok && r.pass){ right++; res.textContent="✓ 著咧！就係「"+q.w+"」。"; res.className="sq-res v2"; }
+    else if(r.ok){ res.textContent="發音還差兜仔。正解係「"+q.w+"」—— 撳「聽正解」跈等唸。"; res.className="sq-res v0"; }
     else { res.textContent=(r.silent?"無聽著聲。":"評分無成功。")+"正解係「"+q.w+"」。"; res.className="sq-res"; }
   }
   async function speak(){
     if(busy||recording) { if(recording) stopRec(); return; }
     const method=window.HAKKA_SCORE?HAKKA_SCORE.resolve(wordPinyin(list[at]&&list[at].w)).method:"hakka";
-    if(method==="none"){ res.textContent="這題無拼音，長問評分用毋著。"; res.className="sq-res"; return; }
+    if(method==="none"){ res.textContent="這題目前無法評分。"; res.className="sq-res"; return; }
     if(method==="changwen"){
       let st0;
       try{ st0=await getMic(); }

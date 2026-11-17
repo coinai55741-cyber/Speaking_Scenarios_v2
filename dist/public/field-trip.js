@@ -538,7 +538,7 @@
       if (scoreMethod === "none") {
         isRecording = false; clearTimeout(recTimeout);
         mediaStream.getTracks().forEach((t) => t.stop()); mediaStream = null;
-        setAsrState("retry", "⚠️ 無法評分", "這題沒有拼音，長問評分無法使用。");
+        setAsrState("retry", "⚠️ 無法評分", "這題目前無法評分，請再試一次。");
         return;
       }
       if (scoreMethod === "changwen") {
@@ -693,7 +693,7 @@
     if (scoreSess) {
       const sess = scoreSess; scoreSess = null;
       const q = qForScreen(state.screen);
-      setAsrState("recording", "⏳ 評分中", "長問發音評分中⋯", "（評分中⋯）");
+      setAsrState("recording", "⏳ 評分中", "發音評分中⋯", "（評分中⋯）");
       sess.finish().then((r) => {
         if (mediaStream) { mediaStream.getTracks().forEach((t) => t.stop()); mediaStream = null; }
         if (!q || qForScreen(state.screen) !== q) return;
@@ -795,7 +795,7 @@
       setAsrState(
         "success",
         "✅ 辨識成功",
-        `命中「${targetTxt}」！${scored ? "（發音 " + scored.score + " 分）" : ""}獲得 20 分！請點擊右下角「下一題」繼續。`,
+        `命中「${targetTxt}」！獲得 20 分！請點擊右下角「下一題」繼續。`,
         "✓ 唸對了"
       );
       if (asrStatusText) asrStatusText.textContent = `✓ 辨識成功（命中 ${targetTxt}）`;
@@ -812,7 +812,7 @@
         "retry",
         "⚠️ 請再試一次",
         (transcript || scored)
-          ? `跟目標「${targetTxt}」的發音還不太一樣喔${scored ? "（" + scored.score + " 分）" : ""}！請點「聽一聽」重聽後再次挑戰。`
+          ? `跟目標「${targetTxt}」的發音還不太一樣喔！請點「聽一聽」重聽後再次挑戰。`
           : "沒有聽清楚聲音，請靠近麥克風再唸一次。",
         (transcript || scored) ? "再試一次" : "（未偵測到清晰語音）"
       );
