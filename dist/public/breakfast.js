@@ -61,6 +61,42 @@ function questionHakkaText(question) {
 if (window.HAKKA_SCORE) HAKKA_SCORE.configure({ isMandarin: () => breakfastSpeechProvider() === "mandarin" });
 let breakfastScoreSess = null;
 
+/* 多樣食物的題目：同一段錄音對每樣食物各評一次分，全部達標才過關；
+ * 只念到其中幾樣時回傳 partial，提示學生還少了一樣 */
+function startBreakfastScoring(question, stream) {
+  const parts = acceptedAnswers(question).map(answer => {
+    const food = findFood(answer);
+    return { name: answer, pinyin: food?.pinyin || "", text: food?.hakka || answer };
+  });
+  if (parts.length < 2) return HAKKA_SCORE.startScoring(stream);
+
+  const rec = HAKKA_SCORE.createRecorder(stream);
+  rec.start();
+  HAKKA_SCORE.setResult("錄音中⋯（多樣食物分開評分）");
+  return {
+    async finish() {
+      const wav = await rec.stop();
+      HAKKA_SCORE.setResult("評分中⋯");
+      const results = await Promise.all(parts.map(part => HAKKA_SCORE.score(wav, part.pinyin, { text: part.text })));
+      const failed = results.find(r => !r.ok);
+      if (failed) {
+        HAKKA_SCORE.setResult(`評分失敗：${failed.error}`);
+        if (HAKKA_SCORE.getMode() === "auto" && !failed.silent) HAKKA_SCORE.fallbackCurrent();
+        return failed;
+      }
+      const passedCount = results.filter(r => r.pass).length;
+      HAKKA_SCORE.setResult("分開評分：" + parts.map((part, i) => `${part.name} <b>${results[i].score} 分</b>`).join("、"));
+      return {
+        ok: true,
+        pass: passedCount === parts.length,
+        partial: passedCount > 0 && passedCount < parts.length,
+        score: Math.min(...results.map(r => r.score))
+      };
+    },
+    abort() { rec.abort(); }
+  };
+}
+
 function breakfastSpeechProvider() {
   const value = localStorage.getItem(BREAKFAST_PROVIDER_KEY) || "hakka";
   return value === "mandarin" ? "mandarin" : "hakka";
@@ -747,7 +783,7 @@ async function startSpeechRecording() {
     isSpeechRecording = true;
     const scoreMethod = window.HAKKA_SCORE ? HAKKA_SCORE.resolve(questionPinyin(activeQuestions[currentIndex])).method : "hakka";
     if (scoreMethod === "changwen") {
-      breakfastScoreSess = HAKKA_SCORE.startScoring(speechStream);
+      breakfastScoreSess = startBreakfastScoring(activeQuestions[currentIndex], speechStream);
     } else if (scoreMethod === "none") {
       if (els.speechStatus) els.speechStatus.textContent = "這題目前無法評分，請再試一次。";
     } else if (breakfastSpeechProvider() === "hakka" && breakfastRecognitionMode() === "realtime") {
@@ -927,7 +963,7 @@ async function finishSpeechRecording() {
     if (els.recordSpeechBtn) { els.recordSpeechBtn.disabled = false; setIconButton(els.recordSpeechBtn, "mic", "重新錄音"); }
     if (activeQuestions[currentIndex] !== question) return;
     if (r.ok) {
-      await handleSpeechAnswer("", question, { forcePass: r.pass, statusText: r.pass ? "唸對了！" : "發音還不太一樣，再試一次。" });
+      await handleSpeechAnswer("", question, { forcePass: r.pass, statusText: r.pass ? "唸對了！" : (r.partial ? "還少了一樣喔！" : "發音還不太一樣，再試一次。") });
     } else {
       els.feedback.hidden = false;
       els.feedback.textContent = question.hint;
