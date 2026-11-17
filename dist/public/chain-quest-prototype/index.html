@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>客語情境互動學習原型｜6大生活任務與連鎖分支</title>
-  <link rel="stylesheet" href="./style.css?v=20260916-nurse2">
+  <link rel="stylesheet" href="./style.css?v=20261117-devlock">
 </head>
 <body>
   <div class="layout-shell" id="layoutShell">
@@ -184,8 +184,8 @@
             </svg>
           </button>
 
-          <!-- 開發者模式切換開關 -->
-          <label class="dev-mode-toggle" title="切換顯示左側內部顯示與即時比對面板">
+          <!-- 開發者模式切換開關（對外隱藏；內部人員以 ?dev 輸入內部密碼後顯示） -->
+          <label class="dev-mode-toggle" id="devModeToggleWrap" title="切換顯示左側內部顯示與即時比對面板" hidden>
             <input id="debugToggle" type="checkbox">
             <span class="toggle-slider"></span>
             <span class="toggle-label">開發者模式</span>
@@ -449,7 +449,7 @@
     </div>
   </aside>
 
-  <script src="./app.js?v=20260916-drawer"></script>
+  <script src="./app.js?v=20261117-devlock"></script>
 </body>
 </html>
 

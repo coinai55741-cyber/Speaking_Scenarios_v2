@@ -49,6 +49,12 @@ try {
   scoreHandler = mod.default || mod;
 } catch (e) {}
 
+let devUnlockHandler = null;
+try {
+  const mod = require("./api/dev-unlock.js");
+  devUnlockHandler = mod.default || mod;
+} catch (e) {}
+
 const server = http.createServer((req, res) => {
   const urlObj = new URL(req.url, `http://localhost:${PORT}`);
   const pathname = decodeURIComponent(urlObj.pathname);
@@ -68,6 +74,9 @@ const server = http.createServer((req, res) => {
   }
   if (pathname === "/api/speech/recognize" || pathname === "/recognize") {
     if (recognizeHandler) return recognizeHandler(req, res);
+  }
+  if (pathname === "/api/dev-unlock") {
+    if (devUnlockHandler) return devUnlockHandler(req, res);
   }
 
   // 靜態檔案路由：支援根目錄與 dist/public 雙向自動尋找最新修改之檔案
