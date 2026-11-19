@@ -1569,6 +1569,14 @@ h1 {
   line-height: 1.05;
 }
 
+.participation-disclaimer {
+  margin: 10px 0 0;
+  color: var(--muted);
+  font-size: .85rem;
+  font-weight: 700;
+  line-height: 1.5;
+}
+
 .participation-page-avatar {
   width: min(100%, 280px);
   justify-self: end;
